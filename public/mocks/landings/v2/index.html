@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Ubudian — V2: The Village Bulletin Board</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;0,9..144,900;1,9..144,400&family=DM+Sans:wght@300;400;500;700&family=Caveat:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    /* Mockup Navigation */
+    .mock-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 9999;
+      background: rgba(30, 30, 30, 0.92);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      gap: 0;
+      padding: 0 1rem;
+      height: 40px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .mock-nav-label {
+      color: rgba(255,255,255,0.4);
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-right: 1rem;
+      white-space: nowrap;
+    }
+    .mock-nav a {
+      color: rgba(255,255,255,0.55);
+      text-decoration: none;
+      padding: 0.5rem 0.75rem;
+      border-radius: 4px;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+      line-height: 1;
+    }
+    .mock-nav a:hover {
+      color: rgba(255,255,255,0.9);
+      background: rgba(255,255,255,0.08);
+    }
+    .mock-nav a.active {
+      color: #fff;
+      background: rgba(255,255,255,0.13);
+      font-weight: 600;
+    }
+    body { padding-top: 40px; }
+
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      font-size: 16px;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background-color: #F5EDE0;
+      background-image:
+        repeating-linear-gradient(
+          0deg,
+          transparent,
+          transparent 50px,
+          rgba(0,0,0,0.015) 50px,
+          rgba(0,0,0,0.015) 51px
+        ),
+        repeating-linear-gradient(
+          90deg,
+          transparent,
+          transparent 50px,
+          rgba(0,0,0,0.01) 50px,
+          rgba(0,0,0,0.01) 51px
+        );
+      color: #2D2D2D;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 400;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Hero */
+    .hero {
+      text-align: center;
+      padding: 5rem 1.5rem 3rem;
+      position: relative;
+    }
+
+    .hero-title {
+      font-family: 'Fraunces', serif;
+      font-weight: 900;
+      font-size: 4.5rem;
+      letter-spacing: -0.02em;
+      line-height: 1;
+      transform: rotate(-2deg);
+      display: inline-block;
+      margin-bottom: 1rem;
+    }
+
+    .hero-subtitle {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1.2rem;
+      font-weight: 300;
+      color: #4A7C6F;
+      max-width: 500px;
+      margin: 0 auto 2.5rem;
+    }
+
+    .hero-arrow {
+      display: block;
+      margin: 0 auto;
+      width: 40px;
+      height: 60px;
+      opacity: 0.5;
+    }
+
+    /* Board Grid */
+    .board {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 4rem;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+
+    .board-item {
+      background: #FFFDF7;
+      border-radius: 4px;
+      padding: 1.5rem;
+      box-shadow: 2px 3px 12px rgba(0,0,0,0.08);
+      position: relative;
+      transition: transform 0.2s ease;
+    }
+
+    .board-item:hover {
+      transform: rotate(0deg) scale(1.02);
+    }
+
+    .board-item:nth-child(1) { transform: rotate(-1.5deg); }
+    .board-item:nth-child(2) { transform: rotate(1deg); }
+    .board-item:nth-child(3) { transform: rotate(-0.5deg); }
+    .board-item:nth-child(4) { transform: rotate(1.5deg); }
+    .board-item:nth-child(5) { transform: rotate(-1deg); }
+    .board-item:nth-child(6) { transform: rotate(2deg); }
+
+    /* Tape strip decoration */
+    .board-item::before {
+      content: '';
+      position: absolute;
+      top: -6px;
+      left: 50%;
+      transform: translateX(-50%) rotate(-3deg);
+      width: 50px;
+      height: 16px;
+      background: #E8C547;
+      opacity: 0.75;
+      border-radius: 2px;
+    }
+
+    .board-item:nth-child(even)::before {
+      transform: translateX(-50%) rotate(2deg);
+      background: #E8C547;
+    }
+
+    /* Polaroid story card */
+    .card-polaroid .card-image {
+      width: 100%;
+      aspect-ratio: 4/3;
+      background: linear-gradient(135deg, #C4A98A 0%, #D4B896 50%, #BFA07A 100%);
+      border-radius: 2px;
+      margin-bottom: 1rem;
+    }
+
+    .card-polaroid .card-caption {
+      font-family: 'Caveat', cursive;
+      font-size: 1.15rem;
+      color: #2D2D2D;
+      text-align: center;
+    }
+
+    /* Flyer card */
+    .card-flyer {
+      background: #4A7C6F !important;
+      color: #FFFDF7;
+    }
+
+    .card-flyer .flyer-label {
+      font-family: 'Caveat', cursive;
+      font-size: 0.9rem;
+      opacity: 0.8;
+      margin-bottom: 0.5rem;
+    }
+
+    .card-flyer .flyer-title {
+      font-family: 'Fraunces', serif;
+      font-weight: 700;
+      font-size: 1.4rem;
+      line-height: 1.3;
+      margin-bottom: 0.5rem;
+    }
+
+    .card-flyer .flyer-date {
+      font-size: 0.85rem;
+      opacity: 0.8;
+    }
+
+    .card-flyer-warm {
+      background: #C4705A !important;
+      color: #FFFDF7;
+    }
+
+    /* Postcard */
+    .card-postcard .postcard-image {
+      width: 100%;
+      aspect-ratio: 16/9;
+      background: linear-gradient(135deg, #8BAF8A 0%, #6B9A6E 50%, #4A7C6F 100%);
+      border-radius: 2px;
+      margin-bottom: 1rem;
+    }
+
+    .card-postcard .postcard-title {
+      font-family: 'Fraunces', serif;
+      font-weight: 500;
+      font-size: 1.1rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .card-postcard .postcard-desc {
+      font-size: 0.9rem;
+      color: #666;
+    }
+
+    /* Newsletter card */
+    .card-newsletter {
+      background: #E8C547 !important;
+      text-align: center;
+    }
+
+    .card-newsletter::before {
+      display: none;
+    }
+
+    .card-newsletter .newsletter-title {
+      font-family: 'Fraunces', serif;
+      font-weight: 700;
+      font-size: 1.6rem;
+      margin-bottom: 1rem;
+    }
+
+    .card-newsletter input[type="email"] {
+      width: 100%;
+      padding: 0.75rem;
+      border: 2px solid #2D2D2D;
+      background: #FFFDF7;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      border-radius: 4px;
+      outline: none;
+      margin-bottom: 0.75rem;
+    }
+
+    .card-newsletter button {
+      width: 100%;
+      padding: 0.75rem;
+      background: #2D2D2D;
+      color: #FFFDF7;
+      border: none;
+      border-radius: 4px;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .card-newsletter button:hover {
+      opacity: 0.85;
+    }
+
+    /* Note card */
+    .card-note {
+      background: #FFF9E6 !important;
+      text-align: center;
+    }
+
+    .card-note .note-text {
+      font-family: 'Caveat', cursive;
+      font-size: 1.3rem;
+      line-height: 1.5;
+      color: #2D2D2D;
+    }
+
+    /* Events Section */
+    .events-section {
+      padding: 3rem 1.5rem 4rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .events-title {
+      font-family: 'Fraunces', serif;
+      font-weight: 700;
+      font-size: 2rem;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
+    .events-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+    }
+
+    .event-card {
+      background: #FFFDF7;
+      border-radius: 8px;
+      padding: 1.5rem;
+      box-shadow: 1px 2px 8px rgba(0,0,0,0.06);
+    }
+
+    .event-card .event-category {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      background: #4A7C6F;
+      color: #FFFDF7;
+      padding: 0.2rem 0.6rem;
+      border-radius: 3px;
+      margin-bottom: 0.75rem;
+    }
+
+    .event-card .event-category.ceremony { background: #C4705A; }
+    .event-card .event-category.wellness { background: #4A7C6F; }
+    .event-card .event-category.food { background: #E8C547; color: #2D2D2D; }
+
+    .event-card .event-name {
+      font-family: 'Fraunces', serif;
+      font-weight: 500;
+      font-size: 1.15rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .event-card .event-date {
+      font-size: 0.85rem;
+      color: #888;
+    }
+
+    /* Humans Section */
+    .humans-section {
+      padding: 3rem 1.5rem 4rem;
+      max-width: 900px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .humans-title {
+      font-family: 'Fraunces', serif;
+      font-weight: 700;
+      font-size: 2rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .humans-grid {
+      display: flex;
+      justify-content: center;
+      gap: 2.5rem;
+      flex-wrap: wrap;
+    }
+
+    .human-card {
+      width: 200px;
+    }
+
+    .human-card:nth-child(1) { transform: rotate(-2deg); }
+    .human-card:nth-child(2) { transform: rotate(1deg); margin-top: 1rem; }
+    .human-card:nth-child(3) { transform: rotate(-1deg); }
+
+    .human-photo {
+      width: 180px;
+      height: 200px;
+      background: linear-gradient(135deg, #D9D2C7 0%, #C4A98A 100%);
+      margin: 0 auto;
+      padding: 10px 10px 40px 10px;
+      background-color: white;
+      box-shadow: 2px 3px 10px rgba(0,0,0,0.1);
+    }
+
+    .human-photo .photo-inner {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #D9D2C7 0%, #C4A98A 100%);
+    }
+
+    .human-name {
+      font-family: 'Caveat', cursive;
+      font-size: 1.2rem;
+      margin-top: 0.75rem;
+    }
+
+    .human-tagline {
+      font-size: 0.85rem;
+      color: #888;
+    }
+
+    /* Footer */
+    .footer {
+      background: #F5EDE0;
+      padding: 4rem 1.5rem;
+      text-align: center;
+      border-top: 2px dashed #D9D2C7;
+    }
+
+    .footer-text {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      color: #888;
+      margin-bottom: 1rem;
+    }
+
+    .footer-signoff {
+      font-family: 'Caveat', cursive;
+      font-size: 1.5rem;
+      color: #4A7C6F;
+      margin-bottom: 1.5rem;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 1.5rem;
+      justify-content: center;
+      margin-bottom: 2rem;
+    }
+
+    .footer-links a {
+      font-size: 0.85rem;
+      color: #888;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover {
+      color: #C4705A;
+    }
+
+    .footer-newsletter-sm input[type="email"] {
+      padding: 0.6rem 1rem;
+      border: 1px solid #D9D2C7;
+      background: #FFFDF7;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem;
+      border-radius: 4px;
+      outline: none;
+      width: 220px;
+      max-width: 100%;
+    }
+
+    .footer-newsletter-sm button {
+      padding: 0.6rem 1rem;
+      background: #C4705A;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 700;
+      font-size: 0.8rem;
+      cursor: pointer;
+      margin-left: 0.5rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hero-title {
+        font-size: 3rem;
+      }
+
+      .board {
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
+      }
+
+      .board-item {
+        transform: none !important;
+      }
+
+      .board-item:nth-child(odd) { transform: rotate(-1deg) !important; }
+      .board-item:nth-child(even) { transform: rotate(0.5deg) !important; }
+
+      .events-row {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+
+      .humans-grid {
+        gap: 1.5rem;
+      }
+
+      .human-card {
+        transform: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="mock-nav">
+    <span class="mock-nav-label">Mocks</span>
+    <a href="../v1/index.html">V1 Letter</a>
+    <a href="../v2/index.html" class="active">V2 Board</a>
+    <a href="../v3/index.html">V3 Temple</a>
+    <a href="../v4/index.html">V4 Magazine</a>
+    <a href="../v5/index.html">V5 Circle</a>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <h1 class="hero-title">The Ubudian</h1>
+    <p class="hero-subtitle">Ubud's community board — stories, events, and good vibes.</p>
+    <svg class="hero-arrow" viewBox="0 0 40 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M20 0 C18 20, 22 30, 20 45 M12 38 L20 48 L28 38" stroke="#2D2D2D" stroke-width="2" stroke-linecap="round" fill="none"/>
+    </svg>
+  </section>
+
+  <!-- Board -->
+  <section class="board">
+    <!-- Polaroid story -->
+    <div class="board-item card-polaroid">
+      <div class="card-image"></div>
+      <p class="card-caption">Kadek at the morning market — she's been selling jamu since 1987</p>
+    </div>
+
+    <!-- Flyer: Event -->
+    <div class="board-item card-flyer">
+      <p class="flyer-label">this saturday</p>
+      <h3 class="flyer-title">Full Moon Sound Healing at Pyramids of Chi</h3>
+      <p class="flyer-date">Feb 14 — 7:30 PM</p>
+    </div>
+
+    <!-- Newsletter CTA -->
+    <div class="board-item card-newsletter">
+      <h3 class="newsletter-title">Get the weekly letter</h3>
+      <form onsubmit="return false;">
+        <input type="email" placeholder="your@email.com">
+        <button type="submit">Count me in</button>
+      </form>
+    </div>
+
+    <!-- Postcard: Tour -->
+    <div class="board-item card-postcard">
+      <div class="postcard-image"></div>
+      <h3 class="postcard-title">Hidden Waterfall Walk</h3>
+      <p class="postcard-desc">A morning trek to three waterfalls the guidebooks forgot.</p>
+    </div>
+
+    <!-- Flyer: Event 2 -->
+    <div class="board-item card-flyer card-flyer-warm">
+      <p class="flyer-label">every wednesday</p>
+      <h3 class="flyer-title">Ecstatic Dance at The Yoga Barn</h3>
+      <p class="flyer-date">Wednesdays — 5:30 PM</p>
+    </div>
+
+    <!-- Note -->
+    <div class="board-item card-note">
+      <p class="note-text">"In Ubud, strangers are just friends you haven't had coffee with yet." ☕</p>
+    </div>
+  </section>
+
+  <!-- Events -->
+  <section class="events-section">
+    <h2 class="events-title">What's Happening This Week</h2>
+    <div class="events-row">
+      <div class="event-card">
+        <span class="event-category ceremony">Ceremony</span>
+        <h3 class="event-name">Galungan Celebration</h3>
+        <p class="event-date">Feb 14 &middot; All Day</p>
+      </div>
+      <div class="event-card">
+        <span class="event-category wellness">Wellness</span>
+        <h3 class="event-name">Morning Yoga &amp; Breathwork</h3>
+        <p class="event-date">Feb 15 &middot; 7:00 AM</p>
+      </div>
+      <div class="event-card">
+        <span class="event-category food">Food</span>
+        <h3 class="event-name">Balinese Cooking with Ibu Mangku</h3>
+        <p class="event-date">Feb 17 &middot; 10:00 AM</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Humans -->
+  <section class="humans-section">
+    <h2 class="humans-title">Meet the Humans</h2>
+    <div class="humans-grid">
+      <div class="human-card">
+        <div class="human-photo"><div class="photo-inner"></div></div>
+        <p class="human-name">Wayan Sudarma</p>
+        <p class="human-tagline">Healer, Penestanan</p>
+      </div>
+      <div class="human-card">
+        <div class="human-photo"><div class="photo-inner"></div></div>
+        <p class="human-name">Sophia Laurent</p>
+        <p class="human-tagline">Ceramicist, Ubud</p>
+      </div>
+      <div class="human-card">
+        <div class="human-photo"><div class="photo-inner"></div></div>
+        <p class="human-name">Made Artika</p>
+        <p class="human-tagline">Woodcarver, Mas Village</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p class="footer-signoff">See you around Ubud ✌️</p>
+    <div class="footer-links">
+      <a href="#">Instagram</a>
+      <a href="#">About</a>
+      <a href="#">Contact</a>
+    </div>
+    <div class="footer-newsletter-sm">
+      <form onsubmit="return false;">
+        <input type="email" placeholder="Your email">
+        <button type="submit">Subscribe</button>
+      </form>
+    </div>
+    <p class="footer-text" style="margin-top: 2rem;">The Ubudian — Ubud, Bali</p>
+  </footer>
+
+</body>
+</html>
