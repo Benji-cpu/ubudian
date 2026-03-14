@@ -10,6 +10,8 @@ import { slugify } from "@/lib/utils";
 import { TOUR_THEMES } from "@/lib/constants";
 import { RichTextEditor } from "@/components/admin/rich-text-editor";
 import { MultiImageUploader } from "@/components/admin/multi-image-uploader";
+import { TagInput } from "@/components/admin/tag-input";
+import { ARCHETYPE_IDS } from "@/lib/quiz-data";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -63,6 +65,7 @@ const tourSchema = z.object({
   booking_whatsapp: z.string().optional().or(z.literal("")),
   booking_email: z.string().optional().or(z.literal("")),
   is_active: z.boolean(),
+  archetype_tags: z.array(z.enum(["seeker", "explorer", "creative", "connector", "epicurean"])),
 });
 
 type TourFormValues = z.infer<typeof tourSchema>;
@@ -99,6 +102,7 @@ export function TourForm({ initialData }: TourFormProps) {
       booking_whatsapp: initialData?.booking_whatsapp ?? "",
       booking_email: initialData?.booking_email ?? "",
       is_active: initialData?.is_active ?? true,
+      archetype_tags: initialData?.archetype_tags ?? [],
     },
   });
 
@@ -131,6 +135,7 @@ export function TourForm({ initialData }: TourFormProps) {
       booking_whatsapp: data.booking_whatsapp || null,
       booking_email: data.booking_email || null,
       is_active: data.is_active,
+      archetype_tags: data.archetype_tags,
     };
 
     let error;
@@ -311,6 +316,21 @@ export function TourForm({ initialData }: TourFormProps) {
 
             <FormField
               control={form.control}
+              name="archetype_tags"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Archetype Tags</FormLabel>
+                  <FormControl>
+                    <TagInput options={ARCHETYPE_IDS} value={field.value} onChange={field.onChange} />
+                  </FormControl>
+                  <FormDescription>Tag for personalized recommendations</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
               name="photo_urls"
               render={({ field }) => (
                 <FormItem>
@@ -365,7 +385,7 @@ export function TourForm({ initialData }: TourFormProps) {
                 name="price_per_person"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Price (IDR)</FormLabel>
+                    <FormLabel>Price (USD cents)</FormLabel>
                     <FormControl>
                       <Input type="number" placeholder="500000" {...field} />
                     </FormControl>

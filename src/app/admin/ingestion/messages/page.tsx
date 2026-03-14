@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { RawMessageCard } from "@/components/admin/ingestion/raw-message-card";
+import { ReparseFailedButton } from "@/components/admin/ingestion/reparse-failed-button";
 import type { RawIngestionMessage, EventSource } from "@/types";
 
 export default async function RawMessagesPage({
@@ -27,9 +28,10 @@ export default async function RawMessagesPage({
     query = query.eq("source_id", params.source);
   }
 
-  const [{ data: messages }, { data: sources }] = await Promise.all([
+  const [{ data: messages }, { data: sources }, { count: failedCount }] = await Promise.all([
     query,
     supabase.from("event_sources").select("id, name"),
+    supabase.from("raw_ingestion_messages").select("id", { count: "exact", head: true }).eq("status", "failed"),
   ]);
 
   const allMessages = (messages ?? []) as RawIngestionMessage[];
@@ -42,13 +44,16 @@ export default async function RawMessagesPage({
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-3">
-        <Button asChild variant="ghost" size="sm">
-          <Link href="/admin/ingestion">
-            <ArrowLeft className="h-4 w-4" />
-          </Link>
-        </Button>
-        <h1 className="text-3xl font-bold">Raw Messages</h1>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <Button asChild variant="ghost" size="sm">
+            <Link href="/admin/ingestion">
+              <ArrowLeft className="h-4 w-4" />
+            </Link>
+          </Button>
+          <h1 className="text-3xl font-bold">Raw Messages</h1>
+        </div>
+        <ReparseFailedButton failedCount={failedCount ?? 0} />
       </div>
 
       <div className="flex items-center gap-2">
@@ -79,13 +84,19 @@ export default async function RawMessagesPage({
         </div>
       ) : (
         <div className="space-y-4">
-          {allMessages.map((msg) => (
-            <RawMessageCard
-              key={msg.id}
-              message={msg}
-              sourceName={sourceNames[msg.source_id] || "Unknown"}
-            />
-          ))}
+          {allMessages.map((msg) => {
+            const rawData = msg.raw_data as Record<string, unknown> | null;
+            const payload = rawData?.payload as Record<string, unknown> | undefined;
+            const groupName = (payload?.chatName as string) || undefined;
+            return (
+              <RawMessageCard
+                key={msg.id}
+                message={msg}
+                sourceName={sourceNames[msg.source_id] || "Unknown"}
+                groupName={groupName}
+              />
+            );
+          })}
         </div>
       )}
     </div>

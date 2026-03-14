@@ -13,14 +13,50 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Plus, Calendar, ShieldCheck } from "lucide-react";
-import type { Event } from "@/types";
+import { Plus, Calendar, ShieldCheck, Bot } from "lucide-react";
+import type { Event, EventSource } from "@/types";
 import { DeleteEventButton } from "./delete-button";
 
 interface TrustedSubmitter {
   email: string;
   approved_count: number;
   auto_approve: boolean;
+}
+
+const sourceBadgeStyles: Record<string, string> = {
+  telegram: "border-blue-300 text-blue-700 bg-blue-50",
+  whatsapp: "border-green-300 text-green-700 bg-green-50",
+  api: "border-purple-300 text-purple-700 bg-purple-50",
+  scraper: "border-orange-300 text-orange-700 bg-orange-50",
+};
+
+const sourceEmoji: Record<string, string> = {
+  telegram: "📨",
+  whatsapp: "💬",
+  api: "🔗",
+  scraper: "🔗",
+};
+
+function SourceBadge({ event, sourceMap }: { event: Event; sourceMap: Record<string, EventSource> }) {
+  if (!event.source_id) return null;
+  const source = sourceMap[event.source_id];
+  if (!source) return null;
+
+  const styles = sourceBadgeStyles[source.source_type] ?? "border-gray-300 text-gray-700 bg-gray-50";
+  const emoji = sourceEmoji[source.source_type] ?? "🔗";
+
+  return (
+    <span className="inline-flex items-center gap-1">
+      <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-medium ${styles}`}>
+        {emoji} {source.source_type.charAt(0).toUpperCase() + source.source_type.slice(1)}
+      </span>
+      {event.llm_parsed && (
+        <span className="inline-flex items-center gap-0.5 rounded-full border border-amber-300 bg-amber-50 px-1.5 py-0.5 text-[10px] font-medium text-amber-700">
+          <Bot className="h-2.5 w-2.5" /> AI
+        </span>
+      )}
+    </span>
+  );
 }
 
 const statusVariant: Record<string, "secondary" | "default" | "outline" | "destructive"> = {
@@ -30,7 +66,7 @@ const statusVariant: Record<string, "secondary" | "default" | "outline" | "destr
   archived: "outline",
 };
 
-function EventTable({ items, trustedMap }: { items: Event[]; trustedMap: Record<string, TrustedSubmitter> }) {
+function EventTable({ items, trustedMap, sourceMap }: { items: Event[]; trustedMap: Record<string, TrustedSubmitter>; sourceMap: Record<string, EventSource> }) {
   if (items.length === 0) {
     return (
       <div className="py-8 text-center text-sm text-muted-foreground">
@@ -47,6 +83,7 @@ function EventTable({ items, trustedMap }: { items: Event[]; trustedMap: Record<
           <TableHead>Category</TableHead>
           <TableHead>Date</TableHead>
           <TableHead>Venue</TableHead>
+          <TableHead>Source</TableHead>
           <TableHead>Status</TableHead>
           <TableHead className="text-right">Actions</TableHead>
         </TableRow>
@@ -82,6 +119,9 @@ function EventTable({ items, trustedMap }: { items: Event[]; trustedMap: Record<
               {event.venue_name || "—"}
             </TableCell>
             <TableCell>
+              <SourceBadge event={event} sourceMap={sourceMap} />
+            </TableCell>
+            <TableCell>
               <Badge variant={statusVariant[event.status]}>
                 {event.status}
               </Badge>
@@ -104,15 +144,20 @@ function EventTable({ items, trustedMap }: { items: Event[]; trustedMap: Record<
 export default async function AdminEventsPage() {
   const supabase = await createClient();
 
-  const [{ data: events }, { data: trusted }] = await Promise.all([
+  const [{ data: events }, { data: trusted }, { data: sources }] = await Promise.all([
     supabase.from("events").select("*").order("created_at", { ascending: false }),
     supabase.from("trusted_submitters").select("*"),
+    supabase.from("event_sources").select("id, name, slug, source_type"),
   ]);
 
   const allEvents = (events ?? []) as Event[];
   const trustedMap: Record<string, TrustedSubmitter> = {};
   ((trusted ?? []) as TrustedSubmitter[]).forEach((t) => {
     trustedMap[t.email] = t;
+  });
+  const sourceMap: Record<string, EventSource> = {};
+  ((sources ?? []) as EventSource[]).forEach((s) => {
+    sourceMap[s.id] = s;
   });
 
   const pending = allEvents.filter((e) => e.status === "pending");
@@ -173,16 +218,16 @@ export default async function AdminEventsPage() {
             <TabsTrigger value="other">Rejected/Archived ({other.length})</TabsTrigger>
           </TabsList>
           <TabsContent value="all" className="mt-4">
-            <EventTable items={allEvents} trustedMap={trustedMap} />
+            <EventTable items={allEvents} trustedMap={trustedMap} sourceMap={sourceMap} />
           </TabsContent>
           <TabsContent value="pending" className="mt-4">
-            <EventTable items={pending} trustedMap={trustedMap} />
+            <EventTable items={pending} trustedMap={trustedMap} sourceMap={sourceMap} />
           </TabsContent>
           <TabsContent value="approved" className="mt-4">
-            <EventTable items={approved} trustedMap={trustedMap} />
+            <EventTable items={approved} trustedMap={trustedMap} sourceMap={sourceMap} />
           </TabsContent>
           <TabsContent value="other" className="mt-4">
-            <EventTable items={other} trustedMap={trustedMap} />
+            <EventTable items={other} trustedMap={trustedMap} sourceMap={sourceMap} />
           </TabsContent>
         </Tabs>
       </div>

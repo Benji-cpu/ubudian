@@ -49,6 +49,8 @@ CREATE TABLE blog_posts (
   published_at TIMESTAMPTZ,
   meta_title TEXT,
   meta_description TEXT,
+  is_placeholder BOOLEAN DEFAULT FALSE,
+  archetype_tags TEXT[] DEFAULT '{}',
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -67,6 +69,8 @@ CREATE TABLE stories (
   published_at TIMESTAMPTZ,
   meta_title TEXT,
   meta_description TEXT,
+  is_placeholder BOOLEAN DEFAULT FALSE,
+  archetype_tags TEXT[] DEFAULT '{}',
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -151,6 +155,8 @@ CREATE TABLE events (
   submitted_by_email TEXT,
   is_trusted_submitter BOOLEAN DEFAULT FALSE,
   rejection_reason TEXT,
+  is_placeholder BOOLEAN DEFAULT FALSE,
+  archetype_tags TEXT[] DEFAULT '{}',
   -- Ingestion columns
   source_id UUID REFERENCES event_sources(id) ON DELETE SET NULL,
   source_event_id TEXT,
@@ -180,6 +186,8 @@ CREATE TABLE tours (
   booking_whatsapp TEXT,
   booking_email TEXT,
   is_active BOOLEAN DEFAULT TRUE,
+  is_placeholder BOOLEAN DEFAULT FALSE,
+  archetype_tags TEXT[] DEFAULT '{}',
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -212,6 +220,7 @@ CREATE TABLE newsletter_subscribers (
   beehiiv_subscriber_id TEXT,
   status TEXT DEFAULT 'active',
   source TEXT DEFAULT 'website',
+  archetype TEXT,
   subscribed_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -240,6 +249,19 @@ CREATE TABLE dedup_matches (
   metadata JSONB DEFAULT '{}',
   created_at TIMESTAMPTZ DEFAULT NOW(),
   UNIQUE(event_a_id, event_b_id)
+);
+
+CREATE TABLE unresolved_venues (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  raw_name TEXT NOT NULL,
+  normalized_name TEXT UNIQUE NOT NULL,
+  seen_count INTEGER DEFAULT 1,
+  first_seen_at TIMESTAMPTZ DEFAULT NOW(),
+  last_seen_at TIMESTAMPTZ DEFAULT NOW(),
+  status TEXT NOT NULL DEFAULT 'unresolved',
+  resolved_canonical_name TEXT,
+  resolved_at TIMESTAMPTZ,
+  resolved_by UUID REFERENCES profiles(id)
 );
 
 CREATE TABLE trusted_submitters (
@@ -463,6 +485,23 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- ============================================
+-- VENUE SEEN COUNT FUNCTION
+-- ============================================
+
+CREATE OR REPLACE FUNCTION increment_venue_seen_count(
+  p_normalized_name TEXT,
+  p_raw_name TEXT
+) RETURNS VOID AS $$
+BEGIN
+  INSERT INTO unresolved_venues (raw_name, normalized_name, seen_count, first_seen_at, last_seen_at, status)
+  VALUES (p_raw_name, p_normalized_name, 1, NOW(), NOW(), 'unresolved')
+  ON CONFLICT (normalized_name) DO UPDATE SET
+    seen_count = unresolved_venues.seen_count + 1,
+    last_seen_at = NOW();
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- ============================================
 -- STORAGE BUCKET
 -- ============================================
 
@@ -496,6 +535,7 @@ ALTER TABLE ingestion_runs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE raw_ingestion_messages ENABLE ROW LEVEL SECURITY;
 ALTER TABLE venue_aliases ENABLE ROW LEVEL SECURITY;
 ALTER TABLE dedup_matches ENABLE ROW LEVEL SECURITY;
+ALTER TABLE unresolved_venues ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Admins can manage event sources"
   ON event_sources FOR ALL
@@ -521,6 +561,176 @@ CREATE POLICY "Admins can manage dedup matches"
   ON dedup_matches FOR ALL
   USING (public.is_admin());
 
+CREATE POLICY "Admins can manage unresolved venues"
+  ON unresolved_venues FOR ALL
+  USING (public.is_admin());
+
+-- ============================================
+-- SEED DATA: VENUE ALIASES
+-- ============================================
+
+INSERT INTO venue_aliases (canonical_name, alias) VALUES
+  ('The Yoga Barn', 'Yoga Barn'),
+  ('The Yoga Barn', 'yoga barn ubud'),
+  ('The Yoga Barn', 'The Yoga Barn Ubud'),
+  ('Pyramids of Chi', 'pyramids of chi ubud'),
+  ('Pyramids of Chi', 'Pyramids Of Chi Ubud'),
+  ('Pyramids of Chi', 'POC Ubud'),
+  ('Outpost', 'Outpost Ubud'),
+  ('Outpost', 'outpost coworking'),
+  ('Outpost', 'Outpost Co-working'),
+  ('Hubud', 'Hubud Bali'),
+  ('Hubud', 'hubud coworking'),
+  ('Alchemy', 'Alchemy Ubud'),
+  ('Alchemy', 'Alchemy Bali'),
+  ('CP Lounge', 'CP Lounge Ubud'),
+  ('CP Lounge', 'CPUB'),
+  ('Ubud Palace', 'Puri Saren Agung'),
+  ('Ubud Palace', 'Puri Saren'),
+  ('ARMA Museum', 'Agung Rai Museum of Art'),
+  ('ARMA Museum', 'ARMA'),
+  ('Neka Art Museum', 'Neka Museum'),
+  ('Neka Art Museum', 'Neka'),
+  ('Museum Puri Lukisan', 'Puri Lukisan'),
+  ('Museum Puri Lukisan', 'Puri Lukisan Museum'),
+  ('Intuitive Flow', 'Intuitive Flow Yoga'),
+  ('Intuitive Flow', 'Intuitive Flow Ubud'),
+  ('Radiantly Alive', 'Radiantly Alive Yoga'),
+  ('Radiantly Alive', 'Radiantly Alive Ubud'),
+  ('Taksu', 'Taksu Ubud'),
+  ('Taksu', 'Taksu Spa'),
+  ('Bridges Bali', 'Bridges Restaurant'),
+  ('Bridges Bali', 'Bridges Ubud'),
+  ('Locavore', 'Locavore Ubud'),
+  ('Locavore', 'Locavore Restaurant'),
+  ('Sacred Monkey Forest Sanctuary', 'Monkey Forest'),
+  ('Sacred Monkey Forest Sanctuary', 'Monkey Forest Ubud'),
+  ('Sacred Monkey Forest Sanctuary', 'Sacred Monkey Forest'),
+  ('Campuhan Ridge Walk', 'Campuhan Ridge'),
+  ('Campuhan Ridge Walk', 'Campuhan Walk'),
+  ('Fivelements', 'Fivelements Bali'),
+  ('Fivelements', 'Five Elements'),
+  ('Bambu Indah', 'Bambu Indah Ubud'),
+  ('Komaneka', 'Komaneka at Bisma'),
+  ('Komaneka', 'Komaneka Ubud'),
+  ('BaliSpirit Festival Grounds', 'BaliSpirit Festival'),
+  ('BaliSpirit Festival Grounds', 'Bali Spirit Festival')
+ON CONFLICT (alias) DO NOTHING;
+
+-- ============================================
+-- STRIPE INTEGRATION: ALTER EXISTING TABLES
+-- ============================================
+
+ALTER TABLE profiles ADD COLUMN stripe_customer_id TEXT UNIQUE;
+ALTER TABLE tours ADD COLUMN stripe_price_id TEXT;
+ALTER TABLE blog_posts ADD COLUMN is_members_only BOOLEAN DEFAULT FALSE;
+ALTER TABLE stories ADD COLUMN is_members_only BOOLEAN DEFAULT FALSE;
+
+-- ============================================
+-- BOOKINGS TABLE (tour booking records)
+-- ============================================
+
+CREATE TABLE bookings (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tour_id UUID NOT NULL REFERENCES tours(id) ON DELETE CASCADE,
+  profile_id UUID REFERENCES profiles(id) ON DELETE SET NULL,
+  guest_name TEXT NOT NULL,
+  guest_email TEXT NOT NULL,
+  guest_phone TEXT,
+  num_guests INTEGER NOT NULL DEFAULT 1,
+  preferred_date DATE NOT NULL,
+  special_requests TEXT,
+  price_per_person INTEGER NOT NULL,  -- cents USD
+  total_amount INTEGER NOT NULL,       -- cents USD
+  currency TEXT NOT NULL DEFAULT 'usd',
+  stripe_checkout_session_id TEXT UNIQUE,
+  stripe_payment_intent_id TEXT,
+  stripe_payment_status TEXT DEFAULT 'unpaid', -- unpaid/paid/failed/refunded
+  status TEXT NOT NULL DEFAULT 'pending', -- pending/confirmed/cancelled/completed/refunded
+  booking_reference TEXT UNIQUE NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- ============================================
+-- SUBSCRIPTIONS TABLE (membership records)
+-- ============================================
+
+CREATE TABLE subscriptions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  profile_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  stripe_subscription_id TEXT UNIQUE NOT NULL,
+  stripe_customer_id TEXT NOT NULL,
+  stripe_price_id TEXT,
+  status TEXT NOT NULL DEFAULT 'incomplete', -- active/trialing/past_due/canceled/unpaid/incomplete
+  plan_name TEXT NOT NULL DEFAULT 'Ubudian Insider',
+  interval TEXT NOT NULL DEFAULT 'month', -- month/year
+  current_period_start TIMESTAMPTZ,
+  current_period_end TIMESTAMPTZ,
+  cancel_at_period_end BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- ============================================
+-- PAYMENTS TABLE (unified transaction log)
+-- ============================================
+
+CREATE TABLE payments (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  profile_id UUID REFERENCES profiles(id) ON DELETE SET NULL,
+  payment_type TEXT NOT NULL, -- tour_booking/subscription
+  booking_id UUID REFERENCES bookings(id) ON DELETE SET NULL,
+  subscription_id UUID REFERENCES subscriptions(id) ON DELETE SET NULL,
+  stripe_payment_intent_id TEXT,
+  stripe_invoice_id TEXT,
+  stripe_charge_id TEXT,
+  amount INTEGER NOT NULL, -- cents
+  currency TEXT NOT NULL DEFAULT 'usd',
+  status TEXT NOT NULL DEFAULT 'pending', -- pending/succeeded/failed/refunded
+  receipt_url TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- ============================================
+-- STRIPE TABLES: RLS
+-- ============================================
+
+ALTER TABLE bookings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE subscriptions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE payments ENABLE ROW LEVEL SECURITY;
+
+-- Bookings: users can read own, admins can manage all
+CREATE POLICY "Users can read own bookings"
+  ON bookings FOR SELECT
+  TO authenticated
+  USING (profile_id = auth.uid() OR guest_email = (SELECT email FROM profiles WHERE id = auth.uid()));
+
+CREATE POLICY "Admins can manage bookings"
+  ON bookings FOR ALL
+  USING (public.is_admin());
+
+-- Subscriptions: users can read own, admins can manage all
+CREATE POLICY "Users can read own subscriptions"
+  ON subscriptions FOR SELECT
+  TO authenticated
+  USING (profile_id = auth.uid());
+
+CREATE POLICY "Admins can manage subscriptions"
+  ON subscriptions FOR ALL
+  USING (public.is_admin());
+
+-- Payments: users can read own, admins can manage all
+CREATE POLICY "Users can read own payments"
+  ON payments FOR SELECT
+  TO authenticated
+  USING (profile_id = auth.uid());
+
+CREATE POLICY "Admins can manage payments"
+  ON payments FOR ALL
+  USING (public.is_admin());
+
 -- ============================================
 -- PERFORMANCE INDEXES
 -- ============================================
@@ -542,3 +752,27 @@ CREATE INDEX idx_dedup_matches_status ON dedup_matches(status);
 CREATE INDEX idx_events_source ON events(source_id);
 CREATE INDEX idx_events_fingerprint ON events(content_fingerprint);
 CREATE INDEX idx_events_source_event_id ON events(source_id, source_event_id);
+CREATE INDEX idx_events_source_url ON events(source_url);
+CREATE INDEX idx_quiz_results_email ON quiz_results(email);
+CREATE INDEX idx_quiz_results_primary_archetype ON quiz_results(primary_archetype);
+CREATE INDEX idx_quiz_results_created_at ON quiz_results(created_at DESC);
+CREATE INDEX idx_event_sources_type ON event_sources(source_type);
+CREATE INDEX idx_venue_aliases_canonical ON venue_aliases(canonical_name);
+CREATE INDEX idx_dedup_matches_events ON dedup_matches(event_a_id, event_b_id);
+CREATE INDEX idx_unresolved_venues_status ON unresolved_venues(status);
+CREATE INDEX idx_unresolved_venues_seen_count ON unresolved_venues(seen_count DESC);
+
+-- Stripe integration indexes
+CREATE INDEX idx_bookings_tour ON bookings(tour_id);
+CREATE INDEX idx_bookings_profile ON bookings(profile_id);
+CREATE INDEX idx_bookings_status ON bookings(status);
+CREATE INDEX idx_bookings_reference ON bookings(booking_reference);
+CREATE INDEX idx_bookings_stripe_session ON bookings(stripe_checkout_session_id);
+CREATE INDEX idx_subscriptions_profile ON subscriptions(profile_id);
+CREATE INDEX idx_subscriptions_status ON subscriptions(status);
+CREATE INDEX idx_subscriptions_stripe_sub ON subscriptions(stripe_subscription_id);
+CREATE INDEX idx_payments_profile ON payments(profile_id);
+CREATE INDEX idx_payments_booking ON payments(booking_id);
+CREATE INDEX idx_payments_subscription ON payments(subscription_id);
+CREATE INDEX idx_payments_stripe_pi ON payments(stripe_payment_intent_id);
+CREATE INDEX idx_profiles_stripe_customer ON profiles(stripe_customer_id);

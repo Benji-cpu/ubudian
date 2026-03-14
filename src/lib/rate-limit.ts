@@ -1,3 +1,11 @@
+/**
+ * In-memory rate limiter.
+ *
+ * - Persists across warm invocations on the same serverless instance
+ * - Resets on cold starts (acceptable for basic abuse prevention)
+ * - /tmp-based persistence offers no benefit on Vercel — same lifecycle as in-memory
+ * - For distributed rate limiting, use Upstash Redis (@upstash/ratelimit)
+ */
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
 
 // Clean up expired entries every 5 minutes

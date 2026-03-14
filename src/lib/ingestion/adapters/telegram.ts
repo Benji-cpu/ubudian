@@ -71,6 +71,37 @@ export async function parseTelegramUpdate(update: TelegramUpdate): Promise<RawMe
 }
 
 /**
+ * Download media from a Telegram file URL.
+ * Returns the raw image buffer and content type, or null on failure.
+ *
+ * Telegram file URLs are self-authenticating (token is embedded in the URL),
+ * so no extra auth headers are needed.
+ */
+export async function downloadTelegramMedia(
+  url: string
+): Promise<{ buffer: Buffer; contentType: string } | null> {
+  if (!url) return null;
+
+  try {
+    const res = await fetch(url);
+
+    if (!res.ok) {
+      console.error(
+        `[telegram] Failed to download media: ${res.status} ${res.statusText}`
+      );
+      return null;
+    }
+
+    const contentType = res.headers.get("content-type") || "image/jpeg";
+    const arrayBuffer = await res.arrayBuffer();
+    return { buffer: Buffer.from(arrayBuffer), contentType };
+  } catch (err) {
+    console.error("[telegram] Error downloading media:", err);
+    return null;
+  }
+}
+
+/**
  * Telegram source adapter.
  *
  * Note: Telegram uses a push model (webhooks), not polling.

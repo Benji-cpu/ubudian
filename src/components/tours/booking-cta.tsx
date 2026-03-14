@@ -3,6 +3,8 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { MessageCircle, Mail, Clock, Users } from "lucide-react";
+import { BookingForm } from "@/components/tours/booking-form";
+import { formatUsdPrice } from "@/lib/stripe/helpers";
 import type { Tour } from "@/types";
 
 interface BookingCtaProps {
@@ -24,9 +26,9 @@ export function BookingCta({ tour }: BookingCtaProps) {
         </h3>
 
         <div className="space-y-2 text-sm">
-          {tour.price_per_person && (
+          {tour.price_per_person != null && (
             <div className="text-2xl font-bold text-brand-terracotta">
-              {tour.price_per_person.toLocaleString()} IDR
+              {formatUsdPrice(tour.price_per_person)}
               <span className="text-sm font-normal text-muted-foreground"> / person</span>
             </div>
           )}
@@ -44,8 +46,13 @@ export function BookingCta({ tour }: BookingCtaProps) {
           )}
         </div>
 
+        {/* Online payment booking */}
+        {tour.price_per_person != null && (
+          <BookingForm tour={tour} />
+        )}
+
         {whatsappNumber && (
-          <Button asChild className="w-full gap-2" size="lg">
+          <Button asChild className="w-full gap-2" size="lg" variant={tour.price_per_person != null ? "outline" : "default"}>
             <a
               href={`https://wa.me/${whatsappNumber}?text=${whatsappMessage}`}
               target="_blank"

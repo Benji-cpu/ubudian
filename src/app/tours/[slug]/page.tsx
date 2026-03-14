@@ -10,6 +10,7 @@ import { TourCard } from "@/components/tours/tour-card";
 import { Badge } from "@/components/ui/badge";
 import { Clock, Users } from "lucide-react";
 import { TourJsonLd } from "@/components/tours/tour-json-ld";
+import { formatUsdPrice } from "@/lib/stripe/helpers";
 import type { Tour } from "@/types";
 
 interface TourPageProps {
@@ -143,7 +144,7 @@ export default async function TourPage({ params }: TourPageProps) {
                 )}
                 {t.price_per_person && (
                   <span className="font-semibold text-brand-terracotta">
-                    {t.price_per_person.toLocaleString()} IDR / person
+                    {formatUsdPrice(t.price_per_person)} / person
                   </span>
                 )}
                 {t.max_group_size && (

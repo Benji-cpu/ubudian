@@ -52,7 +52,7 @@ export async function FeaturedStories() {
       <div>
         <p className="text-lg leading-relaxed text-brand-charcoal-light">
           Every face tells a tale of why this magical place draws people
-          from around the world. Stories coming soon.
+          from around the world — their stories are coming soon.
         </p>
       </div>
     </div>

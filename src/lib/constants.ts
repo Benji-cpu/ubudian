@@ -10,6 +10,7 @@ export const NAV_LINKS = [
   { label: "Tours", href: "/tours" },
   { label: "Newsletter", href: "/newsletter" },
   { label: "Blog", href: "/blog" },
+  { label: "Membership", href: "/membership" },
 ] as const;
 
 export const ADMIN_NAV_LINKS = [
@@ -22,6 +23,8 @@ export const ADMIN_NAV_LINKS = [
   { label: "Subscribers", href: "/admin/subscribers", icon: "UserPlus" },
   { label: "Trusted", href: "/admin/trusted-submitters", icon: "ShieldCheck" },
   { label: "Ingestion", href: "/admin/ingestion", icon: "Zap" },
+  { label: "Bookings", href: "/admin/bookings", icon: "CreditCard" },
+  { label: "Subscriptions", href: "/admin/subscriptions", icon: "Sparkles" },
 ] as const;
 
 export const EVENT_CATEGORIES = [
@@ -62,6 +65,7 @@ export const DASHBOARD_NAV_LINKS = [
   { label: "Overview", href: "/dashboard" },
   { label: "My Spirit", href: "/dashboard/archetype" },
   { label: "My Events", href: "/dashboard/events" },
+  { label: "Membership", href: "/dashboard/membership" },
   { label: "Settings", href: "/dashboard/settings" },
 ] as const;
 

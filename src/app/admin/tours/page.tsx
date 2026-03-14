@@ -12,6 +12,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Plus, MapPin } from "lucide-react";
+import { formatUsdPrice } from "@/lib/stripe/helpers";
 import type { Tour } from "@/types";
 import { DeleteTourButton } from "./delete-button";
 
@@ -101,7 +102,7 @@ export default async function AdminToursPage() {
                 </TableCell>
                 <TableCell className="text-muted-foreground">
                   {tour.price_per_person
-                    ? `${tour.price_per_person.toLocaleString()} IDR`
+                    ? formatUsdPrice(tour.price_per_person)
                     : "—"}
                 </TableCell>
                 <TableCell>

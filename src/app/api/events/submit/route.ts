@@ -2,6 +2,8 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { queryWithRetry } from "@/lib/supabase/retry";
 import { slugify } from "@/lib/utils";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
+import { sendTransactionalEmail } from "@/lib/email";
+import { eventSubmissionConfirmation } from "@/lib/email-templates";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -109,6 +111,13 @@ export async function POST(request: Request) {
         { status: 500 }
       );
     }
+
+    // Fire-and-forget confirmation email
+    sendTransactionalEmail(
+      data.submitted_by_email,
+      "Your event has been submitted!",
+      eventSubmissionConfirmation(data.title, autoApprove)
+    );
 
     return NextResponse.json({ success: true, autoApproved: autoApprove });
   } catch (err) {

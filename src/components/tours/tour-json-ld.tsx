@@ -23,8 +23,8 @@ export function TourJsonLd({ tour }: TourJsonLdProps) {
     ...(tour.price_per_person && {
       offers: {
         "@type": "Offer",
-        price: tour.price_per_person,
-        priceCurrency: "IDR",
+        price: (tour.price_per_person / 100).toFixed(2),
+        priceCurrency: "USD",
         url: `${SITE_URL}/tours/${tour.slug}`,
       },
     }),

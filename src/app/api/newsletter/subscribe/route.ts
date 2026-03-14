@@ -2,6 +2,8 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { queryWithRetry } from "@/lib/supabase/retry";
 import { addSubscriber } from "@/lib/beehiiv";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
+import { sendTransactionalEmail } from "@/lib/email";
+import { newsletterWelcome } from "@/lib/email-templates";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
@@ -61,6 +63,13 @@ export async function POST(request: Request) {
         .update({ beehiiv_subscriber_id: beehiivId })
         .eq("email", normalizedEmail);
     }
+
+    // Fire-and-forget welcome email
+    sendTransactionalEmail(
+      normalizedEmail,
+      "Welcome to The Ubudian!",
+      newsletterWelcome()
+    );
 
     return NextResponse.json({ success: true });
   } catch {

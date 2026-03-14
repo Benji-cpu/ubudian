@@ -10,6 +10,7 @@
 import { NextResponse } from "next/server";
 import { isAdmin } from "@/lib/auth";
 import { runIngestion } from "@/lib/ingestion";
+import "@/lib/ingestion/adapters";
 
 export async function POST(request: Request) {
   if (!(await isAdmin())) {

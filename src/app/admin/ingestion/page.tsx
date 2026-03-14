@@ -1,22 +1,30 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { IngestionStats } from "@/components/admin/ingestion/ingestion-stats";
 import { SourceHealthCard } from "@/components/admin/ingestion/source-health-card";
 import { RunHistoryTable } from "@/components/admin/ingestion/run-history-table";
 import { TriggerRunButton } from "@/components/admin/ingestion/trigger-run-button";
-import { Plus, Settings, Copy, MapPin, MessageSquare } from "lucide-react";
-import type { EventSource, IngestionRun, DedupMatch } from "@/types";
+import { PendingApprovalQueue } from "@/components/admin/ingestion/pending-approval-queue";
+import { Plus, Settings, Copy, MapPin, MessageSquare, Smartphone, Send } from "lucide-react";
+import type { EventSource, IngestionRun } from "@/types";
 
 export default async function IngestionDashboardPage() {
   const supabase = await createClient();
+
+  const now = new Date();
+  const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString();
 
   const [
     { data: sources },
     { data: runs },
     { data: pendingDedups },
     { data: recentErrorRuns },
+    { data: lastMessageData },
+    { count: totalMessages24h },
+    { count: parsedMessages24h },
+    { data: pendingEvents },
   ] = await Promise.all([
     supabase
       .from("event_sources")
@@ -35,13 +43,39 @@ export default async function IngestionDashboardPage() {
       .from("ingestion_runs")
       .select("id")
       .eq("status", "failed")
-      .gte("started_at", new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()),
+      .gte("started_at", twentyFourHoursAgo),
+    supabase
+      .from("raw_ingestion_messages")
+      .select("created_at")
+      .order("created_at", { ascending: false })
+      .limit(1),
+    supabase
+      .from("raw_ingestion_messages")
+      .select("*", { count: "exact", head: true })
+      .gte("created_at", twentyFourHoursAgo),
+    supabase
+      .from("raw_ingestion_messages")
+      .select("*", { count: "exact", head: true })
+      .eq("status", "parsed")
+      .gte("created_at", twentyFourHoursAgo),
+    supabase
+      .from("events")
+      .select("id, title, category, start_date, venue_name, source_id, raw_message_id, llm_parsed, created_at")
+      .eq("status", "pending")
+      .not("source_id", "is", null)
+      .order("created_at", { ascending: false })
+      .limit(10),
   ]);
 
   const allSources = (sources ?? []) as EventSource[];
   const allRuns = (runs ?? []) as IngestionRun[];
   const activeSources = allSources.filter((s) => s.is_enabled).length;
   const totalEventsIngested = allSources.reduce((sum, s) => sum + (s.events_ingested_count || 0), 0);
+
+  const lastMessageAt = (lastMessageData?.[0]?.created_at as string) ?? null;
+  const total24h = totalMessages24h ?? 0;
+  const parsed24h = parsedMessages24h ?? 0;
+  const successRate = total24h > 0 ? Math.round((parsed24h / total24h) * 100) : -1;
 
   const sourceNames: Record<string, string> = {};
   for (const s of allSources) {
@@ -71,6 +105,18 @@ export default async function IngestionDashboardPage() {
               Messages
             </Link>
           </Button>
+          <Button asChild variant="outline" size="sm">
+            <Link href="/admin/ingestion/whatsapp">
+              <Smartphone className="mr-2 h-4 w-4" />
+              WhatsApp
+            </Link>
+          </Button>
+          <Button asChild variant="outline" size="sm">
+            <Link href="/admin/ingestion/telegram">
+              <Send className="mr-2 h-4 w-4" />
+              Telegram
+            </Link>
+          </Button>
           <Button asChild>
             <Link href="/admin/ingestion/sources/new">
               <Plus className="mr-2 h-4 w-4" />
@@ -86,7 +132,13 @@ export default async function IngestionDashboardPage() {
         totalEventsIngested={totalEventsIngested}
         pendingDedup={(pendingDedups ?? []).length}
         recentErrors={(recentErrorRuns ?? []).length}
+        lastMessageAt={lastMessageAt}
+        successRate={successRate}
       />
+
+      {(pendingEvents ?? []).length > 0 && (
+        <PendingApprovalQueue events={pendingEvents ?? []} />
+      )}
 
       {allSources.length > 0 && (
         <div>

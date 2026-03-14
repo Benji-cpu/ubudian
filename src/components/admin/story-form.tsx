@@ -8,6 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { createClient } from "@/lib/supabase/client";
 import { slugify } from "@/lib/utils";
 import { STORY_THEME_TAGS } from "@/lib/constants";
+import { ARCHETYPE_IDS } from "@/lib/quiz-data";
 import { RichTextEditor } from "@/components/admin/rich-text-editor";
 import { MultiImageUploader } from "@/components/admin/multi-image-uploader";
 import { TagInput } from "@/components/admin/tag-input";
@@ -48,6 +49,7 @@ const storySchema = z.object({
   photo_urls: z.array(z.string()),
   narrative: z.string().min(1, "Narrative is required"),
   theme_tags: z.array(z.string()),
+  archetype_tags: z.array(z.enum(["seeker", "explorer", "creative", "connector", "epicurean"])),
   status: z.enum(["draft", "published", "archived"]),
   meta_title: z.string().max(70).optional().or(z.literal("")),
   meta_description: z.string().max(160).optional().or(z.literal("")),
@@ -79,6 +81,7 @@ export function StoryForm({ initialData }: StoryFormProps) {
       photo_urls: initialData?.photo_urls ?? [],
       narrative: initialData?.narrative ?? "",
       theme_tags: initialData?.theme_tags ?? [],
+      archetype_tags: initialData?.archetype_tags ?? [],
       status: initialData?.status ?? "draft",
       meta_title: initialData?.meta_title ?? "",
       meta_description: initialData?.meta_description ?? "",
@@ -106,6 +109,7 @@ export function StoryForm({ initialData }: StoryFormProps) {
       photo_urls: data.photo_urls,
       narrative: data.narrative,
       theme_tags: data.theme_tags,
+      archetype_tags: data.archetype_tags,
       status: data.status,
       meta_title: data.meta_title || null,
       meta_description: data.meta_description || null,
@@ -319,6 +323,21 @@ export function StoryForm({ initialData }: StoryFormProps) {
                       onChange={field.onChange}
                     />
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="archetype_tags"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Archetype Tags</FormLabel>
+                  <FormControl>
+                    <TagInput options={ARCHETYPE_IDS} value={field.value} onChange={field.onChange} />
+                  </FormControl>
+                  <FormDescription>Tag for personalized recommendations</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}

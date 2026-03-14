@@ -10,7 +10,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { queryWithRetry } from "@/lib/supabase/retry";
 import { slugify } from "@/lib/utils";
 import { EVENT_CATEGORIES } from "@/lib/constants";
-import { classifyMessage, parseEventFromText, parseEventFromImage, LLMApiError } from "./llm-parser";
+import { classifyAndParseMessage, parseEventFromText, parseEventFromImage, LLMApiError } from "./llm-parser";
 import { findDuplicates, recordDedupMatch } from "./dedup";
 import { normalizeVenue } from "./venue-normalizer";
 import { generateFingerprint } from "./fingerprint";
@@ -269,49 +269,45 @@ export async function processRawMessage(
     }
   }
 
-  // Step 1: Classify message (skip for structured API sources)
-  if (contentText && !sourceConfig._skipClassification) {
-    try {
-      const classification = await classifyMessage(contentText);
-
-      if (!classification.is_event || classification.confidence < 0.5) {
-        await supabase
-          .from("raw_ingestion_messages")
-          .update({ status: "not_event", updated_at: new Date().toISOString() })
-          .eq("id", messageId);
-
-        return { messageId, status: "not_event" };
-      }
-    } catch (err) {
-      if (err instanceof LLMApiError) {
-        // LLM API failure — mark as retryable "failed", NOT "not_event"
-        await supabase
-          .from("raw_ingestion_messages")
-          .update({
-            status: "failed",
-            parse_error: `LLM classification error: ${err.message}`,
-            updated_at: new Date().toISOString(),
-          })
-          .eq("id", messageId);
-
-        return { messageId, status: "failed", error: err.message };
-      }
-      throw err; // Re-throw unexpected errors
-    }
-  }
-
-  // Step 2: Parse the message into structured event data
+  // Step 1+2: Classify and parse in a single LLM call (text), or parse directly (images/pre-structured)
   let parsedEvents: ParsedEvent[] = [];
 
   try {
-    if (hasImages && rawMsg.image_urls![0]) {
-      // Try image parsing first (flyer/poster)
-      parsedEvents = await parseEventFromImage(rawMsg.image_urls![0], contentText);
-    }
+    if (hasImages) {
+      // Image messages: skip classify — parseEventFromImage returns [] when no event found
+      for (const imageUrl of rawMsg.image_urls!) {
+        parsedEvents = await parseEventFromImage(imageUrl, contentText);
+        if (parsedEvents.length > 0) break;
+      }
 
-    if (parsedEvents.length === 0 && contentText) {
-      // Fall back to text parsing
-      parsedEvents = await parseEventFromText(contentText);
+      // Text fallback if all images yielded nothing
+      if (parsedEvents.length === 0 && contentText) {
+        if (sourceConfig._skipClassification) {
+          parsedEvents = await parseEventFromText(contentText);
+        } else {
+          const result = await classifyAndParseMessage(contentText);
+          if (result.is_event && result.confidence >= 0.5) {
+            parsedEvents = result.events;
+          }
+          // If not event, parsedEvents stays [] — falls through to "no events" handling below
+        }
+      }
+    } else if (contentText) {
+      if (sourceConfig._skipClassification) {
+        // Pre-structured source — parse text directly without classification
+        parsedEvents = await parseEventFromText(contentText);
+      } else {
+        // Combined classify+parse in one call — replaces separate classify then parse
+        const result = await classifyAndParseMessage(contentText);
+        if (!result.is_event || result.confidence < 0.5) {
+          await supabase
+            .from("raw_ingestion_messages")
+            .update({ status: "not_event", updated_at: new Date().toISOString() })
+            .eq("id", messageId);
+          return { messageId, status: "not_event" };
+        }
+        parsedEvents = result.events;
+      }
     }
 
     if (parsedEvents.length === 0) {
@@ -333,7 +329,7 @@ export async function processRawMessage(
         .from("raw_ingestion_messages")
         .update({
           status: "failed",
-          parse_error: `LLM parse error: ${err.message}`,
+          parse_error: `LLM error: ${err.message}`,
           updated_at: new Date().toISOString(),
         })
         .eq("id", messageId);

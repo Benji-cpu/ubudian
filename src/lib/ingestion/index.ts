@@ -8,7 +8,11 @@ export { findDuplicates, recordDedupMatch, resolveMatch } from "./dedup";
 export type { DedupCandidate, DedupInput } from "./dedup";
 
 // LLM Parser
-export { classifyMessage, parseEventFromText, parseEventFromImage, compareEventsSemantically, LLMApiError } from "./llm-parser";
+export { classifyMessage, classifyAndParseMessage, parseEventFromText, parseEventFromImage, compareEventsSemantically, LLMApiError } from "./llm-parser";
+export type { ClassifyAndParseResult } from "./llm-parser";
+
+// LLM Retry
+export { withLLMRetry } from "./llm-retry";
 
 // Fingerprint
 export { generateFingerprint, NO_VENUE_SENTINEL } from "./fingerprint";

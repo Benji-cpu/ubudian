@@ -10,7 +10,9 @@
 
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { runIngestion } from "@/lib/ingestion";
+import { runIngestion, processRawMessage } from "@/lib/ingestion";
+import type { RawMessage } from "@/lib/ingestion";
+import "@/lib/ingestion/adapters";
 
 export async function GET(request: Request) {
   // Verify cron secret
@@ -76,9 +78,56 @@ export async function GET(request: Request) {
     }
   }
 
+  // Auto-retry stuck pending/failed messages so quota reset = automatic recovery
+  const TEN_MINUTES_AGO = new Date(Date.now() - 10 * 60 * 1000).toISOString();
+  const { data: stuckMessages } = await supabase
+    .from("raw_ingestion_messages")
+    .select("*")
+    .or(`status.eq.failed,and(status.eq.pending,updated_at.lt.${TEN_MINUTES_AGO})`)
+    .order("created_at", { ascending: true })
+    .limit(50);
+
+  let retriedCount = 0;
+  for (const message of stuckMessages ?? []) {
+    // Get source config
+    const { data: source } = await supabase
+      .from("event_sources")
+      .select("config")
+      .eq("id", message.source_id)
+      .single();
+
+    // Reset to pending before reprocessing
+    await supabase
+      .from("raw_ingestion_messages")
+      .update({ status: "pending", parse_error: null, parsed_event_data: null, event_id: null, updated_at: new Date().toISOString() })
+      .eq("id", message.id);
+
+    const rawMsg: RawMessage = {
+      external_id: message.external_id,
+      content_text: message.content_text,
+      content_html: message.content_html,
+      image_urls: message.image_urls,
+      sender_name: message.sender_name,
+      sender_id: message.sender_id,
+      raw_data: message.raw_data,
+    };
+
+    try {
+      await processRawMessage(message.id, rawMsg, message.source_id, source?.config || {});
+      retriedCount++;
+    } catch {
+      // Already marked failed by pipeline — no action needed
+    }
+  }
+
+  if ((stuckMessages?.length ?? 0) > 0) {
+    console.log(`[cron/ingest-events] Retried ${retriedCount}/${stuckMessages!.length} stuck messages`);
+  }
+
   return NextResponse.json({
     sourcesChecked: sources.length,
     sourcesRun: dueSources.length,
     results,
+    stuckMessagesRetried: retriedCount,
   });
 }

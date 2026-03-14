@@ -11,7 +11,7 @@
  * URL through the pipeline.
  */
 
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { processRawMessage } from "@/lib/ingestion/pipeline";
 import {
@@ -56,6 +56,7 @@ export async function POST(request: Request) {
       .single();
 
     if (!source) {
+      console.warn("[waha-webhook] No enabled WhatsApp source configured");
       return NextResponse.json({ ok: true });
     }
 
@@ -110,7 +111,7 @@ export async function POST(request: Request) {
     }
 
     // Store raw message
-    const { data: storedMsg } = await supabase
+    const { data: storedMsg, error: storeError } = await supabase
       .from("raw_ingestion_messages")
       .insert({
         source_id: source.id,
@@ -125,16 +126,31 @@ export async function POST(request: Request) {
       .select("id")
       .single();
 
-    if (storedMsg) {
-      await processRawMessage(storedMsg.id, rawMsg, source.id, config);
+    if (storeError || !storedMsg) {
+      console.error("[waha-webhook] Failed to store message:", storeError);
+      return NextResponse.json({ ok: true, error: "store_failed" });
     }
+
+    // Defer LLM processing so the webhook responds immediately
+    after(async () => {
+      try {
+        await processRawMessage(storedMsg.id, rawMsg, source.id, config);
+      } catch (err) {
+        console.error(`[waha-webhook] Background processing failed for ${storedMsg.id}:`, err);
+        await createAdminClient()
+          .from("raw_ingestion_messages")
+          .update({
+            status: "failed",
+            parse_error: err instanceof Error ? err.message : "Background processing failed",
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", storedMsg.id);
+      }
+    });
 
     return NextResponse.json({ ok: true });
   } catch (err) {
     console.error("[waha-webhook] Error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ ok: true, error: "processing_failed" });
   }
 }

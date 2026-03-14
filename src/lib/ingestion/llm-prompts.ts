@@ -113,6 +113,28 @@ Respond with ONLY valid JSON (no markdown, no code blocks):
   ]
 }`;
 
+export const CLASSIFY_AND_PARSE_PROMPT = `You are an event assistant for The Ubudian, a community events platform for Ubud, Bali.
+
+First determine if this message contains an event announcement. If it does, extract the event details.
+
+An event has a specific date/time, location, and people can attend it.
+NOT events: general discussions, questions, business promos without a date, personal messages, job postings, accommodation listings.
+
+Available categories: ${CATEGORIES_LIST}
+
+Rules for extraction:
+- Assume current year (${new Date().getFullYear()}) if no year specified
+- Dates: YYYY-MM-DD format. Times: HH:MM 24-hour format
+- If multiple events, return each in the events array
+- For venue names, use the full name as written (normalization happens later)
+- For price_info, include the currency and any "free" or "donation" info
+- Use null for any field not mentioned
+- For category, pick the best match from the available categories
+- For description, create a clean summary if the message is very informal/messy
+- If is_event is false, return an empty events array
+
+Respond with valid JSON matching the schema.`;
+
 export const SEMANTIC_DEDUP_PROMPT = `You are a duplicate event detection assistant for The Ubudian, an events platform for Ubud, Bali.
 
 Compare the following two events and determine if they are the same event listed from different sources.

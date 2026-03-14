@@ -10,6 +10,8 @@ import { slugify } from "@/lib/utils";
 import { EVENT_CATEGORIES } from "@/lib/constants";
 import { RichTextEditor } from "@/components/admin/rich-text-editor";
 import { ImageUploader } from "@/components/admin/image-uploader";
+import { TagInput } from "@/components/admin/tag-input";
+import { ARCHETYPE_IDS } from "@/lib/quiz-data";
 import { DatePicker } from "@/components/admin/date-picker";
 import { TimePicker } from "@/components/admin/time-picker";
 import { Button } from "@/components/ui/button";
@@ -70,6 +72,7 @@ const eventSchema = z.object({
   organizer_name: z.string().optional().or(z.literal("")),
   organizer_contact: z.string().optional().or(z.literal("")),
   organizer_instagram: z.string().optional().or(z.literal("")),
+  archetype_tags: z.array(z.enum(["seeker", "explorer", "creative", "connector", "epicurean"])),
 });
 
 type EventFormValues = z.infer<typeof eventSchema>;
@@ -81,6 +84,7 @@ interface EventFormProps {
 export function EventForm({ initialData }: EventFormProps) {
   const router = useRouter();
   const [saving, setSaving] = useState(false);
+  const [rejecting, setRejecting] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [slugManuallyEdited, setSlugManuallyEdited] = useState(!!initialData);
@@ -111,6 +115,7 @@ export function EventForm({ initialData }: EventFormProps) {
       organizer_name: initialData?.organizer_name ?? "",
       organizer_contact: initialData?.organizer_contact ?? "",
       organizer_instagram: initialData?.organizer_instagram ?? "",
+      archetype_tags: initialData?.archetype_tags ?? [],
     },
   });
 
@@ -149,6 +154,7 @@ export function EventForm({ initialData }: EventFormProps) {
       organizer_name: data.organizer_name || null,
       organizer_contact: data.organizer_contact || null,
       organizer_instagram: data.organizer_instagram || null,
+      archetype_tags: data.archetype_tags,
     };
 
     let error;
@@ -195,6 +201,51 @@ export function EventForm({ initialData }: EventFormProps) {
         }
       }
     })();
+  }
+
+  async function handleReject() {
+    const reason = window.prompt("Rejection reason (optional):");
+    if (reason === null) return; // User cancelled
+
+    setRejecting(true);
+    const supabase = createClient();
+
+    const payload: Record<string, unknown> = {
+      status: "rejected",
+      rejection_reason: reason || null,
+    };
+
+    const { error } = await supabase
+      .from("events")
+      .update(payload)
+      .eq("id", initialData!.id);
+
+    if (error) {
+      setRejecting(false);
+      form.setError("root", { message: error.message });
+      return;
+    }
+
+    // Send rejection notification email
+    if (initialData?.submitted_by_email) {
+      try {
+        await fetch("/api/events/approve", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            event_id: initialData.id,
+            action: "reject",
+            rejection_reason: reason || undefined,
+          }),
+        });
+      } catch {
+        // Non-critical
+      }
+    }
+
+    setRejecting(false);
+    router.push("/admin/events");
+    router.refresh();
   }
 
   async function handleDelete() {
@@ -453,6 +504,21 @@ export function EventForm({ initialData }: EventFormProps) {
               )}
             />
 
+            <FormField
+              control={form.control}
+              name="archetype_tags"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Archetype Tags</FormLabel>
+                  <FormControl>
+                    <TagInput options={ARCHETYPE_IDS} value={field.value} onChange={field.onChange} />
+                  </FormControl>
+                  <FormDescription>Tag for personalized recommendations</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             {/* Dates */}
             <div className="space-y-4 rounded-md border p-4">
               <h3 className="text-sm font-medium">Date & Time</h3>
@@ -597,12 +663,18 @@ export function EventForm({ initialData }: EventFormProps) {
             {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Save
           </Button>
-          <Button type="button" onClick={handleApprove} disabled={saving}>
+          <Button type="button" onClick={handleApprove} disabled={saving || rejecting}>
             {saving && form.getValues("status") === "approved" && (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             )}
             Approve
           </Button>
+          {isEditMode && initialData.status === "pending" && (
+            <Button type="button" variant="destructive" onClick={handleReject} disabled={saving || rejecting}>
+              {rejecting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Reject
+            </Button>
+          )}
 
           <div className="flex-1" />
 

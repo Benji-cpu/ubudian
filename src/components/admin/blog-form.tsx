@@ -9,6 +9,8 @@ import { createClient } from "@/lib/supabase/client";
 import { slugify } from "@/lib/utils";
 import { RichTextEditor } from "@/components/admin/rich-text-editor";
 import { ImageUploader } from "@/components/admin/image-uploader";
+import { TagInput } from "@/components/admin/tag-input";
+import { ARCHETYPE_IDS } from "@/lib/quiz-data";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -57,6 +59,7 @@ const blogPostSchema = z.object({
     .optional()
     .or(z.literal("")),
   status: z.enum(["draft", "published", "archived"]),
+  archetype_tags: z.array(z.enum(["seeker", "explorer", "creative", "connector", "epicurean"])),
 });
 
 type BlogPostFormValues = z.infer<typeof blogPostSchema>;
@@ -85,6 +88,7 @@ export function BlogForm({ initialData }: BlogFormProps) {
       meta_title: initialData?.meta_title ?? "",
       meta_description: initialData?.meta_description ?? "",
       status: initialData?.status ?? "draft",
+      archetype_tags: initialData?.archetype_tags ?? [],
     },
   });
 
@@ -109,6 +113,7 @@ export function BlogForm({ initialData }: BlogFormProps) {
       meta_title: data.meta_title || null,
       meta_description: data.meta_description || null,
       status: data.status,
+      archetype_tags: data.archetype_tags,
     };
 
     if (data.status === "published" && !initialData?.published_at) {
@@ -297,6 +302,21 @@ export function BlogForm({ initialData }: BlogFormProps) {
                       <SelectItem value="archived">Archived</SelectItem>
                     </SelectContent>
                   </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="archetype_tags"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Archetype Tags</FormLabel>
+                  <FormControl>
+                    <TagInput options={ARCHETYPE_IDS} value={field.value} onChange={field.onChange} />
+                  </FormControl>
+                  <FormDescription>Tag for personalized recommendations</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}

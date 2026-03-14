@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { ImageIcon, Clock } from "lucide-react";
+import { formatUsdPrice } from "@/lib/stripe/helpers";
 import type { Tour } from "@/types";
 
 interface TourCardProps {
@@ -42,7 +43,7 @@ export function TourCard({ tour }: TourCardProps) {
             )}
             {tour.price_per_person && (
               <span className="font-medium text-brand-terracotta">
-                {tour.price_per_person.toLocaleString()} IDR
+                {formatUsdPrice(tour.price_per_person)}
               </span>
             )}
           </div>

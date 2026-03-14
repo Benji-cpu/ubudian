@@ -4,6 +4,7 @@ export interface Profile {
   display_name: string | null;
   avatar_url: string | null;
   role: "user" | "admin";
+  stripe_customer_id: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -20,6 +21,7 @@ export interface BlogPost {
   meta_title: string | null;
   meta_description: string | null;
   is_placeholder: boolean;
+  is_members_only: boolean;
   archetype_tags: ArchetypeId[];
   created_at: string;
   updated_at: string;
@@ -40,6 +42,7 @@ export interface Story {
   meta_title: string | null;
   meta_description: string | null;
   is_placeholder: boolean;
+  is_members_only: boolean;
   archetype_tags: ArchetypeId[];
   created_at: string;
   updated_at: string;
@@ -103,6 +106,7 @@ export interface Tour {
   booking_email: string | null;
   is_active: boolean;
   is_placeholder: boolean;
+  stripe_price_id: string | null;
   archetype_tags: ArchetypeId[];
   created_at: string;
   updated_at: string;
@@ -198,6 +202,71 @@ export interface QuizResultRecord {
   scores: QuizScores;
   answers: { question_id: number; answer_id: string }[];
   created_at: string;
+}
+
+// ============================================
+// STRIPE / BOOKING / SUBSCRIPTION TYPES
+// ============================================
+
+export type BookingStatus = "pending" | "confirmed" | "cancelled" | "completed" | "refunded";
+
+export interface Booking {
+  id: string;
+  tour_id: string;
+  profile_id: string | null;
+  guest_name: string;
+  guest_email: string;
+  guest_phone: string | null;
+  num_guests: number;
+  preferred_date: string;
+  special_requests: string | null;
+  price_per_person: number; // cents USD
+  total_amount: number; // cents USD
+  currency: string;
+  stripe_checkout_session_id: string | null;
+  stripe_payment_intent_id: string | null;
+  stripe_payment_status: string;
+  status: BookingStatus;
+  booking_reference: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type SubscriptionStatus = "active" | "trialing" | "past_due" | "canceled" | "unpaid" | "incomplete";
+
+export interface Subscription {
+  id: string;
+  profile_id: string;
+  stripe_subscription_id: string;
+  stripe_customer_id: string;
+  stripe_price_id: string | null;
+  status: SubscriptionStatus;
+  plan_name: string;
+  interval: "month" | "year";
+  current_period_start: string | null;
+  current_period_end: string | null;
+  cancel_at_period_end: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export type PaymentStatus = "pending" | "succeeded" | "failed" | "refunded";
+
+export interface Payment {
+  id: string;
+  profile_id: string | null;
+  payment_type: "tour_booking" | "subscription";
+  booking_id: string | null;
+  subscription_id: string | null;
+  stripe_payment_intent_id: string | null;
+  stripe_invoice_id: string | null;
+  stripe_charge_id: string | null;
+  amount: number; // cents
+  currency: string;
+  status: PaymentStatus;
+  receipt_url: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
 // ============================================

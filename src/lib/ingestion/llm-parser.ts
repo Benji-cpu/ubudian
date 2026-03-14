@@ -13,11 +13,13 @@
 import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
 import {
   CLASSIFY_MESSAGE_PROMPT,
+  CLASSIFY_AND_PARSE_PROMPT,
   PARSE_EVENT_PROMPT,
   PARSE_EVENT_IMAGE_PROMPT,
   SEMANTIC_DEDUP_PROMPT,
 } from "./llm-prompts";
 import type { ParsedEvent } from "./types";
+import { withLLMRetry } from "./llm-retry";
 
 /**
  * Error class for LLM API failures.
@@ -118,6 +120,20 @@ const parsedEventSchema = {
   required: ["events"] ,
 };
 
+const classifyAndParseSchema = {
+  type: SchemaType.OBJECT as const,
+  properties: {
+    is_event: { type: SchemaType.BOOLEAN as const, description: "Whether the message contains an event announcement" },
+    confidence: { type: SchemaType.NUMBER as const, description: "Confidence score from 0.0 to 1.0" },
+    events: {
+      type: SchemaType.ARRAY as const,
+      items: parsedEventItemSchema,
+      description: "Array of parsed events (empty if is_event is false)",
+    },
+  },
+  required: ["is_event", "confidence", "events"],
+};
+
 const semanticDedupSchema = {
   type: SchemaType.OBJECT as const,
   properties: {
@@ -148,22 +164,56 @@ export async function classifyMessage(text: string): Promise<ClassificationResul
     },
   });
 
-  let result;
-  try {
-    result = await model.generateContent([
+  const result = await withLLMRetry(
+    () => model.generateContent([
       CLASSIFY_MESSAGE_PROMPT,
       `\nMessage:\n${text}`,
-    ]);
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : "Unknown API error";
-    throw new LLMApiError(`Classification API call failed: ${msg}`, true);
-  }
+    ]),
+    "classifyMessage"
+  );
 
   const response = result.response.text();
   try {
     return JSON.parse(response) as ClassificationResult;
   } catch {
     throw new LLMApiError(`Failed to parse classification response: ${response}`, false);
+  }
+}
+
+export interface ClassifyAndParseResult {
+  is_event: boolean;
+  confidence: number;
+  events: ParsedEvent[];
+}
+
+/**
+ * Classify and parse a message in a single LLM call.
+ * Replaces the separate classifyMessage + parseEventFromText calls for text messages,
+ * halving API usage for text-only messages.
+ */
+export async function classifyAndParseMessage(text: string): Promise<ClassifyAndParseResult> {
+  const ai = getGenAI();
+  const model = ai.getGenerativeModel({
+    model: "gemini-2.0-flash",
+    generationConfig: {
+      responseMimeType: "application/json",
+      responseSchema: classifyAndParseSchema,
+    },
+  });
+
+  const result = await withLLMRetry(
+    () => model.generateContent([
+      CLASSIFY_AND_PARSE_PROMPT,
+      `\nMessage:\n${text}`,
+    ]),
+    "classifyAndParseMessage"
+  );
+
+  const response = result.response.text();
+  try {
+    return JSON.parse(response) as ClassifyAndParseResult;
+  } catch {
+    throw new LLMApiError(`Failed to parse classify+parse response: ${response}`, false);
   }
 }
 
@@ -182,16 +232,13 @@ export async function parseEventFromText(text: string): Promise<ParsedEvent[]> {
     },
   });
 
-  let result;
-  try {
-    result = await model.generateContent([
+  const result = await withLLMRetry(
+    () => model.generateContent([
       PARSE_EVENT_PROMPT,
       `\nMessage:\n${text}`,
-    ]);
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : "Unknown API error";
-    throw new LLMApiError(`Event parsing API call failed: ${msg}`, true);
-  }
+    ]),
+    "parseEventFromText"
+  );
 
   const response = result.response.text();
   try {
@@ -245,13 +292,10 @@ export async function parseEventFromImage(
     (parts as unknown[]).push(`\nAdditional context from message text:\n${additionalText}`);
   }
 
-  let result;
-  try {
-    result = await model.generateContent(parts);
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : "Unknown API error";
-    throw new LLMApiError(`Image parsing API call failed: ${msg}`, true);
-  }
+  const result = await withLLMRetry(
+    () => model.generateContent(parts),
+    "parseEventFromImage"
+  );
 
   const response = result.response.text();
   try {
@@ -291,13 +335,10 @@ export async function compareEventsSemantically(
     JSON.stringify(eventA, null, 2)
   ).replace("{EVENT_B}", JSON.stringify(eventB, null, 2));
 
-  let result;
-  try {
-    result = await model.generateContent(prompt);
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : "Unknown API error";
-    throw new LLMApiError(`Semantic dedup API call failed: ${msg}`, true);
-  }
+  const result = await withLLMRetry(
+    () => model.generateContent(prompt),
+    "compareEventsSemantically"
+  );
 
   const response = result.response.text();
   try {
