@@ -4,6 +4,7 @@ import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+import { Toaster } from "@/components/ui/sonner";
 import { SITE_NAME, SITE_DESCRIPTION } from "@/lib/constants";
 import "./globals.css";
 
@@ -35,12 +36,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <link rel="alternate" type="application/rss+xml" title="The Ubudian" href="/feed.xml" />
+      </head>
       <body className={`${sourceSans.variable} ${lora.variable} antialiased`}>
         <div className="flex min-h-screen flex-col">
           <Header />
           <main className="flex-1 pt-14">{children}</main>
           <Footer />
         </div>
+        <Toaster />
         <Analytics />
         <SpeedInsights />
       </body>

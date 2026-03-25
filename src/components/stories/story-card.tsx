@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
-import { ImageIcon } from "lucide-react";
+import { ImageIcon, Lock } from "lucide-react";
 import type { Story } from "@/types";
 
 interface StoryCardProps {
@@ -30,9 +30,17 @@ export function StoryCard({ story }: StoryCardProps) {
           </div>
         )}
         <div className="p-5">
-          <h3 className="font-serif text-lg font-semibold leading-snug text-foreground group-hover:text-primary">
-            {story.subject_name}
-          </h3>
+          <div className="flex items-center gap-2">
+            <h3 className="font-serif text-lg font-semibold leading-snug text-foreground group-hover:text-primary">
+              {story.subject_name}
+            </h3>
+            {story.is_members_only && (
+              <Badge variant="outline" className="shrink-0 gap-1 border-brand-gold/40 text-brand-gold text-xs">
+                <Lock className="h-3 w-3" />
+                Members
+              </Badge>
+            )}
+          </div>
           {story.subject_tagline && (
             <p className="mt-1 text-sm text-muted-foreground line-clamp-2">
               {story.subject_tagline}

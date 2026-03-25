@@ -4,6 +4,7 @@ import { getStripe } from "@/lib/stripe/server";
 import { generateBookingReference } from "@/lib/stripe/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
+import { rateLimit, getClientIp } from "@/lib/rate-limit";
 
 const bookingSchema = z.object({
   tour_id: z.string().uuid(),
@@ -16,6 +17,12 @@ const bookingSchema = z.object({
 });
 
 export async function POST(request: Request) {
+  const ip = getClientIp(request);
+  const { success } = rateLimit(`checkout-tour:${ip}`, { limit: 10, windowSeconds: 900 });
+  if (!success) {
+    return NextResponse.json({ error: "Too many requests. Please try again later." }, { status: 429 });
+  }
+
   try {
     const body = await request.json();
     const data = bookingSchema.parse(body);

@@ -10,6 +10,17 @@ import { NewsletterSignup } from "@/components/layout/newsletter-signup";
 import { StoryCard } from "@/components/stories/story-card";
 import { Badge } from "@/components/ui/badge";
 import { StoryJsonLd } from "@/components/stories/story-json-ld";
+import { getCurrentUser, getCurrentProfile } from "@/lib/auth";
+import { isInsider } from "@/lib/stripe/subscription";
+import { MembersOnlyPaywall } from "@/components/membership/members-only-paywall";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import type { Story } from "@/types";
 
 interface StoryPageProps {
@@ -53,6 +64,7 @@ export async function generateMetadata({ params }: StoryPageProps): Promise<Meta
 export default async function StoryPage({ params }: StoryPageProps) {
   let s: Story;
   let related: Story[] = [];
+  let showPaywall = false;
 
   try {
     const { slug } = await params;
@@ -70,6 +82,14 @@ export default async function StoryPage({ params }: StoryPageProps) {
     }
 
     s = story as Story;
+
+    // Check members-only gating
+    if (s.is_members_only) {
+      const user = await getCurrentUser();
+      const insider = user ? await isInsider(user.id) : false;
+      const admin = user ? (await getCurrentProfile())?.role === "admin" : false;
+      if (!insider && !admin) showPaywall = true;
+    }
 
     const { data: relatedStories, error: relatedError } = await supabase
       .from("stories")
@@ -104,8 +124,27 @@ export default async function StoryPage({ params }: StoryPageProps) {
         </div>
       )}
 
+      {/* Breadcrumbs */}
+      <nav className="mx-auto max-w-3xl px-4 pt-6 sm:px-6">
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/">Home</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/stories">Humans of Ubud</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>{s.subject_name}</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+      </nav>
+
       {/* Header */}
-      <header className="mx-auto max-w-3xl px-4 pt-10 sm:px-6">
+      <header className="mx-auto max-w-3xl px-4 pt-6 sm:px-6">
         <h1 className="font-serif text-3xl font-bold tracking-tight text-brand-deep-green sm:text-4xl lg:text-5xl">
           {s.title}
         </h1>
@@ -144,7 +183,7 @@ export default async function StoryPage({ params }: StoryPageProps) {
 
       {/* Narrative */}
       <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
-        <MarkdownContent content={s.narrative} />
+        {showPaywall ? <MembersOnlyPaywall /> : <MarkdownContent content={s.narrative} />}
       </div>
 
       {/* Additional Photos Gallery */}

@@ -12,6 +12,15 @@ import { EventCard } from "@/components/events/event-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { MapPin, Clock, Calendar, ExternalLink, User } from "lucide-react";
+import { isSafeUrl } from "@/lib/url-validation";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import type { Event } from "@/types";
 
 interface EventPageProps {
@@ -97,20 +106,40 @@ export default async function EventPage({ params }: EventPageProps) {
       <article>
         {/* Cover Image */}
         {e.cover_image_url && (
-          <div className="relative h-[280px] w-full sm:h-[400px] lg:h-[480px]">
+          <div className="w-full">
             <Image
               src={e.cover_image_url}
               alt={e.title}
-              fill
+              width={0}
+              height={0}
               priority
               sizes="100vw"
-              className="object-cover"
+              className="h-auto max-h-[500px] w-full object-contain"
             />
           </div>
         )}
 
+        {/* Breadcrumbs */}
+        <nav className="mx-auto max-w-3xl px-4 pt-6 sm:px-6">
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink href="/">Home</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbLink href="/events">Events</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage>{e.title}</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+        </nav>
+
         {/* Header */}
-        <header className="mx-auto max-w-3xl px-4 pt-10 sm:px-6">
+        <header className="mx-auto max-w-3xl px-4 pt-6 sm:px-6">
           <Badge variant="outline" className="mb-3">
             {CATEGORY_EMOJI[e.category] || CATEGORY_EMOJI["Other"]} {e.category}
           </Badge>
@@ -141,7 +170,7 @@ export default async function EventPage({ params }: EventPageProps) {
                     {e.venue_address && ` — ${e.venue_address}`}
                   </span>
                 </div>
-                {e.venue_map_url && (
+                {e.venue_map_url && isSafeUrl(e.venue_map_url) && (
                   <a
                     href={e.venue_map_url}
                     target="_blank"
@@ -162,7 +191,7 @@ export default async function EventPage({ params }: EventPageProps) {
           </div>
 
           {/* Ticket button */}
-          {e.external_ticket_url && (
+          {e.external_ticket_url && isSafeUrl(e.external_ticket_url) && (
             <Button asChild className="mt-6" size="lg">
               <a href={e.external_ticket_url} target="_blank" rel="noopener noreferrer">
                 <ExternalLink className="mr-2 h-4 w-4" />

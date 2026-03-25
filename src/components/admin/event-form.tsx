@@ -8,6 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { createClient } from "@/lib/supabase/client";
 import { slugify } from "@/lib/utils";
 import { EVENT_CATEGORIES } from "@/lib/constants";
+import { safeUrlOrEmpty } from "@/lib/url-validation";
 import { RichTextEditor } from "@/components/admin/rich-text-editor";
 import { ImageUploader } from "@/components/admin/image-uploader";
 import { TagInput } from "@/components/admin/tag-input";
@@ -66,9 +67,9 @@ const eventSchema = z.object({
   recurrence_rule: z.string().optional().or(z.literal("")),
   venue_name: z.string().optional().or(z.literal("")),
   venue_address: z.string().optional().or(z.literal("")),
-  venue_map_url: z.string().optional().or(z.literal("")),
+  venue_map_url: z.string().optional().or(z.literal("")).refine(safeUrlOrEmpty, "URL must use http or https"),
   price_info: z.string().optional().or(z.literal("")),
-  external_ticket_url: z.string().optional().or(z.literal("")),
+  external_ticket_url: z.string().optional().or(z.literal("")).refine(safeUrlOrEmpty, "URL must use http or https"),
   organizer_name: z.string().optional().or(z.literal("")),
   organizer_contact: z.string().optional().or(z.literal("")),
   organizer_instagram: z.string().optional().or(z.literal("")),

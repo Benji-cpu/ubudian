@@ -14,11 +14,8 @@ const COMMUNITY_FEATURES = [
 
 const INSIDER_FEATURES = [
   "Everything in Community, plus:",
-  "Early access to new tours",
   "Members-only stories & articles",
-  "Tour booking discounts",
   "Insider badge on your profile",
-  "Priority event submissions",
 ];
 
 export default function MembershipPage() {

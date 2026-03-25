@@ -3,6 +3,7 @@ import { z } from "zod";
 import { getStripe } from "@/lib/stripe/server";
 import { getOrCreateStripeCustomer } from "@/lib/stripe/helpers";
 import { createClient } from "@/lib/supabase/server";
+import { rateLimit, getClientIp } from "@/lib/rate-limit";
 
 const subscriptionSchema = z.object({
   price_id: z.string().min(1),
@@ -15,6 +16,12 @@ export async function POST(request: Request) {
 
     if (!user) {
       return NextResponse.json({ error: "Must be logged in to subscribe" }, { status: 401 });
+    }
+
+    const ip = getClientIp(request);
+    const { success } = rateLimit(`checkout-sub:${ip}`, { limit: 5, windowSeconds: 900 });
+    if (!success) {
+      return NextResponse.json({ error: "Too many requests. Please try again later." }, { status: 429 });
     }
 
     const body = await request.json();

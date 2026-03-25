@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "lsof -ti :4000 | xargs kill 2>/dev/null; concurrently -n next,telegram -c cyan,magenta --success first \"next dev --port 4000\" \"tsx scripts/telegram-poll.ts\"",
+    "dev": "lsof -ti :4000 | xargs kill 2>/dev/null; pkill -f telegram-poll 2>/dev/null; concurrently -n next,telegram -c cyan,magenta --success first \"next dev --port 4000\" \"tsx scripts/telegram-poll.ts\"",
     "dev:next": "lsof -ti :4000 | xargs kill 2>/dev/null; next dev --port 4000",
     "build": "next build",
     "start": "next start",
@@ -35,6 +35,7 @@
     "date-fns": "^4.1.0",
     "lucide-react": "^0.563.0",
     "next": "16.1.6",
+    "next-themes": "^0.4.6",
     "radix-ui": "^1.4.3",
     "react": "19.2.3",
     "react-day-picker": "^9.13.2",
@@ -43,6 +44,7 @@
     "react-markdown": "^10.1.0",
     "remark-gfm": "^4.0.1",
     "resend": "^6.9.2",
+    "sonner": "^2.0.7",
     "stripe": "^20.4.1",
     "tailwind-merge": "^3.4.0",
     "zod": "^4.3.6"

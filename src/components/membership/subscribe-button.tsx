@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 
@@ -29,7 +30,7 @@ export function SubscribeButton({ priceId, label = "Subscribe" }: SubscribeButto
           window.location.href = "/login?redirect=/membership";
           return;
         }
-        alert(data.error || "Something went wrong");
+        toast.error(data.error || "Something went wrong");
         return;
       }
 
@@ -37,7 +38,7 @@ export function SubscribeButton({ priceId, label = "Subscribe" }: SubscribeButto
         window.location.href = data.url;
       }
     } catch {
-      alert("Network error. Please try again.");
+      toast.error("Network error. Please try again.");
     } finally {
       setLoading(false);
     }

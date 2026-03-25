@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { EVENT_CATEGORIES } from "@/lib/constants";
+import { safeUrlOrEmpty } from "@/lib/url-validation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -41,7 +42,7 @@ const submissionSchema = z.object({
   venue_name: z.string().optional().or(z.literal("")),
   venue_address: z.string().optional().or(z.literal("")),
   price_info: z.string().optional().or(z.literal("")),
-  external_ticket_url: z.string().optional().or(z.literal("")),
+  external_ticket_url: z.string().optional().or(z.literal("")).refine(safeUrlOrEmpty, "URL must use http or https"),
   organizer_name: z.string().min(1, "Organizer name is required"),
   organizer_contact: z.string().min(1, "Contact info is required"),
   organizer_instagram: z.string().optional().or(z.literal("")),

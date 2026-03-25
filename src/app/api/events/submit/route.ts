@@ -6,6 +6,7 @@ import { sendTransactionalEmail } from "@/lib/email";
 import { eventSubmissionConfirmation } from "@/lib/email-templates";
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { safeUrlOrEmpty } from "@/lib/url-validation";
 
 const submissionSchema = z.object({
   title: z.string().min(1).max(200),
@@ -19,7 +20,7 @@ const submissionSchema = z.object({
   venue_name: z.string().optional().or(z.literal("")),
   venue_address: z.string().optional().or(z.literal("")),
   price_info: z.string().optional().or(z.literal("")),
-  external_ticket_url: z.string().optional().or(z.literal("")),
+  external_ticket_url: z.string().optional().or(z.literal("")).refine(safeUrlOrEmpty, "URL must use http or https"),
   organizer_name: z.string().min(1),
   organizer_contact: z.string().min(1),
   organizer_instagram: z.string().optional().or(z.literal("")),

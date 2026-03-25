@@ -38,7 +38,7 @@ export async function GET(request: Request) {
   const now = Date.now();
   const dueSources = sources.filter((source) => {
     // Telegram is push-based, skip for cron
-    if (source.source_type === "telegram" || source.source_type === "whatsapp") {
+    if (source.source_type === "telegram") {
       return false;
     }
 
@@ -54,9 +54,16 @@ export async function GET(request: Request) {
   );
 
   const results = [];
+  const startTime = Date.now();
+  const MAX_ELAPSED_MS = 7000; // leave 3s buffer for Vercel Hobby 10s timeout
 
   // Run ingestion for each due source sequentially to avoid overwhelming APIs
   for (const source of dueSources) {
+    if (Date.now() - startTime > MAX_ELAPSED_MS) {
+      console.warn(`[cron/ingest-events] Timeout approaching, skipping ${dueSources.length - results.length} remaining sources`);
+      break;
+    }
+
     try {
       console.log(`[cron/ingest-events] Running ingestion for: ${source.name} (${source.slug})`);
       const result = await runIngestion(source.id);
@@ -78,17 +85,36 @@ export async function GET(request: Request) {
     }
   }
 
-  // Auto-retry stuck pending/failed messages so quota reset = automatic recovery
+  // Auto-retry stuck pending/failed messages (only those from last 24h to cap retries)
+  // Skip if we're already close to the timeout
+  if (Date.now() - startTime > MAX_ELAPSED_MS) {
+    console.warn("[cron/ingest-events] Timeout approaching, skipping stuck message retries");
+    return NextResponse.json({
+      sourcesChecked: sources.length,
+      sourcesRun: dueSources.length,
+      results,
+      stuckMessagesRetried: 0,
+      timedOut: true,
+    });
+  }
+
   const TEN_MINUTES_AGO = new Date(Date.now() - 10 * 60 * 1000).toISOString();
+  const TWENTY_FOUR_HOURS_AGO = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
   const { data: stuckMessages } = await supabase
     .from("raw_ingestion_messages")
     .select("*")
     .or(`status.eq.failed,and(status.eq.pending,updated_at.lt.${TEN_MINUTES_AGO})`)
+    .gte("updated_at", TWENTY_FOUR_HOURS_AGO)
     .order("created_at", { ascending: true })
-    .limit(50);
+    .limit(10);
 
   let retriedCount = 0;
   for (const message of stuckMessages ?? []) {
+    if (Date.now() - startTime > MAX_ELAPSED_MS) {
+      console.warn("[cron/ingest-events] Timeout approaching, stopping stuck message retries");
+      break;
+    }
+
     // Get source config
     const { data: source } = await supabase
       .from("event_sources")
@@ -96,10 +122,23 @@ export async function GET(request: Request) {
       .eq("id", message.source_id)
       .single();
 
-    // Reset to pending before reprocessing
+    // Preserve previous error context for debugging
+    const previousErrors = message.parse_error
+      ? [...((message.parsed_event_data as Record<string, unknown>)?._previous_errors as string[] || []), message.parse_error]
+      : (message.parsed_event_data as Record<string, unknown>)?._previous_errors as string[] || [];
+
+    // Reset to pending before reprocessing, preserving error history
     await supabase
       .from("raw_ingestion_messages")
-      .update({ status: "pending", parse_error: null, parsed_event_data: null, event_id: null, updated_at: new Date().toISOString() })
+      .update({
+        status: "pending",
+        parse_error: null,
+        parsed_event_data: previousErrors.length > 0
+          ? { _previous_errors: previousErrors, _retry_count: previousErrors.length }
+          : null,
+        event_id: null,
+        updated_at: new Date().toISOString(),
+      })
       .eq("id", message.id);
 
     const rawMsg: RawMessage = {

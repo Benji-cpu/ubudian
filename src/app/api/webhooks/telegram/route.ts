@@ -5,7 +5,7 @@
  * Extracts text/photo content, stores in raw_ingestion_messages, and triggers
  * the parsing pipeline.
  *
- * Webhook URL: POST /api/webhooks/telegram?secret={TELEGRAM_WEBHOOK_SECRET}
+ * Webhook URL: POST /api/webhooks/telegram
  *
  * Images: Downloaded from Telegram API and re-uploaded to Supabase Storage
  * (Telegram file URLs are ephemeral and expire after ~1 hour).
@@ -26,12 +26,8 @@ import type { TelegramUpdate } from "@/lib/ingestion/adapters/telegram";
 import "@/lib/ingestion/adapters/telegram";
 
 export async function POST(request: Request) {
-  // Verify webhook secret — prefer X-Telegram-Bot-Api-Secret-Token header,
-  // fall back to ?secret= query param for backwards compatibility
-  const headerSecret = request.headers.get("x-telegram-bot-api-secret-token");
-  const url = new URL(request.url);
-  const querySecret = url.searchParams.get("secret");
-  const secret = headerSecret || querySecret;
+  // Verify webhook secret via X-Telegram-Bot-Api-Secret-Token header
+  const secret = request.headers.get("x-telegram-bot-api-secret-token");
 
   if (!secret || secret !== process.env.TELEGRAM_WEBHOOK_SECRET) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -119,6 +115,7 @@ export async function POST(request: Request) {
         image_urls: rawMsg.image_urls || null,
         sender_name: rawMsg.sender_name || null,
         sender_id: rawMsg.sender_id || null,
+        chat_name: rawMsg.chat_name || null,
         raw_data: rawMsg.raw_data || null,
         status: "pending",
       })

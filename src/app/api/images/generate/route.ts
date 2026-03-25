@@ -22,6 +22,11 @@ export async function POST(request: NextRequest) {
     folder?: string;
   };
 
+  const ALLOWED_FOLDERS = ["blog", "stories", "events", "tours"] as const;
+  if (!ALLOWED_FOLDERS.includes(folder as (typeof ALLOWED_FOLDERS)[number])) {
+    return NextResponse.json({ error: "Invalid folder" }, { status: 400 });
+  }
+
   if (!prompt) {
     return NextResponse.json(
       { error: "prompt is required" },

@@ -6,9 +6,11 @@ let stripePromise: Promise<Stripe | null> | null = null;
 
 export function getStripeClient(): Promise<Stripe | null> {
   if (!stripePromise) {
-    stripePromise = loadStripe(
-      process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
-    );
+    const key = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
+    if (!key) {
+      throw new Error("Missing NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY");
+    }
+    stripePromise = loadStripe(key);
   }
   return stripePromise;
 }

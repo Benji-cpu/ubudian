@@ -10,6 +10,17 @@ import { ShareButtons } from "@/components/blog/share-buttons";
 import { PostCard } from "@/components/blog/post-card";
 import { SmartBlogCta } from "@/components/blog/smart-blog-cta";
 import { ArticleJsonLd } from "@/components/blog/article-json-ld";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+import { getCurrentUser, getCurrentProfile } from "@/lib/auth";
+import { isInsider } from "@/lib/stripe/subscription";
+import { MembersOnlyPaywall } from "@/components/membership/members-only-paywall";
 import type { BlogPost } from "@/types";
 
 interface BlogPostPageProps {
@@ -53,6 +64,7 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
   let blogPost: BlogPost;
   let related: BlogPost[] = [];
+  let showPaywall = false;
 
   try {
     const { slug } = await params;
@@ -70,6 +82,14 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     }
 
     blogPost = post as BlogPost;
+
+    // Check members-only gating
+    if (blogPost.is_members_only) {
+      const user = await getCurrentUser();
+      const insider = user ? await isInsider(user.id) : false;
+      const admin = user ? (await getCurrentProfile())?.role === "admin" : false;
+      if (!insider && !admin) showPaywall = true;
+    }
 
     const { data: relatedPosts, error: relatedError } = await supabase
       .from("blog_posts")
@@ -105,8 +125,27 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         </div>
       )}
 
+      {/* Breadcrumbs */}
+      <nav className="mx-auto max-w-3xl px-4 pt-6 sm:px-6">
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/">Home</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/blog">Blog</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>{blogPost.title}</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+      </nav>
+
       {/* Article Header */}
-      <header className="mx-auto max-w-3xl px-4 pt-10 sm:px-6">
+      <header className="mx-auto max-w-3xl px-4 pt-6 sm:px-6">
         <div className="flex items-center gap-3 text-sm text-muted-foreground">
           {blogPost.published_at && (
             <time>{format(new Date(blogPost.published_at), "MMMM d, yyyy")}</time>
@@ -126,7 +165,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
       {/* Article Body */}
       <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
-        <MarkdownContent content={blogPost.content} />
+        {showPaywall ? <MembersOnlyPaywall /> : <MarkdownContent content={blogPost.content} />}
       </div>
 
       {/* Share Buttons */}

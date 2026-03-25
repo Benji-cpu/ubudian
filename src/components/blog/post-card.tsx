@@ -1,7 +1,8 @@
 import Link from "next/link";
 import Image from "next/image";
 import { format } from "date-fns";
-import { ImageIcon } from "lucide-react";
+import { ImageIcon, Lock } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import type { BlogPost } from "@/types";
 
 interface PostCardProps {
@@ -28,11 +29,19 @@ export function PostCard({ post }: PostCardProps) {
           </div>
         )}
         <div className="p-5">
-          {post.published_at && (
-            <time className="text-xs text-muted-foreground">
-              {format(new Date(post.published_at), "MMMM d, yyyy")}
-            </time>
-          )}
+          <div className="flex items-center gap-2">
+            {post.published_at && (
+              <time className="text-xs text-muted-foreground">
+                {format(new Date(post.published_at), "MMMM d, yyyy")}
+              </time>
+            )}
+            {post.is_members_only && (
+              <Badge variant="outline" className="gap-1 border-brand-gold/40 text-brand-gold text-xs">
+                <Lock className="h-3 w-3" />
+                Members
+              </Badge>
+            )}
+          </div>
           <h3 className="mt-1 font-serif text-lg font-semibold leading-snug text-foreground line-clamp-2 group-hover:text-primary">
             {post.title}
           </h3>

@@ -11,6 +11,14 @@ import { Badge } from "@/components/ui/badge";
 import { Clock, Users } from "lucide-react";
 import { TourJsonLd } from "@/components/tours/tour-json-ld";
 import { formatUsdPrice } from "@/lib/stripe/helpers";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import type { Tour } from "@/types";
 
 interface TourPageProps {
@@ -124,7 +132,26 @@ export default async function TourPage({ params }: TourPageProps) {
         </div>
       )}
 
-      <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6">
+      {/* Breadcrumbs */}
+      <nav className="mx-auto max-w-5xl px-4 pt-6 sm:px-6">
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/">Home</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/tours">Tours</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>{t.title}</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+      </nav>
+
+      <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6">
         <div className="grid gap-10 lg:grid-cols-[1fr_320px]">
           {/* Main content */}
           <div>
