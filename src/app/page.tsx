@@ -7,6 +7,7 @@ import { HomepageScrollSnap } from "@/components/homepage/scroll-snap";
 import { FeaturedStories } from "@/components/homepage/featured-stories";
 import { FeaturedEvents } from "@/components/homepage/featured-events";
 import { FeaturedTours } from "@/components/homepage/featured-tours";
+import { FeaturedExperiences } from "@/components/homepage/featured-experiences";
 import { QuizCtaHomepage } from "@/components/quiz/quiz-cta-homepage";
 import { StoryCardSkeleton } from "@/components/skeletons/story-card-skeleton";
 import { EventCardSkeleton } from "@/components/skeletons/event-card-skeleton";
@@ -14,10 +15,10 @@ import { TourCardSkeleton } from "@/components/skeletons/tour-card-skeleton";
 import { SITE_URL, SITE_NAME, SITE_DESCRIPTION } from "@/lib/constants";
 
 export const metadata: Metadata = {
-  title: "The Ubudian — Your Insider Guide to Ubud, Bali",
+  title: "The Ubudian — Ubud's Conscious Community Platform",
   description: SITE_DESCRIPTION,
   openGraph: {
-    title: "The Ubudian — Your Insider Guide to Ubud, Bali",
+    title: "The Ubudian — Ubud's Conscious Community Platform",
     description: SITE_DESCRIPTION,
     url: SITE_URL,
     siteName: SITE_NAME,
@@ -25,7 +26,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "The Ubudian — Your Insider Guide to Ubud, Bali",
+    title: "The Ubudian — Ubud's Conscious Community Platform",
     description: SITE_DESCRIPTION,
   },
 };
@@ -106,20 +107,20 @@ export default function HomePage() {
               The Ubudian
             </h1>
             <p className="mt-6 font-serif text-xl italic text-brand-cream sm:text-2xl">
-              Your insider guide to the heart of Bali
+              Where Ubud&apos;s conscious community comes together
             </p>
             <p className="mx-auto mt-4 max-w-lg text-base text-brand-off-white/70">
               <Link href="/events" className="text-brand-off-white underline decoration-brand-off-white/30 underline-offset-2 transition-colors hover:text-brand-gold hover:decoration-brand-gold">Events</Link>,{" "}
               <Link href="/stories" className="text-brand-off-white underline decoration-brand-off-white/30 underline-offset-2 transition-colors hover:text-brand-gold hover:decoration-brand-gold">stories</Link>,{" "}
               <Link href="/tours" className="text-brand-off-white underline decoration-brand-off-white/30 underline-offset-2 transition-colors hover:text-brand-gold hover:decoration-brand-gold">tours</Link>, and a{" "}
               <Link href="/newsletter" className="text-brand-off-white underline decoration-brand-off-white/30 underline-offset-2 transition-colors hover:text-brand-gold hover:decoration-brand-gold">weekly newsletter</Link>{" "}
-              — everything you need to make the most of Ubud.
+              — sound journeys, tantra workshops, medicine song circles, and everything in between.
             </p>
             <Link
               href="/quiz"
               className="mt-6 inline-block font-serif text-sm italic text-brand-gold transition-colors hover:text-brand-cream"
             >
-              Take our 90-second quiz to discover your Ubud spirit &rarr;
+              Take the quiz — find your archetype, find your people &rarr;
             </Link>
           </div>
 
@@ -133,7 +134,7 @@ export default function HomePage() {
 
         {/* Transition: Hero → Humans */}
         <p className="bg-brand-cream px-4 py-10 text-center font-serif text-sm italic text-brand-charcoal-light/70">
-          First, meet the people who make this place unforgettable...
+          Meet the humans behind the ceremonies, the kitchens, and the circles...
         </p>
 
         {/* Garden (Humans of Ubud) */}
@@ -144,8 +145,8 @@ export default function HomePage() {
                 Humans of Ubud
               </h2>
               <p className="mx-auto mt-4 max-w-2xl text-lg leading-relaxed text-brand-charcoal-light">
-                Meet the people who make Ubud special — locals, expats, artists,
-                healers, and entrepreneurs sharing their stories.
+                Mask carvers, breathwork guides, tantra facilitators, organic farmers,
+                and the dreamers who followed something to Bali and stayed.
               </p>
             </div>
 
@@ -166,7 +167,7 @@ export default function HomePage() {
 
         {/* Transition: Humans → Newsletter */}
         <p className="bg-brand-pale-green px-4 py-10 text-center font-serif text-sm italic text-brand-charcoal-light/70">
-          Stay connected to the pulse of Ubud...
+          Never miss a full moon ceremony or a last-minute sound bath...
         </p>
 
         {/* Water (Newsletter) */}
@@ -176,8 +177,8 @@ export default function HomePage() {
               Flow with us.
             </h2>
             <p className="mt-4 text-lg text-brand-charcoal-light">
-              The weekly Ubudian — a curated digest of events, stories, and local
-              tips delivered straight to your inbox.
+              One email a week with the events, stories, and community happenings
+              that matter — so you never hear about the good ones after they sell out.
             </p>
             <NewsletterSignup className="mx-auto mt-8 max-w-md" />
             <p className="mt-3 text-sm text-brand-charcoal-light/60">
@@ -188,7 +189,7 @@ export default function HomePage() {
 
         {/* Transition: Newsletter → Events */}
         <p className="bg-gradient-to-b from-brand-pale-green to-brand-warm-cream px-4 py-10 text-center font-serif text-sm italic text-brand-charcoal-light/70">
-          See what&apos;s stirring this week...
+          See what the community is gathering for this week...
         </p>
 
         {/* Earth (Events) */}
@@ -200,8 +201,8 @@ export default function HomePage() {
                 What&apos;s Happening in Ubud
               </h2>
               <p className="mt-4 text-lg text-brand-charcoal-light">
-                From yoga workshops to live music, art exhibitions, and community
-                gatherings — discover the heartbeat of Ubud&apos;s vibrant scene.
+                Temple nights, sound journeys, embodiment workshops, breathwork,
+                medicine song circles — all in one place, updated daily from the community.
               </p>
             </div>
 
@@ -221,9 +222,37 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Transition: Events → Tours */}
+        {/* Experiences */}
+        <section className="bg-brand-cream px-4 py-20 sm:py-28">
+          <div className="mx-auto max-w-6xl">
+            <div className="text-center">
+              <h2 className="font-serif text-3xl font-medium text-brand-deep-green sm:text-4xl">
+                Ubud Experiences
+              </h2>
+              <p className="mx-auto mt-4 max-w-2xl text-lg leading-relaxed text-brand-charcoal-light">
+                Sound healings, sunrise yoga, temple ceremonies, organic markets — the
+                practices and gatherings that define life in Ubud, curated for your spirit.
+              </p>
+            </div>
+
+            <Suspense fallback={<ToursSkeleton />}>
+              <FeaturedExperiences />
+            </Suspense>
+
+            <div className="mt-10 text-center">
+              <Link
+                href="/experiences"
+                className="font-semibold text-brand-deep-green underline underline-offset-4 transition-colors hover:text-brand-gold"
+              >
+                View all experiences
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        {/* Transition: Experiences → Tours */}
         <p className="bg-brand-cream px-4 py-10 text-center font-serif text-sm italic text-brand-charcoal-light/70">
-          Go deeper into the magic of Ubud...
+          When you want to leave the ceremony and explore the land...
         </p>
 
         {/* Path (Tours) */}
@@ -231,12 +260,12 @@ export default function HomePage() {
           <div className="mx-auto max-w-6xl">
             <div className="text-center">
               <h2 className="font-serif text-3xl italic text-brand-deep-green sm:text-4xl">
-                Walk the Path Less Traveled
+                Explore the Land Beneath the Rituals
               </h2>
               <p className="mx-auto mt-4 max-w-xl text-lg text-brand-charcoal-light">
-                Curated experiences beyond the tourist trail — rice terraces,
-                temples, food tours, and hidden gems with local guides who know
-                Ubud inside out.
+                Rice terraces, water temples, jungle treks, and food trails
+                with guides who actually live here — the Ubud that exists between
+                the ceremonies.
               </p>
             </div>
 

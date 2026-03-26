@@ -114,6 +114,23 @@ export interface Tour {
   updated_at: string;
 }
 
+export interface Experience {
+  id: string;
+  title: string;
+  slug: string;
+  short_description: string | null;
+  cover_image_url: string | null;
+  description: string;
+  who_its_for: string | null;
+  practical_info: string | null;
+  category: string;
+  archetype_tags: ArchetypeId[];
+  is_active: boolean;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface NewsletterEdition {
   id: string;
   subject: string;

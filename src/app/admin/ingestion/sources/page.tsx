@@ -44,7 +44,7 @@ export default async function SourcesPage() {
           <Card key={source.id} className="py-3">
             <CardContent className="px-4 py-0 space-y-2">
               <div className="flex items-start justify-between gap-2">
-                <span className="font-medium">{source.name}</span>
+                <Link href={`/admin/ingestion/sources/${source.id}`} className="font-medium hover:underline">{source.name}</Link>
                 <Badge variant={source.is_enabled ? "default" : "secondary"}>
                   {source.is_enabled ? "Active" : "Disabled"}
                 </Badge>
@@ -94,7 +94,9 @@ export default async function SourcesPage() {
           <TableBody>
             {allSources.map((source) => (
               <TableRow key={source.id}>
-                <TableCell className="font-medium">{source.name}</TableCell>
+                <TableCell className="font-medium">
+                  <Link href={`/admin/ingestion/sources/${source.id}`} className="hover:underline">{source.name}</Link>
+                </TableCell>
                 <TableCell>
                   <Badge variant="outline">{source.source_type}</Badge>
                 </TableCell>

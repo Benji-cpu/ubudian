@@ -13,6 +13,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Plus, Users } from "lucide-react";
+import { MobileCardField } from "@/components/admin/mobile-card-field";
 import type { Story } from "@/types";
 import { DeleteStoryButton } from "./delete-button";
 
@@ -75,7 +76,57 @@ export default async function AdminStoriesPage() {
         </Button>
       </div>
 
-      <div className="mt-6">
+      {/* Mobile cards */}
+      <div className="space-y-3 md:hidden mt-6">
+        {allStories.map((story) => (
+          <Card key={story.id} className="py-3">
+            <CardContent className="px-4 py-0 space-y-2">
+              <div className="flex items-start justify-between gap-2">
+                <Link
+                  href={`/admin/stories/${story.id}/edit`}
+                  className="font-medium hover:underline"
+                >
+                  {story.title}
+                </Link>
+                <Badge variant={statusVariant[story.status]}>
+                  {story.status}
+                </Badge>
+              </div>
+              <p className="text-xs text-muted-foreground">{story.subject_name}</p>
+              {(story.theme_tags?.length ?? 0) > 0 && (
+                <div className="flex flex-wrap gap-1">
+                  {story.theme_tags?.slice(0, 2).map((tag) => (
+                    <Badge key={tag} variant="outline" className="text-xs">
+                      {tag}
+                    </Badge>
+                  ))}
+                  {(story.theme_tags?.length ?? 0) > 2 && (
+                    <Badge variant="outline" className="text-xs">
+                      +{story.theme_tags.length - 2}
+                    </Badge>
+                  )}
+                </div>
+              )}
+              <dl className="grid grid-cols-2 gap-2">
+                <MobileCardField label="Date">
+                  {story.published_at
+                    ? format(new Date(story.published_at), "MMM d, yyyy")
+                    : format(new Date(story.created_at), "MMM d, yyyy")}
+                </MobileCardField>
+              </dl>
+              <div className="flex items-center gap-2 border-t pt-2 mt-2">
+                <Button asChild variant="ghost" size="sm">
+                  <Link href={`/admin/stories/${story.id}/edit`}>Edit</Link>
+                </Button>
+                <DeleteStoryButton storyId={story.id} storyTitle={story.title} />
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* Desktop table */}
+      <div className="hidden md:block mt-6">
         <Table>
           <TableHeader>
             <TableRow>

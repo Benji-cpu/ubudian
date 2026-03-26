@@ -7,7 +7,7 @@ import type { BlogPost } from "@/types";
 export const metadata: Metadata = {
   title: "Blog | The Ubudian",
   description:
-    "Stories, guides, and insights from Ubud — covering everything from local culture and food to wellness and expat life.",
+    "Writing from the heart of Ubud's conscious community — expat realities, cultural reflections, and the conversations we're all having.",
 };
 
 export default async function BlogPage() {
@@ -42,8 +42,8 @@ export default async function BlogPage() {
             Blog
           </h1>
           <p className="mt-4 text-lg text-muted-foreground">
-            Stories, guides, and insights from Ubud — your go-to resource for
-            making the most of life in the heart of Bali.
+            Writing from the community — expat realities, cultural reflections,
+            and honest takes on life in Ubud&apos;s conscious scene.
           </p>
         </div>
       </section>

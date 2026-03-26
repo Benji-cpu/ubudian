@@ -10,6 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Sparkles } from "lucide-react";
+import { MobileCardField } from "@/components/admin/mobile-card-field";
 import type { Subscription } from "@/types";
 
 const statusVariant: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
@@ -53,49 +54,83 @@ export default async function AdminSubscriptionsPage() {
       <h1 className="text-3xl font-bold">Subscriptions</h1>
 
       <div className="mt-6">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Member</TableHead>
-              <TableHead>Plan</TableHead>
-              <TableHead>Interval</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Period End</TableHead>
-              <TableHead>Auto-Renew</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {allSubs.map((sub) => (
-              <TableRow key={sub.id}>
-                <TableCell>
-                  <div>
-                    <div className="text-sm font-medium">{sub.profiles?.display_name ?? "—"}</div>
-                    <div className="text-xs text-muted-foreground">{sub.profiles?.email ?? "—"}</div>
-                  </div>
-                </TableCell>
-                <TableCell>{sub.plan_name}</TableCell>
-                <TableCell className="capitalize">{sub.interval}ly</TableCell>
-                <TableCell>
+        <div className="hidden md:block">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Member</TableHead>
+                <TableHead>Plan</TableHead>
+                <TableHead>Interval</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Period End</TableHead>
+                <TableHead>Auto-Renew</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {allSubs.map((sub) => (
+                <TableRow key={sub.id}>
+                  <TableCell>
+                    <div>
+                      <div className="text-sm font-medium">{sub.profiles?.display_name ?? "—"}</div>
+                      <div className="text-xs text-muted-foreground">{sub.profiles?.email ?? "—"}</div>
+                    </div>
+                  </TableCell>
+                  <TableCell>{sub.plan_name}</TableCell>
+                  <TableCell className="capitalize">{sub.interval}ly</TableCell>
+                  <TableCell>
+                    <Badge variant={statusVariant[sub.status] ?? "outline"}>
+                      {sub.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-muted-foreground">
+                    {sub.current_period_end
+                      ? new Date(sub.current_period_end).toLocaleDateString()
+                      : "—"}
+                  </TableCell>
+                  <TableCell>
+                    {sub.cancel_at_period_end ? (
+                      <Badge variant="secondary">Cancelling</Badge>
+                    ) : (
+                      <Badge variant="outline">Active</Badge>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+
+        <div className="space-y-3 md:hidden">
+          {allSubs.map((sub) => (
+            <Card key={sub.id} className="py-3">
+              <CardContent className="px-4 py-0">
+                <div className="flex items-center justify-between">
+                  <span className="font-medium text-sm">{sub.profiles?.display_name ?? "—"}</span>
                   <Badge variant={statusVariant[sub.status] ?? "outline"}>
                     {sub.status}
                   </Badge>
-                </TableCell>
-                <TableCell className="text-muted-foreground">
-                  {sub.current_period_end
-                    ? new Date(sub.current_period_end).toLocaleDateString()
-                    : "—"}
-                </TableCell>
-                <TableCell>
-                  {sub.cancel_at_period_end ? (
-                    <Badge variant="secondary">Cancelling</Badge>
-                  ) : (
-                    <Badge variant="outline">Active</Badge>
-                  )}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+                </div>
+                <p className="text-xs text-muted-foreground">{sub.profiles?.email ?? "—"}</p>
+                <dl className="mt-2 grid grid-cols-2 gap-2">
+                  <MobileCardField label="Plan">{sub.plan_name}</MobileCardField>
+                  <MobileCardField label="Interval"><span className="capitalize">{sub.interval}ly</span></MobileCardField>
+                  <MobileCardField label="Period End">
+                    {sub.current_period_end
+                      ? new Date(sub.current_period_end).toLocaleDateString()
+                      : "—"}
+                  </MobileCardField>
+                  <MobileCardField label="Auto-Renew">
+                    {sub.cancel_at_period_end ? (
+                      <Badge variant="secondary">Cancelling</Badge>
+                    ) : (
+                      <Badge variant="outline">Active</Badge>
+                    )}
+                  </MobileCardField>
+                </dl>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       </div>
     </div>
   );

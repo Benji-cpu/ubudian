@@ -9,7 +9,7 @@ import { QuizEmailCapture } from "./quiz-email-capture";
 import { QuizResults } from "./quiz-results";
 import { QuizArchetypeCard } from "./quiz-archetype-card";
 import { Button } from "@/components/ui/button";
-import type { ArchetypeId, QuizScores, Event, Tour, Story } from "@/types";
+import type { ArchetypeId, QuizScores, Event, Tour, Story, Experience } from "@/types";
 
 const STORAGE_KEY = "ubudian_quiz_result";
 
@@ -28,9 +28,10 @@ interface QuizContainerProps {
   events: Event[];
   tours: Tour[];
   stories: Story[];
+  experiences: Experience[];
 }
 
-export function QuizContainer({ events, tours, stories }: QuizContainerProps) {
+export function QuizContainer({ events, tours, stories, experiences }: QuizContainerProps) {
   const [step, setStep] = useState<Step>("intro");
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<{ question_id: number; answer_id: string }[]>([]);
@@ -141,6 +142,7 @@ export function QuizContainer({ events, tours, stories }: QuizContainerProps) {
         events={events}
         tours={tours}
         stories={stories}
+        experiences={experiences}
         onRetake={handleRetake}
       />
     );
@@ -178,8 +180,8 @@ export function QuizContainer({ events, tours, stories }: QuizContainerProps) {
         Discover Your Ubud Spirit
       </h1>
       <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-brand-charcoal-light">
-        Answer 6 questions and we&apos;ll match you to one of 5 Ubud archetypes — then
-        recommend events, tours, and experiences tailored to your spirit.
+        Answer 6 questions and we&apos;ll match you to one of 5 archetypes — then
+        show you the ceremonies, workshops, tours, and stories that match your path.
       </p>
 
       <Button size="lg" className="mt-8" onClick={() => setStep("questions")}>

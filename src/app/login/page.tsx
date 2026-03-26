@@ -4,7 +4,7 @@ import { LoginForm } from "@/components/auth/login-form";
 
 export const metadata: Metadata = {
   title: "Sign In | The Ubudian",
-  description: "Sign in to The Ubudian to submit events and manage your account.",
+  description: "Sign in to The Ubudian — submit events, save your favorites, and connect with the community.",
 };
 
 export default function LoginPage() {

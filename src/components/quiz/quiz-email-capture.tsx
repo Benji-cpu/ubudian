@@ -36,8 +36,8 @@ export function QuizEmailCapture({ onSubmit, onSkip }: QuizEmailCaptureProps) {
         Your Ubud Spirit is ready!
       </h2>
       <p className="mt-4 text-lg text-brand-charcoal-light">
-        Enter your email to save your results and get personalized Ubud
-        recommendations in our weekly newsletter.
+        Enter your email to save your results and get community events
+        matched to your archetype in our weekly newsletter.
       </p>
 
       <form onSubmit={handleSubmit} className="mt-8">

@@ -1,0 +1,32 @@
+{
+  "mcpServers": {
+    "supabase": {
+      "type": "http",
+      "url": "https://mcp.supabase.com/mcp?project_ref=vzooblnkztbjgfbdfzxl&read_only=true"
+    },
+    "waha": {
+      "command": "npx",
+      "args": ["-y", "waha-mcp"],
+      "env": {
+        "WAHA_API_KEY": "${WAHA_API_KEY}",
+        "WAHA_URL": "${WAHA_API_URL}"
+      }
+    },
+    "stripe": {
+      "type": "http",
+      "url": "https://mcp.stripe.com/"
+    },
+    "vercel": {
+      "command": "npx",
+      "args": ["-y", "vercel-mcp@latest"]
+    },
+    "beehiiv": {
+      "command": "npx",
+      "args": ["-y", "beehiiv-mcp"],
+      "env": {
+        "BEEHIIV_API_KEY": "${BEEHIIV_API_KEY}",
+        "BEEHIIV_PUBLICATION_ID": "${BEEHIIV_PUBLICATION_ID}"
+      }
+    }
+  }
+}

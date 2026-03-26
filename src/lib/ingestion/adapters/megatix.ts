@@ -214,7 +214,7 @@ const megatixAdapter: SourceAdapter = {
         cover_image_url: event.cover || null,
         source_url: eventUrl,
         source_event_id: String(event.id),
-        quality_score: 0.8,
+        quality_score: 0.9,
         content_flags: [],
       };
 

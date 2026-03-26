@@ -7,7 +7,7 @@ import type { NewsletterEdition } from "@/types";
 export const metadata: Metadata = {
   title: "Newsletter Archive | The Ubudian",
   description:
-    "Browse past editions of The Ubudian — your weekly guide to events, stories, and life in Ubud.",
+    "Browse past editions of The Ubudian Weekly — events, stories, and community happenings from Ubud's conscious scene.",
 };
 
 export default async function NewsletterPage() {
@@ -38,8 +38,8 @@ export default async function NewsletterPage() {
             The Ubudian Newsletter
           </h1>
           <p className="mt-4 text-lg text-muted-foreground">
-            A curated weekly digest of events, stories, and local tips — delivered
-            to your inbox every week.
+            One email a week with the ceremonies, workshops, sound journeys,
+            community stories, and conversations that matter in Ubud right now.
           </p>
           <NewsletterSignup className="mx-auto mt-8 max-w-md" />
         </div>

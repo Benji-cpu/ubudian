@@ -75,8 +75,8 @@ export function QuizCtaHomepage() {
         </h2>
         <p className="mx-auto mt-4 max-w-xl text-lg text-brand-charcoal-light">
           Are you a Seeker, Explorer, Creative, Connector, or Epicurean?
-          Take our 90-second quiz and get personalized recommendations for
-          events, tours, and experiences.
+          Take the 90-second quiz and find the ceremonies, workshops, and
+          community experiences that match your spirit.
         </p>
         <Button asChild size="lg" className="mt-8">
           <Link href="/quiz">Take the Quiz</Link>

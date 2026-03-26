@@ -117,6 +117,8 @@ function mapToParsedEvent(
       event.images?.header || event.images?.thumbnail || null,
     source_url: event.url || null,
     source_event_id: event.id,
+    quality_score: 0.9,
+    content_flags: [],
   };
 }
 

@@ -7,4 +7,5 @@ VALUES (
   '{"_preParsed": true, "organizers": []}',
   false,
   1440
-);
+)
+ON CONFLICT (slug) DO NOTHING;

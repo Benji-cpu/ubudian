@@ -3,14 +3,15 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ARCHETYPES, ARCHETYPE_IDS } from "@/lib/quiz-data";
-import { getEventsForArchetype, getToursForArchetype, getStoriesForArchetype } from "@/lib/quiz-helpers";
+import { getEventsForArchetype, getToursForArchetype, getStoriesForArchetype, getExperiencesForArchetype } from "@/lib/quiz-helpers";
 import { QuizShareButtons } from "./quiz-share-buttons";
 import { EventCard } from "@/components/events/event-card";
 import { TourCard } from "@/components/tours/tour-card";
 import { StoryCard } from "@/components/stories/story-card";
+import { ExperienceCard } from "@/components/experiences/experience-card";
 import { Button } from "@/components/ui/button";
 import { SITE_URL } from "@/lib/constants";
-import type { ArchetypeId, QuizScores, Event, Tour, Story } from "@/types";
+import type { ArchetypeId, QuizScores, Event, Tour, Story, Experience } from "@/types";
 
 interface QuizResultsProps {
   primary: ArchetypeId;
@@ -19,6 +20,7 @@ interface QuizResultsProps {
   events: Event[];
   tours: Tour[];
   stories: Story[];
+  experiences: Experience[];
   onRetake: () => void;
 }
 
@@ -29,6 +31,7 @@ export function QuizResults({
   events,
   tours,
   stories,
+  experiences,
   onRetake,
 }: QuizResultsProps) {
   const archetype = ARCHETYPES[primary];
@@ -36,6 +39,7 @@ export function QuizResults({
   const maxScore = Math.max(...Object.values(scores));
   const shareUrl = `${SITE_URL}/quiz/results/${primary}`;
 
+  const matchedExperiences = getExperiencesForArchetype(experiences, primary);
   const matchedEvents = getEventsForArchetype(events, primary);
   const matchedTours = getToursForArchetype(tours, primary);
   const matchedStories = getStoriesForArchetype(stories, primary);
@@ -113,6 +117,23 @@ export function QuizResults({
         <p className="mb-4 font-serif text-lg text-brand-charcoal">Share your Ubud Spirit</p>
         <QuizShareButtons archetypeName={archetype.name} url={shareUrl} />
       </div>
+
+      {/* Recommended experiences */}
+      {matchedExperiences.length > 0 && (
+        <div className="mt-12">
+          <h3 className="font-serif text-2xl font-medium text-brand-deep-green">
+            Experiences for {archetype.name}
+          </h3>
+          <p className="mt-2 text-brand-charcoal-light">
+            Curated experiences that match your spirit. These are the things that make Ubud feel like home.
+          </p>
+          <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {matchedExperiences.map((experience) => (
+              <ExperienceCard key={experience.id} experience={experience} />
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Recommended events */}
       {matchedEvents.length > 0 && (

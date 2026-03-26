@@ -10,13 +10,13 @@ export const ARCHETYPES: Record<ArchetypeId, ArchetypeResult> = {
     name: "The Seeker",
     tagline: "Your soul craves stillness and transformation",
     description:
-      "You came to Ubud not just to visit, but to be changed. Whether it's a sunrise yoga session above the rice terraces, a water purification ceremony at a sacred temple, or a silent meditation retreat in the jungle, you're drawn to experiences that quiet the noise and connect you to something deeper. Ubud has been calling seekers like you for centuries — and it has so much to show you.",
+      "You came to Ubud not just to visit, but to be changed. Whether it's a sound bath under the stars, a cacao ceremony at dawn, or a silent meditation retreat in the jungle, you're drawn to experiences that quiet the noise and connect you to something deeper. Ubud has been calling seekers like you for centuries — and it has so much to show you.",
     hero_image: "/images/archetypes/seeker.jpg",
     color: "brand-deep-green",
     content_keywords: {
-      event_categories: ["Yoga & Wellness"],
+      event_categories: ["Ceremony & Sound", "Yoga & Meditation", "Healing & Bodywork"],
       tour_themes: ["Spiritual & Healing", "Wellness & Yoga"],
-      story_theme_tags: ["Healer", "Yogi", "Spiritual Guide"],
+      story_theme_tags: ["Healer", "Yogi", "Spiritual Guide", "Ceremonialist"],
     },
   },
   explorer: {
@@ -24,13 +24,13 @@ export const ARCHETYPES: Record<ArchetypeId, ArchetypeResult> = {
     name: "The Explorer",
     tagline: "You follow trails, not crowds",
     description:
-      "While others sleep in, you're already halfway up a volcano to catch the sunrise. You'd rather trek through rice terraces than sit at a cafe, and you're happiest when you discover a hidden waterfall that isn't on any map. Ubud is your kind of place — lush, wild, and full of paths that lead somewhere unexpected. Lace up your boots and let the island surprise you.",
+      "While others sleep in, you're already halfway up a volcano to catch the sunrise. You'd rather trek through rice terraces than sit at a cafe, and you're happiest when you discover a hidden waterfall that isn't on any map. Whether it's a jungle dance or a dawn hike, you crave movement and discovery. Ubud is your kind of place — lush, wild, and full of paths that lead somewhere unexpected.",
     hero_image: "/images/archetypes/explorer.jpg",
     color: "brand-deep-green",
     content_keywords: {
-      event_categories: ["Sports & Adventure"],
+      event_categories: ["Dance & Movement", "Art & Culture"],
       tour_themes: ["Nature & Rice Terraces", "Adventure & Trekking", "Photography"],
-      story_theme_tags: ["Farmer", "Environmentalist"],
+      story_theme_tags: ["Farmer", "Environmentalist", "Dance Facilitator"],
     },
   },
   creative: {
@@ -42,7 +42,7 @@ export const ARCHETYPES: Record<ArchetypeId, ArchetypeResult> = {
     hero_image: "/images/archetypes/creative.jpg",
     color: "brand-gold",
     content_keywords: {
-      event_categories: ["Art & Culture", "Music & Live Performance", "Workshop & Class"],
+      event_categories: ["Art & Culture", "Music & Performance", "Dance & Movement"],
       tour_themes: ["Cultural & Heritage", "Art & Craft"],
       story_theme_tags: ["Artist", "Musician", "Writer", "Craftsperson"],
     },
@@ -52,25 +52,25 @@ export const ARCHETYPES: Record<ArchetypeId, ArchetypeResult> = {
     name: "The Connector",
     tagline: "You collect people, not things",
     description:
-      "For you, the best part of travel is the people you meet. You're equally comfortable chatting with a warung owner about her grandmother's recipe and swapping stories with digital nomads at a coworking space. You've probably already found a community dinner, joined a meetup, and made friends with half the expats in town. Ubud's magic is its people — and you're already one of them.",
+      "For you, the best part of travel is the people you meet. You're the first to join a sharing circle, show up at a community dinner, or dive into a connection practice with strangers who become friends by sunset. You've probably already made friends with half the community in town. Ubud's magic is its people — and you're already one of them.",
     hero_image: "/images/archetypes/connector.jpg",
     color: "brand-terracotta",
     content_keywords: {
-      event_categories: ["Community & Social", "Market & Shopping"],
+      event_categories: ["Circle & Community", "Tantra & Intimacy"],
       tour_themes: ["Cultural & Heritage"],
-      story_theme_tags: ["Entrepreneur", "Educator", "Expat Life", "Digital Nomad", "Local Legend"],
+      story_theme_tags: ["Entrepreneur", "Educator", "Expat Life", "Digital Nomad", "Local Legend", "Facilitator", "Space Holder"],
     },
   },
   epicurean: {
     id: "epicurean",
     name: "The Epicurean",
-    tagline: "You taste your way through every destination",
+    tagline: "You savour every experience with all your senses",
     description:
-      "You believe the best way to know a place is through its food. Your Ubud itinerary reads like a menu: morning at the organic market, midday Balinese cooking class, afternoon exploring Gianyar night market, evening farm-to-table dinner surrounded by rice paddies. From smoky satay at a roadside warung to innovative plant-based cuisine, Ubud's food scene is as layered and complex as the flavors on your plate.",
+      "You believe the best way to know a place is through full sensory immersion. Your Ubud itinerary is a feast: morning cacao ceremony, midday sound journey, afternoon at a healing session, evening farm-to-table dinner surrounded by rice paddies. From smoky satay at a roadside warung to the vibrations of a gong bath, you're drawn to experiences that you can taste, feel, and remember in your body.",
     hero_image: "/images/archetypes/epicurean.jpg",
     color: "brand-terracotta",
     content_keywords: {
-      event_categories: ["Food & Drink"],
+      event_categories: ["Ceremony & Sound", "Healing & Bodywork"],
       tour_themes: ["Food & Culinary"],
       story_theme_tags: ["Chef & Food"],
     },
@@ -101,7 +101,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
     answers: [
       {
         id: "1a",
-        text: "Sunrise yoga overlooking rice terraces",
+        text: "A breathwork session overlooking the rice terraces",
         image_url: "/images/quiz/yoga-rice-terraces.jpg",
         scores: scores("seeker", "explorer"),
       },
@@ -138,13 +138,13 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
       },
       {
         id: "2b",
-        text: "A sunrise volcano trek with hot springs after",
+        text: "An ecstatic dance night at a jungle venue",
         image_url: "/images/quiz/volcano-trek.jpg",
         scores: scores("explorer", "seeker"),
       },
       {
         id: "2c",
-        text: "A traditional Balinese cooking class",
+        text: "A cacao ceremony and sound journey under the stars",
         image_url: "/images/quiz/cooking-class.jpg",
         scores: scores("epicurean", "creative"),
       },
@@ -163,7 +163,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
     answers: [
       {
         id: "3a",
-        text: "A sound healing ceremony under the stars",
+        text: "A gong bath and sound journey under the stars",
         image_url: "/images/quiz/sound-healing.jpg",
         scores: scores("seeker", "creative"),
       },

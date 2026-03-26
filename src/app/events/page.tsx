@@ -16,7 +16,7 @@ import type { Event } from "@/types";
 export const metadata: Metadata = {
   title: "Events in Ubud | The Ubudian",
   description:
-    "Discover what's happening in Ubud — yoga, music, art, food, workshops, and community events.",
+    "Tantra workshops, sound journeys, breathwork, ecstatic dance, medicine song circles, and sacred ceremonies happening in Ubud this week.",
 };
 
 interface EventsPageProps {
@@ -88,8 +88,8 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
             What&apos;s Happening in Ubud
           </h1>
           <p className="mt-4 text-lg text-muted-foreground">
-            From yoga workshops to live music, art exhibitions, and community
-            gatherings — discover the heartbeat of Ubud.
+            Tantra workshops, sound journeys, breathwork sessions, sacred
+            circles, and community gatherings — updated daily from across Ubud.
           </p>
           <Button asChild variant="outline" className="mt-6">
             <Link href="/events/submit">Submit an Event</Link>

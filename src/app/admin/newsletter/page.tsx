@@ -13,6 +13,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Plus, Mail } from "lucide-react";
+import { MobileCardField } from "@/components/admin/mobile-card-field";
 import type { NewsletterEdition } from "@/types";
 
 export default async function AdminNewsletterPage() {
@@ -74,7 +75,46 @@ export default async function AdminNewsletterPage() {
         </Button>
       </div>
 
-      <div className="mt-6">
+      {/* Mobile cards */}
+      <div className="space-y-3 md:hidden mt-6">
+        {allEditions.map((edition) => (
+          <Card key={edition.id} className="py-3">
+            <CardContent className="px-4 py-0 space-y-2">
+              <div className="flex items-start justify-between gap-2">
+                <Link
+                  href={`/admin/newsletter/${edition.id}/edit`}
+                  className="font-medium hover:underline"
+                >
+                  {edition.subject}
+                </Link>
+                <Badge variant={statusVariant[edition.status]}>
+                  {edition.status}
+                </Badge>
+              </div>
+              <dl className="grid grid-cols-2 gap-2">
+                <MobileCardField label="Beehiiv">
+                  {edition.beehiiv_post_id ? (
+                    <Badge variant="outline" className="text-xs">Synced</Badge>
+                  ) : "—"}
+                </MobileCardField>
+                <MobileCardField label="Date">
+                  {edition.sent_at
+                    ? format(new Date(edition.sent_at), "MMM d, yyyy")
+                    : format(new Date(edition.created_at), "MMM d, yyyy")}
+                </MobileCardField>
+              </dl>
+              <div className="flex items-center gap-2 border-t pt-2 mt-2">
+                <Button asChild variant="ghost" size="sm">
+                  <Link href={`/admin/newsletter/${edition.id}/edit`}>Edit</Link>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* Desktop table */}
+      <div className="hidden md:block mt-6">
         <Table>
           <TableHeader>
             <TableRow>

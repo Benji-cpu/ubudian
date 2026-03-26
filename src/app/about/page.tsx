@@ -7,7 +7,7 @@ import { Calendar, Users, MapPin, FileText, ImageIcon } from "lucide-react";
 export const metadata: Metadata = {
   title: "About | The Ubudian",
   description:
-    "The Ubudian is your insider guide to Ubud — connecting the community through events, stories, tours, and a weekly newsletter.",
+    "The Ubudian brings Ubud's conscious community together — events, stories, tours, and a weekly newsletter in one place.",
 };
 
 export default function AboutPage() {
@@ -20,8 +20,8 @@ export default function AboutPage() {
             About The Ubudian
           </h1>
           <p className="mt-4 text-lg text-muted-foreground">
-            Your insider guide to Ubud — connecting the community through
-            events, stories, tours, and the weekly newsletter.
+            Bringing Ubud&apos;s conscious community together through events,
+            stories, tours, and the weekly newsletter.
           </p>
         </div>
       </section>
@@ -35,22 +35,26 @@ export default function AboutPage() {
             </h2>
             <div className="mt-6 space-y-4 text-muted-foreground">
               <p>
-                Ubud is a place like no other — a melting pot of Balinese
-                tradition, global creativity, and spiritual seekers. But for a
-                community this vibrant, it can feel surprisingly fragmented.
-                Events live in scattered WhatsApp groups. Newcomers don&apos;t
-                know where to start. Talented locals go unnoticed.
+                Every week in Ubud, there are tantra workshops, sound journeys,
+                medicine song circles, cacao ceremonies, breathwork sessions,
+                sacred dance, and shadow work retreats — alongside Balinese temple
+                ceremonies, art exhibitions, and live music. But finding out about
+                them means scrolling through dozens of WhatsApp groups, Instagram
+                stories, and word of mouth. Newcomers miss everything. Even
+                long-term residents lose track.
               </p>
               <p>
-                The Ubudian was created to bring it all together. One platform
-                where you can discover what&apos;s happening, read stories from
-                the people who make Ubud special, find curated tours beyond the
-                tourist trail, and stay connected through a weekly newsletter.
+                The Ubudian puts it all in one place. Every event we can find
+                gets ingested, verified, and listed — from intimate embodiment
+                workshops to full moon ceremonies to community devotional gatherings.
+                Add in stories from the humans who hold space here, tours that
+                take you into the landscape, and a weekly newsletter, and you
+                have the community hub Ubud has been missing.
               </p>
               <p>
-                Think of it as your friend who&apos;s lived in Ubud for years
-                and always knows the best stuff going on — except now it&apos;s
-                a website, and everyone can benefit from it.
+                Think of it as that person in your community who always
+                knows what is happening this week — except now anyone can
+                tap into it, whether they just arrived or have been here for years.
               </p>
             </div>
           </div>
@@ -82,8 +86,8 @@ export default function AboutPage() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground">
-                    Guides, insights, and reflections on life in Ubud — from
-                    local food spots to navigating expat life.
+                    Reflections on life in Ubud — the expat experience, the spiritual
+                    circus, and the real conversations this community is having.
                   </p>
                 </CardContent>
               </Card>
@@ -97,8 +101,8 @@ export default function AboutPage() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground">
-                    Meet the people who make Ubud special — locals, expats,
-                    artists, healers, and entrepreneurs sharing their stories.
+                    The mask carvers, breathwork guides, organic farmers, tantra
+                    teachers, and restless souls who ended up in Ubud and found home.
                   </p>
                 </CardContent>
               </Card>
@@ -112,8 +116,9 @@ export default function AboutPage() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground">
-                    Discover what&apos;s happening in Ubud — from yoga workshops
-                    to live music, art exhibitions, and community gatherings.
+                    Sound journeys, tantra workshops, embodiment retreats, sacred
+                    circles, and community gatherings — pulled from WhatsApp groups,
+                    Telegram channels, and venues across Ubud.
                   </p>
                 </CardContent>
               </Card>
@@ -127,8 +132,9 @@ export default function AboutPage() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground">
-                    Curated experiences beyond the tourist trail — rice terraces,
-                    temples, food tours, and hidden gems with local guides.
+                    Rice terraces, water temples, jungle treks, and food trails
+                    with guides who live here — for when you want to explore the
+                    land itself.
                   </p>
                 </CardContent>
               </Card>
@@ -144,8 +150,8 @@ export default function AboutPage() {
             Join the Community
           </h2>
           <p className="mt-3 text-lg text-brand-off-white/80">
-            Get the weekly Ubudian newsletter — events, stories, and local tips
-            delivered to your inbox.
+            One email a week — the events, stories, and community happenings
+            worth knowing about.
           </p>
           <NewsletterSignup variant="dark" className="mx-auto mt-6 max-w-md" />
           <p className="mt-2 text-sm text-brand-off-white/60">

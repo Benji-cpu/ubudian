@@ -51,8 +51,8 @@ export async function FeaturedStories() {
       </div>
       <div>
         <p className="text-lg leading-relaxed text-brand-charcoal-light">
-          Every face tells a tale of why this magical place draws people
-          from around the world — their stories are coming soon.
+          The healers, ceremonialists, farmers, and seekers who call Ubud
+          home — their stories are on the way.
         </p>
       </div>
     </div>

@@ -200,7 +200,7 @@ export default async function IngestionDashboardPage() {
       )}
 
       {(pendingEvents ?? []).length > 0 && (
-        <PendingApprovalQueue events={pendingEvents ?? []} />
+        <PendingApprovalQueue events={pendingEvents ?? []} sourceNames={sourceNames} />
       )}
 
       {allSources.length > 0 && (
@@ -217,7 +217,9 @@ export default async function IngestionDashboardPage() {
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {allSources.map((source) => (
               <div key={source.id} className="space-y-2">
-                <SourceHealthCard source={source} />
+                <Link href={`/admin/ingestion/sources/${source.id}`}>
+                  <SourceHealthCard source={source} />
+                </Link>
                 <TriggerRunButton sourceId={source.id} sourceName={source.name} />
               </div>
             ))}

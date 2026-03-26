@@ -7,7 +7,7 @@ import type { Tour } from "@/types";
 export const metadata: Metadata = {
   title: "Secret Tours | The Ubudian",
   description:
-    "Curated experiences beyond the tourist trail — rice terraces, temples, food tours, and hidden gems with local guides.",
+    "Walk the rice terraces, visit sacred water temples, trek through jungles, and eat your way through Ubud with local guides.",
 };
 
 export default async function ToursPage() {
@@ -35,11 +35,11 @@ export default async function ToursPage() {
         <div className="mx-auto max-w-3xl text-center">
           <div className="mx-auto mb-6 h-px w-12 bg-brand-gold/40" />
           <h1 className="font-serif text-4xl font-medium tracking-tight text-brand-deep-green sm:text-5xl">
-            The Ubudian Secret Tours
+            Walk the Land
           </h1>
           <p className="mt-4 text-lg text-muted-foreground">
-            Curated experiences beyond the tourist trail — rice terraces, temples,
-            food tours, and hidden gems with local guides who know Ubud inside out.
+            Rice terraces, sacred water temples, jungle waterfalls, and food trails
+            through the warungs and markets — with guides who live here and love this place.
           </p>
         </div>
       </section>

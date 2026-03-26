@@ -3,7 +3,7 @@ import { EventSubmissionForm } from "@/components/events/event-submission-form";
 
 export const metadata: Metadata = {
   title: "Submit an Event | The Ubudian",
-  description: "Submit your event to the Ubud events directory.",
+  description: "Submit your ceremony, workshop, gathering, or event to The Ubudian community calendar.",
 };
 
 export default function SubmitEventPage() {
@@ -17,8 +17,8 @@ export default function SubmitEventPage() {
             Submit an Event
           </h1>
           <p className="mt-4 text-lg text-muted-foreground">
-            Share your event with the Ubud community. All submissions are reviewed
-            before publishing.
+            Hosting a ceremony, workshop, circle, or gathering in Ubud? Share it
+            with the community. All submissions are reviewed before publishing.
           </p>
         </div>
       </section>
@@ -30,9 +30,10 @@ export default function SubmitEventPage() {
           <ul className="list-disc space-y-1 pl-5">
             <li>Events must take place in or around Ubud, Bali</li>
             <li>Include accurate dates, times, and venue information</li>
-            <li>Provide a way for people to contact you or buy tickets</li>
+            <li>Provide a way for people to contact you, register, or buy tickets</li>
+            <li>Workshops, ceremonies, retreats, sound journeys, circles, and community gatherings are all welcome</li>
             <li>Events are typically reviewed within 24 hours</li>
-            <li>Trusted submitters get automatic approval</li>
+            <li>Trusted submitters get automatic approval after 5 approved events</li>
           </ul>
         </div>
 

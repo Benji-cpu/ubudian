@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/table";
 import { CreditCard } from "lucide-react";
 import { formatUsdPrice } from "@/lib/stripe/helpers";
+import { MobileCardField } from "@/components/admin/mobile-card-field";
 import type { Booking } from "@/types";
 
 const statusVariant: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
@@ -53,7 +54,8 @@ export default async function AdminBookingsPage() {
     <div>
       <h1 className="text-3xl font-bold">Bookings</h1>
 
-      <div className="mt-6">
+      {/* Desktop table */}
+      <div className="mt-6 hidden md:block">
         <Table>
           <TableHeader>
             <TableRow>
@@ -108,6 +110,42 @@ export default async function AdminBookingsPage() {
             ))}
           </TableBody>
         </Table>
+      </div>
+
+      {/* Mobile cards */}
+      <div className="mt-6 space-y-3 md:hidden">
+        {allBookings.map((booking) => (
+          <Card key={booking.id} className="py-3">
+            <CardContent className="px-4 py-0">
+              <div className="flex items-start justify-between">
+                <Link
+                  href={`/admin/bookings/${booking.id}`}
+                  className="font-mono text-sm font-medium hover:underline"
+                >
+                  {booking.booking_reference}
+                </Link>
+                <Badge variant={statusVariant[booking.status] ?? "outline"}>
+                  {booking.status}
+                </Badge>
+              </div>
+              <p className="mt-1 truncate text-xs text-muted-foreground">
+                {booking.tours?.title ?? "—"}
+              </p>
+              <p className="text-sm font-medium">{booking.guest_name}</p>
+              <p className="text-xs text-muted-foreground">{booking.guest_email}</p>
+              <dl className="mt-2 grid grid-cols-2 gap-2">
+                <MobileCardField label="Date">{booking.preferred_date}</MobileCardField>
+                <MobileCardField label="Guests">{booking.num_guests}</MobileCardField>
+                <MobileCardField label="Total">{formatUsdPrice(booking.total_amount)}</MobileCardField>
+                <MobileCardField label="Payment">
+                  <Badge variant={booking.stripe_payment_status === "paid" ? "default" : "outline"}>
+                    {booking.stripe_payment_status}
+                  </Badge>
+                </MobileCardField>
+              </dl>
+            </CardContent>
+          </Card>
+        ))}
       </div>
     </div>
   );

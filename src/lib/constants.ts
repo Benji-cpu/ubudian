@@ -1,11 +1,12 @@
 export const SITE_NAME = "The Ubudian";
 export const SITE_DESCRIPTION =
-  "Your insider guide to Ubud — events, stories, tours, and the weekly newsletter.";
+  "Ubud's conscious community in one place — events, stories, tours, and the weekly newsletter.";
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
 export const NAV_LINKS = [
   { label: "Quiz", href: "/quiz" },
   { label: "Events", href: "/events" },
+  { label: "Experiences", href: "/experiences" },
   { label: "Humans of Ubud", href: "/stories" },
   { label: "Tours", href: "/tours" },
   { label: "Newsletter", href: "/newsletter" },
@@ -20,6 +21,7 @@ export const ADMIN_NAV_LINKS = [
   { label: "Blog", href: "/admin/blog", icon: "FileText" },
   { label: "Newsletter", href: "/admin/newsletter", icon: "Mail" },
   { label: "Tours", href: "/admin/tours", icon: "MapPin" },
+  { label: "Experiences", href: "/admin/experiences", icon: "Compass" },
   { label: "Subscribers", href: "/admin/subscribers", icon: "UserPlus" },
   { label: "Trusted", href: "/admin/trusted-submitters", icon: "ShieldCheck" },
   { label: "Ingestion", href: "/admin/ingestion", icon: "Zap" },
@@ -28,15 +30,15 @@ export const ADMIN_NAV_LINKS = [
 ] as const;
 
 export const EVENT_CATEGORIES = [
-  "Music & Live Performance",
-  "Yoga & Wellness",
+  "Dance & Movement",
+  "Tantra & Intimacy",
+  "Ceremony & Sound",
+  "Yoga & Meditation",
+  "Healing & Bodywork",
+  "Circle & Community",
+  "Music & Performance",
   "Art & Culture",
-  "Food & Drink",
-  "Community & Social",
-  "Workshop & Class",
-  "Market & Shopping",
-  "Sports & Adventure",
-  "Kids & Family",
+  "Retreat & Training",
   "Other",
 ] as const;
 
@@ -59,6 +61,12 @@ export const STORY_THEME_TAGS = [
   "Expat Life",
   "Local Legend",
   "Digital Nomad",
+  "Facilitator",
+  "Space Holder",
+  "Bodyworker",
+  "Breathwork Guide",
+  "Dance Facilitator",
+  "Ceremonialist",
 ] as const;
 
 export const DASHBOARD_NAV_LINKS = [
@@ -70,28 +78,28 @@ export const DASHBOARD_NAV_LINKS = [
 ] as const;
 
 export const CATEGORY_EMOJI: Record<string, string> = {
-  "Music & Live Performance": "🎵",
-  "Yoga & Wellness": "🧘",
+  "Dance & Movement": "💃",
+  "Tantra & Intimacy": "🔥",
+  "Ceremony & Sound": "🕯️",
+  "Yoga & Meditation": "🧘",
+  "Healing & Bodywork": "✨",
+  "Circle & Community": "⭕",
+  "Music & Performance": "🎵",
   "Art & Culture": "🎨",
-  "Food & Drink": "🍽️",
-  "Community & Social": "🤝",
-  "Workshop & Class": "✏️",
-  "Market & Shopping": "🛍️",
-  "Sports & Adventure": "🏄",
-  "Kids & Family": "👨‍👩‍👧",
+  "Retreat & Training": "🏕️",
   "Other": "📌",
 };
 
 export const CATEGORY_GRADIENTS: Record<string, string> = {
-  "Music & Live Performance": "from-purple-600 to-indigo-800",
-  "Yoga & Wellness": "from-emerald-500 to-teal-700",
+  "Dance & Movement": "from-fuchsia-500 to-purple-700",
+  "Tantra & Intimacy": "from-red-700 to-amber-900",
+  "Ceremony & Sound": "from-violet-600 to-indigo-900",
+  "Yoga & Meditation": "from-emerald-500 to-teal-700",
+  "Healing & Bodywork": "from-amber-500 to-yellow-700",
+  "Circle & Community": "from-orange-600 to-amber-800",
+  "Music & Performance": "from-purple-600 to-indigo-800",
   "Art & Culture": "from-rose-500 to-pink-700",
-  "Food & Drink": "from-orange-500 to-amber-700",
-  "Community & Social": "from-sky-500 to-blue-700",
-  "Workshop & Class": "from-yellow-500 to-amber-600",
-  "Market & Shopping": "from-fuchsia-500 to-purple-700",
-  "Sports & Adventure": "from-lime-500 to-green-700",
-  "Kids & Family": "from-cyan-400 to-sky-600",
+  "Retreat & Training": "from-emerald-600 to-green-900",
   "Other": "from-gray-500 to-slate-700",
 };
 

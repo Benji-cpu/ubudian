@@ -339,7 +339,7 @@ describe("Megatix Adapter", () => {
       expect(parsed.venue_name).toBe("Yoga Barn");
       expect(parsed.venue_address).toBe("Jl. Hanoman, Ubud, Gianyar, Bali 80571");
       expect(parsed.category).toBe("Yoga & Meditation");
-      expect(parsed.quality_score).toBe(0.8);
+      expect(parsed.quality_score).toBe(0.9);
       expect(parsed.external_ticket_url).toBe(
         "https://megatix.co.id/events/sunset-yoga-yoga-barn"
       );

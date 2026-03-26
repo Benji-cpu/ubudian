@@ -30,7 +30,7 @@ function getChatName(event: PendingEvent): string | null {
   return raw.chat_name;
 }
 
-export function PendingApprovalQueue({ events }: { events: PendingEvent[] }) {
+export function PendingApprovalQueue({ events, sourceNames }: { events: PendingEvent[]; sourceNames: Record<string, string> }) {
   const router = useRouter();
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [originalText, setOriginalText] = useState<Record<string, string>>({});
@@ -106,6 +106,11 @@ export function PendingApprovalQueue({ events }: { events: PendingEvent[] }) {
                 <Badge variant="outline" className="text-xs">
                   {event.category}
                 </Badge>
+                {event.source_id && sourceNames[event.source_id] && (
+                  <Badge variant="outline" className="text-xs text-muted-foreground">
+                    {sourceNames[event.source_id]}
+                  </Badge>
+                )}
                 {event.llm_parsed && (
                   <Badge variant="secondary" className="text-xs">
                     <Bot className="mr-1 h-3 w-3" />

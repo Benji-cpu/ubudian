@@ -12,6 +12,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Plus, MapPin } from "lucide-react";
+import { MobileCardField } from "@/components/admin/mobile-card-field";
 import { formatUsdPrice } from "@/lib/stripe/helpers";
 import type { Tour } from "@/types";
 import { DeleteTourButton } from "./delete-button";
@@ -69,7 +70,50 @@ export default async function AdminToursPage() {
         </Button>
       </div>
 
-      <div className="mt-6">
+      {/* Mobile cards */}
+      <div className="space-y-3 md:hidden mt-6">
+        {allTours.map((tour) => (
+          <Card key={tour.id} className="py-3">
+            <CardContent className="px-4 py-0 space-y-2">
+              <div className="flex items-start justify-between gap-2">
+                <Link
+                  href={`/admin/tours/${tour.id}/edit`}
+                  className="font-medium hover:underline"
+                >
+                  {tour.title}
+                </Link>
+                <Badge variant={tour.is_active ? "default" : "secondary"}>
+                  {tour.is_active ? "Active" : "Inactive"}
+                </Badge>
+              </div>
+              {tour.theme && (
+                <div>
+                  <Badge variant="outline" className="text-xs">{tour.theme}</Badge>
+                </div>
+              )}
+              <dl className="grid grid-cols-2 gap-2">
+                <MobileCardField label="Duration">
+                  {tour.duration || "—"}
+                </MobileCardField>
+                <MobileCardField label="Price">
+                  {tour.price_per_person
+                    ? formatUsdPrice(tour.price_per_person)
+                    : "—"}
+                </MobileCardField>
+              </dl>
+              <div className="flex items-center gap-2 border-t pt-2 mt-2">
+                <Button asChild variant="ghost" size="sm">
+                  <Link href={`/admin/tours/${tour.id}/edit`}>Edit</Link>
+                </Button>
+                <DeleteTourButton tourId={tour.id} tourTitle={tour.title} />
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* Desktop table */}
+      <div className="hidden md:block mt-6">
         <Table>
           <TableHeader>
             <TableRow>
