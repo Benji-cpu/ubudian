@@ -14,6 +14,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Plus, Calendar, ShieldCheck, Bot } from "lucide-react";
+import { MobileCardField } from "@/components/admin/mobile-card-field";
 import type { Event, EventSource } from "@/types";
 import { DeleteEventButton } from "./delete-button";
 
@@ -37,7 +38,7 @@ const sourceEmoji: Record<string, string> = {
   scraper: "🔗",
 };
 
-function SourceBadge({ event, sourceMap }: { event: Event; sourceMap: Record<string, EventSource> }) {
+function SourceBadge({ event, sourceMap, chatName }: { event: Event; sourceMap: Record<string, EventSource>; chatName?: string | null }) {
   if (!event.source_id) return null;
   const source = sourceMap[event.source_id];
   if (!source) return null;
@@ -46,13 +47,20 @@ function SourceBadge({ event, sourceMap }: { event: Event; sourceMap: Record<str
   const emoji = sourceEmoji[source.source_type] ?? "🔗";
 
   return (
-    <span className="inline-flex items-center gap-1">
-      <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-medium ${styles}`}>
-        {emoji} {source.source_type.charAt(0).toUpperCase() + source.source_type.slice(1)}
+    <span className="inline-flex flex-col gap-0.5">
+      <span className="inline-flex items-center gap-1">
+        <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-medium ${styles}`}>
+          {emoji} {source.source_type.charAt(0).toUpperCase() + source.source_type.slice(1)}
+        </span>
+        {event.llm_parsed && (
+          <span className="inline-flex items-center gap-0.5 rounded-full border border-amber-300 bg-amber-50 px-1.5 py-0.5 text-[10px] font-medium text-amber-700">
+            <Bot className="h-2.5 w-2.5" /> AI
+          </span>
+        )}
       </span>
-      {event.llm_parsed && (
-        <span className="inline-flex items-center gap-0.5 rounded-full border border-amber-300 bg-amber-50 px-1.5 py-0.5 text-[10px] font-medium text-amber-700">
-          <Bot className="h-2.5 w-2.5" /> AI
+      {chatName && (
+        <span className="text-[10px] text-muted-foreground truncate max-w-[150px]" title={chatName}>
+          {chatName}
         </span>
       )}
     </span>
@@ -66,7 +74,18 @@ const statusVariant: Record<string, "secondary" | "default" | "outline" | "destr
   archived: "outline",
 };
 
-function EventTable({ items, trustedMap, sourceMap }: { items: Event[]; trustedMap: Record<string, TrustedSubmitter>; sourceMap: Record<string, EventSource> }) {
+type EventWithChatName = Event & {
+  raw_ingestion_messages?: { chat_name: string | null } | { chat_name: string | null }[] | null;
+};
+
+function getEventChatName(event: EventWithChatName): string | null {
+  const raw = event.raw_ingestion_messages;
+  if (!raw) return null;
+  if (Array.isArray(raw)) return raw[0]?.chat_name ?? null;
+  return raw.chat_name;
+}
+
+function EventTable({ items, trustedMap, sourceMap }: { items: EventWithChatName[]; trustedMap: Record<string, TrustedSubmitter>; sourceMap: Record<string, EventSource> }) {
   if (items.length === 0) {
     return (
       <div className="py-8 text-center text-sm text-muted-foreground">
@@ -76,68 +95,116 @@ function EventTable({ items, trustedMap, sourceMap }: { items: Event[]; trustedM
   }
 
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Title</TableHead>
-          <TableHead>Category</TableHead>
-          <TableHead>Date</TableHead>
-          <TableHead>Venue</TableHead>
-          <TableHead>Source</TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead className="text-right">Actions</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
+    <>
+      <div className="hidden md:block">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Title</TableHead>
+              <TableHead>Category</TableHead>
+              <TableHead>Date</TableHead>
+              <TableHead>Venue</TableHead>
+              <TableHead>Source</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {items.map((event) => (
+              <TableRow key={event.id}>
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    <Link
+                      href={`/admin/events/${event.id}/edit`}
+                      className="font-medium hover:underline"
+                    >
+                      {event.title}
+                    </Link>
+                    {event.submitted_by_email && trustedMap[event.submitted_by_email.toLowerCase()] && (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-brand-pale-green px-2 py-0.5 text-[10px] font-medium text-brand-deep-green">
+                        <ShieldCheck className="h-3 w-3" />
+                        Trusted ({trustedMap[event.submitted_by_email.toLowerCase()].approved_count})
+                      </span>
+                    )}
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <Badge variant="outline" className="text-xs">
+                    {event.category}
+                  </Badge>
+                </TableCell>
+                <TableCell className="text-muted-foreground">
+                  {format(new Date(event.start_date), "MMM d, yyyy")}
+                </TableCell>
+                <TableCell className="text-muted-foreground">
+                  {event.venue_name || "—"}
+                </TableCell>
+                <TableCell>
+                  <SourceBadge event={event} sourceMap={sourceMap} chatName={getEventChatName(event)} />
+                </TableCell>
+                <TableCell>
+                  <Badge variant={statusVariant[event.status]}>
+                    {event.status}
+                  </Badge>
+                </TableCell>
+                <TableCell className="text-right">
+                  <div className="flex items-center justify-end gap-2">
+                    <Button asChild variant="ghost" size="sm">
+                      <Link href={`/admin/events/${event.id}/edit`}>Edit</Link>
+                    </Button>
+                    <DeleteEventButton eventId={event.id} eventTitle={event.title} />
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+
+      <div className="space-y-3 md:hidden">
         {items.map((event) => (
-          <TableRow key={event.id}>
-            <TableCell>
-              <div className="flex items-center gap-2">
-                <Link
-                  href={`/admin/events/${event.id}/edit`}
-                  className="font-medium hover:underline"
-                >
-                  {event.title}
-                </Link>
-                {event.submitted_by_email && trustedMap[event.submitted_by_email.toLowerCase()] && (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-brand-pale-green px-2 py-0.5 text-[10px] font-medium text-brand-deep-green">
-                    <ShieldCheck className="h-3 w-3" />
-                    Trusted ({trustedMap[event.submitted_by_email.toLowerCase()].approved_count})
-                  </span>
-                )}
+          <Card key={event.id} className="py-3">
+            <CardContent className="px-4 py-0">
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2 min-w-0">
+                  <Link
+                    href={`/admin/events/${event.id}/edit`}
+                    className="font-medium text-sm hover:underline truncate"
+                  >
+                    {event.title}
+                  </Link>
+                  {event.submitted_by_email && trustedMap[event.submitted_by_email.toLowerCase()] && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-brand-pale-green px-2 py-0.5 text-[10px] font-medium text-brand-deep-green shrink-0">
+                      <ShieldCheck className="h-3 w-3" />
+                      Trusted ({trustedMap[event.submitted_by_email.toLowerCase()].approved_count})
+                    </span>
+                  )}
+                </div>
+                <Badge variant={statusVariant[event.status]} className="shrink-0">
+                  {event.status}
+                </Badge>
               </div>
-            </TableCell>
-            <TableCell>
-              <Badge variant="outline" className="text-xs">
-                {event.category}
-              </Badge>
-            </TableCell>
-            <TableCell className="text-muted-foreground">
-              {format(new Date(event.start_date), "MMM d, yyyy")}
-            </TableCell>
-            <TableCell className="text-muted-foreground">
-              {event.venue_name || "—"}
-            </TableCell>
-            <TableCell>
-              <SourceBadge event={event} sourceMap={sourceMap} />
-            </TableCell>
-            <TableCell>
-              <Badge variant={statusVariant[event.status]}>
-                {event.status}
-              </Badge>
-            </TableCell>
-            <TableCell className="text-right">
-              <div className="flex items-center justify-end gap-2">
+              <div className="mt-1 flex items-center gap-2">
+                <Badge variant="outline" className="text-xs">
+                  {event.category}
+                </Badge>
+                <SourceBadge event={event} sourceMap={sourceMap} chatName={getEventChatName(event)} />
+              </div>
+              <dl className="mt-2 grid grid-cols-2 gap-2">
+                <MobileCardField label="Date">{format(new Date(event.start_date), "MMM d, yyyy")}</MobileCardField>
+                <MobileCardField label="Venue">{event.venue_name || "—"}</MobileCardField>
+              </dl>
+              <div className="flex items-center gap-2 border-t pt-2 mt-2">
                 <Button asChild variant="ghost" size="sm">
                   <Link href={`/admin/events/${event.id}/edit`}>Edit</Link>
                 </Button>
                 <DeleteEventButton eventId={event.id} eventTitle={event.title} />
               </div>
-            </TableCell>
-          </TableRow>
+            </CardContent>
+          </Card>
         ))}
-      </TableBody>
-    </Table>
+      </div>
+    </>
   );
 }
 
@@ -145,12 +212,15 @@ export default async function AdminEventsPage() {
   const supabase = await createClient();
 
   const [{ data: events }, { data: trusted }, { data: sources }] = await Promise.all([
-    supabase.from("events").select("*").order("created_at", { ascending: false }),
+    supabase
+      .from("events")
+      .select("*, raw_ingestion_messages!raw_message_id(chat_name)")
+      .order("created_at", { ascending: false }),
     supabase.from("trusted_submitters").select("*"),
     supabase.from("event_sources").select("id, name, slug, source_type"),
   ]);
 
-  const allEvents = (events ?? []) as Event[];
+  const allEvents = (events ?? []) as EventWithChatName[];
   const trustedMap: Record<string, TrustedSubmitter> = {};
   ((trusted ?? []) as TrustedSubmitter[]).forEach((t) => {
     trustedMap[t.email] = t;

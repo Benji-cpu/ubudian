@@ -14,6 +14,8 @@ const updateSourceSchema = z.object({
   name: z.string().min(1).max(200).optional(),
   config: z.record(z.string(), z.unknown()).optional(),
   is_enabled: z.boolean().optional(),
+  auto_approve_enabled: z.boolean().optional(),
+  auto_approve_threshold: z.number().min(0.5).max(1.0).optional(),
   fetch_interval_minutes: z.number().int().min(5).optional(),
 });
 

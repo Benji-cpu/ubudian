@@ -49,7 +49,7 @@ export async function POST(request: Request) {
     // Look up WhatsApp source
     const { data: source } = await supabase
       .from("event_sources")
-      .select("id, config, is_enabled")
+      .select("id, config, is_enabled, events_ingested_count")
       .eq("source_type", "whatsapp")
       .eq("is_enabled", true)
       .limit(1)
@@ -81,36 +81,7 @@ export async function POST(request: Request) {
       }
     }
 
-    // Handle media: download from WAHA → upload to Supabase Storage
-    if (body.payload.hasMedia && body.payload.mediaUrl) {
-      const mediaType = body.payload.type;
-      if (mediaType === "image" || !mediaType) {
-        const media = await downloadWahaMedia(body.payload.mediaUrl);
-        if (media) {
-          const ext = media.contentType.includes("png") ? "png" : "jpg";
-          const filename = `ingestion/${Date.now()}-${body.payload.id}.${ext}`;
-
-          const { error: uploadError } = await supabase.storage
-            .from("images")
-            .upload(filename, media.buffer, {
-              contentType: media.contentType,
-              upsert: false,
-            });
-
-          if (!uploadError) {
-            const {
-              data: { publicUrl },
-            } = supabase.storage.from("images").getPublicUrl(filename);
-
-            rawMsg.image_urls = [publicUrl];
-          } else {
-            console.error("[waha-webhook] Storage upload error:", uploadError);
-          }
-        }
-      }
-    }
-
-    // Store raw message
+    // Store raw message (media downloaded later in after() to avoid timeout)
     const { data: storedMsg, error: storeError } = await supabase
       .from("raw_ingestion_messages")
       .insert({
@@ -120,6 +91,7 @@ export async function POST(request: Request) {
         image_urls: rawMsg.image_urls || null,
         sender_name: rawMsg.sender_name || null,
         sender_id: rawMsg.sender_id || null,
+        chat_name: rawMsg.chat_name || null,
         raw_data: rawMsg.raw_data || null,
         status: "pending",
       })
@@ -131,10 +103,57 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: true, error: "store_failed" });
     }
 
-    // Defer LLM processing so the webhook responds immediately
+    // Defer media download + LLM processing so the webhook responds immediately
     after(async () => {
       try {
-        await processRawMessage(storedMsg.id, rawMsg, source.id, config);
+        // Download media from WAHA → upload to Supabase Storage
+        if (body.payload.hasMedia && body.payload.mediaUrl) {
+          const mediaType = body.payload.type;
+          if (mediaType === "image" || !mediaType) {
+            const media = await downloadWahaMedia(body.payload.mediaUrl);
+            if (media) {
+              const adminClient = createAdminClient();
+              const ext = media.contentType.includes("png") ? "png" : "jpg";
+              const filename = `ingestion/${Date.now()}-${body.payload.id}.${ext}`;
+
+              const { error: uploadError } = await adminClient.storage
+                .from("images")
+                .upload(filename, media.buffer, {
+                  contentType: media.contentType,
+                  upsert: false,
+                });
+
+              if (!uploadError) {
+                const {
+                  data: { publicUrl },
+                } = adminClient.storage.from("images").getPublicUrl(filename);
+
+                rawMsg.image_urls = [publicUrl];
+
+                // Update the stored message with image URLs
+                await adminClient
+                  .from("raw_ingestion_messages")
+                  .update({ image_urls: [publicUrl], updated_at: new Date().toISOString() })
+                  .eq("id", storedMsg.id);
+              } else {
+                console.error("[waha-webhook] Storage upload error:", uploadError);
+              }
+            }
+          }
+        }
+
+        const result = await processRawMessage(storedMsg.id, rawMsg, source.id, config);
+
+        // Increment events_ingested_count on the source when an event is created
+        if (result.status === "created") {
+          await createAdminClient()
+            .from("event_sources")
+            .update({
+              events_ingested_count: (source.events_ingested_count || 0) + 1,
+              updated_at: new Date().toISOString(),
+            })
+            .eq("id", source.id);
+        }
       } catch (err) {
         console.error(`[waha-webhook] Background processing failed for ${storedMsg.id}:`, err);
         await createAdminClient()

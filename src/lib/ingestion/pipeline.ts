@@ -44,6 +44,7 @@ export async function runIngestion(sourceId: string): Promise<IngestionRunResult
       messagesFetched: 0,
       messagesParsed: 0,
       eventsCreated: 0,
+      eventsAutoApproved: 0,
       duplicatesFound: 0,
       errorsCount: 1,
       errors: [{ error: `Source not found: ${sourceError?.message || "unknown"}` }],
@@ -60,6 +61,7 @@ export async function runIngestion(sourceId: string): Promise<IngestionRunResult
       messagesFetched: 0,
       messagesParsed: 0,
       eventsCreated: 0,
+      eventsAutoApproved: 0,
       duplicatesFound: 0,
       errorsCount: 1,
       errors: [{ error: `No adapter registered for source: ${source.slug}` }],
@@ -84,6 +86,7 @@ export async function runIngestion(sourceId: string): Promise<IngestionRunResult
       messagesFetched: 0,
       messagesParsed: 0,
       eventsCreated: 0,
+      eventsAutoApproved: 0,
       duplicatesFound: 0,
       errorsCount: 1,
       errors: [{ error: `Failed to create run: ${runError?.message}` }],
@@ -94,7 +97,15 @@ export async function runIngestion(sourceId: string): Promise<IngestionRunResult
   let messagesFetched = 0;
   let messagesParsed = 0;
   let eventsCreated = 0;
+  let eventsAutoApproved = 0;
   let duplicatesFound = 0;
+
+  // Merge auto-approve settings into source config for downstream use
+  const effectiveConfig: Record<string, unknown> = {
+    ...(source.config || {}),
+    _autoApproveEnabled: source.auto_approve_enabled ?? false,
+    _autoApproveThreshold: source.auto_approve_threshold ?? 0.85,
+  };
 
   try {
     // Fetch raw messages from adapter
@@ -132,6 +143,7 @@ export async function runIngestion(sourceId: string): Promise<IngestionRunResult
             image_urls: rawMsg.image_urls || null,
             sender_name: rawMsg.sender_name || null,
             sender_id: rawMsg.sender_id || null,
+            chat_name: rawMsg.chat_name || null,
             raw_data: rawMsg.raw_data || null,
             status: "pending",
           })
@@ -148,11 +160,12 @@ export async function runIngestion(sourceId: string): Promise<IngestionRunResult
           storedMsg.id,
           rawMsg,
           sourceId,
-          source.config || {}
+          effectiveConfig
         );
 
         if (result.status === "created") {
           eventsCreated++;
+          eventsAutoApproved += result.eventsAutoApproved ?? 0;
           messagesParsed++;
         } else if (result.status === "duplicate") {
           duplicatesFound++;
@@ -202,6 +215,7 @@ export async function runIngestion(sourceId: string): Promise<IngestionRunResult
       messagesFetched,
       messagesParsed,
       eventsCreated,
+      eventsAutoApproved,
       duplicatesFound,
       errorsCount: errors.length,
       errors,
@@ -241,6 +255,7 @@ export async function runIngestion(sourceId: string): Promise<IngestionRunResult
       messagesFetched,
       messagesParsed,
       eventsCreated,
+      eventsAutoApproved,
       duplicatesFound,
       errorsCount: errors.length + 1,
       errors: [...errors, { error: errorMsg }],
@@ -265,7 +280,7 @@ export async function processRawMessage(
   if (sourceConfig._preParsed && rawMsg.raw_data) {
     const parsedEvents = rawMsg.raw_data as ParsedEvent[];
     if (parsedEvents.length > 0) {
-      return createEventFromParsed(messageId, parsedEvents[0], sourceId, false);
+      return createEventFromParsed(messageId, parsedEvents[0], sourceId, false, sourceConfig);
     }
   }
 
@@ -277,7 +292,15 @@ export async function processRawMessage(
       // Image messages: skip classify — parseEventFromImage returns [] when no event found
       for (const imageUrl of rawMsg.image_urls!) {
         parsedEvents = await parseEventFromImage(imageUrl, contentText);
-        if (parsedEvents.length > 0) break;
+        if (parsedEvents.length > 0) {
+          // The analyzed image IS the event flyer — use it as cover image
+          for (const evt of parsedEvents) {
+            if (!evt.cover_image_url) {
+              evt.cover_image_url = imageUrl;
+            }
+          }
+          break;
+        }
       }
 
       // Text fallback if all images yielded nothing
@@ -290,6 +313,14 @@ export async function processRawMessage(
             parsedEvents = result.events;
           }
           // If not event, parsedEvents stays [] — falls through to "no events" handling below
+        }
+        // Text parsed successfully from image message — use first image as cover
+        if (parsedEvents.length > 0) {
+          for (const evt of parsedEvents) {
+            if (!evt.cover_image_url) {
+              evt.cover_image_url = rawMsg.image_urls![0];
+            }
+          }
         }
       }
     } else if (contentText) {
@@ -311,16 +342,20 @@ export async function processRawMessage(
     }
 
     if (parsedEvents.length === 0) {
+      // Images with no events are legitimate (e.g. food photos) — not a failure
+      const status = hasImages ? "not_event" : "failed";
+      const parseError = status === "failed" ? "LLM returned no events" : null;
+
       await supabase
         .from("raw_ingestion_messages")
         .update({
-          status: "failed",
-          parse_error: "LLM returned no events",
+          status,
+          parse_error: parseError,
           updated_at: new Date().toISOString(),
         })
         .eq("id", messageId);
 
-      return { messageId, status: "failed", error: "LLM returned no events" };
+      return { messageId, status, error: parseError || undefined };
     }
   } catch (err) {
     if (err instanceof LLMApiError) {
@@ -364,14 +399,16 @@ export async function processRawMessage(
   let firstEventId: string | undefined;
   const allEventIds: string[] = [];
   let eventsCreatedCount = 0;
+  let eventsAutoApprovedCount = 0;
   let duplicatesFoundCount = 0;
   let lastError: string | undefined;
 
   for (const parsed of parsedEvents) {
-    const result = await createEventFromParsed(messageId, parsed, sourceId, true);
+    const result = await createEventFromParsed(messageId, parsed, sourceId, true, sourceConfig);
 
     if (result.status === "created") {
       eventsCreatedCount++;
+      eventsAutoApprovedCount += result.eventsAutoApproved ?? 0;
       if (result.eventId) allEventIds.push(result.eventId);
       if (!firstEventId) firstEventId = result.eventId;
       aggregateStatus = "created"; // "created" wins
@@ -416,6 +453,7 @@ export async function processRawMessage(
     error: lastError,
     eventsCreatedCount,
     duplicatesFoundCount,
+    eventsAutoApproved: eventsAutoApprovedCount,
   };
 }
 
@@ -426,7 +464,8 @@ export async function createEventFromParsed(
   messageId: string,
   parsed: ParsedEvent,
   sourceId: string,
-  llmParsed: boolean
+  llmParsed: boolean,
+  sourceConfig: Record<string, unknown> = {}
 ): Promise<ProcessResult> {
   const supabase = createAdminClient();
 
@@ -468,7 +507,7 @@ export async function createEventFromParsed(
     venue_name: normalizedVenue,
   });
 
-  // Run dedup
+  // Run dedup (pass precomputed venue/fingerprint to avoid redundant calls)
   const duplicates = await findDuplicates({
     title: parsed.title,
     start_date: parsed.start_date,
@@ -477,7 +516,7 @@ export async function createEventFromParsed(
     source_id: sourceId,
     source_event_id: parsed.source_event_id,
     description: parsed.description,
-  });
+  }, { normalizedVenue, fingerprint });
 
   // If high-confidence duplicate, skip creation but store audit trail
   if (duplicates.length > 0 && duplicates[0].confidence >= 0.9) {
@@ -515,6 +554,19 @@ export async function createEventFromParsed(
     slug = `${slug}-${Date.now().toString(36)}`;
   }
 
+  // Determine auto-approve eligibility
+  const qualityScore = parsed.quality_score ?? 0;
+  const contentFlags = parsed.content_flags ?? [];
+  let eventStatus: "pending" | "approved" = "pending";
+
+  if (
+    sourceConfig._autoApproveEnabled &&
+    qualityScore >= ((sourceConfig._autoApproveThreshold as number) ?? 0.85) &&
+    contentFlags.length === 0
+  ) {
+    eventStatus = "approved";
+  }
+
   // Insert the event
   const { data: newEvent, error: insertError } = await queryWithRetry(
     () =>
@@ -541,13 +593,15 @@ export async function createEventFromParsed(
           organizer_contact: parsed.organizer_contact || null,
           organizer_instagram: parsed.organizer_instagram || null,
           cover_image_url: parsed.cover_image_url || null,
-          status: "pending",
+          status: eventStatus,
           source_id: sourceId,
           source_event_id: parsed.source_event_id || null,
           source_url: parsed.source_url || null,
           content_fingerprint: fingerprint,
           raw_message_id: messageId,
           llm_parsed: llmParsed,
+          quality_score: qualityScore || null,
+          content_flags: contentFlags,
         })
         .select("id")
         .single(),
@@ -569,5 +623,10 @@ export async function createEventFromParsed(
     }
   }
 
-  return { messageId, status: "created", eventId: newEvent.id };
+  return {
+    messageId,
+    status: "created",
+    eventId: newEvent.id,
+    eventsAutoApproved: eventStatus === "approved" ? 1 : 0,
+  };
 }

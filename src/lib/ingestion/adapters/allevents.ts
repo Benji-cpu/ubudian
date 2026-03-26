@@ -96,22 +96,21 @@ function formatTime(timestamp: string | number | undefined): string | null {
 function mapCategory(category: string | undefined): string {
   if (!category) return "Other";
   const lower = category.toLowerCase();
-  if (lower.includes("music") || lower.includes("concert")) return "Music & Live Performance";
-  if (lower.includes("yoga") || lower.includes("wellness") || lower.includes("health"))
-    return "Yoga & Wellness";
+  if (lower.includes("dance") || lower.includes("movement")) return "Dance & Movement";
+  if (lower.includes("tantra") || lower.includes("intimacy")) return "Tantra & Intimacy";
+  if (lower.includes("ceremony") || lower.includes("sound") || lower.includes("cacao"))
+    return "Ceremony & Sound";
+  if (lower.includes("yoga") || lower.includes("meditation") || lower.includes("breathwork"))
+    return "Yoga & Meditation";
+  if (lower.includes("healing") || lower.includes("bodywork") || lower.includes("reiki"))
+    return "Healing & Bodywork";
+  if (lower.includes("circle") || lower.includes("community") || lower.includes("social") || lower.includes("networking"))
+    return "Circle & Community";
+  if (lower.includes("music") || lower.includes("concert")) return "Music & Performance";
   if (lower.includes("art") || lower.includes("culture") || lower.includes("exhibition"))
     return "Art & Culture";
-  if (lower.includes("food") || lower.includes("drink") || lower.includes("culinary"))
-    return "Food & Drink";
-  if (lower.includes("community") || lower.includes("social") || lower.includes("networking"))
-    return "Community & Social";
-  if (lower.includes("workshop") || lower.includes("class") || lower.includes("learn"))
-    return "Workshop & Class";
-  if (lower.includes("market") || lower.includes("shop")) return "Market & Shopping";
-  if (lower.includes("sport") || lower.includes("adventure") || lower.includes("outdoor"))
-    return "Sports & Adventure";
-  if (lower.includes("kid") || lower.includes("family") || lower.includes("children"))
-    return "Kids & Family";
+  if (lower.includes("retreat") || lower.includes("training") || lower.includes("workshop") || lower.includes("class"))
+    return "Retreat & Training";
   return "Other";
 }
 

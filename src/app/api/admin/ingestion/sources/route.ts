@@ -24,6 +24,8 @@ const createSourceSchema = z.object({
   ]),
   config: z.record(z.string(), z.unknown()).optional().default({}),
   is_enabled: z.boolean().optional().default(true),
+  auto_approve_enabled: z.boolean().optional().default(false),
+  auto_approve_threshold: z.number().min(0.5).max(1.0).optional().default(0.85),
   fetch_interval_minutes: z.number().int().min(5).optional().default(240),
 });
 
@@ -76,6 +78,8 @@ export async function POST(request: Request) {
         source_type: data.source_type,
         config: data.config,
         is_enabled: data.is_enabled,
+        auto_approve_enabled: data.auto_approve_enabled,
+        auto_approve_threshold: data.auto_approve_threshold,
         fetch_interval_minutes: data.fetch_interval_minutes,
       })
       .select()

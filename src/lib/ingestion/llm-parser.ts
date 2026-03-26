@@ -104,8 +104,10 @@ const parsedEventItemSchema = {
     organizer_contact: { type: SchemaType.STRING as const, description: "Contact info", nullable: true },
     organizer_instagram: { type: SchemaType.STRING as const, description: "Instagram handle", nullable: true },
     cover_image_url: { type: SchemaType.STRING as const, description: "Cover image URL", nullable: true },
+    quality_score: { type: SchemaType.NUMBER as const, description: "Content quality score 0.0-1.0 based on: field completeness (title, description, date, venue, time, price), description clarity, and overall publish-readiness" },
+    content_flags: { type: SchemaType.ARRAY as const, items: { type: SchemaType.STRING as const }, description: "Content flags: 'spam', 'inappropriate', 'misleading', 'off_topic', 'low_quality'. Empty array if content is clean." },
   },
-  required: ["title", "description", "category", "start_date"] ,
+  required: ["title", "description", "category", "start_date", "quality_score", "content_flags"] ,
 };
 
 const parsedEventSchema = {
@@ -157,7 +159,7 @@ export interface ClassificationResult {
 export async function classifyMessage(text: string): Promise<ClassificationResult> {
   const ai = getGenAI();
   const model = ai.getGenerativeModel({
-    model: "gemini-2.0-flash",
+    model: "gemini-2.5-flash-lite",
     generationConfig: {
       responseMimeType: "application/json",
       responseSchema: classificationSchema,
@@ -194,7 +196,7 @@ export interface ClassifyAndParseResult {
 export async function classifyAndParseMessage(text: string): Promise<ClassifyAndParseResult> {
   const ai = getGenAI();
   const model = ai.getGenerativeModel({
-    model: "gemini-2.0-flash",
+    model: "gemini-2.5-flash-lite",
     generationConfig: {
       responseMimeType: "application/json",
       responseSchema: classifyAndParseSchema,
@@ -225,7 +227,7 @@ export async function classifyAndParseMessage(text: string): Promise<ClassifyAnd
 export async function parseEventFromText(text: string): Promise<ParsedEvent[]> {
   const ai = getGenAI();
   const model = ai.getGenerativeModel({
-    model: "gemini-2.0-flash",
+    model: "gemini-2.5-flash-lite",
     generationConfig: {
       responseMimeType: "application/json",
       responseSchema: parsedEventSchema,
@@ -260,7 +262,7 @@ export async function parseEventFromImage(
 ): Promise<ParsedEvent[]> {
   const ai = getGenAI();
   const model = ai.getGenerativeModel({
-    model: "gemini-2.0-flash",
+    model: "gemini-2.5-flash-lite",
     generationConfig: {
       responseMimeType: "application/json",
       responseSchema: parsedEventSchema,
@@ -276,7 +278,16 @@ export async function parseEventFromImage(
 
   const imageBuffer = await imageResponse.arrayBuffer();
   const base64 = Buffer.from(imageBuffer).toString("base64");
-  const mimeType = imageResponse.headers.get("content-type") || "image/jpeg";
+  let mimeType = imageResponse.headers.get("content-type") || "image/jpeg";
+  // Detect real image type from magic bytes when server returns generic octet-stream
+  if (mimeType === "application/octet-stream" || !mimeType.startsWith("image/")) {
+    const bytes = new Uint8Array(imageBuffer.slice(0, 4));
+    if (bytes[0] === 0xff && bytes[1] === 0xd8) mimeType = "image/jpeg";
+    else if (bytes[0] === 0x89 && bytes[1] === 0x50) mimeType = "image/png";
+    else if (bytes[0] === 0x47 && bytes[1] === 0x49) mimeType = "image/gif";
+    else if (bytes[0] === 0x52 && bytes[1] === 0x49) mimeType = "image/webp";
+    else mimeType = "image/jpeg"; // fallback
+  }
 
   const parts: Parameters<typeof model.generateContent>[0] = [
     PARSE_EVENT_IMAGE_PROMPT,
@@ -323,7 +334,7 @@ export async function compareEventsSemantically(
 ): Promise<SemanticDedupResult> {
   const ai = getGenAI();
   const model = ai.getGenerativeModel({
-    model: "gemini-2.0-flash",
+    model: "gemini-2.5-flash-lite",
     generationConfig: {
       responseMimeType: "application/json",
       responseSchema: semanticDedupSchema,

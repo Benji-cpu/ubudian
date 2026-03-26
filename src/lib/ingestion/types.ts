@@ -27,6 +27,9 @@ export interface ParsedEvent {
   organizer_contact?: string | null;
   organizer_instagram?: string | null;
   cover_image_url?: string | null;
+  // Quality assessment (set by LLM)
+  quality_score?: number;
+  content_flags?: string[];
   // Source tracking (set by adapter)
   source_url?: string | null;
   source_event_id?: string | null;
@@ -42,6 +45,7 @@ export interface RawMessage {
   image_urls?: string[];
   sender_name?: string;
   sender_id?: string;
+  chat_name?: string;
   raw_data?: unknown;
 }
 
@@ -55,6 +59,7 @@ export interface ProcessResult {
   error?: string;
   eventsCreatedCount?: number;
   duplicatesFoundCount?: number;
+  eventsAutoApproved?: number;
 }
 
 /**
@@ -67,6 +72,7 @@ export interface IngestionRunResult {
   messagesFetched: number;
   messagesParsed: number;
   eventsCreated: number;
+  eventsAutoApproved: number;
   duplicatesFound: number;
   errorsCount: number;
   errors: Array<{ messageId?: string; error: string }>;

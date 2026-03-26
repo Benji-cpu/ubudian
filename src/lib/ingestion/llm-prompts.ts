@@ -24,6 +24,13 @@ NOT events:
 - Job postings
 - Accommodation listings
 
+Geographic filter:
+- This platform is EXCLUSIVELY for events in Ubud and Bali, Indonesia
+- If the event is clearly in another country (UK, USA, Europe, etc.), classify as not an event with reason "not in Ubud/Bali area"
+- Location keywords like "London", "New York", "Sydney", specific non-Indonesian cities = not valid
+- Online-only events with no Bali connection = not valid
+- If location is ambiguous, treat as potentially valid (admin will review)
+
 Respond with ONLY valid JSON (no markdown, no code blocks):
 {
   "is_event": true/false,
@@ -37,16 +44,40 @@ Extract structured event data from the following message. The current year is ${
 
 Available categories: ${CATEGORIES_LIST}
 
+Category selection guide:
+- Ecstatic dance, 5Rhythms, body prayer, contact improv, conscious sober dance → "Dance & Movement"
+- Somatic tantra, sacred sexuality, conscious touch, tantric temple, intimacy workshop → "Tantra & Intimacy"
+- Cacao ceremony, sound bath/journey, gong bath, moon ceremony, equinox gathering → "Ceremony & Sound"
+- Yoga classes, meditation, breathwork, pranayama → "Yoga & Meditation"
+- Reiki, energy healing, tachyon, energy clinic, massage workshop → "Healing & Bodywork"
+- Women's/men's circles, sharing circles, connection practice, community gathering → "Circle & Community"
+- Multi-day retreats, teacher trainings, level courses, certification programs → "Retreat & Training"
+
 Rules:
 - If no year is specified, assume the current year (${new Date().getFullYear()})
 - Dates should be in YYYY-MM-DD format
 - Times should be in HH:MM (24-hour) format
 - If the message contains multiple events, extract each one separately
 - For venue names, use the full name as written (normalization happens later)
+- venue_name must be the SHORT name of the physical location only (e.g. 'Yoga Barn', 'HOUSE of MUKTI', 'Swasti Eco Cottages'). Maximum 60 characters. NEVER include descriptions, commentary, geographic analysis, or reasoning in the venue_name field. If venue is unclear, use null.
 - For price_info, include the currency and any "free" or "donation" info
 - If a field is not mentioned, use null
 - For category, pick the best match from the available categories
 - For description, create a clean summary if the message is very informal/messy
+- Convert any relative date/time references (e.g. 'tomorrow', 'this Friday', 'next week', 'tonight') to absolute dates (e.g. 'March 18, 2026') based on the message date. Never use relative time language in any extracted field.
+
+Quality Assessment:
+- quality_score (0.0-1.0): Rate how publish-ready this event is.
+  - 0.9-1.0: All key fields present (title, description, date, venue, time), clear description
+  - 0.7-0.89: Most fields present, minor gaps (e.g. missing time or price)
+  - 0.5-0.69: Bare minimum (title + date), vague description
+  - Below 0.5: Missing critical info, unclear what the event is
+- content_flags: Flag any issues. Use empty array [] if content is clean.
+  - "spam": Promotional content disguised as events, MLM, crypto schemes
+  - "inappropriate": NSFW, hate speech, offensive content
+  - "misleading": Fake events, clickbait, scam-like content
+  - "off_topic": Not related to Ubud/Bali community events
+  - "low_quality": Extremely vague, unreadable, or gibberish content
 
 Respond with ONLY valid JSON (no markdown, no code blocks). For a single event:
 {
@@ -69,7 +100,9 @@ Respond with ONLY valid JSON (no markdown, no code blocks). For a single event:
       "organizer_name": "Organizer or null",
       "organizer_contact": "Contact info or null",
       "organizer_instagram": "@handle or null",
-      "cover_image_url": "Image URL if available or null"
+      "cover_image_url": "Image URL if available or null",
+      "quality_score": 0.85,
+      "content_flags": []
     }
   ]
 }`;
@@ -80,12 +113,36 @@ This image is an event flyer or poster. Extract all event details you can read f
 
 Available categories: ${CATEGORIES_LIST}
 
+Category selection guide:
+- Ecstatic dance, 5Rhythms, body prayer, contact improv, conscious sober dance → "Dance & Movement"
+- Somatic tantra, sacred sexuality, conscious touch, tantric temple, intimacy workshop → "Tantra & Intimacy"
+- Cacao ceremony, sound bath/journey, gong bath, moon ceremony, equinox gathering → "Ceremony & Sound"
+- Yoga classes, meditation, breathwork, pranayama → "Yoga & Meditation"
+- Reiki, energy healing, tachyon, energy clinic, massage workshop → "Healing & Bodywork"
+- Women's/men's circles, sharing circles, connection practice, community gathering → "Circle & Community"
+- Multi-day retreats, teacher trainings, level courses, certification programs → "Retreat & Training"
+
 Rules:
 - If no year is specified, assume the current year (${new Date().getFullYear()})
 - Dates should be in YYYY-MM-DD format
 - Times should be in HH:MM (24-hour) format
 - For category, pick the best match from the available categories
+- venue_name must be the SHORT name of the physical location only (e.g. 'Yoga Barn', 'HOUSE of MUKTI', 'Swasti Eco Cottages'). Maximum 60 characters. NEVER include descriptions, commentary, geographic analysis, or reasoning in the venue_name field. If venue is unclear, use null.
 - If a field is not readable, use null
+- Convert any relative date/time references (e.g. 'tomorrow', 'this Friday', 'next week', 'tonight') to absolute dates (e.g. 'March 18, 2026') based on the message date. Never use relative time language in any extracted field.
+
+Quality Assessment:
+- quality_score (0.0-1.0): Rate how publish-ready this event is.
+  - 0.9-1.0: All key fields present (title, description, date, venue, time), clear description
+  - 0.7-0.89: Most fields present, minor gaps (e.g. missing time or price)
+  - 0.5-0.69: Bare minimum (title + date), vague description
+  - Below 0.5: Missing critical info, unclear what the event is
+- content_flags: Flag any issues. Use empty array [] if content is clean.
+  - "spam": Promotional content disguised as events, MLM, crypto schemes
+  - "inappropriate": NSFW, hate speech, offensive content
+  - "misleading": Fake events, clickbait, scam-like content
+  - "off_topic": Not related to Ubud/Bali community events
+  - "low_quality": Extremely vague, unreadable, or gibberish content
 
 Respond with ONLY valid JSON (no markdown, no code blocks):
 {
@@ -108,7 +165,9 @@ Respond with ONLY valid JSON (no markdown, no code blocks):
       "organizer_name": "Organizer or null",
       "organizer_contact": "Contact or null",
       "organizer_instagram": "@handle or null",
-      "cover_image_url": null
+      "cover_image_url": null,
+      "quality_score": 0.85,
+      "content_flags": []
     }
   ]
 }`;
@@ -120,18 +179,49 @@ First determine if this message contains an event announcement. If it does, extr
 An event has a specific date/time, location, and people can attend it.
 NOT events: general discussions, questions, business promos without a date, personal messages, job postings, accommodation listings.
 
+Geographic filter:
+- This platform is EXCLUSIVELY for events in Ubud and Bali, Indonesia
+- If the event is clearly in another country (UK, USA, Europe, etc.), classify as not an event with reason "not in Ubud/Bali area"
+- Location keywords like "London", "New York", "Sydney", specific non-Indonesian cities = not valid
+- Online-only events with no Bali connection = not valid
+- If location is ambiguous, treat as potentially valid (admin will review)
+
 Available categories: ${CATEGORIES_LIST}
+
+Category selection guide:
+- Ecstatic dance, 5Rhythms, body prayer, contact improv, conscious sober dance → "Dance & Movement"
+- Somatic tantra, sacred sexuality, conscious touch, tantric temple, intimacy workshop → "Tantra & Intimacy"
+- Cacao ceremony, sound bath/journey, gong bath, moon ceremony, equinox gathering → "Ceremony & Sound"
+- Yoga classes, meditation, breathwork, pranayama → "Yoga & Meditation"
+- Reiki, energy healing, tachyon, energy clinic, massage workshop → "Healing & Bodywork"
+- Women's/men's circles, sharing circles, connection practice, community gathering → "Circle & Community"
+- Multi-day retreats, teacher trainings, level courses, certification programs → "Retreat & Training"
 
 Rules for extraction:
 - Assume current year (${new Date().getFullYear()}) if no year specified
 - Dates: YYYY-MM-DD format. Times: HH:MM 24-hour format
 - If multiple events, return each in the events array
 - For venue names, use the full name as written (normalization happens later)
+- venue_name must be the SHORT name of the physical location only (e.g. 'Yoga Barn', 'HOUSE of MUKTI', 'Swasti Eco Cottages'). Maximum 60 characters. NEVER include descriptions, commentary, geographic analysis, or reasoning in the venue_name field. If venue is unclear, use null.
 - For price_info, include the currency and any "free" or "donation" info
 - Use null for any field not mentioned
 - For category, pick the best match from the available categories
 - For description, create a clean summary if the message is very informal/messy
 - If is_event is false, return an empty events array
+- Convert any relative date/time references (e.g. 'tomorrow', 'this Friday', 'next week', 'tonight') to absolute dates (e.g. 'March 18, 2026') based on the message date. Never use relative time language in any extracted field.
+
+Quality Assessment (for each event):
+- quality_score (0.0-1.0): Rate how publish-ready this event is.
+  - 0.9-1.0: All key fields present (title, description, date, venue, time), clear description
+  - 0.7-0.89: Most fields present, minor gaps (e.g. missing time or price)
+  - 0.5-0.69: Bare minimum (title + date), vague description
+  - Below 0.5: Missing critical info, unclear what the event is
+- content_flags: Flag any issues. Use empty array [] if content is clean.
+  - "spam": Promotional content disguised as events, MLM, crypto schemes
+  - "inappropriate": NSFW, hate speech, offensive content
+  - "misleading": Fake events, clickbait, scam-like content
+  - "off_topic": Not related to Ubud/Bali community events
+  - "low_quality": Extremely vague, unreadable, or gibberish content
 
 Respond with valid JSON matching the schema.`;
 

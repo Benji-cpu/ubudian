@@ -32,6 +32,8 @@ const sourceSchema = z.object({
     "manual",
   ]),
   is_enabled: z.boolean(),
+  auto_approve_enabled: z.boolean(),
+  auto_approve_threshold: z.number().min(0.5).max(1.0),
   fetch_interval_minutes: z.number().int().min(5),
   config_json: z.string(),
 });
@@ -65,12 +67,15 @@ export function SourceForm({ source }: { source?: EventSource }) {
       name: source?.name || "",
       source_type: source?.source_type || "api",
       is_enabled: source?.is_enabled ?? true,
+      auto_approve_enabled: source?.auto_approve_enabled ?? false,
+      auto_approve_threshold: source?.auto_approve_threshold ?? 0.85,
       fetch_interval_minutes: source?.fetch_interval_minutes || 240,
       config_json: source?.config ? JSON.stringify(source.config, null, 2) : "{}",
     },
   });
 
   const isEnabled = watch("is_enabled");
+  const autoApproveEnabled = watch("auto_approve_enabled");
 
   async function onSubmit(data: SourceFormData) {
     setSaving(true);
@@ -97,6 +102,8 @@ export function SourceForm({ source }: { source?: EventSource }) {
           name: data.name,
           source_type: data.source_type,
           is_enabled: data.is_enabled,
+          auto_approve_enabled: data.auto_approve_enabled,
+          auto_approve_threshold: data.auto_approve_threshold,
           fetch_interval_minutes: data.fetch_interval_minutes,
           config,
         }),
@@ -166,6 +173,39 @@ export function SourceForm({ source }: { source?: EventSource }) {
           onCheckedChange={(checked) => setValue("is_enabled", checked)}
         />
         <Label htmlFor="is_enabled">Enabled</Label>
+      </div>
+
+      <div className="rounded-md border p-4 space-y-4">
+        <div className="flex items-center gap-3">
+          <Switch
+            id="auto_approve_enabled"
+            checked={autoApproveEnabled}
+            onCheckedChange={(checked) => setValue("auto_approve_enabled", checked)}
+          />
+          <Label htmlFor="auto_approve_enabled">Auto-Approve Events</Label>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          Automatically approve high-quality events from this source. Events with content flags or low quality scores stay pending for manual review.
+        </p>
+        {autoApproveEnabled && (
+          <div className="space-y-2">
+            <Label htmlFor="auto_approve_threshold">Quality Threshold</Label>
+            <Input
+              id="auto_approve_threshold"
+              type="number"
+              step="0.05"
+              min="0.5"
+              max="1.0"
+              {...register("auto_approve_threshold", { valueAsNumber: true })}
+            />
+            <p className="text-xs text-muted-foreground">
+              Minimum quality score (0.5–1.0) required for auto-approval. Default: 0.85.
+            </p>
+            {errors.auto_approve_threshold && (
+              <p className="text-sm text-red-600">{errors.auto_approve_threshold.message}</p>
+            )}
+          </div>
+        )}
       </div>
 
       <div className="space-y-2">

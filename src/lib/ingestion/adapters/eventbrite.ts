@@ -78,20 +78,20 @@ const eventbriteAdapter: SourceAdapter = {
 function mapEventbriteCategory(categoryId?: string, _subcategoryId?: string): string {
   // Eventbrite category IDs: https://www.eventbrite.com/platform/api#/reference/categories
   const map: Record<string, string> = {
-    "103": "Music & Live Performance",
+    "103": "Music & Performance",
     "105": "Art & Culture",
-    "107": "Yoga & Wellness",
-    "108": "Sports & Adventure",
-    "110": "Food & Drink",
-    "113": "Community & Social",
-    "199": "Workshop & Class",
-    "101": "Community & Social",
-    "102": "Workshop & Class",
+    "107": "Yoga & Meditation",
+    "108": "Dance & Movement",
+    "110": "Ceremony & Sound",
+    "113": "Circle & Community",
+    "199": "Retreat & Training",
+    "101": "Circle & Community",
+    "102": "Retreat & Training",
     "104": "Art & Culture",
     "106": "Art & Culture",
-    "111": "Community & Social",
-    "112": "Community & Social",
-    "115": "Kids & Family",
+    "111": "Circle & Community",
+    "112": "Circle & Community",
+    "115": "Circle & Community",
   };
   return map[categoryId || ""] || "Other";
 }

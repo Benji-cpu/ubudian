@@ -130,11 +130,11 @@ const meetupAdapter: SourceAdapter = {
 };
 
 function mapMeetupCategory(eventType?: string): string {
-  if (!eventType) return "Community & Social";
+  if (!eventType) return "Circle & Community";
   const lower = eventType.toLowerCase();
-  if (lower.includes("online")) return "Community & Social";
-  if (lower.includes("physical")) return "Community & Social";
-  return "Community & Social"; // Meetup events are mostly social/community
+  if (lower.includes("online")) return "Circle & Community";
+  if (lower.includes("physical")) return "Circle & Community";
+  return "Circle & Community"; // Meetup events are mostly social/community
 }
 
 interface MeetupEvent {

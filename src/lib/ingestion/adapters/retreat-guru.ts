@@ -73,14 +73,16 @@ const retreatGuruAdapter: SourceAdapter = {
 };
 
 function mapRetreatCategory(categories?: string[]): string {
-  if (!categories?.length) return "Yoga & Wellness";
+  if (!categories?.length) return "Retreat & Training";
   const first = categories[0].toLowerCase();
-  if (first.includes("yoga")) return "Yoga & Wellness";
-  if (first.includes("meditation")) return "Yoga & Wellness";
+  if (first.includes("yoga")) return "Yoga & Meditation";
+  if (first.includes("meditation")) return "Yoga & Meditation";
+  if (first.includes("tantra")) return "Tantra & Intimacy";
+  if (first.includes("healing")) return "Healing & Bodywork";
   if (first.includes("art")) return "Art & Culture";
-  if (first.includes("music")) return "Music & Live Performance";
-  if (first.includes("food") || first.includes("cooking")) return "Food & Drink";
-  return "Yoga & Wellness";
+  if (first.includes("music")) return "Music & Performance";
+  if (first.includes("dance")) return "Dance & Movement";
+  return "Retreat & Training";
 }
 
 interface RetreatGuruProgram {

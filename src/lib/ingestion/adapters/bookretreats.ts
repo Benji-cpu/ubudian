@@ -49,7 +49,7 @@ const bookretreatAdapter: SourceAdapter = {
         title: retreat.title || retreat.name || "",
         description: retreat.description || "",
         short_description: retreat.summary?.slice(0, 200) || retreat.description?.slice(0, 200) || null,
-        category: "Yoga & Wellness",
+        category: "Retreat & Training",
         venue_name: retreat.location?.name || retreat.venue || null,
         venue_address: retreat.location?.address || null,
         start_date: retreat.start_date || retreat.next_date || new Date().toISOString().split("T")[0],

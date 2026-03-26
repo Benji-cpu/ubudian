@@ -3,9 +3,18 @@ import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { ArrowLeft, MessageSquare, CheckCircle, XCircle, AlertTriangle, Clock, Globe } from "lucide-react";
 import { WhatsAppGroupList } from "@/components/admin/ingestion/whatsapp-group-list";
 import { CreateSourceButton } from "@/components/admin/ingestion/create-source-button";
+import { TriggerRunButton } from "@/components/admin/ingestion/trigger-run-button";
 import { formatDistanceToNow } from "date-fns";
 import type { EventSource, RawIngestionMessage } from "@/types";
 
@@ -23,7 +32,7 @@ function EnvBadge({ name, isSet }: { name: string; isSet: boolean }) {
 }
 
 interface WahaChat {
-  id: string;
+  id: string | { _serialized: string; [key: string]: unknown };
   name: string;
 }
 
@@ -124,11 +133,17 @@ export default async function WhatsAppIngestionPage() {
       if (res.ok) {
         const chats = (await res.json()) as WahaChat[];
         groups = chats
-          .filter((c) => c.id?.endsWith("@g.us"))
-          .map((c) => ({ id: c.id, name: c.name || c.id }));
+          .filter((c) => {
+            const id = typeof c.id === "object" ? (c.id as any)?._serialized ?? String(c.id) : String(c.id ?? "");
+            return id.endsWith("@g.us");
+          })
+          .map((c) => {
+            const id = typeof c.id === "object" ? (c.id as any)?._serialized ?? String(c.id) : String(c.id ?? "");
+            return { id, name: c.name || id };
+          });
       }
-    } catch {
-      // WAHA unavailable — show empty groups list
+    } catch (err) {
+      console.error("[whatsapp-admin] Failed to fetch groups from WAHA:", err);
     }
   }
 
@@ -194,6 +209,21 @@ export default async function WhatsAppIngestionPage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Poll Now — trigger ingestion manually */}
+      {source && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Manual Poll</CardTitle>
+          </CardHeader>
+          <CardContent className="flex items-center gap-3">
+            <TriggerRunButton sourceId={source.id} sourceName="WhatsApp" />
+            <span className="text-xs text-muted-foreground">
+              Fetch recent messages from WAHA API (no webhook needed)
+            </span>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Source missing prompt */}
       {!source && (
@@ -281,46 +311,82 @@ export default async function WhatsAppIngestionPage() {
             {recentMessages.length === 0 ? (
               <p className="py-8 text-center text-muted-foreground">No messages yet.</p>
             ) : (
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b">
-                    <th className="pb-2 text-left font-medium">Sender</th>
-                    <th className="pb-2 text-left font-medium">Group</th>
-                    <th className="pb-2 text-left font-medium">Message</th>
-                    <th className="pb-2 text-left font-medium">Status</th>
-                    <th className="pb-2 text-right font-medium">Time</th>
-                  </tr>
-                </thead>
-                <tbody>
+              <>
+                {/* Desktop table */}
+                <div className="hidden md:block">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Sender</TableHead>
+                        <TableHead>Group</TableHead>
+                        <TableHead>Message</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead className="text-right">Time</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {recentMessages.map((msg) => (
+                        <TableRow key={msg.id}>
+                          <TableCell className="text-muted-foreground">
+                            {msg.sender_name ?? "—"}
+                          </TableCell>
+                          <TableCell className="text-muted-foreground text-xs">
+                            {(() => {
+                              const gid = (msg.raw_data as any)?.payload?.from as string | undefined;
+                              return gid ? (groupNameById[gid] ?? gid) : "—";
+                            })()}
+                          </TableCell>
+                          <TableCell className="max-w-xs truncate">
+                            {msg.content_text
+                              ? msg.content_text.slice(0, 80) +
+                                (msg.content_text.length > 80 ? "…" : "")
+                              : "—"}
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant={statusBadgeVariant(msg.status)}>
+                              {msg.status}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-right text-muted-foreground">
+                            {new Date(msg.created_at).toLocaleString()}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+
+                {/* Mobile cards */}
+                <div className="space-y-3 md:hidden">
                   {recentMessages.map((msg) => (
-                    <tr key={msg.id} className="border-b last:border-0">
-                      <td className="py-2 pr-4 text-muted-foreground">
-                        {msg.sender_name ?? "—"}
-                      </td>
-                      <td className="py-2 pr-4 text-muted-foreground text-xs">
+                    <div key={msg.id} className="rounded-lg border p-3">
+                      <div className="flex items-start justify-between">
+                        <span className="text-sm font-medium">
+                          {msg.sender_name ?? "—"}
+                        </span>
+                        <Badge variant={statusBadgeVariant(msg.status)}>
+                          {msg.status}
+                        </Badge>
+                      </div>
+                      <p className="mt-0.5 text-xs text-muted-foreground">
                         {(() => {
                           const gid = (msg.raw_data as any)?.payload?.from as string | undefined;
                           return gid ? (groupNameById[gid] ?? gid) : "—";
                         })()}
-                      </td>
-                      <td className="max-w-xs truncate py-2 pr-4">
+                      </p>
+                      <p className="mt-1 truncate text-sm">
                         {msg.content_text
                           ? msg.content_text.slice(0, 80) +
                             (msg.content_text.length > 80 ? "…" : "")
                           : "—"}
-                      </td>
-                      <td className="py-2 pr-4">
-                        <Badge variant={statusBadgeVariant(msg.status)}>
-                          {msg.status}
-                        </Badge>
-                      </td>
-                      <td className="py-2 text-right text-muted-foreground">
+                      </p>
+                      <p className="mt-1 text-xs text-muted-foreground">
                         {new Date(msg.created_at).toLocaleString()}
-                      </td>
-                    </tr>
+                      </p>
+                    </div>
                   ))}
-                </tbody>
-              </table>
+                </div>
+              </>
             )}
           </CardContent>
         </Card>

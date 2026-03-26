@@ -33,11 +33,19 @@ export interface DedupInput {
   description?: string | null;
 }
 
+export interface DedupPrecomputed {
+  normalizedVenue?: string | null;
+  fingerprint?: string;
+}
+
 /**
  * Find potential duplicates for a parsed event before inserting it.
  * Returns an array of candidates ordered by confidence (highest first).
+ *
+ * Pass `precomputed` to skip redundant normalizeVenue/generateFingerprint calls
+ * when the caller has already computed them (e.g. createEventFromParsed).
  */
-export async function findDuplicates(input: DedupInput): Promise<DedupCandidate[]> {
+export async function findDuplicates(input: DedupInput, precomputed?: DedupPrecomputed): Promise<DedupCandidate[]> {
   const supabase = createAdminClient();
   const candidates: DedupCandidate[] = [];
 
@@ -80,9 +88,9 @@ export async function findDuplicates(input: DedupInput): Promise<DedupCandidate[
     }
   }
 
-  // Layer 2: Content fingerprint hash
-  const normalizedVenue = await normalizeVenue(input.venue_name);
-  const fingerprint = await generateFingerprint({
+  // Layer 2: Content fingerprint hash (use precomputed values if available)
+  const normalizedVenue = precomputed?.normalizedVenue ?? await normalizeVenue(input.venue_name);
+  const fingerprint = precomputed?.fingerprint ?? await generateFingerprint({
     title: input.title,
     start_date: input.start_date,
     venue_name: normalizedVenue,

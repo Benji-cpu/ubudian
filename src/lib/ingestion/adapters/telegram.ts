@@ -66,6 +66,7 @@ export async function parseTelegramUpdate(update: TelegramUpdate): Promise<RawMe
       ? [message.from.first_name, message.from.last_name].filter(Boolean).join(" ")
       : undefined,
     sender_id: message.from ? String(message.from.id) : undefined,
+    chat_name: message.chat.title || undefined,
     raw_data: update,
   };
 }

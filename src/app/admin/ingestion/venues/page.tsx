@@ -13,6 +13,7 @@ import {
 import { ArrowLeft, AlertCircle } from "lucide-react";
 import { VenueAliasForm } from "@/components/admin/ingestion/venue-alias-form";
 import type { VenueAlias } from "@/types";
+import { MobileCardField } from "@/components/admin/mobile-card-field";
 
 export default async function VenueAliasesPage() {
   const supabase = await createClient();
@@ -67,42 +68,74 @@ export default async function VenueAliasesPage() {
         </CardContent>
       </Card>
 
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Canonical Name</TableHead>
-            <TableHead>Aliases</TableHead>
-            <TableHead className="text-right">Count</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {Array.from(grouped.entries()).map(([canonical, venueAliases]) => (
-            <TableRow key={canonical}>
-              <TableCell className="font-medium">{canonical}</TableCell>
-              <TableCell>
-                <div className="flex flex-wrap gap-1">
-                  {venueAliases.map((a) => (
-                    <span
-                      key={a.id}
-                      className="inline-block rounded-full bg-muted px-2 py-0.5 text-xs"
-                    >
-                      {a.alias}
-                    </span>
-                  ))}
-                </div>
-              </TableCell>
-              <TableCell className="text-right">{venueAliases.length}</TableCell>
-            </TableRow>
-          ))}
-          {grouped.size === 0 && (
+      <div className="hidden md:block">
+        <Table>
+          <TableHeader>
             <TableRow>
-              <TableCell colSpan={3} className="py-8 text-center text-muted-foreground">
-                No venue aliases configured yet.
-              </TableCell>
+              <TableHead>Canonical Name</TableHead>
+              <TableHead>Aliases</TableHead>
+              <TableHead className="text-right">Count</TableHead>
             </TableRow>
-          )}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {Array.from(grouped.entries()).map(([canonical, venueAliases]) => (
+              <TableRow key={canonical}>
+                <TableCell className="font-medium">{canonical}</TableCell>
+                <TableCell>
+                  <div className="flex flex-wrap gap-1">
+                    {venueAliases.map((a) => (
+                      <span
+                        key={a.id}
+                        className="inline-block rounded-full bg-muted px-2 py-0.5 text-xs"
+                      >
+                        {a.alias}
+                      </span>
+                    ))}
+                  </div>
+                </TableCell>
+                <TableCell className="text-right">{venueAliases.length}</TableCell>
+              </TableRow>
+            ))}
+            {grouped.size === 0 && (
+              <TableRow>
+                <TableCell colSpan={3} className="py-8 text-center text-muted-foreground">
+                  No venue aliases configured yet.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
+
+      <div className="space-y-3 md:hidden">
+        {Array.from(grouped.entries()).map(([canonical, venueAliases]) => (
+          <Card key={canonical} className="py-3">
+            <CardContent className="px-4 py-0">
+              <div className="flex items-start justify-between gap-2">
+                <p className="font-medium">{canonical}</p>
+                <span className="shrink-0 text-xs text-muted-foreground">
+                  {venueAliases.length} alias{venueAliases.length !== 1 ? "es" : ""}
+                </span>
+              </div>
+              <div className="mt-2 flex flex-wrap gap-1">
+                {venueAliases.map((a) => (
+                  <span
+                    key={a.id}
+                    className="inline-block rounded-full bg-muted px-2 py-0.5 text-xs"
+                  >
+                    {a.alias}
+                  </span>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+        {grouped.size === 0 && (
+          <p className="py-8 text-center text-sm text-muted-foreground">
+            No venue aliases configured yet.
+          </p>
+        )}
+      </div>
     </div>
   );
 }

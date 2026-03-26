@@ -91,6 +91,8 @@ CREATE TABLE event_sources (
   last_success_at TIMESTAMPTZ,
   last_error TEXT,
   events_ingested_count INTEGER DEFAULT 0,
+  auto_approve_enabled BOOLEAN DEFAULT FALSE,
+  auto_approve_threshold REAL DEFAULT 0.85,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -120,6 +122,7 @@ CREATE TABLE raw_ingestion_messages (
   image_urls TEXT[],
   sender_name TEXT,
   sender_id TEXT,
+  chat_name TEXT,
   raw_data JSONB,
   status TEXT NOT NULL DEFAULT 'pending',
   parsed_event_data JSONB,
@@ -164,6 +167,8 @@ CREATE TABLE events (
   content_fingerprint TEXT,
   raw_message_id UUID REFERENCES raw_ingestion_messages(id) ON DELETE SET NULL,
   llm_parsed BOOLEAN DEFAULT FALSE,
+  quality_score REAL,
+  content_flags TEXT[] DEFAULT '{}',
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );

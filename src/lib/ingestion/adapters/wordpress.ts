@@ -145,12 +145,15 @@ function stripHtml(html: string): string {
 function mapWPCategory(categories?: Array<{ name?: string }>): string {
   if (!categories?.length) return "Other";
   const name = categories[0].name?.toLowerCase() || "";
-  if (name.includes("music")) return "Music & Live Performance";
-  if (name.includes("yoga") || name.includes("wellness")) return "Yoga & Wellness";
+  if (name.includes("dance")) return "Dance & Movement";
+  if (name.includes("tantra")) return "Tantra & Intimacy";
+  if (name.includes("ceremony") || name.includes("sound")) return "Ceremony & Sound";
+  if (name.includes("yoga") || name.includes("meditation")) return "Yoga & Meditation";
+  if (name.includes("healing") || name.includes("bodywork")) return "Healing & Bodywork";
+  if (name.includes("circle") || name.includes("community")) return "Circle & Community";
+  if (name.includes("music")) return "Music & Performance";
   if (name.includes("art")) return "Art & Culture";
-  if (name.includes("food")) return "Food & Drink";
-  if (name.includes("workshop")) return "Workshop & Class";
-  if (name.includes("community")) return "Community & Social";
+  if (name.includes("retreat") || name.includes("training")) return "Retreat & Training";
   return "Other";
 }
 

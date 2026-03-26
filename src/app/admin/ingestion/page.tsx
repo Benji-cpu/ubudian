@@ -7,6 +7,8 @@ import { SourceHealthCard } from "@/components/admin/ingestion/source-health-car
 import { RunHistoryTable } from "@/components/admin/ingestion/run-history-table";
 import { TriggerRunButton } from "@/components/admin/ingestion/trigger-run-button";
 import { PendingApprovalQueue } from "@/components/admin/ingestion/pending-approval-queue";
+import { ActiveGroupsPanel } from "@/components/admin/ingestion/active-groups-panel";
+import type { GroupActivity } from "@/components/admin/ingestion/active-groups-panel";
 import { Plus, Settings, Copy, MapPin, MessageSquare, Smartphone, Send } from "lucide-react";
 import type { EventSource, IngestionRun } from "@/types";
 
@@ -15,6 +17,7 @@ export default async function IngestionDashboardPage() {
 
   const now = new Date();
   const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString();
+  const fortyEightHoursAgo = new Date(now.getTime() - 48 * 60 * 60 * 1000).toISOString();
 
   const [
     { data: sources },
@@ -25,6 +28,8 @@ export default async function IngestionDashboardPage() {
     { count: totalMessages24h },
     { count: parsedMessages24h },
     { data: pendingEvents },
+    { count: autoApproved24h },
+    { data: recentGroupMessages },
   ] = await Promise.all([
     supabase
       .from("event_sources")
@@ -60,11 +65,24 @@ export default async function IngestionDashboardPage() {
       .gte("created_at", twentyFourHoursAgo),
     supabase
       .from("events")
-      .select("id, title, category, start_date, venue_name, source_id, raw_message_id, llm_parsed, created_at")
+      .select("id, title, category, start_date, venue_name, source_id, raw_message_id, llm_parsed, quality_score, content_flags, created_at, raw_ingestion_messages!raw_message_id(chat_name)")
       .eq("status", "pending")
       .not("source_id", "is", null)
       .order("created_at", { ascending: false })
       .limit(10),
+    supabase
+      .from("events")
+      .select("*", { count: "exact", head: true })
+      .eq("status", "approved")
+      .not("source_id", "is", null)
+      .eq("llm_parsed", true)
+      .gte("created_at", twentyFourHoursAgo),
+    supabase
+      .from("raw_ingestion_messages")
+      .select("chat_name, source_id, status, created_at")
+      .gte("created_at", fortyEightHoursAgo)
+      .not("chat_name", "is", null)
+      .order("created_at", { ascending: false }),
   ]);
 
   const allSources = (sources ?? []) as EventSource[];
@@ -78,52 +96,92 @@ export default async function IngestionDashboardPage() {
   const successRate = total24h > 0 ? Math.round((parsed24h / total24h) * 100) : -1;
 
   const sourceNames: Record<string, string> = {};
+  const sourceTypeMap: Record<string, string> = {};
   for (const s of allSources) {
     sourceNames[s.id] = s.name;
+    sourceTypeMap[s.id] = s.source_type;
   }
+
+  // Aggregate group activity from recent messages
+  const groupMap = new Map<string, GroupActivity>();
+  const twentyFourHoursAgoMs = now.getTime() - 24 * 60 * 60 * 1000;
+
+  for (const msg of (recentGroupMessages ?? []) as { chat_name: string; source_id: string; status: string; created_at: string }[]) {
+    const key = `${msg.source_id}::${msg.chat_name}`;
+    let group = groupMap.get(key);
+    if (!group) {
+      group = {
+        chatName: msg.chat_name,
+        sourceType: sourceTypeMap[msg.source_id] || "unknown",
+        messagesLast24h: 0,
+        messagesPrior24h: 0,
+        eventsCreated: 0,
+        lastMessageAt: msg.created_at,
+      };
+      groupMap.set(key, group);
+    }
+
+    const msgTime = new Date(msg.created_at).getTime();
+    if (msgTime >= twentyFourHoursAgoMs) {
+      group.messagesLast24h++;
+    } else {
+      group.messagesPrior24h++;
+    }
+
+    if (msg.status === "parsed") {
+      group.eventsCreated++;
+    }
+
+    // lastMessageAt is the most recent (messages are ordered desc)
+    if (msg.created_at > group.lastMessageAt) {
+      group.lastMessageAt = msg.created_at;
+    }
+  }
+
+  const groupActivity = Array.from(groupMap.values());
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Event Ingestion</h1>
-        <div className="flex items-center gap-2">
-          <Button asChild variant="outline" size="sm">
-            <Link href="/admin/ingestion/venues">
-              <MapPin className="mr-2 h-4 w-4" />
-              Venues
-            </Link>
-          </Button>
-          <Button asChild variant="outline" size="sm">
-            <Link href="/admin/ingestion/dedup-review">
-              <Copy className="mr-2 h-4 w-4" />
-              Dedup Queue ({(pendingDedups ?? []).length})
-            </Link>
-          </Button>
-          <Button asChild variant="outline" size="sm">
-            <Link href="/admin/ingestion/messages">
-              <MessageSquare className="mr-2 h-4 w-4" />
-              Messages
-            </Link>
-          </Button>
-          <Button asChild variant="outline" size="sm">
-            <Link href="/admin/ingestion/whatsapp">
-              <Smartphone className="mr-2 h-4 w-4" />
-              WhatsApp
-            </Link>
-          </Button>
-          <Button asChild variant="outline" size="sm">
-            <Link href="/admin/ingestion/telegram">
-              <Send className="mr-2 h-4 w-4" />
-              Telegram
-            </Link>
-          </Button>
-          <Button asChild>
-            <Link href="/admin/ingestion/sources/new">
-              <Plus className="mr-2 h-4 w-4" />
-              Add Source
-            </Link>
-          </Button>
-        </div>
+        <Button asChild>
+          <Link href="/admin/ingestion/sources/new">
+            <Plus className="mr-2 h-4 w-4" />
+            Add Source
+          </Link>
+        </Button>
+      </div>
+      <div className="flex flex-wrap gap-2 mt-4">
+        <Button asChild variant="outline" size="sm">
+          <Link href="/admin/ingestion/venues">
+            <MapPin className="mr-2 h-4 w-4" />
+            Venues
+          </Link>
+        </Button>
+        <Button asChild variant="outline" size="sm">
+          <Link href="/admin/ingestion/dedup-review">
+            <Copy className="mr-2 h-4 w-4" />
+            Dedup Queue ({(pendingDedups ?? []).length})
+          </Link>
+        </Button>
+        <Button asChild variant="outline" size="sm">
+          <Link href="/admin/ingestion/messages">
+            <MessageSquare className="mr-2 h-4 w-4" />
+            Messages
+          </Link>
+        </Button>
+        <Button asChild variant="outline" size="sm">
+          <Link href="/admin/ingestion/whatsapp">
+            <Smartphone className="mr-2 h-4 w-4" />
+            WhatsApp
+          </Link>
+        </Button>
+        <Button asChild variant="outline" size="sm">
+          <Link href="/admin/ingestion/telegram">
+            <Send className="mr-2 h-4 w-4" />
+            Telegram
+          </Link>
+        </Button>
       </div>
 
       <IngestionStats
@@ -134,7 +192,12 @@ export default async function IngestionDashboardPage() {
         recentErrors={(recentErrorRuns ?? []).length}
         lastMessageAt={lastMessageAt}
         successRate={successRate}
+        autoApproved24h={autoApproved24h ?? 0}
       />
+
+      {groupActivity.length > 0 && (
+        <ActiveGroupsPanel groups={groupActivity} />
+      )}
 
       {(pendingEvents ?? []).length > 0 && (
         <PendingApprovalQueue events={pendingEvents ?? []} />

@@ -83,6 +83,8 @@ export interface Event {
   content_fingerprint: string | null;
   raw_message_id: string | null;
   llm_parsed: boolean;
+  quality_score: number | null;
+  content_flags: string[];
   created_at: string;
   updated_at: string;
 }
@@ -287,6 +289,8 @@ export interface EventSource {
   last_success_at: string | null;
   last_error: string | null;
   events_ingested_count: number;
+  auto_approve_enabled: boolean;
+  auto_approve_threshold: number;
   created_at: string;
   updated_at: string;
 }
@@ -320,6 +324,7 @@ export interface RawIngestionMessage {
   image_urls: string[] | null;
   sender_name: string | null;
   sender_id: string | null;
+  chat_name: string | null;
   raw_data: unknown;
   status: RawMessageStatus;
   parsed_event_data: unknown;

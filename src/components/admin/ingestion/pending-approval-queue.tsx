@@ -17,7 +17,17 @@ interface PendingEvent {
   source_id: string | null;
   raw_message_id: string | null;
   llm_parsed: boolean;
+  quality_score: number | null;
+  content_flags: string[] | null;
   created_at: string;
+  raw_ingestion_messages?: { chat_name: string | null } | { chat_name: string | null }[] | null;
+}
+
+function getChatName(event: PendingEvent): string | null {
+  const raw = event.raw_ingestion_messages;
+  if (!raw) return null;
+  if (Array.isArray(raw)) return raw[0]?.chat_name ?? null;
+  return raw.chat_name;
 }
 
 export function PendingApprovalQueue({ events }: { events: PendingEvent[] }) {
@@ -102,6 +112,25 @@ export function PendingApprovalQueue({ events }: { events: PendingEvent[] }) {
                     AI
                   </Badge>
                 )}
+                {event.quality_score != null && (
+                  <Badge
+                    variant="outline"
+                    className={`text-xs ${
+                      event.quality_score >= 0.85
+                        ? "border-green-500 text-green-700"
+                        : event.quality_score >= 0.6
+                          ? "border-yellow-500 text-yellow-700"
+                          : "border-red-500 text-red-700"
+                    }`}
+                  >
+                    QA: {event.quality_score.toFixed(2)}
+                  </Badge>
+                )}
+                {event.content_flags?.map((flag) => (
+                  <Badge key={flag} variant="destructive" className="text-xs">
+                    {flag}
+                  </Badge>
+                ))}
               </div>
               <span className="text-xs text-muted-foreground">
                 {formatDistanceToNow(new Date(event.created_at), {
@@ -113,6 +142,9 @@ export function PendingApprovalQueue({ events }: { events: PendingEvent[] }) {
               <div className="flex items-center gap-4 text-sm text-muted-foreground">
                 <span>{new Date(event.start_date).toLocaleDateString()}</span>
                 {event.venue_name && <span>{event.venue_name}</span>}
+                {getChatName(event) && (
+                  <span className="text-xs">from {getChatName(event)}</span>
+                )}
               </div>
 
               <div className="flex items-center gap-2">
@@ -159,7 +191,7 @@ export function PendingApprovalQueue({ events }: { events: PendingEvent[] }) {
               {expandedId === event.id && (
                 <div className="rounded-md bg-muted p-3">
                   <p className="mb-1 text-xs font-medium text-muted-foreground">
-                    Original WhatsApp Message
+                    Original Message{getChatName(event) ? ` from ${getChatName(event)}` : ""}
                   </p>
                   {loadingText === event.id ? (
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
