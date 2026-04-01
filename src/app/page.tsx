@@ -15,10 +15,10 @@ import { TourCardSkeleton } from "@/components/skeletons/tour-card-skeleton";
 import { SITE_URL, SITE_NAME, SITE_DESCRIPTION } from "@/lib/constants";
 
 export const metadata: Metadata = {
-  title: "The Ubudian — Ubud's Conscious Community Platform",
+  title: "The Ubudian — Ubud's Conscious Community",
   description: SITE_DESCRIPTION,
   openGraph: {
-    title: "The Ubudian — Ubud's Conscious Community Platform",
+    title: "The Ubudian — Ubud's Conscious Community",
     description: SITE_DESCRIPTION,
     url: SITE_URL,
     siteName: SITE_NAME,
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "The Ubudian — Ubud's Conscious Community Platform",
+    title: "The Ubudian — Ubud's Conscious Community",
     description: SITE_DESCRIPTION,
   },
 };
@@ -107,7 +107,7 @@ export default function HomePage() {
               The Ubudian
             </h1>
             <p className="mt-6 font-serif text-xl italic text-brand-cream sm:text-2xl">
-              Where Ubud&apos;s conscious community comes together
+              Tantra. Sound journeys. Shadow work. Ecstatic dance. All in one place.
             </p>
             <p className="mx-auto mt-4 max-w-lg text-base text-brand-off-white/70">
               <Link href="/events" className="text-brand-off-white underline decoration-brand-off-white/30 underline-offset-2 transition-colors hover:text-brand-gold hover:decoration-brand-gold">Events</Link>,{" "}
@@ -120,7 +120,7 @@ export default function HomePage() {
               href="/quiz"
               className="mt-6 inline-block font-serif text-sm italic text-brand-gold transition-colors hover:text-brand-cream"
             >
-              Take the quiz — find your archetype, find your people &rarr;
+              Take the quiz — find your archetype, find your corner of Ubud &rarr;
             </Link>
           </div>
 
@@ -230,8 +230,8 @@ export default function HomePage() {
                 Ubud Experiences
               </h2>
               <p className="mx-auto mt-4 max-w-2xl text-lg leading-relaxed text-brand-charcoal-light">
-                Sound healings, sunrise yoga, temple ceremonies, organic markets — the
-                practices and gatherings that define life in Ubud, curated for your spirit.
+                Embodiment workshops, cacao ceremonies, tantric temples, sound journeys — the
+                practices that make Ubud unlike anywhere else.
               </p>
             </div>
 

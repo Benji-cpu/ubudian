@@ -68,15 +68,14 @@ export function QuizCtaHomepage() {
     <section className="bg-brand-pale-green px-4 py-16 sm:py-20">
       <div className="mx-auto max-w-3xl text-center">
         <p className="text-sm font-semibold uppercase tracking-wider text-brand-gold">
-          New: Interactive Quiz
+          90-Second Quiz
         </p>
         <h2 className="mt-3 font-serif text-3xl font-medium text-brand-deep-green sm:text-4xl">
           Discover Your Ubud Spirit
         </h2>
         <p className="mx-auto mt-4 max-w-xl text-lg text-brand-charcoal-light">
-          Are you a Seeker, Explorer, Creative, Connector, or Epicurean?
-          Take the 90-second quiz and find the ceremonies, workshops, and
-          community experiences that match your spirit.
+          Seeker, Explorer, Creative, Connector, or Epicurean? Take the quiz
+          and find out which corner of Ubud&apos;s conscious community has your name on it.
         </p>
         <Button asChild size="lg" className="mt-8">
           <Link href="/quiz">Take the Quiz</Link>

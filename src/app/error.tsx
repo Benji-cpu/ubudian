@@ -10,10 +10,10 @@ export default function GlobalError({
     <div className="flex min-h-[60vh] flex-col items-center justify-center px-4 text-center">
       <div className="mx-auto mb-6 h-px w-12 bg-brand-gold/40" />
       <h1 className="font-serif text-3xl font-medium text-brand-deep-green sm:text-4xl">
-        Something went wrong
+        Something broke
       </h1>
       <p className="mt-4 max-w-md text-lg text-muted-foreground">
-        We&apos;re having trouble loading this page. Please try again in a moment.
+        Not everything in Ubud goes to plan. Give it another try.
       </p>
       <button
         onClick={reset}

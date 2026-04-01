@@ -5,7 +5,7 @@ import { SubscribeButton } from "@/components/membership/subscribe-button";
 import { PricingToggle } from "@/components/membership/pricing-toggle";
 
 const COMMUNITY_FEATURES = [
-  "Browse all events — ceremonies, workshops, sound journeys, and more",
+  "Every event — tantra, ceremonies, ecstatic dance, sound journeys, and more",
   "Read Humans of Ubud stories & blog posts",
   "Weekly community newsletter",
   "Take the Ubud Spirit Quiz",
@@ -14,7 +14,7 @@ const COMMUNITY_FEATURES = [
 
 const INSIDER_FEATURES = [
   "Everything in Community, plus:",
-  "Members-only stories & deep dives",
+  "Members-only stories & deep dives into Ubud's scene",
   "Insider badge on your profile",
 ];
 
@@ -33,7 +33,7 @@ export default function MembershipPage() {
           Go Deeper with The Ubudian
         </h1>
         <p className="mt-3 text-lg text-muted-foreground">
-          Support the platform, get members-only content, and help keep Ubud&apos;s community connected.
+          Support the platform that keeps Ubud&apos;s conscious community connected — and get the content nobody else sees.
         </p>
       </div>
 

@@ -157,7 +157,7 @@ export default async function ArchetypeResultPage({ params }: PageProps) {
               Experiences for {archetype.name}
             </h2>
             <p className="mt-2 text-brand-charcoal-light">
-              Curated experiences that match your spirit.
+              Based on your archetype — the practices and gatherings that&apos;ll feel like home.
             </p>
             <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {matchedExperiences.map((experience) => (

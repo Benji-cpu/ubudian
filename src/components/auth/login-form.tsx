@@ -26,7 +26,7 @@ export function LoginForm() {
         <CardHeader className="text-center">
           <CardTitle className="text-2xl">{SITE_NAME}</CardTitle>
           <CardDescription>
-            Sign in to submit events, save favorites, and access your dashboard
+            Sign in to submit events, save your favorites, and find what&apos;s happening this week
           </CardDescription>
         </CardHeader>
         <CardContent>

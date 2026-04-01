@@ -53,7 +53,7 @@ export default async function NewsletterPage() {
         {allEditions.length === 0 ? (
           <div className="mt-8 py-12 text-center">
             <p className="text-lg text-muted-foreground">
-              No editions published yet. Subscribe to be the first to know!
+              No editions published yet — subscribe and you&apos;ll be the first to read one.
             </p>
           </div>
         ) : (

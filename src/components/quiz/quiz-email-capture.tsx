@@ -7,10 +7,9 @@ import { Loader2 } from "lucide-react";
 
 interface QuizEmailCaptureProps {
   onSubmit: (email: string) => void;
-  onSkip: () => void;
 }
 
-export function QuizEmailCapture({ onSubmit, onSkip }: QuizEmailCaptureProps) {
+export function QuizEmailCapture({ onSubmit }: QuizEmailCaptureProps) {
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -32,16 +31,16 @@ export function QuizEmailCapture({ onSubmit, onSkip }: QuizEmailCaptureProps) {
   return (
     <div className="mx-auto max-w-md text-center">
       <div className="mb-2 text-4xl">&#10024;</div>
-      <h2 className="font-serif text-3xl font-medium text-brand-charcoal sm:text-4xl">
+      <h2 className="font-serif text-2xl font-medium text-brand-charcoal sm:text-3xl">
         Your Ubud Spirit is ready!
       </h2>
       <p className="mt-4 text-lg text-brand-charcoal-light">
-        Enter your email to save your results and get community events
-        matched to your archetype in our weekly newsletter.
+        Save your results and get events matched to your archetype in the
+        weekly newsletter.
       </p>
 
       <form onSubmit={handleSubmit} className="mt-8">
-        <div className="flex gap-2">
+        <div className="flex flex-col gap-3 sm:flex-row sm:gap-2">
           <Input
             type="email"
             placeholder="your@email.com"
@@ -56,12 +55,6 @@ export function QuizEmailCapture({ onSubmit, onSkip }: QuizEmailCaptureProps) {
         {error && <p className="mt-2 text-sm text-destructive">{error}</p>}
       </form>
 
-      <button
-        onClick={onSkip}
-        className="mt-4 text-sm text-brand-charcoal-light/60 underline underline-offset-2 transition-colors hover:text-brand-charcoal-light"
-      >
-        Skip and see results
-      </button>
     </div>
   );
 }

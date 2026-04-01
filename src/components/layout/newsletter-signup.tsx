@@ -36,7 +36,7 @@ export function NewsletterSignup({ className, variant = "light" }: NewsletterSig
       }
 
       setStatus("success");
-      setMessage("Welcome to The Ubudian!");
+      setMessage("You're in. See you in your inbox.");
       setEmail("");
       try {
         localStorage.setItem("ubudian_subscribed", "true");

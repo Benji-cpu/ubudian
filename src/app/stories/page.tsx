@@ -9,7 +9,7 @@ import type { Story } from "@/types";
 export const metadata: Metadata = {
   title: "Humans of Ubud | The Ubudian",
   description:
-    "Portraits of the people who make Ubud what it is — healers, farmers, ceremonialists, facilitators, and the dreamers who stayed.",
+    "Tantra facilitators, breathwork guides, ceremony holders, organic farmers — the humans who hold space in Ubud.",
 };
 
 interface StoriesPageProps {
@@ -53,8 +53,8 @@ export default async function StoriesPage({ searchParams }: StoriesPageProps) {
             Humans of Ubud
           </h1>
           <p className="mt-4 text-lg text-muted-foreground">
-            Portraits of the people who make Ubud what it is — healers, farmers,
-            ceremonialists, facilitators, and the dreamers who stayed.
+            Tantra facilitators, breathwork guides, ceremony holders, organic
+            farmers — the humans who hold space in Ubud.
           </p>
         </div>
       </section>

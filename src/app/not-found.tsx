@@ -5,8 +5,8 @@ export default function NotFound() {
   return (
     <div>
       <NotFoundContent
-        title="Page not found"
-        description="The page you're looking for doesn't exist or has been moved."
+        title="Wrong turn"
+        description="This page doesn't exist — but there's plenty that does."
       />
       <div className="bg-brand-cream pb-16 text-center">
         <p className="text-sm text-muted-foreground">Try one of these instead:</p>

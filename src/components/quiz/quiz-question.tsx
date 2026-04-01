@@ -21,7 +21,7 @@ export function QuizQuestion({ question, onAnswer }: QuizQuestionProps) {
   if (question.type === "image") {
     return (
       <div>
-        <h2 className="mb-6 text-center font-serif text-2xl font-medium text-brand-charcoal sm:text-3xl">
+        <h2 className="mb-4 text-center font-serif text-xl font-medium text-brand-charcoal sm:text-2xl">
           {question.question}
         </h2>
         <div className="grid grid-cols-2 gap-3 sm:gap-4">
@@ -67,15 +67,15 @@ export function QuizQuestion({ question, onAnswer }: QuizQuestionProps) {
   // Text-based question
   return (
     <div>
-      <h2 className="mb-6 text-center font-serif text-2xl font-medium text-brand-charcoal sm:text-3xl">
+      <h2 className="mb-4 text-center font-serif text-xl font-medium text-brand-charcoal sm:text-2xl">
         {question.question}
       </h2>
-      <div className="mx-auto max-w-lg space-y-3">
+      <div className="mx-auto max-w-lg space-y-2">
         {question.answers.map((answer) => (
           <button
             key={answer.id}
             onClick={() => handleSelect(answer.id)}
-            className={`w-full rounded-xl border-2 px-5 py-4 text-left transition-all duration-300 ${
+            className={`w-full rounded-xl border-2 px-4 py-3 text-left transition-all duration-300 ${
               selected === answer.id
                 ? "border-brand-gold bg-brand-gold/10 text-brand-charcoal"
                 : selected

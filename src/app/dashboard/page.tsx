@@ -100,7 +100,7 @@ export default async function DashboardPage() {
             Discover Your Ubud Spirit
           </h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            Take the 90-second quiz to find your archetype and see events and stories matched to you.
+            Take the quiz — find your archetype and see what Ubud has for you this week.
           </p>
           <Button asChild className="mt-4">
             <Link href="/quiz">Take the Quiz</Link>

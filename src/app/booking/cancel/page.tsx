@@ -16,10 +16,10 @@ export default async function BookingCancelPage({ searchParams }: BookingCancelP
         <CardContent className="flex flex-col items-center p-8 text-center">
           <XCircle className="h-16 w-16 text-muted-foreground" />
           <h1 className="mt-4 font-serif text-2xl font-bold text-brand-deep-green">
-            Payment Cancelled
+            Booking not completed
           </h1>
           <p className="mt-2 text-muted-foreground">
-            Your booking was not completed. No charges were made.
+            No charges were made. The tour will still be there when you&apos;re ready.
           </p>
           {ref && (
             <p className="mt-2 text-sm text-muted-foreground">

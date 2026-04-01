@@ -113,8 +113,8 @@ export function SettingsForm({ profile, isSubscribed }: SettingsFormProps) {
         <h2 className="font-serif text-xl font-medium">Newsletter</h2>
         <p className="mt-2 text-sm text-muted-foreground">
           {isSubscribed
-            ? "You're subscribed to The Ubudian weekly newsletter."
-            : "You're not currently subscribed to the newsletter."}
+            ? "You're getting the weekly Ubudian — one email, every week."
+            : "You're not subscribed yet — you're missing the weekly roundup."}
         </p>
       </div>
 

@@ -36,7 +36,7 @@ export default async function BookingSuccessPage({ searchParams }: BookingSucces
         <CardContent className="flex flex-col items-center p-8 text-center">
           <CheckCircle className="h-16 w-16 text-green-600" />
           <h1 className="mt-4 font-serif text-2xl font-bold text-brand-deep-green">
-            Booking Confirmed!
+            You&apos;re booked
           </h1>
 
           {booking ? (
@@ -56,7 +56,7 @@ export default async function BookingSuccessPage({ searchParams }: BookingSucces
             </div>
           ) : (
             <p className="mt-4 text-muted-foreground">
-              Your booking has been received. Check your email for details.
+              Your booking has been received — check your email for the details.
             </p>
           )}
 

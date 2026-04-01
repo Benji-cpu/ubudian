@@ -8,7 +8,7 @@ import type { Experience } from "@/types";
 export const metadata: Metadata = {
   title: "Ubud Experiences | The Ubudian",
   description:
-    "Curated experiences that define Ubud — sound healings, sunrise yoga, temple ceremonies, organic markets, and more. Find the ones that match your spirit.",
+    "Embodiment workshops, cacao ceremonies, tantric temples, sound journeys — the practices that define life in Ubud.",
 };
 
 export default async function ExperiencesPage() {
@@ -40,8 +40,8 @@ export default async function ExperiencesPage() {
             Ubud Experiences
           </h1>
           <p className="mt-4 text-lg text-muted-foreground">
-            The ceremonies, practices, and gatherings that make Ubud unlike
-            anywhere else — curated by the community, matched to your spirit.
+            Embodiment workshops, cacao ceremonies, tantric temples, sound
+            journeys — the practices that define life in Ubud, matched to your archetype.
           </p>
         </div>
       </section>
@@ -70,7 +70,7 @@ export default async function ExperiencesPage() {
             Not sure where to start?
           </h2>
           <p className="mt-2 text-muted-foreground">
-            Take the 90-second quiz to discover your Ubud spirit — and find experiences matched to you.
+            Take the quiz to find your archetype — and see which experiences have your name on them.
           </p>
           <Button asChild className="mt-6">
             <Link href="/quiz">Take the Quiz</Link>

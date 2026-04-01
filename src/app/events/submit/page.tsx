@@ -17,8 +17,9 @@ export default function SubmitEventPage() {
             Submit an Event
           </h1>
           <p className="mt-4 text-lg text-muted-foreground">
-            Hosting a ceremony, workshop, circle, or gathering in Ubud? Share it
-            with the community. All submissions are reviewed before publishing.
+            Hosting a ceremony, tantra workshop, sound journey, circle, or
+            gathering in Ubud? Share it with the community. All submissions are
+            reviewed before publishing.
           </p>
         </div>
       </section>

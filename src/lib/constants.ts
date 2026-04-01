@@ -1,6 +1,6 @@
 export const SITE_NAME = "The Ubudian";
 export const SITE_DESCRIPTION =
-  "Ubud's conscious community in one place — events, stories, tours, and the weekly newsletter.";
+  "Tantra, ceremonies, ecstatic dance, sound journeys, shadow work — Ubud's conscious community in one place.";
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
 export const NAV_LINKS = [

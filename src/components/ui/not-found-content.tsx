@@ -9,8 +9,8 @@ interface NotFoundContentProps {
 }
 
 export function NotFoundContent({
-  title = "Page not found",
-  description = "Sorry, we couldn't find what you're looking for.",
+  title = "Wrong turn",
+  description = "This page doesn't exist — but there's plenty that does.",
   backHref = "/",
   backLabel = "Back to Home",
 }: NotFoundContentProps) {

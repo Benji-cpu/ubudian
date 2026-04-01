@@ -9,7 +9,7 @@ export function EventListEmptyState() {
         <Search className="h-7 w-7 text-brand-deep-green" />
       </div>
       <h3 className="font-serif text-xl font-medium text-foreground">
-        No events found
+        Nothing matching those filters
       </h3>
       <p className="mt-2 max-w-sm text-muted-foreground">
         Try adjusting your filters or search, or submit your own event to share

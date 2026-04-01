@@ -12,7 +12,7 @@ export function Footer() {
             {SITE_NAME}
           </h3>
           <p className="mt-2 text-sm text-brand-sage">
-            Ubud&apos;s conscious community, connected
+            The edgy, messy, transformative heart of Ubud
           </p>
         </div>
 
@@ -32,7 +32,7 @@ export function Footer() {
         {/* Newsletter */}
         <div className="mx-auto mt-10 max-w-md text-center">
           <p className="text-sm text-brand-off-white/70">
-            The weekly Ubudian — events, stories, and community happenings in one email.
+            One email a week — ceremonies, workshops, sound journeys, and the stories worth reading.
           </p>
           <NewsletterSignup variant="dark" className="mt-4" />
         </div>

@@ -125,7 +125,7 @@ export function QuizResults({
             Experiences for {archetype.name}
           </h3>
           <p className="mt-2 text-brand-charcoal-light">
-            Curated experiences that match your spirit. These are the things that make Ubud feel like home.
+            Based on your archetype — the practices, ceremonies, and gatherings that&apos;ll feel like home.
           </p>
           <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {matchedExperiences.map((experience) => (
@@ -142,7 +142,7 @@ export function QuizResults({
             Events for {archetype.name}
           </h3>
           <p className="mt-2 text-brand-charcoal-light">
-            Experiences we think you&apos;ll love.
+            Happening soon in Ubud.
           </p>
           <div className="mt-6 space-y-3">
             {matchedEvents.map((event) => (
@@ -167,7 +167,7 @@ export function QuizResults({
             Tours for {archetype.name}
           </h3>
           <p className="mt-2 text-brand-charcoal-light">
-            Curated experiences that match your spirit.
+            Get out of the ceremony and into the landscape.
           </p>
           <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {matchedTours.map((tour) => (
@@ -184,7 +184,7 @@ export function QuizResults({
             Humans of Ubud for {archetype.name}
           </h3>
           <p className="mt-2 text-brand-charcoal-light">
-            Meet the people who share your spirit.
+            The humans behind the events you&apos;ll love.
           </p>
           <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {matchedStories.map((story) => (

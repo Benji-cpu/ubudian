@@ -49,7 +49,7 @@ export default async function ToursPage() {
         {allTours.length === 0 ? (
           <div className="py-12 text-center">
             <p className="text-lg text-muted-foreground">
-              Tours are coming soon! Check back shortly.
+              Tours are coming — subscribe to hear when they drop.
             </p>
           </div>
         ) : (
@@ -65,10 +65,10 @@ export default async function ToursPage() {
       <section className="bg-brand-pale-green px-4 py-14">
         <div className="mx-auto max-w-xl text-center">
           <h2 className="font-serif text-2xl font-bold text-brand-deep-green">
-            Get notified about new tours
+            Don&apos;t miss the next one
           </h2>
           <p className="mt-2 text-muted-foreground">
-            Subscribe to The Ubudian and be the first to know about new experiences.
+            Subscribe to The Ubudian and hear about new tours before they fill up.
           </p>
           <NewsletterSignup className="mx-auto mt-6 max-w-md" />
         </div>

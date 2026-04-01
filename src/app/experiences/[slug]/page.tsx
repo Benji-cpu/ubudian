@@ -212,7 +212,7 @@ export default async function ExperiencePage({ params }: ExperiencePageProps) {
               Upcoming {exp.category} Events
             </h2>
             <p className="mt-2 text-muted-foreground">
-              Live instances of this experience happening soon in Ubud.
+              Coming up in Ubud — don&apos;t just read about it.
             </p>
             <div className="mt-6 space-y-3">
               {upcomingEvents.map((event) => (

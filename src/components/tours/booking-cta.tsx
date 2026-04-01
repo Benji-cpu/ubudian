@@ -77,7 +77,7 @@ export function BookingCta({ tour }: BookingCtaProps) {
 
         {tour.guide_name && (
           <p className="text-center text-xs text-muted-foreground">
-            Your guide: <strong>{tour.guide_name}</strong>
+            Walk with <strong>{tour.guide_name}</strong>
           </p>
         )}
       </CardContent>

@@ -51,8 +51,8 @@ export async function FeaturedStories() {
       </div>
       <div>
         <p className="text-lg leading-relaxed text-brand-charcoal-light">
-          The healers, ceremonialists, farmers, and seekers who call Ubud
-          home — their stories are on the way.
+          Tantra facilitators, ceremony holders, sound healers, and seekers
+          who make Ubud what it is — their stories are on the way.
         </p>
       </div>
     </div>

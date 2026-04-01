@@ -68,13 +68,13 @@ export default async function DashboardMembershipPage() {
           <CardContent className="flex flex-col items-center py-12 text-center">
             <Sparkles className="h-12 w-12 text-brand-gold/60" />
             <h2 className="mt-4 font-serif text-xl font-medium">
-              You&apos;re a Community Member
+              You&apos;re part of the community
             </h2>
             <p className="mt-2 max-w-sm text-sm text-muted-foreground">
-              Upgrade to Ubudian Insider for exclusive content, early tour access, and more.
+              Go deeper with Ubudian Insider — members-only stories, early tour access, and the content nobody else sees.
             </p>
             <div className="mt-4 space-y-2 text-left text-sm">
-              {["Early tour access", "Members-only content", "Tour discounts", "Insider badge"].map((perk) => (
+              {["First access to new tours", "Members-only stories & deep dives", "Tour discounts", "Insider badge on your profile"].map((perk) => (
                 <div key={perk} className="flex items-center gap-2">
                   <CheckCircle className="h-4 w-4 text-brand-gold" />
                   {perk}

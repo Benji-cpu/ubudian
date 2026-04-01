@@ -34,7 +34,7 @@ export default async function ArchetypePage() {
           Discover Your Ubud Spirit
         </h1>
         <p className="mt-3 text-muted-foreground">
-          Take our 90-second quiz to find out which Ubud archetype matches your personality.
+          Take the quiz to find your Ubud archetype — and see the events, tours, and stories that match.
         </p>
         <Button asChild size="lg" className="mt-6">
           <Link href="/quiz">Take the Quiz</Link>

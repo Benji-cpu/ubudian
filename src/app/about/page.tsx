@@ -7,7 +7,7 @@ import { Calendar, Users, MapPin, FileText, ImageIcon } from "lucide-react";
 export const metadata: Metadata = {
   title: "About | The Ubudian",
   description:
-    "The Ubudian brings Ubud's conscious community together — events, stories, tours, and a weekly newsletter in one place.",
+    "Community infrastructure for Ubud's conscious scene — tantra, ceremonies, ecstatic dance, shadow work, and everything that actually happens here.",
 };
 
 export default function AboutPage() {
@@ -20,8 +20,8 @@ export default function AboutPage() {
             About The Ubudian
           </h1>
           <p className="mt-4 text-lg text-muted-foreground">
-            Bringing Ubud&apos;s conscious community together through events,
-            stories, tours, and the weekly newsletter.
+            Community infrastructure for Ubud&apos;s conscious scene — tantra,
+            ceremonies, ecstatic dance, shadow work, and everything in between.
           </p>
         </div>
       </section>
@@ -35,26 +35,29 @@ export default function AboutPage() {
             </h2>
             <div className="mt-6 space-y-4 text-muted-foreground">
               <p>
-                Every week in Ubud, there are tantra workshops, sound journeys,
-                medicine song circles, cacao ceremonies, breathwork sessions,
-                sacred dance, and shadow work retreats — alongside Balinese temple
-                ceremonies, art exhibitions, and live music. But finding out about
-                them means scrolling through dozens of WhatsApp groups, Instagram
-                stories, and word of mouth. Newcomers miss everything. Even
-                long-term residents lose track.
+                Every week in Ubud, people are exploring tantra at Liquid Love
+                Temple, doing shadow work at multi-day retreats, crying in
+                breathwork sessions, dancing barefoot at ecstatic dance nights,
+                sitting in medicine song circles at Dragonfly Village, and falling
+                in love with someone they met at a cacao ceremony three hours ago.
+                It&apos;s messy and beautiful and transformative — and finding out
+                about any of it means scrolling through dozens of WhatsApp groups
+                and hoping someone mentions it at the café.
               </p>
               <p>
-                The Ubudian puts it all in one place. Every event we can find
-                gets ingested, verified, and listed — from intimate embodiment
-                workshops to full moon ceremonies to community devotional gatherings.
-                Add in stories from the humans who hold space here, tours that
-                take you into the landscape, and a weekly newsletter, and you
-                have the community hub Ubud has been missing.
+                The Ubudian puts it all in one place. Every event we can find —
+                from intimate tantric temple nights to full moon ceremonies to
+                community devotional gatherings — gets ingested, verified, and
+                listed. Add stories from the humans who hold space here, tours
+                that take you into the landscape, and a weekly newsletter, and
+                you have the community hub this scene has been missing.
               </p>
               <p>
-                Think of it as that person in your community who always
-                knows what is happening this week — except now anyone can
-                tap into it, whether they just arrived or have been here for years.
+                Think of it as that friend who&apos;s been in Ubud for three
+                years and knows which breathwork facilitator will actually change
+                your life, which tantric temple is safe for beginners, and which
+                sound journey is worth rearranging your week for — except now
+                anyone can tap into it.
               </p>
             </div>
           </div>
@@ -86,8 +89,8 @@ export default function AboutPage() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground">
-                    Reflections on life in Ubud — the expat experience, the spiritual
-                    circus, and the real conversations this community is having.
+                    The eat-pray-love reality checks, the spiritual bypassing
+                    call-outs, and the love letters to this messy, transformative community.
                   </p>
                 </CardContent>
               </Card>
@@ -101,8 +104,8 @@ export default function AboutPage() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground">
-                    The mask carvers, breathwork guides, organic farmers, tantra
-                    teachers, and restless souls who ended up in Ubud and found home.
+                    Tantra facilitators, breathwork guides, ceremony holders, sound
+                    healers, and the souls who followed something to Bali and never left.
                   </p>
                 </CardContent>
               </Card>
@@ -150,8 +153,8 @@ export default function AboutPage() {
             Join the Community
           </h2>
           <p className="mt-3 text-lg text-brand-off-white/80">
-            One email a week — the events, stories, and community happenings
-            worth knowing about.
+            One email a week — so you never hear about the good ceremony
+            after it already happened.
           </p>
           <NewsletterSignup variant="dark" className="mx-auto mt-6 max-w-md" />
           <p className="mt-2 text-sm text-brand-off-white/60">

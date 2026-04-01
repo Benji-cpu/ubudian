@@ -6,7 +6,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Discover Your Ubud Spirit | The Ubudian",
   description:
-    "Take the 90-second quiz to find your Ubud archetype — Seeker, Explorer, Creative, Connector, or Epicurean — and discover ceremonies, workshops, and experiences matched to your spirit.",
+    "Take the 90-second quiz to find your Ubud archetype — Seeker, Explorer, Creative, Connector, or Epicurean — and discover the events, ceremonies, and community that match your energy.",
 };
 
 export default async function QuizPage() {
