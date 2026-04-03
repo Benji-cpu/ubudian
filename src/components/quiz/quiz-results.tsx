@@ -11,7 +11,7 @@ import { StoryCard } from "@/components/stories/story-card";
 import { ExperienceCard } from "@/components/experiences/experience-card";
 import { Button } from "@/components/ui/button";
 import { SITE_URL } from "@/lib/constants";
-import type { ArchetypeId, QuizScores, Event, Tour, Story, Experience } from "@/types";
+import type { ArchetypeId, QuizScores, Event, Tour, Story, Experience, UserSegment } from "@/types";
 
 interface QuizResultsProps {
   primary: ArchetypeId;
@@ -22,6 +22,7 @@ interface QuizResultsProps {
   stories: Story[];
   experiences: Experience[];
   onRetake: () => void;
+  userSegment?: UserSegment | null;
 }
 
 export function QuizResults({
@@ -33,6 +34,7 @@ export function QuizResults({
   stories,
   experiences,
   onRetake,
+  userSegment: _userSegment,
 }: QuizResultsProps) {
   const archetype = ARCHETYPES[primary];
   const secondaryArchetype = ARCHETYPES[secondary];
