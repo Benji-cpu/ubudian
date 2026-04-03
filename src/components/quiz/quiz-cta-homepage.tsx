@@ -53,10 +53,10 @@ export function QuizCtaHomepage() {
             </div>
           </div>
           <Link
-            href={`/quiz/results/${result.primary}`}
+            href="/login?redirect=/dashboard"
             className="text-sm font-semibold text-brand-deep-green underline underline-offset-4 hover:text-brand-gold"
           >
-            View results
+            Sign in for your event feed
           </Link>
         </div>
       </div>

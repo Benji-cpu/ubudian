@@ -80,7 +80,7 @@ export default async function DashboardPage() {
     const experiences = (experiencesRes.data ?? []) as Experience[];
 
     matchedExperiences = getExperiencesForArchetype(experiences, archetype as ArchetypeId, 3);
-    matchedEvents = getEventsForArchetype(events, archetype as ArchetypeId, 4);
+    matchedEvents = getEventsForArchetype(events, archetype as ArchetypeId, 8);
     matchedStories = getStoriesForArchetype(stories, archetype as ArchetypeId, 3);
   }
 
