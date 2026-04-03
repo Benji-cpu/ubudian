@@ -7,6 +7,8 @@ export interface Profile {
   stripe_customer_id: string | null;
   created_at: string;
   updated_at: string;
+  primary_archetype?: string | null;
+  user_segment?: string | null;
 }
 
 export interface BlogPost {
@@ -176,6 +178,8 @@ export interface TrustedSubmitter {
 
 export type ArchetypeId = "seeker" | "explorer" | "creative" | "connector" | "epicurean";
 
+export type UserSegment = "curious" | "visiting" | "local";
+
 export interface QuizAnswer {
   id: string;
   text: string;
@@ -220,6 +224,7 @@ export interface QuizResultRecord {
   secondary_archetype: ArchetypeId | null;
   scores: QuizScores;
   answers: { question_id: number; answer_id: string }[];
+  user_segment?: string | null;
   created_at: string;
 }
 

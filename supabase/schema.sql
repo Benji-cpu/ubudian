@@ -781,3 +781,11 @@ CREATE INDEX idx_payments_booking ON payments(booking_id);
 CREATE INDEX idx_payments_subscription ON payments(subscription_id);
 CREATE INDEX idx_payments_stripe_pi ON payments(stripe_payment_intent_id);
 CREATE INDEX idx_profiles_stripe_customer ON profiles(stripe_customer_id);
+
+-- ============================================
+-- QUIZ REDESIGN: SEGMENT COLUMNS
+-- ============================================
+
+ALTER TABLE quiz_results ADD COLUMN IF NOT EXISTS user_segment TEXT;
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS primary_archetype TEXT;
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS user_segment TEXT;
