@@ -48,7 +48,7 @@ export function QuizCtaHomepage() {
               />
             </div>
             <div>
-              <p className="text-sm text-brand-charcoal-light">Your Ubud Spirit</p>
+              <p className="text-sm text-brand-charcoal-light">Matched as</p>
               <p className="font-serif font-medium text-brand-deep-green">{archetype.name}</p>
             </div>
           </div>
@@ -65,20 +65,21 @@ export function QuizCtaHomepage() {
 
   // New user: full CTA
   return (
-    <section className="bg-brand-pale-green px-4 py-16 sm:py-20">
+    <section className="flex min-h-[100dvh] items-center bg-brand-pale-green px-4 py-16 sm:py-20">
       <div className="mx-auto max-w-3xl text-center">
         <p className="text-sm font-semibold uppercase tracking-wider text-brand-gold">
-          90-Second Quiz
+          90 Seconds. Zero Overwhelm.
         </p>
         <h2 className="mt-3 font-serif text-3xl font-medium text-brand-deep-green sm:text-4xl">
-          Discover Your Ubud Spirit
+          Ubud Has Hundreds of Ceremonies. We&apos;ll Find Yours.
         </h2>
         <p className="mx-auto mt-4 max-w-xl text-lg text-brand-charcoal-light">
-          Seeker, Explorer, Creative, Connector, or Epicurean? Take the quiz
-          and find out which corner of Ubud&apos;s conscious community has your name on it.
+          Answer 6 questions about how you experience Ubud and we&apos;ll match you
+          to the ceremonies, workshops, and gatherings that actually fit — plus
+          a weekly email so you never miss the good ones.
         </p>
         <Button asChild size="lg" className="mt-8">
-          <Link href="/quiz">Take the Quiz</Link>
+          <Link href="/quiz">Show Me What Fits</Link>
         </Button>
       </div>
     </section>

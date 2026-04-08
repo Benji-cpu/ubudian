@@ -107,20 +107,21 @@ export default function HomePage() {
               The Ubudian
             </h1>
             <p className="mt-6 font-serif text-xl italic text-brand-cream sm:text-2xl">
-              Tantra. Sound journeys. Shadow work. Ecstatic dance. All in one place.
+              Your guide to Ubud&apos;s conscious community.
             </p>
-            <p className="mx-auto mt-4 max-w-lg text-base text-brand-off-white/70">
-              <Link href="/events" className="text-brand-off-white underline decoration-brand-off-white/30 underline-offset-2 transition-colors hover:text-brand-gold hover:decoration-brand-gold">Events</Link>,{" "}
+            <p className="mx-auto mt-4 max-w-lg text-base text-brand-off-white/80">
+              Ceremonies, sound journeys, ecstatic dance, tantra workshops, and everything
+              in between —{" "}
+              <Link href="/events" className="text-brand-off-white underline decoration-brand-off-white/30 underline-offset-2 transition-colors hover:text-brand-gold hover:decoration-brand-gold">events</Link>,{" "}
               <Link href="/stories" className="text-brand-off-white underline decoration-brand-off-white/30 underline-offset-2 transition-colors hover:text-brand-gold hover:decoration-brand-gold">stories</Link>,{" "}
               <Link href="/tours" className="text-brand-off-white underline decoration-brand-off-white/30 underline-offset-2 transition-colors hover:text-brand-gold hover:decoration-brand-gold">tours</Link>, and a{" "}
-              <Link href="/newsletter" className="text-brand-off-white underline decoration-brand-off-white/30 underline-offset-2 transition-colors hover:text-brand-gold hover:decoration-brand-gold">weekly newsletter</Link>{" "}
-              — sound journeys, tantra workshops, medicine song circles, and everything in between.
+              <Link href="/newsletter" className="text-brand-off-white underline decoration-brand-off-white/30 underline-offset-2 transition-colors hover:text-brand-gold hover:decoration-brand-gold">weekly newsletter</Link>.
             </p>
             <Link
               href="/quiz"
               className="mt-6 inline-block font-serif text-sm italic text-brand-gold transition-colors hover:text-brand-cream"
             >
-              Take the quiz — find your archetype, find your corner of Ubud &rarr;
+              Six questions. Your Ubud, sorted &rarr;
             </Link>
           </div>
 
@@ -132,14 +133,9 @@ export default function HomePage() {
         {/* Quiz CTA */}
         <QuizCtaHomepage />
 
-        {/* Transition: Hero → Humans */}
-        <p className="bg-brand-cream px-4 py-10 text-center font-serif text-sm italic text-brand-charcoal-light/70">
-          Meet the humans behind the ceremonies, the kitchens, and the circles...
-        </p>
-
         {/* Garden (Humans of Ubud) */}
-        <section className="bg-brand-cream px-4 py-20 sm:py-28">
-          <div className="mx-auto max-w-6xl">
+        <section className="flex min-h-[100dvh] items-center bg-brand-cream px-4 py-20 sm:py-28">
+          <div className="mx-auto w-full max-w-6xl">
             <div className="text-center">
               <h2 className="font-serif text-3xl font-medium text-brand-deep-green sm:text-4xl">
                 Humans of Ubud
@@ -165,11 +161,6 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Transition: Humans → Newsletter */}
-        <p className="bg-brand-pale-green px-4 py-10 text-center font-serif text-sm italic text-brand-charcoal-light/70">
-          Never miss a full moon ceremony or a last-minute sound bath...
-        </p>
-
         {/* Water (Newsletter) */}
         <section className="flex min-h-[100dvh] items-center bg-brand-pale-green px-4 py-20 sm:py-28">
           <div className="mx-auto w-full max-w-xl text-center">
@@ -187,13 +178,8 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Transition: Newsletter → Events */}
-        <p className="bg-gradient-to-b from-brand-pale-green to-brand-warm-cream px-4 py-10 text-center font-serif text-sm italic text-brand-charcoal-light/70">
-          See what the community is gathering for this week...
-        </p>
-
         {/* Earth (Events) */}
-        <section className="bg-gradient-to-b from-brand-warm-cream to-brand-off-white px-4 py-20 sm:py-28">
+        <section className="flex min-h-[100dvh] items-center bg-gradient-to-b from-brand-warm-cream to-brand-off-white px-4 py-20 sm:py-28">
           <div className="mx-auto w-full max-w-3xl">
             <div className="text-center">
               <div className="mx-auto mb-8 h-px w-16 bg-brand-gold/40" />
@@ -223,8 +209,8 @@ export default function HomePage() {
         </section>
 
         {/* Experiences */}
-        <section className="bg-brand-cream px-4 py-20 sm:py-28">
-          <div className="mx-auto max-w-6xl">
+        <section className="flex min-h-[100dvh] items-center bg-brand-cream px-4 py-20 sm:py-28">
+          <div className="mx-auto w-full max-w-6xl">
             <div className="text-center">
               <h2 className="font-serif text-3xl font-medium text-brand-deep-green sm:text-4xl">
                 Ubud Experiences
@@ -250,14 +236,9 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Transition: Experiences → Tours */}
-        <p className="bg-brand-cream px-4 py-10 text-center font-serif text-sm italic text-brand-charcoal-light/70">
-          When you want to leave the ceremony and explore the land...
-        </p>
-
         {/* Path (Tours) */}
-        <section className="bg-brand-cream px-4 py-20 sm:py-28">
-          <div className="mx-auto max-w-6xl">
+        <section className="flex min-h-[100dvh] items-center bg-brand-cream px-4 py-20 sm:py-28">
+          <div className="mx-auto w-full max-w-6xl">
             <div className="text-center">
               <h2 className="font-serif text-3xl italic text-brand-deep-green sm:text-4xl">
                 Explore the Land Beneath the Rituals

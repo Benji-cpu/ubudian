@@ -1,8 +1,9 @@
 import Link from "next/link";
-import { NAV_LINKS, SITE_NAME } from "@/lib/constants";
+import { SITE_NAME } from "@/lib/constants";
 import { getCurrentProfile } from "@/lib/auth";
 import { UserMenu } from "./user-menu";
 import { MobileMenu } from "./mobile-menu";
+import { ExploreMenu } from "./explore-menu";
 import { Button } from "@/components/ui/button";
 import { Shield } from "lucide-react";
 
@@ -25,15 +26,19 @@ export async function Header() {
 
         {/* Desktop Nav */}
         <nav className="hidden items-center gap-6 md:flex">
-          {NAV_LINKS.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="text-xs font-semibold uppercase tracking-widest text-brand-off-white transition-colors duration-300 hover:text-brand-gold"
-            >
-              {link.label}
-            </Link>
-          ))}
+          <Link
+            href="/quiz"
+            className="text-xs font-semibold uppercase tracking-widest text-brand-off-white transition-colors duration-300 hover:text-brand-gold"
+          >
+            Quiz
+          </Link>
+          <Link
+            href="/events"
+            className="text-xs font-semibold uppercase tracking-widest text-brand-off-white transition-colors duration-300 hover:text-brand-gold"
+          >
+            Events
+          </Link>
+          <ExploreMenu />
           {profile?.role === "admin" && (
             <Link
               href="/admin"

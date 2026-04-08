@@ -37,6 +37,15 @@ yarn-error.log*
 # worktrees
 .worktrees/
 
+# screenshots & test artifacts
+*.png
+*.jpeg
+reparse-check.md
+e2e/test-results/
+
+# tool directories
+.playwright-mcp/
+
 # vercel
 .vercel
 
