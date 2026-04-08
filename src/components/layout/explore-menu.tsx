@@ -52,7 +52,7 @@ const EXPLORE_ITEMS = [
 
 export function ExploreMenu() {
   return (
-    <NavigationMenu>
+    <NavigationMenu viewport={false}>
       <NavigationMenuList>
         <NavigationMenuItem>
           <NavigationMenuTrigger
@@ -63,7 +63,7 @@ export function ExploreMenu() {
               <ChevronDown className="h-3 w-3 transition-transform duration-200 group-data-[state=open]:rotate-180" />
             </span>
           </NavigationMenuTrigger>
-          <NavigationMenuContent>
+          <NavigationMenuContent className="border-none bg-transparent p-0 shadow-none">
             <div
               className="w-[420px] rounded-xl border border-brand-gold/30 p-4 shadow-2xl"
               style={{ background: "rgba(44,74,62,0.97)", backdropFilter: "blur(12px)" }}

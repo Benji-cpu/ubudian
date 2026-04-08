@@ -130,8 +130,35 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Quiz CTA */}
-        <QuizCtaHomepage />
+        {/* Earth (Events) — moved up to section 2 */}
+        <section className="flex min-h-[100dvh] items-center bg-gradient-to-b from-brand-warm-cream to-brand-off-white px-4 py-20 sm:py-28">
+          <div className="mx-auto w-full max-w-3xl">
+            <div className="text-center">
+              <div className="mx-auto mb-8 h-px w-16 bg-brand-gold/40" />
+              <h2 className="font-serif text-3xl font-medium text-brand-deep-green sm:text-4xl">
+                What&apos;s Happening in Ubud
+              </h2>
+              <p className="mt-4 text-lg text-brand-charcoal-light">
+                Temple nights, sound journeys, embodiment workshops, breathwork,
+                medicine song circles — all in one place, updated daily from the community.
+              </p>
+            </div>
+
+            <Suspense fallback={<EventsSkeleton />}>
+              <FeaturedEvents />
+            </Suspense>
+
+            <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
+              <Button asChild size="lg">
+                <Link href="/events">Browse All Events</Link>
+              </Button>
+              <Button asChild variant="outline" size="lg">
+                <Link href="/events/submit">Submit an Event</Link>
+              </Button>
+            </div>
+            <div className="mx-auto mt-8 h-px w-16 bg-brand-gold/40" />
+          </div>
+        </section>
 
         {/* Garden (Humans of Ubud) */}
         <section className="flex min-h-[100dvh] items-center bg-brand-cream px-4 py-20 sm:py-28">
@@ -161,52 +188,8 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Water (Newsletter) */}
-        <section className="flex min-h-[100dvh] items-center bg-brand-pale-green px-4 py-20 sm:py-28">
-          <div className="mx-auto w-full max-w-xl text-center">
-            <h2 className="font-serif text-3xl italic text-brand-deep-green sm:text-4xl">
-              Flow with us.
-            </h2>
-            <p className="mt-4 text-lg text-brand-charcoal-light">
-              One email a week with the events, stories, and community happenings
-              that matter — so you never hear about the good ones after they sell out.
-            </p>
-            <NewsletterSignup className="mx-auto mt-8 max-w-md" />
-            <p className="mt-3 text-sm text-brand-charcoal-light/60">
-              No spam, unsubscribe anytime.
-            </p>
-          </div>
-        </section>
-
-        {/* Earth (Events) */}
-        <section className="flex min-h-[100dvh] items-center bg-gradient-to-b from-brand-warm-cream to-brand-off-white px-4 py-20 sm:py-28">
-          <div className="mx-auto w-full max-w-3xl">
-            <div className="text-center">
-              <div className="mx-auto mb-8 h-px w-16 bg-brand-gold/40" />
-              <h2 className="font-serif text-3xl font-medium text-brand-deep-green sm:text-4xl">
-                What&apos;s Happening in Ubud
-              </h2>
-              <p className="mt-4 text-lg text-brand-charcoal-light">
-                Temple nights, sound journeys, embodiment workshops, breathwork,
-                medicine song circles — all in one place, updated daily from the community.
-              </p>
-            </div>
-
-            <Suspense fallback={<EventsSkeleton />}>
-              <FeaturedEvents />
-            </Suspense>
-
-            <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-              <Button asChild size="lg">
-                <Link href="/events">Browse All Events</Link>
-              </Button>
-              <Button asChild variant="outline" size="lg">
-                <Link href="/events/submit">Submit an Event</Link>
-              </Button>
-            </div>
-            <div className="mx-auto mt-8 h-px w-16 bg-brand-gold/40" />
-          </div>
-        </section>
+        {/* Quiz CTA — moved down to after content */}
+        <QuizCtaHomepage />
 
         {/* Experiences */}
         <section className="flex min-h-[100dvh] items-center bg-brand-cream px-4 py-20 sm:py-28">
@@ -262,6 +245,23 @@ export default function HomePage() {
                 Explore tours
               </Link>
             </div>
+          </div>
+        </section>
+
+        {/* Water (Newsletter) — moved to bottom */}
+        <section className="flex min-h-[100dvh] items-center bg-brand-pale-green px-4 py-20 sm:py-28">
+          <div className="mx-auto w-full max-w-xl text-center">
+            <h2 className="font-serif text-3xl italic text-brand-deep-green sm:text-4xl">
+              Flow with us.
+            </h2>
+            <p className="mt-4 text-lg text-brand-charcoal-light">
+              One email a week with the events, stories, and community happenings
+              that matter — so you never hear about the good ones after they sell out.
+            </p>
+            <NewsletterSignup className="mx-auto mt-8 max-w-md" />
+            <p className="mt-3 text-sm text-brand-charcoal-light/60">
+              No spam, unsubscribe anytime.
+            </p>
           </div>
         </section>
       </div>
