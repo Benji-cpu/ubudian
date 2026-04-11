@@ -5,6 +5,7 @@ import { generateBookingReference } from "@/lib/stripe/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
+import { SITE_URL } from "@/lib/constants";
 
 const bookingSchema = z.object({
   tour_id: z.string().uuid(),
@@ -91,7 +92,7 @@ export async function POST(request: Request) {
 
     // Create Stripe Checkout Session
     const stripe = getStripe();
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:4000";
+    const siteUrl = SITE_URL;
 
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
