@@ -178,6 +178,17 @@ export default async function ExperiencePage({ params }: ExperiencePageProps) {
           <MarkdownContent content={exp.description} />
         </section>
 
+        {/* Browse Events CTA */}
+        <div className="mt-8">
+          <Link
+            href={`/events?category=${encodeURIComponent(exp.category)}`}
+            className="inline-flex w-full items-center justify-center rounded-lg bg-[#C9A84C] px-6 py-3 text-base font-semibold text-white transition-colors hover:bg-[#B8993F] sm:w-auto"
+          >
+            See upcoming {exp.category} events
+            <span className="ml-2" aria-hidden="true">&rarr;</span>
+          </Link>
+        </div>
+
         {/* Who It's For */}
         {exp.who_its_for && (
           <section className="mt-10">

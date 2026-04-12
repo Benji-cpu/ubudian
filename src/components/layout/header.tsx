@@ -38,6 +38,18 @@ export async function Header() {
           >
             Events
           </Link>
+          <Link
+            href="/stories"
+            className="text-xs font-semibold uppercase tracking-widest text-brand-off-white transition-colors duration-300 hover:text-brand-gold"
+          >
+            Stories
+          </Link>
+          <Link
+            href="/tours"
+            className="text-xs font-semibold uppercase tracking-widest text-brand-off-white transition-colors duration-300 hover:text-brand-gold"
+          >
+            Tours
+          </Link>
           <ExploreMenu />
           {profile?.role === "admin" && (
             <Link

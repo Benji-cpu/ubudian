@@ -9,6 +9,7 @@ import { FeaturedEvents } from "@/components/homepage/featured-events";
 import { FeaturedTours } from "@/components/homepage/featured-tours";
 import { FeaturedExperiences } from "@/components/homepage/featured-experiences";
 import { QuizCtaHomepage } from "@/components/quiz/quiz-cta-homepage";
+import { QuizPrompt } from "@/components/quiz/quiz-prompt";
 import { StoryCardSkeleton } from "@/components/skeletons/story-card-skeleton";
 import { EventCardSkeleton } from "@/components/skeletons/event-card-skeleton";
 import { TourCardSkeleton } from "@/components/skeletons/tour-card-skeleton";
@@ -160,6 +161,33 @@ export default function HomePage() {
           </div>
         </section>
 
+        {/* Guides (Experiences) — moved up to after Events */}
+        <section className="flex min-h-[100dvh] items-center bg-brand-cream px-4 py-20 sm:py-28">
+          <div className="mx-auto w-full max-w-6xl">
+            <div className="text-center">
+              <h2 className="font-serif text-3xl font-medium text-brand-deep-green sm:text-4xl">
+                Understand the Practices
+              </h2>
+              <p className="mx-auto mt-4 max-w-2xl text-lg leading-relaxed text-brand-charcoal-light">
+                Evergreen guides to the practices that define life in Ubud.
+              </p>
+            </div>
+
+            <Suspense fallback={<ToursSkeleton />}>
+              <FeaturedExperiences />
+            </Suspense>
+
+            <div className="mt-10 text-center">
+              <Link
+                href="/experiences"
+                className="font-semibold text-brand-deep-green underline underline-offset-4 transition-colors hover:text-brand-gold"
+              >
+                View all guides
+              </Link>
+            </div>
+          </div>
+        </section>
+
         {/* Garden (Humans of Ubud) */}
         <section className="flex min-h-[100dvh] items-center bg-brand-cream px-4 py-20 sm:py-28">
           <div className="mx-auto w-full max-w-6xl">
@@ -190,34 +218,6 @@ export default function HomePage() {
 
         {/* Quiz CTA — moved down to after content */}
         <QuizCtaHomepage />
-
-        {/* Experiences */}
-        <section className="flex min-h-[100dvh] items-center bg-brand-cream px-4 py-20 sm:py-28">
-          <div className="mx-auto w-full max-w-6xl">
-            <div className="text-center">
-              <h2 className="font-serif text-3xl font-medium text-brand-deep-green sm:text-4xl">
-                Ubud Experiences
-              </h2>
-              <p className="mx-auto mt-4 max-w-2xl text-lg leading-relaxed text-brand-charcoal-light">
-                Embodiment workshops, cacao ceremonies, tantric temples, sound journeys — the
-                practices that make Ubud unlike anywhere else.
-              </p>
-            </div>
-
-            <Suspense fallback={<ToursSkeleton />}>
-              <FeaturedExperiences />
-            </Suspense>
-
-            <div className="mt-10 text-center">
-              <Link
-                href="/experiences"
-                className="font-semibold text-brand-deep-green underline underline-offset-4 transition-colors hover:text-brand-gold"
-              >
-                View all experiences
-              </Link>
-            </div>
-          </div>
-        </section>
 
         {/* Path (Tours) */}
         <section className="flex min-h-[100dvh] items-center bg-brand-cream px-4 py-20 sm:py-28">
@@ -265,6 +265,7 @@ export default function HomePage() {
           </div>
         </section>
       </div>
+      <QuizPrompt />
     </>
   );
 }

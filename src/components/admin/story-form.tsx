@@ -51,6 +51,7 @@ const storySchema = z.object({
   theme_tags: z.array(z.string()),
   archetype_tags: z.array(z.enum(["seeker", "explorer", "creative", "connector", "epicurean"])),
   status: z.enum(["draft", "published", "archived"]),
+  related_organizer_name: z.string().optional().or(z.literal("")),
   meta_title: z.string().max(70).optional().or(z.literal("")),
   meta_description: z.string().max(160).optional().or(z.literal("")),
 });
@@ -82,6 +83,7 @@ export function StoryForm({ initialData }: StoryFormProps) {
       narrative: initialData?.narrative ?? "",
       theme_tags: initialData?.theme_tags ?? [],
       archetype_tags: initialData?.archetype_tags ?? [],
+      related_organizer_name: initialData?.related_organizer_name ?? "",
       status: initialData?.status ?? "draft",
       meta_title: initialData?.meta_title ?? "",
       meta_description: initialData?.meta_description ?? "",
@@ -110,6 +112,7 @@ export function StoryForm({ initialData }: StoryFormProps) {
       narrative: data.narrative,
       theme_tags: data.theme_tags,
       archetype_tags: data.archetype_tags,
+      related_organizer_name: data.related_organizer_name || null,
       status: data.status,
       meta_title: data.meta_title || null,
       meta_description: data.meta_description || null,
@@ -338,6 +341,23 @@ export function StoryForm({ initialData }: StoryFormProps) {
                     <TagInput options={ARCHETYPE_IDS} value={field.value} onChange={field.onChange} />
                   </FormControl>
                   <FormDescription>Tag for personalized recommendations</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="related_organizer_name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Related Organizer Name</FormLabel>
+                  <FormControl>
+                    <Input placeholder="e.g. Bali Sound Healing" {...field} />
+                  </FormControl>
+                  <FormDescription>
+                    Enter the organizer name as it appears in their event submissions. This links the story to their upcoming events.
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}

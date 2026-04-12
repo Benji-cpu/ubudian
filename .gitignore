@@ -37,6 +37,9 @@ yarn-error.log*
 # worktrees
 .worktrees/
 
+# claude code settings (contains secrets + machine-specific paths)
+.claude/
+
 # screenshots & test artifacts
 *.png
 *.jpeg

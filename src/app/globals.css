@@ -154,6 +154,24 @@
   animation: pulse-down 2s ease-in-out infinite;
 }
 
+@keyframes slide-up {
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes slide-down {
+  from { transform: translateY(0); opacity: 1; }
+  to { transform: translateY(100%); opacity: 0; }
+}
+
+@utility animate-slide-up {
+  animation: slide-up 0.4s ease-out forwards;
+}
+
+@utility animate-slide-down {
+  animation: slide-down 0.3s ease-in forwards;
+}
+
 html.snap-homepage {
   scroll-snap-type: y proximity;
 }

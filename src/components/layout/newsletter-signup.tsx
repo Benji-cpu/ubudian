@@ -10,6 +10,17 @@ interface NewsletterSignupProps {
   variant?: "light" | "dark";
 }
 
+function getStoredArchetype(): string | null {
+  try {
+    const raw = localStorage.getItem("ubudian_quiz_result");
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return parsed.primary_archetype || parsed.primary || null;
+  } catch {
+    return null;
+  }
+}
+
 export function NewsletterSignup({ className, variant = "light" }: NewsletterSignupProps) {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
@@ -21,10 +32,11 @@ export function NewsletterSignup({ className, variant = "light" }: NewsletterSig
 
     setStatus("loading");
     try {
+      const archetype = getStoredArchetype();
       const res = await fetch("/api/newsletter/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, ...(archetype && { archetype }) }),
       });
 
       const data = await res.json();

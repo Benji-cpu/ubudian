@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
 import { SITE_URL } from "@/lib/constants";
@@ -21,7 +22,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import type { Event } from "@/types";
+import type { Event, Story } from "@/types";
 
 interface EventPageProps {
   params: Promise<{ slug: string }>;
@@ -63,6 +64,7 @@ export async function generateMetadata({ params }: EventPageProps): Promise<Meta
 export default async function EventPage({ params }: EventPageProps) {
   let e: Event;
   let related: Event[] = [];
+  let facilitatorStory: Story | null = null;
 
   try {
     const { slug } = await params;
@@ -93,6 +95,22 @@ export default async function EventPage({ params }: EventPageProps) {
 
     if (relatedError) console.error("Related events query error:", relatedError);
     related = (relatedEvents ?? []) as Event[];
+
+    // Query for a story linked to this event's organizer
+    if (e.organizer_name) {
+      const { data: storyData, error: storyError } = await supabase
+        .from("stories")
+        .select("*")
+        .eq("status", "published")
+        .ilike("related_organizer_name", e.organizer_name)
+        .limit(1)
+        .single();
+
+      if (storyError && storyError.code !== "PGRST116") {
+        console.error("Facilitator story query error:", storyError);
+      }
+      facilitatorStory = storyData ? (storyData as Story) : null;
+    }
   } catch {
     notFound();
   }
@@ -223,6 +241,34 @@ export default async function EventPage({ params }: EventPageProps) {
                 </a>
               )}
             </div>
+
+            {/* Meet the Facilitator */}
+            {facilitatorStory && (
+              <Link
+                href={`/stories/${facilitatorStory.slug}`}
+                className="mt-4 flex items-center gap-4 rounded-lg bg-brand-cream p-4 transition-shadow hover:shadow-md"
+              >
+                {facilitatorStory.photo_urls?.[0] && (
+                  <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-full">
+                    <Image
+                      src={facilitatorStory.photo_urls[0]}
+                      alt={facilitatorStory.subject_name}
+                      fill
+                      sizes="64px"
+                      className="object-cover"
+                    />
+                  </div>
+                )}
+                <div className="min-w-0">
+                  <p className="text-xs font-medium uppercase tracking-wide text-brand-gold">
+                    Meet the Facilitator
+                  </p>
+                  <p className="mt-0.5 font-serif text-sm font-medium text-brand-deep-green">
+                    Read {facilitatorStory.title} &rarr;
+                  </p>
+                </div>
+              </Link>
+            )}
           </div>
         )}
 

@@ -44,6 +44,7 @@ export interface Story {
   is_placeholder: boolean;
   is_members_only: boolean;
   archetype_tags: ArchetypeId[];
+  related_organizer_name: string | null;
   created_at: string;
   updated_at: string;
 }

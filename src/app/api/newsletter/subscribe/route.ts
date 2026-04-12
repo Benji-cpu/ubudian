@@ -1,10 +1,13 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { queryWithRetry } from "@/lib/supabase/retry";
-import { addSubscriber } from "@/lib/beehiiv";
+import { addSubscriber, addSubscriberWithArchetype } from "@/lib/beehiiv";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
 import { sendTransactionalEmail } from "@/lib/email";
 import { newsletterWelcome } from "@/lib/email-templates";
 import { NextResponse } from "next/server";
+import type { ArchetypeId } from "@/types";
+
+const VALID_ARCHETYPES: ArchetypeId[] = ["seeker", "explorer", "creative", "connector", "epicurean"];
 
 export async function POST(request: Request) {
   const ip = getClientIp(request);
@@ -14,7 +17,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const { email } = await request.json();
+    const { email, archetype } = await request.json();
 
     if (!email || typeof email !== "string") {
       return NextResponse.json(
@@ -32,6 +35,11 @@ export async function POST(request: Request) {
       );
     }
 
+    // Validate archetype if provided
+    const validArchetype = typeof archetype === "string" && VALID_ARCHETYPES.includes(archetype as ArchetypeId)
+      ? (archetype as ArchetypeId)
+      : null;
+
     const normalizedEmail = email.toLowerCase().trim();
     const supabase = createAdminClient();
 
@@ -41,7 +49,11 @@ export async function POST(request: Request) {
         supabase
           .from("newsletter_subscribers")
           .upsert(
-            { email: normalizedEmail, source: "website" },
+            {
+              email: normalizedEmail,
+              source: "website",
+              ...(validArchetype && { archetype: validArchetype }),
+            },
             { onConflict: "email" }
           ),
       "newsletter-subscribe"
@@ -56,7 +68,9 @@ export async function POST(request: Request) {
     }
 
     // Also sync to Beehiiv (graceful fallback)
-    const beehiivId = await addSubscriber(normalizedEmail);
+    const beehiivId = validArchetype
+      ? await addSubscriberWithArchetype(normalizedEmail, validArchetype)
+      : await addSubscriber(normalizedEmail);
     if (beehiivId) {
       await supabase
         .from("newsletter_subscribers")

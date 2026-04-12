@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Compass, Users, Map, Mail, BookOpen, Sparkles, ChevronDown } from "lucide-react";
+import { Compass, Mail, Sparkles, Info, ChevronDown } from "lucide-react";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -13,22 +13,10 @@ import {
 
 const EXPLORE_ITEMS = [
   {
-    label: "Experiences",
+    label: "Guides",
     href: "/experiences",
     icon: Compass,
-    description: "Yoga, wellness & culture",
-  },
-  {
-    label: "Tours",
-    href: "/tours",
-    icon: Map,
-    description: "Guided adventures",
-  },
-  {
-    label: "Humans of Ubud",
-    href: "/stories",
-    icon: Users,
-    description: "Stories from the community",
+    description: "Understand the practices",
   },
   {
     label: "Newsletter",
@@ -37,16 +25,16 @@ const EXPLORE_ITEMS = [
     description: "Weekly dispatch",
   },
   {
-    label: "Blog",
-    href: "/blog",
-    icon: BookOpen,
-    description: "In-depth reads & guides",
-  },
-  {
     label: "Membership",
     href: "/membership",
     icon: Sparkles,
     description: "Join the circle",
+  },
+  {
+    label: "About",
+    href: "/about",
+    icon: Info,
+    description: "Our story & mission",
   },
 ] as const;
 
@@ -59,7 +47,7 @@ export function ExploreMenu() {
             className="h-auto bg-transparent p-0 text-xs font-semibold uppercase tracking-widest text-brand-off-white transition-colors duration-300 hover:bg-transparent hover:text-brand-gold focus:bg-transparent data-[active]:bg-transparent data-[state=open]:bg-transparent data-[state=open]:text-brand-gold [&>svg]:hidden"
           >
             <span className="flex items-center gap-1">
-              Explore
+              More
               <ChevronDown className="h-3 w-3 transition-transform duration-200 group-data-[state=open]:rotate-180" />
             </span>
           </NavigationMenuTrigger>

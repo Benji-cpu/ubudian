@@ -94,6 +94,10 @@ export function newsletterWelcome(): string {
     <p style="margin-top:20px;">
       <a href="${SITE_URL}/events" style="display:inline-block;padding:10px 24px;background-color:${COLORS.deepGreen};color:#ffffff;text-decoration:none;border-radius:4px;font-weight:600;">Browse Events</a>
     </p>
+    <p style="margin-top:24px;padding-top:20px;border-top:1px solid #eee;font-size:14px;color:#666;">
+      Want personalized event recommendations? Take the 90-second Ubud Spirit Quiz:
+      <a href="${SITE_URL}/quiz" style="color:#B85C3F;text-decoration:underline;font-weight:600;">Take the Quiz</a>
+    </p>
   `);
 }
 

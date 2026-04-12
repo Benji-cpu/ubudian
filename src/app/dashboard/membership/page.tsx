@@ -71,10 +71,11 @@ export default async function DashboardMembershipPage() {
               You&apos;re part of the community
             </h2>
             <p className="mt-2 max-w-sm text-sm text-muted-foreground">
-              Go deeper with Ubudian Insider — members-only stories, early tour access, and the content nobody else sees.
+              Go deeper with Ubudian Insider — members-only stories, first
+              access to tours, and the content nobody else sees.
             </p>
             <div className="mt-4 space-y-2 text-left text-sm">
-              {["First access to new tours", "Members-only stories & deep dives", "Tour discounts", "Insider badge on your profile"].map((perk) => (
+              {["Members-only stories and deep dives", "First access to new tours and events", "Tour booking discounts", "Insider badge on your profile", "Support independent community media"].map((perk) => (
                 <div key={perk} className="flex items-center gap-2">
                   <CheckCircle className="h-4 w-4 text-brand-gold" />
                   {perk}

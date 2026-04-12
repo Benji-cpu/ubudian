@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { EditionCard } from "@/components/newsletter/edition-card";
 import { NewsletterSignup } from "@/components/layout/newsletter-signup";
@@ -42,6 +43,13 @@ export default async function NewsletterPage() {
             community stories, and conversations that matter in Ubud right now.
           </p>
           <NewsletterSignup className="mx-auto mt-8 max-w-md" />
+          <p className="mx-auto mt-4 max-w-md text-sm text-muted-foreground">
+            Already subscribed?{" "}
+            <Link href="/quiz" className="font-medium text-brand-terracotta hover:underline">
+              Take the Ubud Spirit Quiz
+            </Link>{" "}
+            to get personalized picks in your weekly email.
+          </p>
         </div>
       </section>
 

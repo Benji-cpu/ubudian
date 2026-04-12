@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/lib/auth";
 import { SettingsForm } from "@/components/dashboard/settings-form";
 import type { Metadata } from "next";
+import type { ArchetypeId } from "@/types";
 
 export const metadata: Metadata = {
   title: "Settings | The Ubudian",
@@ -24,11 +25,22 @@ export default async function SettingsPage() {
 
   const isSubscribed = !!subscriber;
 
+  // Check quiz result for archetype personalization
+  const { data: quizResult } = await supabase
+    .from("quiz_results")
+    .select("primary_archetype")
+    .eq("profile_id", profile.id)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  const archetype = (quizResult?.primary_archetype as ArchetypeId) ?? null;
+
   return (
     <div>
       <h1 className="font-serif text-2xl font-medium">Settings</h1>
       <div className="mt-6">
-        <SettingsForm profile={profile} isSubscribed={isSubscribed} />
+        <SettingsForm profile={profile} isSubscribed={isSubscribed} archetype={archetype} />
       </div>
     </div>
   );

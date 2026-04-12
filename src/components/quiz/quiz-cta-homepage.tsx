@@ -71,15 +71,18 @@ export function QuizCtaHomepage() {
           6 Questions. 90 Seconds.
         </p>
         <h2 className="mt-3 font-serif text-3xl font-medium text-brand-deep-green sm:text-4xl">
-          Like What You See? Let Us Personalize It.
+          Tell Us Who You Are. We&apos;ll Show You YOUR Ubud.
         </h2>
         <p className="mx-auto mt-4 max-w-xl text-lg text-brand-charcoal-light">
           Tell us how you move through the world and we&apos;ll match you to the
           events, workshops, and ceremonies that actually fit.
         </p>
         <Button asChild size="lg" className="mt-8">
-          <Link href="/quiz">Find My Fit</Link>
+          <Link href="/quiz">Take the 90-Second Quiz</Link>
         </Button>
+        <p className="mt-3 text-sm text-brand-charcoal-light/70">
+          Get personalized event, tour, and experience recommendations.
+        </p>
       </div>
     </section>
   );

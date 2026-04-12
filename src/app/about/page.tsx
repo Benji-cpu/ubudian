@@ -2,13 +2,62 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { NewsletterSignup } from "@/components/layout/newsletter-signup";
-import { Calendar, Users, MapPin, FileText, ImageIcon } from "lucide-react";
+import {
+  Sparkles,
+  Calendar,
+  Users,
+  Map,
+  CheckCircle2,
+  ArrowRight,
+} from "lucide-react";
 
 export const metadata: Metadata = {
   title: "About | The Ubudian",
   description:
-    "Community infrastructure for Ubud's conscious scene — tantra, ceremonies, ecstatic dance, shadow work, and everything that actually happens here.",
+    "One place for everything happening in Ubud's conscious community — events, stories, tours, and a weekly newsletter.",
 };
+
+const WHAT_WE_DO = [
+  {
+    title: "Discover your Ubud Spirit",
+    description:
+      "Take the quiz to find your archetype and get personalized recommendations for events and experiences.",
+    href: "/quiz",
+    icon: Sparkles,
+    iconColor: "text-brand-gold",
+  },
+  {
+    title: "Find what's happening",
+    description:
+      "Browse events aggregated from community sources and organizer submissions, updated daily.",
+    href: "/events",
+    icon: Calendar,
+    iconColor: "text-brand-terracotta",
+  },
+  {
+    title: "Meet the community",
+    description:
+      "Read the stories of facilitators, healers, and creators who make Ubud what it is.",
+    href: "/stories",
+    icon: Users,
+    iconColor: "text-brand-deep-green",
+  },
+  {
+    title: "Explore the land",
+    description:
+      "Rice terraces, water temples, jungle treks, and food trails with guides who live here.",
+    href: "/tours",
+    icon: Map,
+    iconColor: "text-brand-deep-green",
+  },
+] as const;
+
+const SOLUTION_POINTS = [
+  "Events aggregated from community sources and submitted by organizers — reviewed and published daily",
+  "The Ubud Spirit Quiz matches you to one of five archetypes for personalized recommendations",
+  "Humans of Ubud profiles the facilitators, healers, and creators behind the events",
+  "A weekly newsletter keeps you in the loop with what's happening this week",
+] as const;
 
 export default function AboutPage() {
   return (
@@ -19,130 +68,94 @@ export default function AboutPage() {
           <h1 className="font-serif text-4xl font-bold tracking-tight text-brand-deep-green sm:text-5xl">
             About The Ubudian
           </h1>
-          <p className="mt-4 text-lg text-muted-foreground">
-            Community infrastructure for Ubud&apos;s conscious scene — tantra,
-            ceremonies, ecstatic dance, shadow work, and everything in between.
+          <p className="mt-4 text-lg text-muted-foreground sm:text-xl">
+            One place for everything happening in Ubud&apos;s conscious
+            community.
           </p>
         </div>
       </section>
 
-      {/* Mission */}
-      <section className="mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:px-8">
-        <div className="grid items-center gap-10 md:grid-cols-2">
-          <div>
-            <h2 className="font-serif text-2xl font-bold text-brand-deep-green sm:text-3xl">
-              Why The Ubudian Exists
-            </h2>
-            <div className="mt-6 space-y-4 text-muted-foreground">
-              <p>
-                Every week in Ubud, people are exploring tantra at Liquid Love
-                Temple, doing shadow work at multi-day retreats, crying in
-                breathwork sessions, dancing barefoot at ecstatic dance nights,
-                sitting in medicine song circles at Dragonfly Village, and falling
-                in love with someone they met at a cacao ceremony three hours ago.
-                It&apos;s messy and beautiful and transformative — and finding out
-                about any of it means scrolling through dozens of WhatsApp groups
-                and hoping someone mentions it at the café.
-              </p>
-              <p>
-                The Ubudian puts it all in one place. Every event we can find —
-                from intimate tantric temple nights to full moon ceremonies to
-                community devotional gatherings — gets ingested, verified, and
-                listed. Add stories from the humans who hold space here, tours
-                that take you into the landscape, and a weekly newsletter, and
-                you have the community hub this scene has been missing.
-              </p>
-              <p>
-                Think of it as that friend who&apos;s been in Ubud for three
-                years and knows which breathwork facilitator will actually change
-                your life, which tantric temple is safe for beginners, and which
-                sound journey is worth rearranging your week for — except now
-                anyone can tap into it.
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center justify-center">
-            <div className="flex h-64 w-full items-center justify-center rounded-xl bg-muted">
-              <div className="text-center">
-                <ImageIcon className="mx-auto h-12 w-12 text-muted-foreground/40" />
-                <p className="mt-2 text-sm text-muted-foreground">
-                  Photo coming soon
-                </p>
-              </div>
-            </div>
-          </div>
+      {/* The Problem */}
+      <section className="mx-auto max-w-3xl px-4 py-16 sm:px-6">
+        <h2 className="font-serif text-2xl font-bold text-brand-deep-green sm:text-3xl">
+          The Problem
+        </h2>
+        <div className="mt-6 space-y-4 text-lg leading-relaxed text-muted-foreground">
+          <p>
+            Ubud has more ecstatic dance, breathwork, and cacao ceremonies per
+            square kilometer than anywhere on Earth. Finding them means
+            monitoring 10+ WhatsApp groups, following 50 Instagram accounts, and
+            asking that friend who&apos;s been here for three years.
+          </p>
+          <p>
+            We built The Ubudian because the community deserved better than
+            scattered posts and secondhand tips.
+          </p>
+        </div>
+      </section>
+
+      {/* The Solution */}
+      <section className="border-y border-brand-deep-green/10 bg-brand-cream/50 px-4 py-16 sm:px-6">
+        <div className="mx-auto max-w-3xl">
+          <h2 className="font-serif text-2xl font-bold text-brand-deep-green sm:text-3xl">
+            The Solution
+          </h2>
+          <ul className="mt-8 space-y-4">
+            {SOLUTION_POINTS.map((point) => (
+              <li key={point} className="flex gap-3">
+                <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-brand-deep-green" />
+                <span className="text-muted-foreground">{point}</span>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 
       {/* What We Do */}
-      <section className="bg-brand-off-white px-4 py-16 sm:px-6 lg:px-8">
+      <section className="px-4 py-16 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
           <h2 className="text-center font-serif text-2xl font-bold text-brand-deep-green sm:text-3xl">
             What We Do
           </h2>
           <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            <Link href="/blog">
-              <Card className="h-full transition-shadow hover:shadow-md">
-                <CardHeader>
-                  <FileText className="h-8 w-8 text-brand-deep-green" />
-                  <CardTitle className="mt-2">Blog</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground">
-                    The eat-pray-love reality checks, the spiritual bypassing
-                    call-outs, and the love letters to this messy, transformative community.
-                  </p>
-                </CardContent>
-              </Card>
-            </Link>
-
-            <Link href="/stories">
-              <Card className="h-full transition-shadow hover:shadow-md">
-                <CardHeader>
-                  <Users className="h-8 w-8 text-brand-terracotta" />
-                  <CardTitle className="mt-2">Humans of Ubud</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground">
-                    Tantra facilitators, breathwork guides, ceremony holders, sound
-                    healers, and the souls who followed something to Bali and never left.
-                  </p>
-                </CardContent>
-              </Card>
-            </Link>
-
-            <Link href="/events">
-              <Card className="h-full transition-shadow hover:shadow-md">
-                <CardHeader>
-                  <Calendar className="h-8 w-8 text-brand-gold" />
-                  <CardTitle className="mt-2">Events</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground">
-                    Sound journeys, tantra workshops, embodiment retreats, sacred
-                    circles, and community gatherings — pulled from WhatsApp groups,
-                    Telegram channels, and venues across Ubud.
-                  </p>
-                </CardContent>
-              </Card>
-            </Link>
-
-            <Link href="/tours">
-              <Card className="h-full transition-shadow hover:shadow-md">
-                <CardHeader>
-                  <MapPin className="h-8 w-8 text-brand-deep-green" />
-                  <CardTitle className="mt-2">Tours</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground">
-                    Rice terraces, water temples, jungle treks, and food trails
-                    with guides who live here — for when you want to explore the
-                    land itself.
-                  </p>
-                </CardContent>
-              </Card>
-            </Link>
+            {WHAT_WE_DO.map((item) => (
+              <Link key={item.href} href={item.href}>
+                <Card className="h-full transition-shadow hover:shadow-md">
+                  <CardHeader>
+                    <item.icon className={`h-8 w-8 ${item.iconColor}`} />
+                    <CardTitle className="mt-2">{item.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-muted-foreground">
+                      {item.description}
+                    </p>
+                  </CardContent>
+                </Card>
+              </Link>
+            ))}
           </div>
+        </div>
+      </section>
+
+      {/* For Event Organizers */}
+      <section className="bg-brand-cream px-4 py-16 sm:px-6">
+        <div className="mx-auto max-w-3xl text-center">
+          <h2 className="font-serif text-2xl font-bold text-brand-deep-green sm:text-3xl">
+            For Event Organizers
+          </h2>
+          <p className="mt-6 text-lg leading-relaxed text-muted-foreground">
+            Run a workshop, ceremony, or class in Ubud? Submit your event for
+            free. We review submissions within 24 hours. After 5 approved
+            events, you become a trusted submitter — your events go live
+            automatically.
+          </p>
+          <Link
+            href="/events/submit"
+            className="mt-8 inline-flex items-center gap-2 rounded-lg bg-brand-gold px-6 py-3 font-semibold text-brand-deep-green transition-colors hover:bg-brand-gold/90"
+          >
+            Submit an Event
+            <ArrowRight className="h-4 w-4" />
+          </Link>
         </div>
       </section>
 
@@ -153,8 +166,8 @@ export default function AboutPage() {
             Join the Community
           </h2>
           <p className="mt-3 text-lg text-brand-off-white/80">
-            One email a week — so you never hear about the good ceremony
-            after it already happened.
+            One email a week — so you never hear about the good ceremony after
+            it already happened.
           </p>
           <NewsletterSignup variant="dark" className="mx-auto mt-6 max-w-md" />
           <p className="mt-2 text-sm text-brand-off-white/60">

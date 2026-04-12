@@ -4,19 +4,26 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { queryWithRetry } from "@/lib/supabase/retry";
 import { Button } from "@/components/ui/button";
-import { EventList } from "@/components/events/event-list";
-import { EventGridView } from "@/components/events/event-grid-view";
-import { EventCalendar } from "@/components/events/event-calendar";
-import { EventWeekView } from "@/components/events/event-week-view";
+import { PriceFilteredEvents } from "@/components/events/price-filtered-events";
 import { ViewSwitcher } from "@/components/events/view-switcher";
+import { EventSortSelect } from "@/components/events/event-sort-select";
 import { EventFilters } from "@/components/events/event-filters";
 import { EventSearch } from "@/components/events/event-search";
-import type { Event } from "@/types";
+import { CategoryGuideLink } from "@/components/events/category-guide-link";
+import type { Event, Experience } from "@/types";
 
 export const metadata: Metadata = {
   title: "Events in Ubud | The Ubudian",
   description:
     "Tantra workshops, sound journeys, breathwork, ecstatic dance, medicine song circles, and sacred ceremonies happening in Ubud this week.",
+};
+
+const ARCHETYPE_NAMES: Record<string, string> = {
+  seeker: "The Seeker",
+  explorer: "The Explorer",
+  creative: "The Creative",
+  connector: "The Connector",
+  epicurean: "The Epicurean",
 };
 
 interface EventsPageProps {
@@ -28,6 +35,12 @@ interface EventsPageProps {
     q?: string;
     month?: string;
     week?: string;
+    time?: string;
+    sort?: string;
+    venue?: string;
+    happening?: string;
+    price?: string;
+    archetype?: string;
   }>;
 }
 
@@ -36,20 +49,44 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
   const view = params.view || "list";
 
   let allEvents: Event[] = [];
+  let categoryGuide: Experience | null = null;
 
   try {
     const supabase = await createClient();
 
+    // Fetch matching guide for the active category
+    if (params.category) {
+      const { data: guide } = await supabase
+        .from("experiences")
+        .select("*")
+        .eq("category", params.category)
+        .eq("is_active", true)
+        .order("sort_order", { ascending: true })
+        .limit(1)
+        .single();
+      categoryGuide = (guide as Experience) ?? null;
+    }
+
     const { data: events, error } = await queryWithRetry(() => {
+      // Sort order
+      const sortByNewest = params.sort === "newest";
       let query = supabase
         .from("events")
         .select("*")
         .eq("status", "approved")
-        .order("start_date", { ascending: true });
+        .order(sortByNewest ? "created_at" : "start_date", {
+          ascending: !sortByNewest,
+        });
 
-      // Only show future events in list/grid view (but include recurring events with past start dates)
-      if (view === "list" || view === "grid") {
-        const today = new Date().toISOString().split("T")[0];
+      const today = new Date().toISOString().split("T")[0];
+
+      // Happening Now filter
+      if (params.happening === "true") {
+        query = query
+          .lte("start_date", today)
+          .or(`end_date.gte.${today},end_date.is.null`);
+      } else if (view === "list" || view === "grid") {
+        // Only show future events in list/grid view (but include recurring events with past start dates)
         query = query.or(`start_date.gte.${today},is_recurring.eq.true`);
       }
 
@@ -57,17 +94,41 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
         query = query.eq("category", params.category);
       }
 
-      if (params.from) {
+      // Date range filters (not used with "happening now")
+      if (params.from && params.happening !== "true") {
         query = query.gte("start_date", params.from);
       }
 
-      if (params.to) {
+      if (params.to && params.happening !== "true") {
         query = query.lte("start_date", params.to);
       }
 
       if (params.q) {
         const q = `%${params.q}%`;
-        query = query.or(`title.ilike.${q},short_description.ilike.${q},venue_name.ilike.${q},category.ilike.${q}`);
+        query = query.or(
+          `title.ilike.${q},short_description.ilike.${q},venue_name.ilike.${q},category.ilike.${q}`
+        );
+      }
+
+      // Time of Day filter
+      if (params.time === "morning") {
+        query = query.or("start_time.is.null,start_time.lt.12:00:00");
+      } else if (params.time === "afternoon") {
+        query = query.or(
+          "start_time.is.null,and(start_time.gte.12:00:00,start_time.lt.17:00:00)"
+        );
+      } else if (params.time === "evening") {
+        query = query.or("start_time.is.null,start_time.gte.17:00:00");
+      }
+
+      // Venue search
+      if (params.venue) {
+        query = query.ilike("venue_name", `%${params.venue}%`);
+      }
+
+      // Archetype filter
+      if (params.archetype) {
+        query = query.contains("archetype_tags", [params.archetype]);
       }
 
       return query;
@@ -100,9 +161,14 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
       {/* Controls & Content */}
       <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-          <Suspense>
-            <ViewSwitcher />
-          </Suspense>
+          <div className="flex items-center gap-2">
+            <Suspense>
+              <ViewSwitcher />
+            </Suspense>
+            <Suspense>
+              <EventSortSelect />
+            </Suspense>
+          </div>
           <div className="w-full sm:max-w-xs">
             <Suspense>
               <EventSearch />
@@ -114,19 +180,34 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
           <Suspense>
             <EventFilters />
           </Suspense>
+          {params.category && categoryGuide && (
+            <CategoryGuideLink
+              category={params.category}
+              guide={categoryGuide}
+            />
+          )}
         </div>
+
+        {params.archetype && ARCHETYPE_NAMES[params.archetype] && (
+          <div className="mt-4 flex items-center justify-between rounded-lg border border-brand-gold/20 bg-brand-gold/5 px-4 py-3">
+            <p className="text-sm text-brand-charcoal">
+              Showing events matched to your archetype:{" "}
+              <span className="font-semibold text-brand-deep-green">
+                {ARCHETYPE_NAMES[params.archetype]}
+              </span>
+            </p>
+            <Link
+              href="/events"
+              className="text-sm font-medium text-brand-deep-green underline underline-offset-2 hover:text-brand-gold"
+            >
+              Show all events
+            </Link>
+          </div>
+        )}
 
         <div className="mt-8">
           <Suspense>
-            {view === "calendar" ? (
-              <EventCalendar events={allEvents} />
-            ) : view === "week" ? (
-              <EventWeekView events={allEvents} />
-            ) : view === "grid" ? (
-              <EventGridView events={allEvents} />
-            ) : (
-              <EventList events={allEvents} />
-            )}
+            <PriceFilteredEvents events={allEvents} view={view} />
           </Suspense>
         </div>
       </section>
