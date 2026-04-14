@@ -28,6 +28,7 @@ export const ADMIN_NAV_LINKS = [
   { label: "Ingestion", href: "/admin/ingestion", icon: "Zap" },
   { label: "Bookings", href: "/admin/bookings", icon: "CreditCard" },
   { label: "Subscriptions", href: "/admin/subscriptions", icon: "Sparkles" },
+  { label: "Feedback", href: "/admin/feedback", icon: "MessageSquare" },
 ] as const;
 
 export const EVENT_CATEGORIES = [

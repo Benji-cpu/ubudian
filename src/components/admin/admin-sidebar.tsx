@@ -18,6 +18,7 @@ import {
   Zap,
   CreditCard,
   Sparkles,
+  MessageSquare,
   Menu,
 } from "lucide-react";
 import {
@@ -42,6 +43,7 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Zap,
   CreditCard,
   Sparkles,
+  MessageSquare,
 };
 
 function NavLinks({ onClick }: { onClick?: () => void }) {

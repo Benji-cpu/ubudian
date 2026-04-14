@@ -5,6 +5,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { Toaster } from "@/components/ui/sonner";
+import { FeedbackFab } from "@/components/feedback/feedback-fab";
 import { SITE_NAME, SITE_DESCRIPTION } from "@/lib/constants";
 import "./globals.css";
 
@@ -46,6 +47,7 @@ export default function RootLayout({
           <Footer />
         </div>
         <Toaster />
+        <FeedbackFab />
         <Analytics />
         <SpeedInsights />
       </body>

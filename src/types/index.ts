@@ -396,3 +396,24 @@ export interface SavedEvent {
   event_id: string;
   created_at: string;
 }
+
+// ============================================
+// FEEDBACK TYPES
+// ============================================
+
+export type FeedbackType = "bug" | "suggestion" | "general";
+export type FeedbackStatus = "new" | "reviewed" | "resolved" | "dismissed";
+
+export interface Feedback {
+  id: string;
+  type: FeedbackType;
+  message: string;
+  email: string | null;
+  page_url: string | null;
+  page_title: string | null;
+  user_agent: string | null;
+  profile_id: string | null;
+  status: FeedbackStatus;
+  admin_notes: string | null;
+  created_at: string;
+}

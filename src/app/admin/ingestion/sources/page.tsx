@@ -45,9 +45,16 @@ export default async function SourcesPage() {
             <CardContent className="px-4 py-0 space-y-2">
               <div className="flex items-start justify-between gap-2">
                 <Link href={`/admin/ingestion/sources/${source.id}`} className="font-medium hover:underline">{source.name}</Link>
-                <Badge variant={source.is_enabled ? "default" : "secondary"}>
-                  {source.is_enabled ? "Active" : "Disabled"}
-                </Badge>
+                <div className="flex items-center gap-1 flex-wrap justify-end">
+                  <Badge variant={source.is_enabled ? "default" : "secondary"}>
+                    {source.is_enabled ? "Active" : "Disabled"}
+                  </Badge>
+                  {source.auto_approve_enabled && (
+                    <Badge variant="outline" className="text-green-600 border-green-600">
+                      Auto-approve
+                    </Badge>
+                  )}
+                </div>
               </div>
               <div>
                 <Badge variant="outline">{source.source_type}</Badge>
@@ -101,9 +108,16 @@ export default async function SourcesPage() {
                   <Badge variant="outline">{source.source_type}</Badge>
                 </TableCell>
                 <TableCell>
-                  <Badge variant={source.is_enabled ? "default" : "secondary"}>
-                    {source.is_enabled ? "Active" : "Disabled"}
-                  </Badge>
+                  <div className="flex items-center gap-1 flex-wrap">
+                    <Badge variant={source.is_enabled ? "default" : "secondary"}>
+                      {source.is_enabled ? "Active" : "Disabled"}
+                    </Badge>
+                    {source.auto_approve_enabled && (
+                      <Badge variant="outline" className="text-green-600 border-green-600">
+                        Auto-approve
+                      </Badge>
+                    )}
+                  </div>
                 </TableCell>
                 <TableCell>{source.fetch_interval_minutes}m</TableCell>
                 <TableCell className="text-right">{source.events_ingested_count}</TableCell>

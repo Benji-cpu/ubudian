@@ -48,6 +48,7 @@ export default async function TelegramIngestionPage() {
   const webhookUrl = process.env.NEXT_PUBLIC_SITE_URL
     ? `${process.env.NEXT_PUBLIC_SITE_URL}/api/webhooks/telegram`
     : "(NEXT_PUBLIC_SITE_URL not set)";
+  const isLocalhost = !process.env.NEXT_PUBLIC_SITE_URL?.startsWith("https://");
 
   // Fetch Telegram event source
   const { data: sourceData } = await supabase
@@ -168,7 +169,7 @@ export default async function TelegramIngestionPage() {
             <EnvBadge name="TELEGRAM_WEBHOOK_SECRET" isSet={hasWebhookSecret} />
             <EnvBadge name="NEXT_PUBLIC_SITE_URL" isSet={hasSiteUrl} />
           </div>
-          <TelegramRegisterButton />
+          <TelegramRegisterButton isLocalhost={isLocalhost} />
         </CardContent>
       </Card>
 

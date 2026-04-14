@@ -99,6 +99,28 @@ export async function runHealthCheck(): Promise<HealthCheckResult> {
 }
 
 /**
+ * Archive all pending events whose start_date is in the past.
+ * Returns the number of events archived.
+ */
+export async function archivePastPendingEvents(): Promise<number> {
+  const supabase = createAdminClient();
+  const today = new Date().toISOString().split("T")[0]; // "YYYY-MM-DD"
+  const { data, error } = await supabase
+    .from("events")
+    .update({ status: "archived" })
+    .eq("status", "pending")
+    .lt("start_date", today)
+    .not("start_date", "is", null)
+    .select("id");
+
+  if (error) {
+    console.error("[archivePastPendingEvents] Error:", error);
+    return 0;
+  }
+  return data?.length ?? 0;
+}
+
+/**
  * Send a health alert email via Resend.
  */
 async function sendHealthAlert(issues: string[]): Promise<void> {

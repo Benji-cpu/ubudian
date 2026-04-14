@@ -8,7 +8,7 @@
  */
 
 import { NextResponse } from "next/server";
-import { runHealthCheck } from "@/lib/ingestion/alerts";
+import { runHealthCheck, archivePastPendingEvents } from "@/lib/ingestion/alerts";
 
 export async function GET(request: Request) {
   const authHeader = request.headers.get("authorization");
@@ -18,7 +18,8 @@ export async function GET(request: Request) {
 
   try {
     const result = await runHealthCheck();
-    return NextResponse.json(result);
+    const archived = await archivePastPendingEvents();
+    return NextResponse.json({ ...result, archivedCount: archived });
   } catch (err) {
     console.error("[cron/ingestion-health] Error:", err);
     return NextResponse.json({ error: "Health check failed" }, { status: 500 });

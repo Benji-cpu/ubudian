@@ -174,6 +174,35 @@ export function bookingCancellation(opts: {
   `);
 }
 
+export function feedbackNotification(opts: {
+  type: string;
+  message: string;
+  pageUrl: string | null;
+  email: string | null;
+}): string {
+  const typeLabel = opts.type.charAt(0).toUpperCase() + opts.type.slice(1);
+  const preview = opts.message.length > 200 ? opts.message.slice(0, 200) + "..." : opts.message;
+  const pageRow = opts.pageUrl
+    ? `<tr><td style="padding:8px 0;color:#888;">Page</td><td style="padding:8px 0;"><a href="${escapeHtml(opts.pageUrl)}" style="color:${COLORS.deepGreen};text-decoration:underline;">${escapeHtml(opts.pageUrl)}</a></td></tr>`
+    : "";
+  const emailRow = opts.email
+    ? `<tr><td style="padding:8px 0;color:#888;">From</td><td style="padding:8px 0;">${escapeHtml(opts.email)}</td></tr>`
+    : "";
+
+  return layout(`
+    <h2 style="margin:0 0 16px;font-family:'Lora',Georgia,serif;color:${COLORS.deepGreen};">New Feedback: ${typeLabel}</h2>
+    <table style="margin:16px 0;width:100%;border-collapse:collapse;font-size:14px;">
+      <tr><td style="padding:8px 0;color:#888;">Type</td><td style="padding:8px 0;font-weight:600;">${typeLabel}</td></tr>
+      ${emailRow}
+      ${pageRow}
+    </table>
+    <div style="margin:16px 0;padding:12px 16px;background-color:${COLORS.cream};border-radius:4px;font-size:14px;white-space:pre-wrap;">${escapeHtml(preview)}</div>
+    <p style="margin-top:20px;">
+      <a href="${SITE_URL}/admin/feedback" style="display:inline-block;padding:10px 24px;background-color:${COLORS.deepGreen};color:#ffffff;text-decoration:none;border-radius:4px;font-weight:600;">View in Admin</a>
+    </p>
+  `);
+}
+
 function escapeHtml(str: string): string {
   return str
     .replace(/&/g, "&amp;")

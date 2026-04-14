@@ -39,7 +39,8 @@ const API = `https://api.telegram.org/bot${BOT_TOKEN}`;
 let running = true;
 let offset = 0;
 
-// Graceful shutdown
+// Graceful shutdown — signal handlers just flip the flag;
+// main() restores the production webhook after the loop exits.
 process.on("SIGINT", () => {
   console.log("\nShutting down...");
   running = false;
@@ -61,7 +62,28 @@ async function tg(method: string, params?: Record<string, unknown>) {
   return res.json();
 }
 
+async function tgPost(method: string, body: Record<string, unknown>) {
+  const res = await fetch(`${API}/${method}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  return res.json();
+}
+
 async function main() {
+  // Check for an existing production webhook before clearing it.
+  // We'll restore it when polling stops so production keeps working.
+  const webhookInfo = await tg("getWebhookInfo");
+  const existingWebhookUrl: string | null = webhookInfo?.result?.url || null;
+  const isProductionWebhook =
+    !!existingWebhookUrl && !existingWebhookUrl.includes("localhost");
+
+  if (isProductionWebhook) {
+    console.log(`[telegram-poll] Production webhook detected: ${existingWebhookUrl}`);
+    console.log("[telegram-poll] It will be restored when polling stops.\n");
+  }
+
   // Delete any existing webhook (required for getUpdates to work)
   console.log("Clearing webhook for polling mode...");
   await tg("deleteWebhook");
@@ -202,6 +224,27 @@ async function main() {
   }
 
   console.log("Polling stopped.");
+
+  // Restore production webhook so Vercel keeps receiving messages
+  if (isProductionWebhook) {
+    console.log(`\n[telegram-poll] Restoring production webhook: ${existingWebhookUrl}`);
+    const webhookSecret = process.env.TELEGRAM_WEBHOOK_SECRET;
+    const body: Record<string, unknown> = {
+      url: existingWebhookUrl,
+      allowed_updates: ["message", "channel_post"],
+    };
+    if (webhookSecret) body.secret_token = webhookSecret;
+    const result = await tgPost("setWebhook", body);
+    if (result.ok) {
+      console.log("[telegram-poll] Production webhook restored.");
+    } else {
+      console.error(
+        "[telegram-poll] Failed to restore webhook:",
+        result.description,
+        `\nRun 'Register Webhook' in the admin panel to restore manually.`
+      );
+    }
+  }
 }
 
 function sleep(ms: number) {
