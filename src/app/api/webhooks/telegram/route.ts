@@ -58,6 +58,17 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: true });
     }
 
+    // Group filtering — matches WhatsApp pattern
+    const config = (source.config || {}) as Record<string, unknown>;
+    const allowedGroups = config.allowed_groups as string[] | undefined;
+    const chatId = String(
+      update.message?.chat?.id || update.channel_post?.chat?.id || ""
+    );
+
+    if (allowedGroups?.length && chatId && !allowedGroups.includes(chatId)) {
+      return NextResponse.json({ ok: true }); // Silently ignore non-allowed groups
+    }
+
     // Check for duplicate message (same external_id from same source)
     if (rawMsg.external_id) {
       const { data: existing } = await supabase

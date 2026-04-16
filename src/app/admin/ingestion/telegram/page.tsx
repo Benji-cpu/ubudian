@@ -21,9 +21,10 @@ import {
   Globe,
   Users,
 } from "lucide-react";
-import { MobileCardField } from "@/components/admin/mobile-card-field";
 import { CreateSourceButton } from "@/components/admin/ingestion/create-source-button";
 import { TelegramRegisterButton } from "@/components/admin/ingestion/telegram-register-button";
+import { TelegramGroupList } from "@/components/admin/ingestion/telegram-group-list";
+import type { TelegramGroup } from "@/components/admin/ingestion/telegram-group-list";
 import { formatDistanceToNow } from "date-fns";
 import type { EventSource, RawIngestionMessage } from "@/types";
 
@@ -117,41 +118,22 @@ export default async function TelegramIngestionPage() {
 
   const recentMessages = (messagesData ?? []) as RawIngestionMessage[];
 
-  // Fetch messages with chat_name for group aggregation
+  // Fetch messages with chat_name + raw_data for group aggregation (need raw_data for chat_id)
   const { data: groupMsgData } = source
     ? await supabase
         .from("raw_ingestion_messages")
-        .select("chat_name, status, created_at")
+        .select("chat_name, status, created_at, raw_data")
         .eq("source_id", source.id)
         .not("chat_name", "is", null)
     : { data: [] };
 
-  // Build group summaries
+  // Build group summaries keyed by chat_id (extracted from raw_data)
   type GroupStatus = "active" | "quiet" | "stale";
-  interface GroupSummary {
-    chatName: string;
-    totalMessages: number;
-    eventsCreated: number;
-    lastMessageAt: string;
-    status: GroupStatus;
-  }
 
-  const groupMap = new Map<string, { total: number; parsed: number; lastAt: string }>();
-  for (const msg of groupMsgData ?? []) {
-    const name = msg.chat_name as string;
-    const existing = groupMap.get(name);
-    const createdAt = msg.created_at as string;
-    if (existing) {
-      existing.total++;
-      if (msg.status === "parsed") existing.parsed++;
-      if (createdAt > existing.lastAt) existing.lastAt = createdAt;
-    } else {
-      groupMap.set(name, {
-        total: 1,
-        parsed: msg.status === "parsed" ? 1 : 0,
-        lastAt: createdAt,
-      });
-    }
+  function extractChatId(rawData: unknown): string {
+    const data = rawData as { message?: { chat?: { id?: number } }; channel_post?: { chat?: { id?: number } } } | null;
+    const id = data?.message?.chat?.id || data?.channel_post?.chat?.id;
+    return id ? String(id) : "";
   }
 
   function getGroupStatus(lastMessageAt: string): GroupStatus {
@@ -161,21 +143,41 @@ export default async function TelegramIngestionPage() {
     return "stale";
   }
 
-  const groupStatusStyles: Record<GroupStatus, string> = {
-    active: "border-green-300 text-green-700 bg-green-50",
-    quiet: "border-yellow-300 text-yellow-700 bg-yellow-50",
-    stale: "border-red-300 text-red-700 bg-red-50",
-  };
+  const groupMap = new Map<string, { chatName: string; total: number; parsed: number; lastAt: string }>();
+  for (const msg of groupMsgData ?? []) {
+    const chatId = extractChatId(msg.raw_data);
+    if (!chatId) continue;
+    const name = msg.chat_name as string;
+    const createdAt = msg.created_at as string;
+    const existing = groupMap.get(chatId);
+    if (existing) {
+      existing.total++;
+      if (msg.status === "parsed") existing.parsed++;
+      if (createdAt > existing.lastAt) existing.lastAt = createdAt;
+    } else {
+      groupMap.set(chatId, {
+        chatName: name,
+        total: 1,
+        parsed: msg.status === "parsed" ? 1 : 0,
+        lastAt: createdAt,
+      });
+    }
+  }
 
-  const groups: GroupSummary[] = Array.from(groupMap.entries())
-    .map(([chatName, data]) => ({
-      chatName,
+  const groups: TelegramGroup[] = Array.from(groupMap.entries())
+    .map(([chatId, data]) => ({
+      chatId,
+      chatName: data.chatName,
       totalMessages: data.total,
       eventsCreated: data.parsed,
       lastMessageAt: data.lastAt,
       status: getGroupStatus(data.lastAt),
     }))
     .sort((a, b) => new Date(b.lastMessageAt).getTime() - new Date(a.lastMessageAt).getTime());
+
+  // Read allowed_groups from source config
+  const sourceConfig = (source?.config || {}) as Record<string, unknown>;
+  const allowedGroups = (sourceConfig.allowed_groups as string[] | undefined) ?? [];
 
   // Staleness indicator
   const lastMessageAt = lastMessageData?.[0]?.created_at as string | null;
@@ -294,85 +296,18 @@ export default async function TelegramIngestionPage() {
         </Card>
       </div>
 
-      {/* Groups */}
+      {/* Groups with filtering toggles */}
       {source && (
         <div>
           <h2 className="mb-3 text-lg font-semibold flex items-center gap-2">
             <Users className="h-4 w-4" />
             Groups ({groups.length})
           </h2>
-          <Card>
-            <CardContent className="pt-6">
-              {groups.length === 0 ? (
-                <p className="py-8 text-center text-muted-foreground">
-                  No group messages received yet. Add the bot to Telegram groups to start ingesting events.
-                </p>
-              ) : (
-                <>
-                  {/* Desktop table */}
-                  <div className="hidden md:block">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Group</TableHead>
-                          <TableHead className="text-center">Messages</TableHead>
-                          <TableHead className="text-center">Events Created</TableHead>
-                          <TableHead>Last Active</TableHead>
-                          <TableHead>Status</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {groups.map((group) => (
-                          <TableRow key={group.chatName}>
-                            <TableCell className="font-medium max-w-[200px] truncate" title={group.chatName}>
-                              {group.chatName}
-                            </TableCell>
-                            <TableCell className="text-center tabular-nums">
-                              {group.totalMessages}
-                            </TableCell>
-                            <TableCell className="text-center tabular-nums">
-                              {group.eventsCreated}
-                            </TableCell>
-                            <TableCell className="text-xs text-muted-foreground">
-                              {formatDistanceToNow(new Date(group.lastMessageAt), { addSuffix: true })}
-                            </TableCell>
-                            <TableCell>
-                              <Badge variant="outline" className={`text-xs capitalize ${groupStatusStyles[group.status]}`}>
-                                {group.status}
-                              </Badge>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
-
-                  {/* Mobile cards */}
-                  <div className="space-y-3 md:hidden">
-                    {groups.map((group) => (
-                      <div key={group.chatName} className="rounded-lg border p-3">
-                        <div className="flex items-center justify-between gap-2">
-                          <span className="font-medium text-sm truncate" title={group.chatName}>
-                            {group.chatName}
-                          </span>
-                          <Badge variant="outline" className={`text-xs capitalize shrink-0 ${groupStatusStyles[group.status]}`}>
-                            {group.status}
-                          </Badge>
-                        </div>
-                        <dl className="mt-2 grid grid-cols-2 gap-2">
-                          <MobileCardField label="Messages">{group.totalMessages}</MobileCardField>
-                          <MobileCardField label="Events">{group.eventsCreated}</MobileCardField>
-                          <MobileCardField label="Last Active">
-                            {formatDistanceToNow(new Date(group.lastMessageAt), { addSuffix: true })}
-                          </MobileCardField>
-                        </dl>
-                      </div>
-                    ))}
-                  </div>
-                </>
-              )}
-            </CardContent>
-          </Card>
+          <TelegramGroupList
+            sourceId={source.id}
+            groups={groups}
+            allowedGroups={allowedGroups}
+          />
         </div>
       )}
 
