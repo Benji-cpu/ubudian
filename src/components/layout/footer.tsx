@@ -4,7 +4,7 @@ import { NewsletterSignup } from "./newsletter-signup";
 
 export function Footer() {
   return (
-    <footer className="border-t border-brand-gold/15 bg-brand-deep-green">
+    <footer className="border-t border-brand-gold/15 bg-[#2C4A3E] dark:bg-[#1A1A1A]">
       <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6 lg:px-8">
         {/* Title */}
         <div className="text-center">

@@ -40,7 +40,7 @@ export async function FeaturedEvents() {
   return (
     <div className="mt-10 space-y-0 divide-y divide-brand-gold/20">
       <div className="flex gap-5 py-5">
-        <div className="flex w-14 shrink-0 flex-col items-center rounded bg-brand-deep-green px-2 py-1.5 text-center text-brand-cream">
+        <div className="flex w-14 shrink-0 flex-col items-center rounded bg-[#2C4A3E] px-2 py-1.5 text-center text-[#FAF5EC] dark:bg-[#2C4A3E]">
           <span className="text-xs font-semibold uppercase leading-tight">Soon</span>
           <span className="text-xl font-bold leading-tight">...</span>
         </div>

@@ -160,7 +160,7 @@ export default function AboutPage() {
       </section>
 
       {/* Newsletter CTA */}
-      <section className="bg-brand-deep-green px-4 py-16">
+      <section className="bg-[#2C4A3E] px-4 py-16 dark:bg-[#1A1A1A]">
         <div className="mx-auto max-w-xl text-center">
           <h2 className="font-serif text-3xl font-bold text-brand-off-white">
             Join the Community

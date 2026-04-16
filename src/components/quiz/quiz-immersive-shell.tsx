@@ -18,7 +18,7 @@ export function QuizImmersiveShell({ children }: QuizImmersiveShellProps) {
   }, []);
 
   return (
-    <div className="fixed inset-0 z-[60] flex flex-col bg-gradient-to-br from-brand-cream via-white to-brand-cream">
+    <div className="fixed inset-0 z-[60] flex flex-col bg-gradient-to-br from-brand-cream via-background to-brand-cream">
       {/* Minimal top bar */}
       <div className="flex items-center justify-end px-4 py-3">
         <Link

@@ -34,7 +34,7 @@ export function MobileMenu({ profile }: { profile: Profile | null }) {
           <span className="sr-only">Open menu</span>
         </Button>
       </SheetTrigger>
-      <SheetContent side="right" className="w-full border-none bg-brand-deep-green sm:max-w-full">
+      <SheetContent side="right" className="w-full border-none bg-[#2C4A3E] dark:bg-[#1A1A1A] sm:max-w-full">
         <div className="flex justify-end p-4">
           <SheetClose asChild>
             <button className="text-brand-gold hover:text-brand-gold/80 transition-colors">

@@ -45,7 +45,7 @@ export function QuizPrompt() {
         closing ? "animate-slide-down" : "animate-slide-up"
       }`}
     >
-      <div className="w-full max-w-md rounded-xl border border-brand-gold/20 bg-brand-deep-green p-5 shadow-2xl">
+      <div className="w-full max-w-md rounded-xl border border-brand-gold/20 bg-[#2C4A3E] p-5 shadow-2xl dark:bg-[#1A1A1A]">
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1">
             <p className="font-serif text-lg font-medium text-brand-gold">

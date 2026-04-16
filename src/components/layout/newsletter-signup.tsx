@@ -87,7 +87,7 @@ export function NewsletterSignup({ className, variant = "light" }: NewsletterSig
           className={
             isDark
               ? "border-brand-off-white/20 bg-white/5 text-brand-off-white placeholder:text-brand-off-white/40"
-              : "bg-white"
+              : "bg-background"
           }
         />
         <Button

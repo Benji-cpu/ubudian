@@ -17,7 +17,7 @@ export default function NewsletterError({
       </p>
       <button
         onClick={reset}
-        className="mt-8 rounded-md bg-brand-deep-green px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-deep-green/90"
+        className="mt-8 rounded-md bg-primary px-6 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
       >
         Try again
       </button>

@@ -29,7 +29,7 @@ export function FeedbackFab() {
       {!open && (
         <Button
           onClick={() => setOpen(true)}
-          className="fixed bottom-6 right-6 z-40 h-12 w-12 rounded-full shadow-lg bg-[var(--brand-deep-green)] hover:bg-[var(--brand-deep-green)]/90 text-[var(--brand-gold)]"
+          className="fixed bottom-6 right-6 z-40 h-12 w-12 rounded-full shadow-lg bg-[#2C4A3E] text-brand-gold hover:bg-[#2C4A3E]/90 dark:bg-[#2D2D2D] dark:hover:bg-[#2D2D2D]/90"
           size="icon"
           aria-label="Send feedback"
         >

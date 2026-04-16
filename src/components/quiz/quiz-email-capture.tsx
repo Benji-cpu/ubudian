@@ -46,7 +46,7 @@ export function QuizEmailCapture({ onSubmit }: QuizEmailCaptureProps) {
             placeholder="your@email.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="bg-white"
+            className="bg-background"
           />
           <Button type="submit" disabled={loading}>
             {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "See My Results"}

@@ -87,7 +87,7 @@ export default function HomePage() {
       <HomepageScrollSnap />
       <div className="-mt-14">
         {/* Canopy (Hero) */}
-        <section className="relative flex min-h-[100dvh] items-center justify-center overflow-hidden bg-gradient-to-b from-brand-deep-green via-brand-mid-green to-brand-sage">
+        <section className="relative flex min-h-[100dvh] items-center justify-center overflow-hidden bg-gradient-to-b from-[#2C4A3E] via-[#3A5F50] to-[#8BAF8A] dark:from-[#0D1A14] dark:via-[#152820] dark:to-[#1A2A22]">
           <svg
             className="pointer-events-none absolute inset-0 h-full w-full opacity-5"
             xmlns="http://www.w3.org/2000/svg"

@@ -6,14 +6,14 @@ import { MobileMenu } from "./mobile-menu";
 import { ExploreMenu } from "./explore-menu";
 import { Button } from "@/components/ui/button";
 import { Shield } from "lucide-react";
+import { ThemeToggle } from "./theme-toggle";
 
 export async function Header() {
   const profile = await getCurrentProfile();
 
   return (
     <header
-      className="fixed top-0 z-50 w-full border-b border-brand-gold/15"
-      style={{ background: "rgba(44,74,62,0.85)", backdropFilter: "blur(12px)" }}
+      className="fixed top-0 z-50 w-full border-b border-brand-gold/15 bg-brand-deep-green/85 backdrop-blur-[12px] dark:bg-[#1A1A1A]/90"
     >
       <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Logo */}
@@ -64,6 +64,7 @@ export async function Header() {
 
         {/* Right side: Auth + Mobile */}
         <div className="flex items-center gap-2">
+          <ThemeToggle />
           {profile ? (
             <UserMenu profile={profile} />
           ) : (

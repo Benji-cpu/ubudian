@@ -113,7 +113,7 @@ export function QuizResults({
       </div>
 
       {/* Share */}
-      <div className="mt-8 rounded-xl border border-brand-cream bg-white p-6 text-center">
+      <div className="mt-8 rounded-xl border border-brand-cream bg-card p-6 text-center">
         <p className="mb-4 font-serif text-lg text-brand-charcoal">Share your Ubud Spirit</p>
         <QuizShareButtons archetypeName={archetype.name} url={shareUrl} />
       </div>

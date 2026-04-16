@@ -11,19 +11,19 @@
   --font-serif: var(--font-lora);
   --font-mono: var(--font-geist-mono);
 
-  /* V3 Temple Garden palette */
-  --color-brand-deep-green: #2C4A3E;
-  --color-brand-mid-green: #3A5F50;
-  --color-brand-sage: #8BAF8A;
-  --color-brand-pale-green: #E8F0ED;
-  --color-brand-gold: #C9A84C;
-  --color-brand-gold-light: #D4BB7F;
-  --color-brand-cream: #FAF5EC;
-  --color-brand-warm-cream: #F5EBE0;
-  --color-brand-off-white: #F0EAD6;
-  --color-brand-terracotta: #B85C3F;
-  --color-brand-charcoal: #2D2D2D;
-  --color-brand-charcoal-light: #4A4A4A;
+  /* V3 Temple Garden palette — values set in :root / .dark */
+  --color-brand-deep-green: var(--brand-deep-green);
+  --color-brand-mid-green: var(--brand-mid-green);
+  --color-brand-sage: var(--brand-sage);
+  --color-brand-pale-green: var(--brand-pale-green);
+  --color-brand-gold: var(--brand-gold);
+  --color-brand-gold-light: var(--brand-gold-light);
+  --color-brand-cream: var(--brand-cream);
+  --color-brand-warm-cream: var(--brand-warm-cream);
+  --color-brand-off-white: var(--brand-off-white);
+  --color-brand-terracotta: var(--brand-terracotta);
+  --color-brand-charcoal: var(--brand-charcoal);
+  --color-brand-charcoal-light: var(--brand-charcoal-light);
 
   /* shadcn theme mappings */
   --color-sidebar-ring: var(--sidebar-ring);
@@ -66,6 +66,18 @@
 
 :root {
   --radius: 0.125rem;
+  --brand-deep-green: #2C4A3E;
+  --brand-mid-green: #3A5F50;
+  --brand-sage: #8BAF8A;
+  --brand-pale-green: #E8F0ED;
+  --brand-gold: #C9A84C;
+  --brand-gold-light: #D4BB7F;
+  --brand-cream: #FAF5EC;
+  --brand-warm-cream: #F5EBE0;
+  --brand-off-white: #F0EAD6;
+  --brand-terracotta: #B85C3F;
+  --brand-charcoal: #2D2D2D;
+  --brand-charcoal-light: #4A4A4A;
   --background: #FAF5EC;
   --foreground: #2D2D2D;
   --card: #FFFFFF;
@@ -100,6 +112,18 @@
 }
 
 .dark {
+  --brand-deep-green: #8BAF8A;
+  --brand-mid-green: #5A8A70;
+  --brand-sage: #3A6050;
+  --brand-pale-green: #1A2A22;
+  --brand-gold: #C9A84C;
+  --brand-gold-light: #D4BB7F;
+  --brand-cream: #252525;
+  --brand-warm-cream: #1F1F1F;
+  --brand-off-white: #E0D8CC;
+  --brand-terracotta: #D4917F;
+  --brand-charcoal: #FAF5EC;
+  --brand-charcoal-light: #B0B0B0;
   --background: #1A1A1A;
   --foreground: #FAF5EC;
   --card: #2D2D2D;
