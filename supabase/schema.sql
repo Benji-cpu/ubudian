@@ -782,6 +782,26 @@ CREATE POLICY "Admins can manage health logs"
   USING (public.is_admin());
 
 -- ============================================
+-- INGESTION ACTIVITY LOG
+-- ============================================
+
+CREATE TABLE ingestion_activity_log (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  category TEXT NOT NULL,       -- event_created | source_error | source_recovered | group_quiet | run_summary
+  severity TEXT NOT NULL DEFAULT 'info', -- info | warning | error
+  title TEXT NOT NULL,          -- Short human-readable description
+  details JSONB,                -- Structured metadata
+  source_id UUID REFERENCES event_sources(id) ON DELETE SET NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE ingestion_activity_log ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Admins can manage activity log"
+  ON ingestion_activity_log FOR ALL
+  USING (public.is_admin());
+
+-- ============================================
 -- PERFORMANCE INDEXES
 -- ============================================
 
@@ -835,3 +855,8 @@ CREATE INDEX idx_feedback_created_at ON feedback(created_at DESC);
 CREATE INDEX idx_health_logs_created_at ON pipeline_health_logs(created_at DESC);
 CREATE INDEX idx_health_logs_log_type ON pipeline_health_logs(log_type);
 CREATE INDEX idx_health_logs_channel ON pipeline_health_logs(channel);
+
+-- Activity log indexes
+CREATE INDEX idx_activity_log_category ON ingestion_activity_log(category);
+CREATE INDEX idx_activity_log_created ON ingestion_activity_log(created_at DESC);
+CREATE INDEX idx_activity_log_source ON ingestion_activity_log(source_id);
