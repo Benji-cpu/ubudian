@@ -15,21 +15,28 @@ export const NAV_LINKS = [
   { label: "About", href: "/about" },
 ] as const;
 
-export const ADMIN_NAV_LINKS = [
-  { label: "Dashboard", href: "/admin", icon: "LayoutDashboard" },
-  { label: "Events", href: "/admin/events", icon: "Calendar" },
-  { label: "Stories", href: "/admin/stories", icon: "Users" },
-  { label: "Blog", href: "/admin/blog", icon: "FileText" },
-  { label: "Newsletter", href: "/admin/newsletter", icon: "Mail" },
-  { label: "Tours", href: "/admin/tours", icon: "MapPin" },
-  { label: "Experiences", href: "/admin/experiences", icon: "Compass" },
-  { label: "Subscribers", href: "/admin/subscribers", icon: "UserPlus" },
-  { label: "Trusted", href: "/admin/trusted-submitters", icon: "ShieldCheck" },
-  { label: "Ingestion", href: "/admin/ingestion", icon: "Zap" },
-  { label: "Bookings", href: "/admin/bookings", icon: "CreditCard" },
-  { label: "Subscriptions", href: "/admin/subscriptions", icon: "Sparkles" },
-  { label: "Feedback", href: "/admin/feedback", icon: "MessageSquare" },
-] as const;
+export type AdminNavItem =
+  | { type: "link"; label: string; href: string; icon: string }
+  | { type: "divider" };
+
+export const ADMIN_NAV_LINKS: AdminNavItem[] = [
+  { type: "link", label: "Dashboard", href: "/admin", icon: "LayoutDashboard" },
+  { type: "link", label: "Events", href: "/admin/events", icon: "Calendar" },
+  { type: "link", label: "Sources", href: "/admin/sources", icon: "Zap" },
+  { type: "divider" },
+  { type: "link", label: "Content", href: "/admin/content", icon: "FileText" },
+  { type: "link", label: "Tours", href: "/admin/tours", icon: "MapPin" },
+  { type: "link", label: "Commerce", href: "/admin/commerce", icon: "CreditCard" },
+  { type: "link", label: "Community", href: "/admin/community", icon: "Users" },
+];
+
+export const ADMIN_GROUPED_ROUTES: Record<string, string[]> = {
+  "/admin/content": ["/admin/blog", "/admin/stories", "/admin/newsletter"],
+  "/admin/tours": ["/admin/tours", "/admin/experiences"],
+  "/admin/commerce": ["/admin/bookings", "/admin/subscriptions"],
+  "/admin/community": ["/admin/subscribers", "/admin/trusted-submitters", "/admin/feedback"],
+  "/admin/sources": ["/admin/ingestion"],
+};
 
 export const EVENT_CATEGORIES = [
   "Dance & Movement",

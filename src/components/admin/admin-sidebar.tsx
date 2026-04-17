@@ -4,21 +4,16 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { ADMIN_NAV_LINKS } from "@/lib/constants";
+import { ADMIN_NAV_LINKS, ADMIN_GROUPED_ROUTES } from "@/lib/constants";
+import type { AdminNavItem } from "@/lib/constants";
 import {
   LayoutDashboard,
   Calendar,
   Users,
   FileText,
-  Mail,
   MapPin,
-  Compass,
-  UserPlus,
-  ShieldCheck,
   Zap,
   CreditCard,
-  Sparkles,
-  MessageSquare,
   Menu,
 } from "lucide-react";
 import {
@@ -35,15 +30,9 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Calendar,
   Users,
   FileText,
-  Mail,
   MapPin,
-  Compass,
-  UserPlus,
-  ShieldCheck,
   Zap,
   CreditCard,
-  Sparkles,
-  MessageSquare,
 };
 
 function NavLinks({ onClick }: { onClick?: () => void }) {
@@ -51,17 +40,30 @@ function NavLinks({ onClick }: { onClick?: () => void }) {
 
   return (
     <>
-      {ADMIN_NAV_LINKS.map((link) => {
-        const Icon = iconMap[link.icon];
+      {ADMIN_NAV_LINKS.map((item: AdminNavItem, index: number) => {
+        if (item.type === "divider") {
+          return (
+            <hr
+              key={`divider-${index}`}
+              className="my-2 border-t border-border"
+            />
+          );
+        }
+
+        const Icon = iconMap[item.icon];
         const isActive =
-          link.href === "/admin"
+          item.href === "/admin"
             ? pathname === "/admin"
-            : pathname.startsWith(link.href);
+            : pathname.startsWith(item.href) ||
+              (ADMIN_GROUPED_ROUTES[item.href]?.some((sub) =>
+                pathname.startsWith(sub)
+              ) ??
+                false);
 
         return (
           <Link
-            key={link.href}
-            href={link.href}
+            key={item.href}
+            href={item.href}
             onClick={onClick}
             className={cn(
               "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
@@ -71,7 +73,7 @@ function NavLinks({ onClick }: { onClick?: () => void }) {
             )}
           >
             {Icon && <Icon className="h-4 w-4" />}
-            {link.label}
+            {item.label}
           </Link>
         );
       })}
