@@ -42,7 +42,7 @@ export default async function VenueAliasesPage() {
     <div className="space-y-6">
       <div className="flex items-center gap-3">
         <Button asChild variant="ghost" size="sm">
-          <Link href="/admin/ingestion">
+          <Link href="/admin/sources">
             <ArrowLeft className="h-4 w-4" />
           </Link>
         </Button>

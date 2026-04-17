@@ -43,7 +43,7 @@ export default async function FeedbackDetailPage({ params }: FeedbackDetailPageP
     <div>
       <div className="mb-6">
         <Button asChild variant="ghost" size="sm">
-          <Link href="/admin/feedback">
+          <Link href="/admin/community">
             <ArrowLeft className="mr-2 h-4 w-4" />
             All Feedback
           </Link>

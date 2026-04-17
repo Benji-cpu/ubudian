@@ -142,7 +142,7 @@ export function BlogForm({ initialData }: BlogFormProps) {
       return;
     }
 
-    router.push("/admin/blog");
+    router.push("/admin/content");
     router.refresh();
   }
 
@@ -173,7 +173,7 @@ export function BlogForm({ initialData }: BlogFormProps) {
     }
 
     setDeleteOpen(false);
-    router.push("/admin/blog");
+    router.push("/admin/content");
     router.refresh();
   }
 

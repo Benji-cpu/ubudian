@@ -144,7 +144,7 @@ export function StoryForm({ initialData }: StoryFormProps) {
       return;
     }
 
-    router.push("/admin/stories");
+    router.push("/admin/content");
     router.refresh();
   }
 
@@ -175,7 +175,7 @@ export function StoryForm({ initialData }: StoryFormProps) {
     }
 
     setDeleteOpen(false);
-    router.push("/admin/stories");
+    router.push("/admin/content");
     router.refresh();
   }
 

@@ -138,7 +138,7 @@ export function ExperienceForm({ initialData }: ExperienceFormProps) {
       return;
     }
 
-    router.push("/admin/experiences");
+    router.push("/admin/tours");
     router.refresh();
   }
 
@@ -156,7 +156,7 @@ export function ExperienceForm({ initialData }: ExperienceFormProps) {
     }
 
     setDeleteOpen(false);
-    router.push("/admin/experiences");
+    router.push("/admin/tours");
     router.refresh();
   }
 
