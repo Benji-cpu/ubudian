@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -7,20 +8,12 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Loader2 } from "lucide-react";
+import { Loader2, ImagePlus, X } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
 
 const feedbackSchema = z.object({
-  type: z.enum(["bug", "suggestion", "general"]),
   message: z.string().min(10, "Please provide at least 10 characters").max(2000),
-  email: z.string().email("Invalid email").optional().or(z.literal("")),
+  image_url: z.string().url().optional().or(z.literal("")),
   page_url: z.string().optional(),
   page_title: z.string().optional(),
   website: z.string().optional(),
@@ -30,30 +23,72 @@ type FeedbackFormData = z.infer<typeof feedbackSchema>;
 
 interface FeedbackFormProps {
   onSuccess: () => void;
-  userEmail?: string | null;
 }
 
-export function FeedbackForm({ onSuccess, userEmail }: FeedbackFormProps) {
+export function FeedbackForm({ onSuccess }: FeedbackFormProps) {
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const {
     register,
     handleSubmit,
     setValue,
     reset,
-    watch,
     formState: { errors, isSubmitting },
   } = useForm<FeedbackFormData>({
     resolver: zodResolver(feedbackSchema),
     defaultValues: {
-      type: "general",
       message: "",
-      email: userEmail || "",
+      image_url: "",
       page_url: typeof window !== "undefined" ? window.location.href : "",
       page_title: typeof window !== "undefined" ? document.title : "",
       website: "",
     },
   });
 
-  const selectedType = watch("type");
+  async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type and size
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please select an image file");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Image must be under 5MB");
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      const supabase = createClient();
+      const fileName = `feedback/${Date.now()}-${file.name}`;
+      const { error } = await supabase.storage.from("images").upload(fileName, file);
+
+      if (error) {
+        toast.error("Failed to upload image");
+        console.error("Image upload error:", error);
+        return;
+      }
+
+      const { data: { publicUrl } } = supabase.storage.from("images").getPublicUrl(fileName);
+      setValue("image_url", publicUrl);
+      setImagePreview(publicUrl);
+    } catch {
+      toast.error("Failed to upload image");
+    } finally {
+      setIsUploading(false);
+      // Reset input so the same file can be re-selected
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  }
+
+  function removeImage() {
+    setValue("image_url", "");
+    setImagePreview(null);
+  }
 
   async function onSubmit(data: FeedbackFormData) {
     try {
@@ -71,6 +106,7 @@ export function FeedbackForm({ onSuccess, userEmail }: FeedbackFormProps) {
 
       toast.success("Thanks for your feedback!");
       reset();
+      setImagePreview(null);
       onSuccess();
     } catch {
       toast.error("Something went wrong. Please try again.");
@@ -79,23 +115,6 @@ export function FeedbackForm({ onSuccess, userEmail }: FeedbackFormProps) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      <div>
-        <Label htmlFor="feedback-type">Type</Label>
-        <Select
-          value={selectedType}
-          onValueChange={(val) => setValue("type", val as FeedbackFormData["type"])}
-        >
-          <SelectTrigger id="feedback-type" className="mt-1">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="bug">Bug Report</SelectItem>
-            <SelectItem value="suggestion">Suggestion</SelectItem>
-            <SelectItem value="general">General Feedback</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
       <div>
         <Label htmlFor="feedback-message">Message</Label>
         <Textarea
@@ -109,30 +128,65 @@ export function FeedbackForm({ onSuccess, userEmail }: FeedbackFormProps) {
         )}
       </div>
 
+      {/* Image upload */}
       <div>
-        <Label htmlFor="feedback-email">Email (optional)</Label>
-        <Input
-          id="feedback-email"
-          type="email"
-          placeholder="your@email.com"
-          className="mt-1"
-          {...register("email")}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={handleImageUpload}
         />
-        {errors.email && (
-          <p className="mt-1 text-sm text-destructive">{errors.email.message}</p>
+        {imagePreview ? (
+          <div className="relative inline-block">
+            <img
+              src={imagePreview}
+              alt="Feedback attachment"
+              className="h-24 w-24 rounded-md object-cover border"
+            />
+            <button
+              type="button"
+              onClick={removeImage}
+              className="absolute -top-2 -right-2 h-5 w-5 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center"
+              aria-label="Remove image"
+            >
+              <X className="h-3 w-3" />
+            </button>
+          </div>
+        ) : (
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            disabled={isUploading}
+            onClick={() => fileInputRef.current?.click()}
+          >
+            {isUploading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Uploading...
+              </>
+            ) : (
+              <>
+                <ImagePlus className="mr-2 h-4 w-4" />
+                Attach image
+              </>
+            )}
+          </Button>
         )}
       </div>
 
       {/* Hidden fields */}
       <input type="hidden" {...register("page_url")} />
       <input type="hidden" {...register("page_title")} />
+      <input type="hidden" {...register("image_url")} />
 
       {/* Honeypot */}
       <div className="absolute -left-[9999px]" aria-hidden="true">
         <input type="text" tabIndex={-1} autoComplete="off" {...register("website")} />
       </div>
 
-      <Button type="submit" disabled={isSubmitting} className="w-full">
+      <Button type="submit" disabled={isSubmitting || isUploading} className="w-full">
         {isSubmitting ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />

@@ -15,14 +15,16 @@ import { createClient } from "@/lib/supabase/client";
 
 export function FeedbackFab() {
   const [open, setOpen] = useState(false);
-  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     const supabase = createClient();
     supabase.auth.getUser().then(({ data }) => {
-      setUserEmail(data.user?.email ?? null);
+      setIsLoggedIn(!!data.user);
     });
   }, []);
+
+  if (!isLoggedIn) return null;
 
   return (
     <>
@@ -45,10 +47,7 @@ export function FeedbackFab() {
               Found a bug or have a suggestion? Let us know.
             </DialogDescription>
           </DialogHeader>
-          <FeedbackForm
-            onSuccess={() => setOpen(false)}
-            userEmail={userEmail}
-          />
+          <FeedbackForm onSuccess={() => setOpen(false)} />
         </DialogContent>
       </Dialog>
     </>

@@ -1,22 +1,32 @@
+import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { rateLimit, getClientIp } from "@/lib/rate-limit";
+import { rateLimit } from "@/lib/rate-limit";
 import { sendTransactionalEmail } from "@/lib/email";
 import { feedbackNotification } from "@/lib/email-templates";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
 const feedbackSchema = z.object({
-  type: z.enum(["bug", "suggestion", "general"]),
   message: z.string().min(10).max(2000),
-  email: z.string().email().optional().or(z.literal("")),
+  image_url: z.string().url().optional().or(z.literal("")),
   page_url: z.string().optional().or(z.literal("")),
   page_title: z.string().optional().or(z.literal("")),
   website: z.string().optional().or(z.literal("")), // honeypot
 });
 
 export async function POST(request: Request) {
-  const ip = getClientIp(request);
-  const { success } = rateLimit(`feedback:${ip}`, { limit: 3, windowSeconds: 900 });
+  // Require authentication
+  const supabase = await createClient();
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  if (authError || !user) {
+    return NextResponse.json(
+      { error: "You must be logged in to submit feedback" },
+      { status: 401 }
+    );
+  }
+
+  // Rate limit by user ID
+  const { success } = rateLimit(`feedback:${user.id}`, { limit: 3, windowSeconds: 900 });
   if (!success) {
     return NextResponse.json(
       { error: "Too many submissions. Please try again later." },
@@ -33,13 +43,15 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: true });
     }
 
-    const supabase = createAdminClient();
+    const admin = createAdminClient();
     const userAgent = request.headers.get("user-agent") || null;
 
-    const { error } = await supabase.from("feedback").insert({
-      type: data.type,
+    const { error } = await admin.from("feedback").insert({
+      type: "general",
       message: data.message,
-      email: data.email || null,
+      email: user.email || null,
+      profile_id: user.id,
+      image_url: data.image_url || null,
       page_url: data.page_url || null,
       page_title: data.page_title || null,
       user_agent: userAgent,
@@ -58,12 +70,12 @@ export async function POST(request: Request) {
     if (adminEmail) {
       sendTransactionalEmail(
         adminEmail,
-        `New feedback: ${data.type}`,
+        "New feedback: General",
         feedbackNotification({
-          type: data.type,
+          type: "general",
           message: data.message,
           pageUrl: data.page_url || null,
-          email: data.email || null,
+          email: user.email || null,
         })
       );
     }
