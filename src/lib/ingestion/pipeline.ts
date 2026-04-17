@@ -16,6 +16,7 @@ import { normalizeVenue } from "./venue-normalizer";
 import { generateFingerprint } from "./fingerprint";
 import { getAdapter } from "./source-adapter";
 import { validateAndNormalizeDate } from "./date-validator";
+import { logHealthEvent } from "./health-utils";
 import type { IngestionRunResult, ParsedEvent, ProcessResult, RawMessage } from "./types";
 
 /**
@@ -208,6 +209,26 @@ export async function runIngestion(sourceId: string): Promise<IngestionRunResult
       })
       .eq("id", sourceId);
 
+    // Best-effort health logging
+    try {
+      await logHealthEvent(supabase, {
+        log_type: "info",
+        channel: source.source_type ?? undefined,
+        message: `Ingestion run completed: ${messagesFetched} fetched, ${eventsCreated} created, ${duplicatesFound} duplicates`,
+        metadata: {
+          run_id: runId,
+          source_id: sourceId,
+          messages_fetched: messagesFetched,
+          messages_parsed: messagesParsed,
+          events_created: eventsCreated,
+          duplicates_found: duplicatesFound,
+          errors_count: errors.length,
+        },
+      });
+    } catch {
+      // Health logging is best-effort — never break the pipeline
+    }
+
     return {
       runId,
       sourceId,
@@ -247,6 +268,24 @@ export async function runIngestion(sourceId: string): Promise<IngestionRunResult
         updated_at: new Date().toISOString(),
       })
       .eq("id", sourceId);
+
+    // Best-effort health logging
+    try {
+      await logHealthEvent(supabase, {
+        log_type: "error",
+        channel: source.source_type ?? undefined,
+        message: `Ingestion run failed: ${errorMsg}`,
+        metadata: {
+          run_id: runId,
+          source_id: sourceId,
+          error: errorMsg,
+          messages_fetched: messagesFetched,
+          events_created: eventsCreated,
+        },
+      });
+    } catch {
+      // Health logging is best-effort — never break the pipeline
+    }
 
     return {
       runId,

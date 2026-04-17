@@ -16,6 +16,7 @@
 import { NextResponse, after } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { processRawMessage } from "@/lib/ingestion/pipeline";
+import { logHealthEvent } from "@/lib/ingestion/health-utils";
 import {
   parseTelegramUpdate,
   downloadTelegramMedia,
@@ -148,6 +149,19 @@ export async function POST(request: Request) {
           source.config || {}
         );
         console.log(`[telegram-webhook] Processed message ${storedMsg.id}: ${result.status}`);
+
+        // Best-effort health logging
+        try {
+          await logHealthEvent(createAdminClient(), {
+            log_type: "info",
+            channel: "telegram",
+            group_name: rawMsg.chat_name ?? undefined,
+            message: `Message received from ${rawMsg.chat_name ?? "unknown chat"}: ${result.status}`,
+            metadata: { message_id: storedMsg.id, status: result.status },
+          });
+        } catch {
+          // Health logging is best-effort
+        }
       } catch (err) {
         console.error(`[telegram-webhook] Background processing failed for ${storedMsg.id}:`, err);
         await createAdminClient()
@@ -158,6 +172,19 @@ export async function POST(request: Request) {
             updated_at: new Date().toISOString(),
           })
           .eq("id", storedMsg.id);
+
+        // Best-effort health logging for errors
+        try {
+          await logHealthEvent(createAdminClient(), {
+            log_type: "error",
+            channel: "telegram",
+            group_name: rawMsg.chat_name ?? undefined,
+            message: `Processing failed: ${err instanceof Error ? err.message : "Unknown error"}`,
+            metadata: { message_id: storedMsg.id },
+          });
+        } catch {
+          // Health logging is best-effort
+        }
       }
     });
 
