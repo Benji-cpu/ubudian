@@ -203,6 +203,56 @@ export function feedbackNotification(opts: {
   `);
 }
 
+export function weeklyIngestionDigest(opts: {
+  eventCount: number;
+  errorCount: number;
+  runCount: number;
+  quietGroupAlerts: number;
+  eventsBySource: Record<string, number>;
+  errorsBySource: Record<string, number>;
+  totalMessages: number;
+  successRate: number;
+}): string {
+  const sourceRows = Object.entries(opts.eventsBySource)
+    .sort(([, a], [, b]) => b - a)
+    .map(([name, count]) => `<tr><td style="padding:4px 8px;">${escapeHtml(name)}</td><td style="padding:4px 8px;text-align:right;font-weight:600;">${count}</td></tr>`)
+    .join("");
+
+  const errorRows = Object.entries(opts.errorsBySource)
+    .sort(([, a], [, b]) => b - a)
+    .map(([name, count]) => `<tr><td style="padding:4px 8px;">${escapeHtml(name)}</td><td style="padding:4px 8px;text-align:right;color:#B85C3F;font-weight:600;">${count}</td></tr>`)
+    .join("");
+
+  return layout(`
+    <h2 style="margin:0 0 16px;font-family:'Lora',Georgia,serif;color:${COLORS.deepGreen};">Weekly Ingestion Summary</h2>
+
+    <table style="margin:16px 0;width:100%;border-collapse:collapse;font-size:14px;">
+      <tr><td style="padding:8px 0;color:#888;">Events Created</td><td style="padding:8px 0;font-weight:600;font-size:18px;">${opts.eventCount}</td></tr>
+      <tr><td style="padding:8px 0;color:#888;">Messages Processed</td><td style="padding:8px 0;">${opts.totalMessages}</td></tr>
+      <tr><td style="padding:8px 0;color:#888;">Ingestion Runs</td><td style="padding:8px 0;">${opts.runCount}</td></tr>
+      <tr><td style="padding:8px 0;color:#888;">Success Rate</td><td style="padding:8px 0;">${opts.successRate}%</td></tr>
+      <tr><td style="padding:8px 0;color:#888;">Source Errors</td><td style="padding:8px 0;${opts.errorCount > 0 ? 'color:#B85C3F;font-weight:600;' : ''}">${opts.errorCount}</td></tr>
+      <tr><td style="padding:8px 0;color:#888;">Quiet Group Alerts</td><td style="padding:8px 0;${opts.quietGroupAlerts > 0 ? 'color:#C9A84C;font-weight:600;' : ''}">${opts.quietGroupAlerts}</td></tr>
+    </table>
+
+    ${sourceRows ? `
+    <h3 style="margin:24px 0 8px;font-family:'Lora',Georgia,serif;color:${COLORS.deepGreen};font-size:16px;">Events by Source</h3>
+    <table style="width:100%;border-collapse:collapse;font-size:14px;">
+      ${sourceRows}
+    </table>` : ""}
+
+    ${errorRows ? `
+    <h3 style="margin:24px 0 8px;font-family:'Lora',Georgia,serif;color:${COLORS.deepGreen};font-size:16px;">Errors by Source</h3>
+    <table style="width:100%;border-collapse:collapse;font-size:14px;">
+      ${errorRows}
+    </table>` : ""}
+
+    <p style="margin-top:24px;">
+      <a href="${SITE_URL}/admin/ingestion" style="display:inline-block;padding:10px 24px;background-color:${COLORS.deepGreen};color:#ffffff;text-decoration:none;border-radius:4px;font-weight:600;">View Dashboard</a>
+    </p>
+  `);
+}
+
 function escapeHtml(str: string): string {
   return str
     .replace(/&/g, "&amp;")

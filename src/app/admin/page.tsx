@@ -3,7 +3,8 @@ import { ChannelHealthCards } from "@/components/admin/dashboard/channel-health-
 import { MetricsRow } from "@/components/admin/dashboard/metrics-row";
 import { PendingQueue } from "@/components/admin/dashboard/pending-queue";
 import { HealthLog } from "@/components/admin/dashboard/health-log";
-import type { PipelineHealthLog } from "@/types";
+import { ActivityLogList } from "@/components/admin/ingestion/activity-log-list";
+import type { PipelineHealthLog, IngestionActivityLog } from "@/types";
 import { formatDistanceToNow } from "date-fns";
 
 export const revalidate = 60;
@@ -30,6 +31,7 @@ export default async function AdminDashboard() {
     eventsThisWeekRes,
     pendingDedupRes,
     healthLogsRes,
+    activityLogRes,
   ] = await Promise.all([
     // Channel sources with type
     supabase
@@ -81,6 +83,12 @@ export default async function AdminDashboard() {
       .select("*")
       .order("created_at", { ascending: false })
       .limit(50),
+    // Activity log (last 20)
+    supabase
+      .from("ingestion_activity_log")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(20),
   ]);
 
   const sources = (sourcesRes.data ?? []) as Array<{
@@ -119,6 +127,7 @@ export default async function AdminDashboard() {
   const eventsThisWeek = eventsThisWeekRes.count ?? 0;
   const pendingDedup = pendingDedupRes.count ?? 0;
   const healthLogs = (healthLogsRes.data ?? []) as PipelineHealthLog[];
+  const recentActivity = (activityLogRes.data ?? []) as IngestionActivityLog[];
 
   const lastUpdated = formatDistanceToNow(now, { addSuffix: true });
 
@@ -154,6 +163,9 @@ export default async function AdminDashboard() {
         <PendingQueue events={pendingEvents} />
         <HealthLog logs={healthLogs} />
       </div>
+
+      {/* Section 5: Activity Log */}
+      <ActivityLogList entries={recentActivity} />
     </div>
   );
 }

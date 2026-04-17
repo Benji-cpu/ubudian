@@ -17,6 +17,7 @@ import { generateFingerprint } from "./fingerprint";
 import { getAdapter } from "./source-adapter";
 import { validateAndNormalizeDate } from "./date-validator";
 import { logHealthEvent } from "./health-utils";
+import { logActivity } from "./activity-log";
 import type { IngestionRunResult, ParsedEvent, ProcessResult, RawMessage } from "./types";
 
 /**
@@ -106,9 +107,12 @@ export async function runIngestion(sourceId: string): Promise<IngestionRunResult
     ...(source.config || {}),
     _autoApproveEnabled: source.auto_approve_enabled ?? false,
     _autoApproveThreshold: source.auto_approve_threshold ?? 0.85,
+    _sourceName: source.name,
   };
 
   try {
+    const startTime = Date.now();
+
     // Fetch raw messages from adapter
     const since = source.last_fetched_at ? new Date(source.last_fetched_at) : undefined;
     const rawMessages = await adapter.fetchMessages(source.config || {}, since);
@@ -197,6 +201,19 @@ export async function runIngestion(sourceId: string): Promise<IngestionRunResult
       })
       .eq("id", runId);
 
+    // Log recovery if source previously had an error
+    if (source.last_error) {
+      await logActivity({
+        category: "source_recovered",
+        title: `${source.name} recovered`,
+        details: {
+          source_name: source.name,
+          previous_error: source.last_error,
+        },
+        sourceId,
+      });
+    }
+
     // Update source timestamps
     await supabase
       .from("event_sources")
@@ -209,25 +226,21 @@ export async function runIngestion(sourceId: string): Promise<IngestionRunResult
       })
       .eq("id", sourceId);
 
-    // Best-effort health logging
-    try {
-      await logHealthEvent(supabase, {
-        log_type: "info",
-        channel: source.source_type ?? undefined,
-        message: `Ingestion run completed: ${messagesFetched} fetched, ${eventsCreated} created, ${duplicatesFound} duplicates`,
-        metadata: {
-          run_id: runId,
-          source_id: sourceId,
-          messages_fetched: messagesFetched,
-          messages_parsed: messagesParsed,
-          events_created: eventsCreated,
-          duplicates_found: duplicatesFound,
-          errors_count: errors.length,
-        },
-      });
-    } catch {
-      // Health logging is best-effort — never break the pipeline
-    }
+    await logActivity({
+      category: "run_summary",
+      title: `${source.name}: ${eventsCreated} events from ${messagesFetched} messages`,
+      details: {
+        source_name: source.name,
+        run_id: runId,
+        messages_fetched: messagesFetched,
+        messages_parsed: messagesParsed,
+        events_created: eventsCreated,
+        duplicates: duplicatesFound,
+        errors_count: errors.length,
+        duration_s: Math.round((Date.now() - startTime) / 1000),
+      },
+      sourceId,
+    });
 
     return {
       runId,
@@ -269,23 +282,18 @@ export async function runIngestion(sourceId: string): Promise<IngestionRunResult
       })
       .eq("id", sourceId);
 
-    // Best-effort health logging
-    try {
-      await logHealthEvent(supabase, {
-        log_type: "error",
-        channel: source.source_type ?? undefined,
-        message: `Ingestion run failed: ${errorMsg}`,
-        metadata: {
-          run_id: runId,
-          source_id: sourceId,
-          error: errorMsg,
-          messages_fetched: messagesFetched,
-          events_created: eventsCreated,
-        },
-      });
-    } catch {
-      // Health logging is best-effort — never break the pipeline
-    }
+    // Fire-and-forget in error path — don't compound latency during failures
+    logActivity({
+      category: "source_error",
+      severity: "error",
+      title: `${source.name} failed: ${errorMsg}`,
+      details: {
+        source_name: source.name,
+        error_message: errorMsg,
+        run_id: runId,
+      },
+      sourceId,
+    });
 
     return {
       runId,
@@ -654,6 +662,20 @@ export async function createEventFromParsed(
       error: `Failed to insert event: ${insertError?.message}`,
     };
   }
+
+  await logActivity({
+    category: "event_created",
+    title: `Event created: ${parsed.title}`,
+    details: {
+      event_id: newEvent.id,
+      event_title: parsed.title,
+      category,
+      venue: normalizedVenue || parsed.venue_name || null,
+      source_name: (sourceConfig._sourceName as string) || null,
+      auto_approved: eventStatus === "approved",
+    },
+    sourceId,
+  });
 
   // Record any lower-confidence dedup matches for admin review
   for (const dup of duplicates) {
