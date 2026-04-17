@@ -413,7 +413,25 @@ export interface Feedback {
   page_title: string | null;
   user_agent: string | null;
   profile_id: string | null;
+  image_url: string | null;
   status: FeedbackStatus;
   admin_notes: string | null;
+  created_at: string;
+}
+
+// ============================================
+// PIPELINE HEALTH LOG TYPES
+// ============================================
+
+export type HealthLogType = "success" | "warning" | "error" | "info";
+export type HealthLogChannel = "telegram" | "whatsapp" | "megatix" | "system";
+
+export interface PipelineHealthLog {
+  id: string;
+  log_type: HealthLogType;
+  channel: HealthLogChannel | null;
+  group_name: string | null;
+  message: string;
+  metadata: Record<string, unknown>;
   created_at: string;
 }

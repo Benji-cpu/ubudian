@@ -737,6 +737,51 @@ CREATE POLICY "Admins can manage payments"
   USING (public.is_admin());
 
 -- ============================================
+-- FEEDBACK TABLE
+-- ============================================
+
+CREATE TABLE feedback (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  type TEXT NOT NULL DEFAULT 'general', -- 'bug' | 'suggestion' | 'general'
+  message TEXT NOT NULL,
+  email TEXT,
+  page_url TEXT,
+  page_title TEXT,
+  user_agent TEXT,
+  profile_id UUID REFERENCES profiles(id) ON DELETE SET NULL,
+  image_url TEXT,
+  status TEXT NOT NULL DEFAULT 'new', -- 'new' | 'reviewed' | 'resolved' | 'dismissed'
+  admin_notes TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE feedback ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Admins can manage feedback"
+  ON feedback FOR ALL
+  USING (public.is_admin());
+
+-- ============================================
+-- PIPELINE HEALTH LOGS TABLE
+-- ============================================
+
+CREATE TABLE pipeline_health_logs (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  log_type TEXT NOT NULL,  -- 'success' | 'warning' | 'error' | 'info'
+  channel TEXT,            -- 'telegram' | 'whatsapp' | 'megatix' | 'system'
+  group_name TEXT,
+  message TEXT NOT NULL,
+  metadata JSONB DEFAULT '{}',
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE pipeline_health_logs ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Admins can manage health logs"
+  ON pipeline_health_logs FOR ALL
+  USING (public.is_admin());
+
+-- ============================================
 -- PERFORMANCE INDEXES
 -- ============================================
 
@@ -781,3 +826,12 @@ CREATE INDEX idx_payments_booking ON payments(booking_id);
 CREATE INDEX idx_payments_subscription ON payments(subscription_id);
 CREATE INDEX idx_payments_stripe_pi ON payments(stripe_payment_intent_id);
 CREATE INDEX idx_profiles_stripe_customer ON profiles(stripe_customer_id);
+
+-- Feedback indexes
+CREATE INDEX idx_feedback_status ON feedback(status);
+CREATE INDEX idx_feedback_created_at ON feedback(created_at DESC);
+
+-- Pipeline health logs indexes
+CREATE INDEX idx_health_logs_created_at ON pipeline_health_logs(created_at DESC);
+CREATE INDEX idx_health_logs_log_type ON pipeline_health_logs(log_type);
+CREATE INDEX idx_health_logs_channel ON pipeline_health_logs(channel);
