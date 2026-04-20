@@ -787,7 +787,7 @@ CREATE POLICY "Admins can manage health logs"
 
 CREATE TABLE ingestion_activity_log (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  category TEXT NOT NULL,       -- event_created | source_error | source_recovered | group_quiet | run_summary
+  category TEXT NOT NULL,       -- event_created | event_enriched | source_error | source_recovered | group_quiet | run_summary
   severity TEXT NOT NULL DEFAULT 'info', -- info | warning | error
   title TEXT NOT NULL,          -- Short human-readable description
   details JSONB,                -- Structured metadata

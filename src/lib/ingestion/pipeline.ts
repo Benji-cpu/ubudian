@@ -18,7 +18,44 @@ import { getAdapter } from "./source-adapter";
 import { validateAndNormalizeDate } from "./date-validator";
 import { logHealthEvent } from "./health-utils";
 import { logActivity } from "./activity-log";
+import { enrichFromSourceUrl, applyEnrichment } from "./url-enricher";
 import type { IngestionRunResult, ParsedEvent, ProcessResult, RawMessage } from "./types";
+
+/**
+ * Fill in missing image / price / description fields by scraping the source URL.
+ * Best-effort: never throws, never overwrites existing values.
+ */
+async function maybeEnrichParsedEvent(parsed: ParsedEvent, sourceId: string): Promise<void> {
+  if (!parsed.source_url) return;
+  const needsEnrichment =
+    !parsed.cover_image_url ||
+    !parsed.price_info ||
+    !parsed.short_description ||
+    !parsed.organizer_name ||
+    !parsed.venue_address ||
+    !parsed.external_ticket_url;
+  if (!needsEnrichment) return;
+
+  try {
+    const enrichment = await enrichFromSourceUrl(parsed.source_url, parsed);
+    if (enrichment.enrichedFields.length > 0) {
+      applyEnrichment(parsed, enrichment);
+      await logActivity({
+        category: "event_enriched",
+        title: `Enriched from source URL: ${enrichment.enrichedFields.join(", ")}`,
+        details: {
+          event_title: parsed.title,
+          source_url: parsed.source_url,
+          enriched_fields: enrichment.enrichedFields,
+        },
+        sourceId,
+      });
+    }
+  } catch (err) {
+    // Enrichment failures are never fatal
+    console.error("[pipeline] enrichment error:", err);
+  }
+}
 
 /**
  * Run the full ingestion pipeline for a given source.
@@ -544,6 +581,9 @@ export async function createEventFromParsed(
   );
   const category = validCategory || "Other";
 
+  // Best-effort enrichment from source URL (image, price, description, etc.)
+  await maybeEnrichParsedEvent(parsed, sourceId);
+
   // Normalize venue
   const normalizedVenue = await normalizeVenue(parsed.venue_name);
 
@@ -601,18 +641,13 @@ export async function createEventFromParsed(
     slug = `${slug}-${Date.now().toString(36)}`;
   }
 
-  // Determine auto-approve eligibility
+  // Auto-approve by default; only hold back content flagged as spam or inappropriate.
+  // Feedback-driven blocking happens post-publish (see follow-ups in plan).
   const qualityScore = parsed.quality_score ?? 0;
   const contentFlags = parsed.content_flags ?? [];
-  let eventStatus: "pending" | "approved" = "pending";
-
-  if (
-    sourceConfig._autoApproveEnabled &&
-    qualityScore >= ((sourceConfig._autoApproveThreshold as number) ?? 0.85) &&
-    contentFlags.length === 0
-  ) {
-    eventStatus = "approved";
-  }
+  const HARD_BLOCK_FLAGS = new Set(["spam", "inappropriate"]);
+  const hasHardBlock = contentFlags.some((f) => HARD_BLOCK_FLAGS.has(f));
+  const eventStatus: "pending" | "approved" = hasHardBlock ? "pending" : "approved";
 
   // Insert the event
   const { data: newEvent, error: insertError } = await queryWithRetry(

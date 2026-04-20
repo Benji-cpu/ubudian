@@ -68,6 +68,17 @@ vi.mock("@/lib/ingestion/source-adapter", () => ({
   getAdapter: (...args: unknown[]) => mockGetAdapter(...args),
 }));
 
+// Mock URL enricher
+const mockEnrichFromSourceUrl = vi.fn().mockResolvedValue({ enrichedFields: [] });
+vi.mock("@/lib/ingestion/url-enricher", () => ({
+  enrichFromSourceUrl: (...args: unknown[]) => mockEnrichFromSourceUrl(...args),
+  applyEnrichment: (parsed: Record<string, unknown>, enrichment: { enrichedFields: string[] } & Record<string, unknown>) => {
+    for (const k of enrichment.enrichedFields) {
+      if (typeof enrichment[k] === "string") parsed[k] = enrichment[k];
+    }
+  },
+}));
+
 // Mock utils
 vi.mock("@/lib/utils", () => ({
   slugify: (text: string) => text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""),
@@ -176,6 +187,7 @@ describe("runIngestion", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockValidateDate.mockImplementation(defaultDateValidator);
+    mockEnrichFromSourceUrl.mockResolvedValue({ enrichedFields: [] });
     setupDefaultMocks();
   });
 
@@ -264,6 +276,7 @@ describe("processRawMessage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockValidateDate.mockImplementation(defaultDateValidator);
+    mockEnrichFromSourceUrl.mockResolvedValue({ enrichedFields: [] });
     setupDefaultMocks();
   });
 
@@ -602,9 +615,73 @@ describe("createEventFromParsed", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockValidateDate.mockImplementation(defaultDateValidator);
+    mockEnrichFromSourceUrl.mockResolvedValue({ enrichedFields: [] });
     setupDefaultMocks();
     mockFindDuplicates.mockResolvedValue([]);
     mockRecordDedupMatch.mockResolvedValue(undefined);
+  });
+
+  describe("URL enrichment", () => {
+    it("calls the enricher when source_url is present and a target field is missing", async () => {
+      const parsed: ParsedEvent = {
+        title: "Sunset Yoga",
+        description: "x",
+        category: "Yoga & Meditation",
+        start_date: "2026-03-20",
+        venue_name: "Yoga Barn",
+        source_url: "https://example.com/event",
+        // cover_image_url is missing → enrichment should fire
+      };
+      await createEventFromParsed("msg-1", parsed, "src-1", true);
+      expect(mockEnrichFromSourceUrl).toHaveBeenCalledTimes(1);
+      expect(mockEnrichFromSourceUrl).toHaveBeenCalledWith(
+        "https://example.com/event",
+        expect.objectContaining({ source_url: "https://example.com/event" })
+      );
+    });
+
+    it("skips enrichment when source_url is missing", async () => {
+      const parsed: ParsedEvent = {
+        title: "Sunset Yoga",
+        description: "x",
+        category: "Yoga & Meditation",
+        start_date: "2026-03-20",
+      };
+      await createEventFromParsed("msg-1", parsed, "src-1", true);
+      expect(mockEnrichFromSourceUrl).not.toHaveBeenCalled();
+    });
+
+    it("skips enrichment when all enrichable fields already present", async () => {
+      const parsed: ParsedEvent = {
+        title: "Sunset Yoga",
+        description: "x",
+        short_description: "Brief",
+        category: "Yoga & Meditation",
+        start_date: "2026-03-20",
+        venue_name: "Yoga Barn",
+        venue_address: "Jl. Hanoman 44",
+        organizer_name: "Saraswati",
+        cover_image_url: "https://existing.com/img.jpg",
+        price_info: "150k IDR",
+        external_ticket_url: "https://tickets.com/x",
+        source_url: "https://example.com/event",
+      };
+      await createEventFromParsed("msg-1", parsed, "src-1", true);
+      expect(mockEnrichFromSourceUrl).not.toHaveBeenCalled();
+    });
+
+    it("never crashes the pipeline when enrichment throws", async () => {
+      mockEnrichFromSourceUrl.mockRejectedValue(new Error("boom"));
+      const parsed: ParsedEvent = {
+        title: "Sunset Yoga",
+        description: "x",
+        category: "Yoga & Meditation",
+        start_date: "2026-03-20",
+        source_url: "https://example.com/event",
+      };
+      const result = await createEventFromParsed("msg-1", parsed, "src-1", true);
+      expect(result.status).toBe("created");
+    });
   });
 
   it("creates an event from valid parsed data", async () => {
@@ -807,7 +884,7 @@ describe("createEventFromParsed", () => {
   // Auto-approve tests
   // ============================================
 
-  it("sets status to pending when auto-approve is disabled", async () => {
+  it("auto-approves clean events regardless of source config", async () => {
     const mockInsert = vi.fn().mockReturnValue(chain({ id: "evt-1" }));
     const mockUpdate = vi.fn().mockReturnValue({
       eq: vi.fn().mockResolvedValue({ error: null }),
@@ -840,13 +917,13 @@ describe("createEventFromParsed", () => {
       _autoApproveThreshold: 0.85,
     });
     expect(result.status).toBe("created");
-    expect(result.eventsAutoApproved).toBe(0);
+    expect(result.eventsAutoApproved).toBe(1);
     expect(mockInsert).toHaveBeenCalledWith(
-      expect.objectContaining({ status: "pending" })
+      expect.objectContaining({ status: "approved" })
     );
   });
 
-  it("auto-approves when quality >= threshold and no flags", async () => {
+  it("auto-approves even when no source config is provided", async () => {
     const mockInsert = vi.fn().mockReturnValue(chain({ id: "evt-1" }));
     const mockUpdate = vi.fn().mockReturnValue({
       eq: vi.fn().mockResolvedValue({ error: null }),
@@ -874,10 +951,7 @@ describe("createEventFromParsed", () => {
       content_flags: [],
     };
 
-    const result = await createEventFromParsed("msg-1", parsed, "src-1", true, {
-      _autoApproveEnabled: true,
-      _autoApproveThreshold: 0.85,
-    });
+    const result = await createEventFromParsed("msg-1", parsed, "src-1", true);
     expect(result.status).toBe("created");
     expect(result.eventsAutoApproved).toBe(1);
     expect(mockInsert).toHaveBeenCalledWith(
@@ -885,7 +959,7 @@ describe("createEventFromParsed", () => {
     );
   });
 
-  it("stays pending when quality < threshold", async () => {
+  it("auto-approves even when quality_score is low", async () => {
     const mockInsert = vi.fn().mockReturnValue(chain({ id: "evt-1" }));
     const mockUpdate = vi.fn().mockReturnValue({
       eq: vi.fn().mockResolvedValue({ error: null }),
@@ -909,22 +983,19 @@ describe("createEventFromParsed", () => {
       description: "Something happening",
       category: "Other",
       start_date: "2026-03-20",
-      quality_score: 0.6,
-      content_flags: [],
+      quality_score: 0.2,
+      content_flags: ["low_quality"],
     };
 
-    const result = await createEventFromParsed("msg-1", parsed, "src-1", true, {
-      _autoApproveEnabled: true,
-      _autoApproveThreshold: 0.85,
-    });
+    const result = await createEventFromParsed("msg-1", parsed, "src-1", true);
     expect(result.status).toBe("created");
-    expect(result.eventsAutoApproved).toBe(0);
+    expect(result.eventsAutoApproved).toBe(1);
     expect(mockInsert).toHaveBeenCalledWith(
-      expect.objectContaining({ status: "pending" })
+      expect.objectContaining({ status: "approved" })
     );
   });
 
-  it("stays pending when content flags are present despite high quality", async () => {
+  it("stays pending when content flags include 'spam'", async () => {
     const mockInsert = vi.fn().mockReturnValue(chain({ id: "evt-1" }));
     const mockUpdate = vi.fn().mockReturnValue({
       eq: vi.fn().mockResolvedValue({ error: null }),
@@ -952,10 +1023,43 @@ describe("createEventFromParsed", () => {
       content_flags: ["spam"],
     };
 
-    const result = await createEventFromParsed("msg-1", parsed, "src-1", true, {
-      _autoApproveEnabled: true,
-      _autoApproveThreshold: 0.85,
+    const result = await createEventFromParsed("msg-1", parsed, "src-1", true);
+    expect(result.status).toBe("created");
+    expect(result.eventsAutoApproved).toBe(0);
+    expect(mockInsert).toHaveBeenCalledWith(
+      expect.objectContaining({ status: "pending" })
+    );
+  });
+
+  it("stays pending when content flags include 'inappropriate'", async () => {
+    const mockInsert = vi.fn().mockReturnValue(chain({ id: "evt-1" }));
+    const mockUpdate = vi.fn().mockReturnValue({
+      eq: vi.fn().mockResolvedValue({ error: null }),
     });
+
+    mockFrom.mockImplementation((table: string) => {
+      if (table === "events") {
+        return { select: () => chain(null), insert: mockInsert };
+      }
+      if (table === "raw_ingestion_messages") {
+        return { update: mockUpdate };
+      }
+      if (table === "dedup_matches") {
+        return { upsert: vi.fn().mockResolvedValue({ error: null }) };
+      }
+      return { select: () => chain(null), update: mockUpdate };
+    });
+
+    const parsed: ParsedEvent = {
+      title: "Inappropriate Event",
+      description: "...",
+      category: "Other",
+      start_date: "2026-03-20",
+      quality_score: 0.9,
+      content_flags: ["inappropriate"],
+    };
+
+    const result = await createEventFromParsed("msg-1", parsed, "src-1", true);
     expect(result.status).toBe("created");
     expect(result.eventsAutoApproved).toBe(0);
     expect(mockInsert).toHaveBeenCalledWith(

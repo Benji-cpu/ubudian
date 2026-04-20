@@ -13,7 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Plus, Calendar, ShieldCheck, Bot } from "lucide-react";
+import { Plus, Calendar, ShieldCheck, Bot, ImageIcon, DollarSign, FileText, MapPin } from "lucide-react";
 import { MobileCardField } from "@/components/admin/mobile-card-field";
 import type { Event, EventSource } from "@/types";
 import { DeleteEventButton } from "./delete-button";
@@ -78,6 +78,37 @@ type EventWithChatName = Event & {
   raw_ingestion_messages?: { chat_name: string | null } | { chat_name: string | null }[] | null;
 };
 
+function QualityIndicator({ event }: { event: Event }) {
+  const checks: { label: string; present: boolean; Icon: typeof ImageIcon }[] = [
+    { label: "Image", present: !!event.cover_image_url, Icon: ImageIcon },
+    { label: "Price", present: !!event.price_info, Icon: DollarSign },
+    {
+      label: "Description",
+      present: !!event.short_description || (event.description?.length ?? 0) > 30,
+      Icon: FileText,
+    },
+    { label: "Venue", present: !!event.venue_name, Icon: MapPin },
+  ];
+  const score = checks.filter((c) => c.present).length;
+  const tooltip = checks
+    .map((c) => `${c.present ? "✓" : "·"} ${c.label}`)
+    .join("  ");
+  return (
+    <span
+      className="inline-flex items-center gap-0.5"
+      title={`${score}/4 fields filled — ${tooltip}`}
+    >
+      {checks.map(({ label, present, Icon }) => (
+        <Icon
+          key={label}
+          className={`h-3.5 w-3.5 ${present ? "text-brand-deep-green" : "text-muted-foreground/30"}`}
+          aria-label={`${label} ${present ? "present" : "missing"}`}
+        />
+      ))}
+    </span>
+  );
+}
+
 function getEventChatName(event: EventWithChatName): string | null {
   const raw = event.raw_ingestion_messages;
   if (!raw) return null;
@@ -105,6 +136,7 @@ function EventTable({ items, trustedMap, sourceMap }: { items: EventWithChatName
               <TableHead>Date</TableHead>
               <TableHead>Venue</TableHead>
               <TableHead>Source</TableHead>
+              <TableHead>Quality</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
@@ -141,6 +173,9 @@ function EventTable({ items, trustedMap, sourceMap }: { items: EventWithChatName
                 </TableCell>
                 <TableCell>
                   <SourceBadge event={event} sourceMap={sourceMap} chatName={getEventChatName(event)} />
+                </TableCell>
+                <TableCell>
+                  <QualityIndicator event={event} />
                 </TableCell>
                 <TableCell>
                   <Badge variant={statusVariant[event.status]}>
@@ -184,11 +219,12 @@ function EventTable({ items, trustedMap, sourceMap }: { items: EventWithChatName
                   {event.status}
                 </Badge>
               </div>
-              <div className="mt-1 flex items-center gap-2">
+              <div className="mt-1 flex flex-wrap items-center gap-2">
                 <Badge variant="outline" className="text-xs">
                   {event.category}
                 </Badge>
                 <SourceBadge event={event} sourceMap={sourceMap} chatName={getEventChatName(event)} />
+                <QualityIndicator event={event} />
               </div>
               <dl className="mt-2 grid grid-cols-2 gap-2">
                 <MobileCardField label="Date">{format(new Date(event.start_date), "MMM d, yyyy")}</MobileCardField>

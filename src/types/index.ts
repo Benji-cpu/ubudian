@@ -390,7 +390,7 @@ export interface UnresolvedVenue {
   resolved_by: string | null;
 }
 
-export type ActivityCategory = "event_created" | "source_error" | "source_recovered" | "group_quiet" | "run_summary";
+export type ActivityCategory = "event_created" | "event_enriched" | "source_error" | "source_recovered" | "group_quiet" | "run_summary";
 export type ActivitySeverity = "info" | "warning" | "error";
 
 export interface IngestionActivityLog {
