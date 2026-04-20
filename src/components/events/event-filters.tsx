@@ -21,6 +21,8 @@ import {
   ChevronUp,
   MapPin,
   SlidersHorizontal,
+  Sparkles,
+  ImageIcon,
   X,
 } from "lucide-react";
 
@@ -75,6 +77,8 @@ export function EventFilters() {
   const activePrice = searchParams.get("price");
   const activeVenue = searchParams.get("venue");
   const activeHappening = searchParams.get("happening") === "true";
+  const activeFreeOnly = searchParams.get("free") === "true";
+  const activeHasImage = searchParams.get("hasImage") === "true";
 
   const [dateFilters, setDateFilters] = useState<
     { label: string; from: string; to: string }[]
@@ -147,13 +151,21 @@ export function EventFilters() {
     setParams({ price: activePrice === value ? null : value });
   }
 
+  function toggleFreeOnly() {
+    setParams({ free: activeFreeOnly ? null : "true" });
+  }
+
+  function toggleHasImage() {
+    setParams({ hasImage: activeHasImage ? null : "true" });
+  }
+
   function clearAllAdvanced() {
     setVenueInput("");
     isUserTyping.current = false;
-    setParams({ time: null, price: null, venue: null });
+    setParams({ time: null, price: null, venue: null, free: null, hasImage: null });
   }
 
-  const hasAdvancedFilters = !!(activeTime || activePrice || activeVenue);
+  const hasAdvancedFilters = !!(activeTime || activePrice || activeVenue || activeFreeOnly || activeHasImage);
 
   // Build active filter pills
   const activePills: { label: string; onClear: () => void }[] = [];
@@ -174,6 +186,12 @@ export function EventFilters() {
         setParams({ venue: null });
       },
     });
+  }
+  if (activeFreeOnly) {
+    activePills.push({ label: "Free only", onClear: () => setParams({ free: null }) });
+  }
+  if (activeHasImage) {
+    activePills.push({ label: "Has image", onClear: () => setParams({ hasImage: null }) });
   }
 
   return (
@@ -209,6 +227,24 @@ export function EventFilters() {
             </Button>
           );
         })}
+        <Button
+          variant={activeFreeOnly ? "default" : "outline"}
+          size="sm"
+          onClick={toggleFreeOnly}
+          aria-pressed={activeFreeOnly}
+        >
+          <Sparkles className="mr-1 h-3 w-3" />
+          Free only
+        </Button>
+        <Button
+          variant={activeHasImage ? "default" : "outline"}
+          size="sm"
+          onClick={toggleHasImage}
+          aria-pressed={activeHasImage}
+        >
+          <ImageIcon className="mr-1 h-3 w-3" />
+          Has image
+        </Button>
       </div>
 
       {/* Section B: Category badges */}

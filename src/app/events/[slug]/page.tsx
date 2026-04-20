@@ -10,10 +10,12 @@ import { MarkdownContent } from "@/components/blog/markdown-content";
 import { ShareButtons } from "@/components/blog/share-buttons";
 import { EventJsonLd } from "@/components/events/event-json-ld";
 import { EventCard } from "@/components/events/event-card";
+import { SaveEventButton } from "@/components/dashboard/save-event-button";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { MapPin, Clock, Calendar, ExternalLink, User } from "lucide-react";
 import { isSafeUrl } from "@/lib/url-validation";
+import { getCurrentProfile } from "@/lib/auth";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -65,6 +67,8 @@ export default async function EventPage({ params }: EventPageProps) {
   let e: Event;
   let related: Event[] = [];
   let facilitatorStory: Story | null = null;
+  let currentProfileId: string | null = null;
+  let initiallySaved = false;
 
   try {
     const { slug } = await params;
@@ -82,6 +86,18 @@ export default async function EventPage({ params }: EventPageProps) {
     }
 
     e = event as Event;
+
+    const profile = await getCurrentProfile();
+    if (profile) {
+      currentProfileId = profile.id;
+      const { data: saved } = await supabase
+        .from("saved_events")
+        .select("event_id")
+        .eq("profile_id", profile.id)
+        .eq("event_id", e.id)
+        .maybeSingle();
+      initiallySaved = !!saved;
+    }
 
     const { data: relatedEvents, error: relatedError } = await supabase
       .from("events")
@@ -121,19 +137,20 @@ export default async function EventPage({ params }: EventPageProps) {
     <>
       <EventJsonLd event={e} />
 
-      <article>
+      <article className="pb-24 md:pb-0">
         {/* Cover Image */}
         {e.cover_image_url && (
-          <div className="w-full">
-            <Image
-              src={e.cover_image_url}
-              alt={e.title}
-              width={0}
-              height={0}
-              priority
-              sizes="100vw"
-              className="h-auto max-h-[500px] w-full object-contain"
-            />
+          <div className="mx-auto max-w-5xl px-0 sm:px-6 sm:pt-6">
+            <div className="relative aspect-[16/9] w-full overflow-hidden sm:rounded-lg">
+              <Image
+                src={e.cover_image_url}
+                alt={e.title}
+                fill
+                priority
+                sizes="(max-width: 1024px) 100vw, 1024px"
+                className="object-cover"
+              />
+            </div>
           </div>
         )}
 
@@ -161,9 +178,20 @@ export default async function EventPage({ params }: EventPageProps) {
           <Badge variant="outline" className="mb-3">
             {CATEGORY_EMOJI[e.category] || CATEGORY_EMOJI["Other"]} {e.category}
           </Badge>
-          <h1 className="font-serif text-3xl font-bold tracking-tight text-brand-deep-green sm:text-4xl lg:text-5xl">
-            {e.title}
-          </h1>
+          <div className="flex items-start justify-between gap-3">
+            <h1 className="font-serif text-3xl font-bold tracking-tight text-brand-deep-green sm:text-4xl lg:text-5xl">
+              {e.title}
+            </h1>
+            {currentProfileId && (
+              <div className="shrink-0 pt-1">
+                <SaveEventButton
+                  eventId={e.id}
+                  profileId={currentProfileId}
+                  initialSaved={initiallySaved}
+                />
+              </div>
+            )}
+          </div>
 
           {/* Event meta */}
           <div className="mt-6 space-y-3">
@@ -208,9 +236,9 @@ export default async function EventPage({ params }: EventPageProps) {
             )}
           </div>
 
-          {/* Ticket button */}
+          {/* Ticket button (inline on desktop, hidden on mobile — replaced by sticky bar) */}
           {e.external_ticket_url && isSafeUrl(e.external_ticket_url) && (
-            <Button asChild className="mt-6" size="lg">
+            <Button asChild className="mt-6 hidden md:inline-flex" size="lg">
               <a href={e.external_ticket_url} target="_blank" rel="noopener noreferrer">
                 <ExternalLink className="mr-2 h-4 w-4" />
                 Get Tickets
@@ -276,6 +304,18 @@ export default async function EventPage({ params }: EventPageProps) {
         <div className="mx-auto max-w-3xl border-t px-4 py-8 sm:px-6">
           <ShareButtons title={e.title} url={eventUrl} />
         </div>
+
+        {/* Sticky mobile ticket CTA */}
+        {e.external_ticket_url && isSafeUrl(e.external_ticket_url) && (
+          <div className="fixed inset-x-0 bottom-0 z-30 border-t border-brand-gold/20 bg-white/95 px-4 py-3 backdrop-blur-sm md:hidden">
+            <Button asChild className="w-full" size="lg">
+              <a href={e.external_ticket_url} target="_blank" rel="noopener noreferrer">
+                <ExternalLink className="mr-2 h-4 w-4" />
+                Get Tickets
+              </a>
+            </Button>
+          </div>
+        )}
 
         {/* Related Events */}
         {related.length > 0 && (

@@ -2,22 +2,19 @@ import Link from "next/link";
 import Image from "next/image";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
-import { formatEventTime } from "@/lib/utils";
+import { formatEventTime, isRecentlyAddedEvent } from "@/lib/utils";
 import { CATEGORY_EMOJI } from "@/lib/constants";
 import { EventCardPlaceholder } from "./event-card-placeholder";
-import { MapPin, Clock, Calendar, User, Ticket, ExternalLink } from "lucide-react";
+import { EventCardExternalLinks } from "./event-card-external-links";
+import { MapPin, Clock, Calendar, User } from "lucide-react";
 import type { Event } from "@/types";
-
-function isNew(createdAt: string): boolean {
-  const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
-  return new Date(createdAt).getTime() > sevenDaysAgo;
-}
 
 interface EventGridCardProps {
   event: Event;
+  saveButton?: React.ReactNode;
 }
 
-export function EventGridCard({ event }: EventGridCardProps) {
+export function EventGridCard({ event, saveButton }: EventGridCardProps) {
   const startDate = new Date(event.start_date);
   const emoji = CATEGORY_EMOJI[event.category] || CATEGORY_EMOJI["Other"];
 
@@ -41,12 +38,19 @@ export function EventGridCard({ event }: EventGridCardProps) {
             />
           )}
 
+          {/* Save button overlay (top-right) */}
+          {saveButton && (
+            <div className="absolute right-2 top-2 rounded-full bg-white/85 backdrop-blur-sm">
+              {saveButton}
+            </div>
+          )}
+
           {/* Category badge overlay (bottom-left) */}
           <div className="absolute bottom-2 left-2 flex items-center gap-1.5">
             <Badge className="bg-black/60 text-white backdrop-blur-sm hover:bg-black/60">
               {emoji} {event.category}
             </Badge>
-            {isNew(event.created_at) && (
+            {isRecentlyAddedEvent(event.created_at, event.start_date) && (
               <span className="rounded bg-brand-gold px-1.5 py-0.5 text-xs font-medium text-white">
                 New
               </span>
@@ -92,30 +96,10 @@ export function EventGridCard({ event }: EventGridCardProps) {
                   {event.price_info}
                 </span>
               )}
-              {event.venue_map_url && (
-                <a
-                  href={event.venue_map_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={(e) => e.stopPropagation()}
-                  className="text-muted-foreground hover:text-brand-terracotta"
-                  title="View on map"
-                >
-                  <ExternalLink className="h-3.5 w-3.5" />
-                </a>
-              )}
-              {event.external_ticket_url && (
-                <a
-                  href={event.external_ticket_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={(e) => e.stopPropagation()}
-                  className="text-muted-foreground hover:text-brand-terracotta"
-                  title="Get tickets"
-                >
-                  <Ticket className="h-3.5 w-3.5" />
-                </a>
-              )}
+              <EventCardExternalLinks
+                venueMapUrl={event.venue_map_url}
+                externalTicketUrl={event.external_ticket_url}
+              />
             </div>
             {event.organizer_name && (
               <span className="flex items-center gap-1 text-xs text-muted-foreground">

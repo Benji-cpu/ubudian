@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { queryWithRetry } from "@/lib/supabase/retry";
+import { getCurrentProfile } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { PriceFilteredEvents } from "@/components/events/price-filtered-events";
 import { ViewSwitcher } from "@/components/events/view-switcher";
@@ -41,6 +42,8 @@ interface EventsPageProps {
     happening?: string;
     price?: string;
     archetype?: string;
+    free?: string;
+    hasImage?: string;
   }>;
 }
 
@@ -50,9 +53,20 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
 
   let allEvents: Event[] = [];
   let categoryGuide: Experience | null = null;
+  let currentProfileId: string | null = null;
+  let savedEventIds: string[] = [];
 
   try {
     const supabase = await createClient();
+    const profile = await getCurrentProfile();
+    if (profile) {
+      currentProfileId = profile.id;
+      const { data: saved } = await supabase
+        .from("saved_events")
+        .select("event_id")
+        .eq("profile_id", profile.id);
+      savedEventIds = ((saved ?? []) as { event_id: string }[]).map((r) => r.event_id);
+    }
 
     // Fetch matching guide for the active category
     if (params.category) {
@@ -207,7 +221,12 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
 
         <div className="mt-8">
           <Suspense>
-            <PriceFilteredEvents events={allEvents} view={view} />
+            <PriceFilteredEvents
+              events={allEvents}
+              view={view}
+              currentProfileId={currentProfileId}
+              savedEventIds={savedEventIds}
+            />
           </Suspense>
         </div>
       </section>
