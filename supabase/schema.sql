@@ -11,6 +11,7 @@ CREATE TABLE profiles (
   display_name TEXT,
   avatar_url TEXT,
   role TEXT DEFAULT 'user',  -- 'user' | 'admin'
+  ics_token TEXT UNIQUE,     -- Per-user token for ICS calendar feed subscription
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -169,6 +170,12 @@ CREATE TABLE events (
   llm_parsed BOOLEAN DEFAULT FALSE,
   quality_score REAL,
   content_flags TEXT[] DEFAULT '{}',
+  -- Geo (populated by Nominatim geocoding on venue normalization)
+  latitude DOUBLE PRECISION,
+  longitude DOUBLE PRECISION,
+  -- AI moderation audit trail
+  ai_approved_at TIMESTAMPTZ,
+  moderation_reason TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -240,6 +247,18 @@ CREATE TABLE venue_aliases (
   alias TEXT NOT NULL,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   UNIQUE(alias)
+);
+
+-- Canonical venue → lat/lng cache backing the map-based events discovery view.
+-- Populated by the Nominatim geocoder on ingestion (and a backfill script).
+CREATE TABLE venue_coordinates (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  canonical_name TEXT UNIQUE NOT NULL,
+  latitude DOUBLE PRECISION NOT NULL,
+  longitude DOUBLE PRECISION NOT NULL,
+  geocoded_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  source TEXT NOT NULL DEFAULT 'nominatim',  -- nominatim | manual
+  confidence REAL
 );
 
 CREATE TABLE dedup_matches (
@@ -787,7 +806,7 @@ CREATE POLICY "Admins can manage health logs"
 
 CREATE TABLE ingestion_activity_log (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  category TEXT NOT NULL,       -- event_created | event_enriched | source_error | source_recovered | group_quiet | run_summary
+  category TEXT NOT NULL,       -- event_created | event_enriched | event_moderation | source_error | source_recovered | group_quiet | run_summary
   severity TEXT NOT NULL DEFAULT 'info', -- info | warning | error
   title TEXT NOT NULL,          -- Short human-readable description
   details JSONB,                -- Structured metadata

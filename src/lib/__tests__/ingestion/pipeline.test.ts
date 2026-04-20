@@ -79,6 +79,12 @@ vi.mock("@/lib/ingestion/url-enricher", () => ({
   },
 }));
 
+// Mock AI moderation gate. Default: pass. Tests can override per-case.
+const mockModerateEvent = vi.fn().mockResolvedValue({ ok: true });
+vi.mock("@/lib/events/moderation", () => ({
+  moderateEvent: (...args: unknown[]) => mockModerateEvent(...args),
+}));
+
 // Mock utils
 vi.mock("@/lib/utils", () => ({
   slugify: (text: string) => text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""),
@@ -188,6 +194,7 @@ describe("runIngestion", () => {
     vi.clearAllMocks();
     mockValidateDate.mockImplementation(defaultDateValidator);
     mockEnrichFromSourceUrl.mockResolvedValue({ enrichedFields: [] });
+    mockModerateEvent.mockResolvedValue({ ok: true });
     setupDefaultMocks();
   });
 
@@ -277,6 +284,7 @@ describe("processRawMessage", () => {
     vi.clearAllMocks();
     mockValidateDate.mockImplementation(defaultDateValidator);
     mockEnrichFromSourceUrl.mockResolvedValue({ enrichedFields: [] });
+    mockModerateEvent.mockResolvedValue({ ok: true });
     setupDefaultMocks();
   });
 
@@ -616,6 +624,7 @@ describe("createEventFromParsed", () => {
     vi.clearAllMocks();
     mockValidateDate.mockImplementation(defaultDateValidator);
     mockEnrichFromSourceUrl.mockResolvedValue({ enrichedFields: [] });
+    mockModerateEvent.mockResolvedValue({ ok: true });
     setupDefaultMocks();
     mockFindDuplicates.mockResolvedValue([]);
     mockRecordDedupMatch.mockResolvedValue(undefined);
@@ -995,7 +1004,13 @@ describe("createEventFromParsed", () => {
     );
   });
 
-  it("stays pending when content flags include 'spam'", async () => {
+  it("rejects when the AI moderation gate flags spam", async () => {
+    mockModerateEvent.mockResolvedValueOnce({
+      ok: false,
+      flag: "spam",
+      reason: "Crypto promotion, not a community event.",
+    });
+
     const mockInsert = vi.fn().mockReturnValue(chain({ id: "evt-1" }));
     const mockUpdate = vi.fn().mockReturnValue({
       eq: vi.fn().mockResolvedValue({ error: null }),
@@ -1020,18 +1035,28 @@ describe("createEventFromParsed", () => {
       category: "Other",
       start_date: "2026-03-20",
       quality_score: 0.9,
-      content_flags: ["spam"],
+      content_flags: [],
     };
 
     const result = await createEventFromParsed("msg-1", parsed, "src-1", true);
     expect(result.status).toBe("created");
     expect(result.eventsAutoApproved).toBe(0);
     expect(mockInsert).toHaveBeenCalledWith(
-      expect.objectContaining({ status: "pending" })
+      expect.objectContaining({
+        status: "rejected",
+        moderation_reason: "Crypto promotion, not a community event.",
+        content_flags: expect.arrayContaining(["spam"]),
+      })
     );
   });
 
-  it("stays pending when content flags include 'inappropriate'", async () => {
+  it("rejects when the AI moderation gate flags inappropriate", async () => {
+    mockModerateEvent.mockResolvedValueOnce({
+      ok: false,
+      flag: "inappropriate",
+      reason: "Contains hate speech.",
+    });
+
     const mockInsert = vi.fn().mockReturnValue(chain({ id: "evt-1" }));
     const mockUpdate = vi.fn().mockReturnValue({
       eq: vi.fn().mockResolvedValue({ error: null }),
@@ -1056,14 +1081,14 @@ describe("createEventFromParsed", () => {
       category: "Other",
       start_date: "2026-03-20",
       quality_score: 0.9,
-      content_flags: ["inappropriate"],
+      content_flags: [],
     };
 
     const result = await createEventFromParsed("msg-1", parsed, "src-1", true);
     expect(result.status).toBe("created");
     expect(result.eventsAutoApproved).toBe(0);
     expect(mockInsert).toHaveBeenCalledWith(
-      expect.objectContaining({ status: "pending" })
+      expect.objectContaining({ status: "rejected" })
     );
   });
 

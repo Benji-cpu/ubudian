@@ -19,6 +19,7 @@ import { validateAndNormalizeDate } from "./date-validator";
 import { logHealthEvent } from "./health-utils";
 import { logActivity } from "./activity-log";
 import { enrichFromSourceUrl, applyEnrichment } from "./url-enricher";
+import { moderateEvent } from "@/lib/events/moderation";
 import type { IngestionRunResult, ParsedEvent, ProcessResult, RawMessage } from "./types";
 
 /**
@@ -641,13 +642,25 @@ export async function createEventFromParsed(
     slug = `${slug}-${Date.now().toString(36)}`;
   }
 
-  // Auto-approve by default; only hold back content flagged as spam or inappropriate.
-  // Feedback-driven blocking happens post-publish (see follow-ups in plan).
+  // AI moderation gate. Hard red flags → rejected; everything else publishes.
   const qualityScore = parsed.quality_score ?? 0;
   const contentFlags = parsed.content_flags ?? [];
-  const HARD_BLOCK_FLAGS = new Set(["spam", "inappropriate"]);
-  const hasHardBlock = contentFlags.some((f) => HARD_BLOCK_FLAGS.has(f));
-  const eventStatus: "pending" | "approved" = hasHardBlock ? "pending" : "approved";
+  const moderation = await moderateEvent({
+    title: parsed.title,
+    description: parsed.description || parsed.title,
+    organizer_name: parsed.organizer_name || null,
+    venue_name: parsed.venue_name || null,
+    source_url: parsed.source_url || null,
+    origin: "ingestion",
+    source_id: sourceId,
+  });
+
+  const eventStatus: "approved" | "rejected" = moderation.ok ? "approved" : "rejected";
+  const moderationReason = moderation.ok ? null : moderation.reason;
+  const aiApprovedAt = moderation.ok ? new Date().toISOString() : null;
+  const mergedFlags = moderation.ok
+    ? contentFlags
+    : Array.from(new Set([...contentFlags, moderation.flag]));
 
   // Insert the event
   const { data: newEvent, error: insertError } = await queryWithRetry(
@@ -683,7 +696,9 @@ export async function createEventFromParsed(
           raw_message_id: messageId,
           llm_parsed: llmParsed,
           quality_score: qualityScore || null,
-          content_flags: contentFlags,
+          content_flags: mergedFlags,
+          ai_approved_at: aiApprovedAt,
+          moderation_reason: moderationReason,
         })
         .select("id")
         .single(),
