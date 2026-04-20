@@ -94,32 +94,35 @@ export async function POST(request: Request) {
     const stripe = getStripe();
     const siteUrl = SITE_URL;
 
-    const session = await stripe.checkout.sessions.create({
-      mode: "payment",
-      currency: "usd",
-      customer_email: data.guest_email,
-      line_items: [
-        {
-          price_data: {
-            currency: "usd",
-            product_data: {
-              name: tour.title,
-              description: `${data.num_guests} guest${data.num_guests > 1 ? "s" : ""} — ${data.preferred_date}`,
+    const session = await stripe.checkout.sessions.create(
+      {
+        mode: "payment",
+        currency: "usd",
+        customer_email: data.guest_email,
+        line_items: [
+          {
+            price_data: {
+              currency: "usd",
+              product_data: {
+                name: tour.title,
+                description: `${data.num_guests} guest${data.num_guests > 1 ? "s" : ""} — ${data.preferred_date}`,
+              },
+              unit_amount: tour.price_per_person,
             },
-            unit_amount: tour.price_per_person,
+            quantity: data.num_guests,
           },
-          quantity: data.num_guests,
+        ],
+        metadata: {
+          booking_id: booking.id,
+          booking_reference: bookingReference,
+          tour_id: data.tour_id,
+          type: "tour_booking",
         },
-      ],
-      metadata: {
-        booking_id: booking.id,
-        booking_reference: bookingReference,
-        tour_id: data.tour_id,
-        type: "tour_booking",
+        success_url: `${siteUrl}/booking/success?ref=${bookingReference}`,
+        cancel_url: `${siteUrl}/booking/cancel?ref=${bookingReference}`,
       },
-      success_url: `${siteUrl}/booking/success?ref=${bookingReference}`,
-      cancel_url: `${siteUrl}/booking/cancel?ref=${bookingReference}`,
-    });
+      { idempotencyKey: `tour-checkout:${booking.id}` }
+    );
 
     // Update booking with Stripe session ID
     await supabaseAdmin

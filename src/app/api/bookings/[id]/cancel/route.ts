@@ -49,9 +49,10 @@ export async function POST(
     // If payment was made, initiate refund
     if (booking.stripe_payment_intent_id && booking.stripe_payment_status === "paid") {
       const stripe = getStripe();
-      await stripe.refunds.create({
-        payment_intent: booking.stripe_payment_intent_id,
-      });
+      await stripe.refunds.create(
+        { payment_intent: booking.stripe_payment_intent_id },
+        { idempotencyKey: `refund:${id}` }
+      );
 
       await supabaseAdmin
         .from("bookings")

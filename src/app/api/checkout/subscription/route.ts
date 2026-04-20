@@ -39,17 +39,20 @@ export async function POST(request: Request) {
     const stripe = getStripe();
     const siteUrl = SITE_URL;
 
-    const session = await stripe.checkout.sessions.create({
-      mode: "subscription",
-      customer: customerId,
-      line_items: [{ price: price_id, quantity: 1 }],
-      metadata: {
-        profile_id: user.id,
-        type: "subscription",
+    const session = await stripe.checkout.sessions.create(
+      {
+        mode: "subscription",
+        customer: customerId,
+        line_items: [{ price: price_id, quantity: 1 }],
+        metadata: {
+          profile_id: user.id,
+          type: "subscription",
+        },
+        success_url: `${siteUrl}/dashboard/membership?success=true`,
+        cancel_url: `${siteUrl}/membership?cancelled=true`,
       },
-      success_url: `${siteUrl}/dashboard/membership?success=true`,
-      cancel_url: `${siteUrl}/membership?cancelled=true`,
-    });
+      { idempotencyKey: `sub-checkout:${user.id}:${price_id}` }
+    );
 
     return NextResponse.json({ url: session.url });
   } catch (err) {
