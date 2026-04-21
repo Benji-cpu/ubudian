@@ -20,6 +20,7 @@ import { logHealthEvent } from "./health-utils";
 import { logActivity } from "./activity-log";
 import { enrichFromSourceUrl, applyEnrichment } from "./url-enricher";
 import { moderateEvent } from "@/lib/events/moderation";
+import { geocodeVenue } from "@/lib/geocoding";
 import type { IngestionRunResult, ParsedEvent, ProcessResult, RawMessage } from "./types";
 
 /**
@@ -588,6 +589,23 @@ export async function createEventFromParsed(
   // Normalize venue
   const normalizedVenue = await normalizeVenue(parsed.venue_name);
 
+  // Best-effort geocoding — populates lat/lng for the map view. Never throws:
+  // any failure just leaves the event without coordinates.
+  let latitude: number | null = null;
+  let longitude: number | null = null;
+  const venueForGeocode = normalizedVenue || parsed.venue_name;
+  if (venueForGeocode) {
+    try {
+      const geo = await geocodeVenue(venueForGeocode, parsed.venue_address);
+      if (geo) {
+        latitude = geo.latitude;
+        longitude = geo.longitude;
+      }
+    } catch (err) {
+      console.error("[pipeline] geocoding error:", err);
+    }
+  }
+
   // Generate fingerprint
   const fingerprint = await generateFingerprint({
     title: parsed.title,
@@ -699,6 +717,8 @@ export async function createEventFromParsed(
           content_flags: mergedFlags,
           ai_approved_at: aiApprovedAt,
           moderation_reason: moderationReason,
+          latitude,
+          longitude,
         })
         .select("id")
         .single(),

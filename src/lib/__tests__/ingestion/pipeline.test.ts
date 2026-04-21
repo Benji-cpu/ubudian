@@ -85,6 +85,11 @@ vi.mock("@/lib/events/moderation", () => ({
   moderateEvent: (...args: unknown[]) => mockModerateEvent(...args),
 }));
 
+// Mock geocoding — best-effort on the pipeline, so default returns null.
+vi.mock("@/lib/geocoding", () => ({
+  geocodeVenue: vi.fn().mockResolvedValue(null),
+}));
+
 // Mock utils
 vi.mock("@/lib/utils", () => ({
   slugify: (text: string) => text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""),

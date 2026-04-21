@@ -13,7 +13,7 @@ import { EventSortSelect } from "@/components/events/event-sort-select";
 import { EventFilters } from "@/components/events/event-filters";
 import { EventSearch } from "@/components/events/event-search";
 import { CategoryGuideLink } from "@/components/events/category-guide-link";
-import { EventsMapPlaceholder } from "@/components/events/events-map-placeholder";
+import { MapView } from "@/components/events/map-view";
 import type { ArchetypeId, Event, Experience, QuizResultRecord } from "@/types";
 
 export const metadata: Metadata = {
@@ -256,7 +256,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
             />
           </Suspense>
         ) : isMapView ? (
-          <EventsMapPlaceholder events={allEvents} />
+          <MapView events={allEvents} />
         ) : (
           <Suspense>
             <PriceFilteredEvents
