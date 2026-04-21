@@ -18,7 +18,46 @@ import { getAdapter } from "./source-adapter";
 import { validateAndNormalizeDate } from "./date-validator";
 import { logHealthEvent } from "./health-utils";
 import { logActivity } from "./activity-log";
+import { enrichFromSourceUrl, applyEnrichment } from "./url-enricher";
+import { moderateEvent } from "@/lib/events/moderation";
+import { geocodeVenue } from "@/lib/geocoding";
 import type { IngestionRunResult, ParsedEvent, ProcessResult, RawMessage } from "./types";
+
+/**
+ * Fill in missing image / price / description fields by scraping the source URL.
+ * Best-effort: never throws, never overwrites existing values.
+ */
+async function maybeEnrichParsedEvent(parsed: ParsedEvent, sourceId: string): Promise<void> {
+  if (!parsed.source_url) return;
+  const needsEnrichment =
+    !parsed.cover_image_url ||
+    !parsed.price_info ||
+    !parsed.short_description ||
+    !parsed.organizer_name ||
+    !parsed.venue_address ||
+    !parsed.external_ticket_url;
+  if (!needsEnrichment) return;
+
+  try {
+    const enrichment = await enrichFromSourceUrl(parsed.source_url, parsed);
+    if (enrichment.enrichedFields.length > 0) {
+      applyEnrichment(parsed, enrichment);
+      await logActivity({
+        category: "event_enriched",
+        title: `Enriched from source URL: ${enrichment.enrichedFields.join(", ")}`,
+        details: {
+          event_title: parsed.title,
+          source_url: parsed.source_url,
+          enriched_fields: enrichment.enrichedFields,
+        },
+        sourceId,
+      });
+    }
+  } catch (err) {
+    // Enrichment failures are never fatal
+    console.error("[pipeline] enrichment error:", err);
+  }
+}
 
 /**
  * Run the full ingestion pipeline for a given source.
@@ -544,8 +583,28 @@ export async function createEventFromParsed(
   );
   const category = validCategory || "Other";
 
+  // Best-effort enrichment from source URL (image, price, description, etc.)
+  await maybeEnrichParsedEvent(parsed, sourceId);
+
   // Normalize venue
   const normalizedVenue = await normalizeVenue(parsed.venue_name);
+
+  // Best-effort geocoding — populates lat/lng for the map view. Never throws:
+  // any failure just leaves the event without coordinates.
+  let latitude: number | null = null;
+  let longitude: number | null = null;
+  const venueForGeocode = normalizedVenue || parsed.venue_name;
+  if (venueForGeocode) {
+    try {
+      const geo = await geocodeVenue(venueForGeocode, parsed.venue_address);
+      if (geo) {
+        latitude = geo.latitude;
+        longitude = geo.longitude;
+      }
+    } catch (err) {
+      console.error("[pipeline] geocoding error:", err);
+    }
+  }
 
   // Generate fingerprint
   const fingerprint = await generateFingerprint({
@@ -601,18 +660,25 @@ export async function createEventFromParsed(
     slug = `${slug}-${Date.now().toString(36)}`;
   }
 
-  // Determine auto-approve eligibility
+  // AI moderation gate. Hard red flags → rejected; everything else publishes.
   const qualityScore = parsed.quality_score ?? 0;
   const contentFlags = parsed.content_flags ?? [];
-  let eventStatus: "pending" | "approved" = "pending";
+  const moderation = await moderateEvent({
+    title: parsed.title,
+    description: parsed.description || parsed.title,
+    organizer_name: parsed.organizer_name || null,
+    venue_name: parsed.venue_name || null,
+    source_url: parsed.source_url || null,
+    origin: "ingestion",
+    source_id: sourceId,
+  });
 
-  if (
-    sourceConfig._autoApproveEnabled &&
-    qualityScore >= ((sourceConfig._autoApproveThreshold as number) ?? 0.85) &&
-    contentFlags.length === 0
-  ) {
-    eventStatus = "approved";
-  }
+  const eventStatus: "approved" | "rejected" = moderation.ok ? "approved" : "rejected";
+  const moderationReason = moderation.ok ? null : moderation.reason;
+  const aiApprovedAt = moderation.ok ? new Date().toISOString() : null;
+  const mergedFlags = moderation.ok
+    ? contentFlags
+    : Array.from(new Set([...contentFlags, moderation.flag]));
 
   // Insert the event
   const { data: newEvent, error: insertError } = await queryWithRetry(
@@ -648,7 +714,11 @@ export async function createEventFromParsed(
           raw_message_id: messageId,
           llm_parsed: llmParsed,
           quality_score: qualityScore || null,
-          content_flags: contentFlags,
+          content_flags: mergedFlags,
+          ai_approved_at: aiApprovedAt,
+          moderation_reason: moderationReason,
+          latitude,
+          longitude,
         })
         .select("id")
         .single(),

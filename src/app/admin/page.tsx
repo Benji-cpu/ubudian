@@ -108,7 +108,7 @@ export default async function AdminDashboard() {
     created_at: string;
   }>;
 
-  const pendingEvents = (pendingEventsRes.data ?? []) as Array<{
+  const pendingEvents = (pendingEventsRes.data ?? []) as unknown as Array<{
     id: string;
     title: string;
     slug: string;

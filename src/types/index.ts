@@ -5,6 +5,7 @@ export interface Profile {
   avatar_url: string | null;
   role: "user" | "admin";
   stripe_customer_id: string | null;
+  ics_token: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -86,8 +87,24 @@ export interface Event {
   llm_parsed: boolean;
   quality_score: number | null;
   content_flags: string[];
+  // Geo (populated by venue geocoding)
+  latitude: number | null;
+  longitude: number | null;
+  // AI moderation audit
+  ai_approved_at: string | null;
+  moderation_reason: string | null;
   created_at: string;
   updated_at: string;
+}
+
+export interface VenueCoordinates {
+  id: string;
+  canonical_name: string;
+  latitude: number;
+  longitude: number;
+  geocoded_at: string;
+  source: "nominatim" | "manual";
+  confidence: number | null;
 }
 
 export interface Tour {
@@ -390,7 +407,7 @@ export interface UnresolvedVenue {
   resolved_by: string | null;
 }
 
-export type ActivityCategory = "event_created" | "source_error" | "source_recovered" | "group_quiet" | "run_summary";
+export type ActivityCategory = "event_created" | "event_enriched" | "event_moderation" | "source_error" | "source_recovered" | "group_quiet" | "run_summary";
 export type ActivitySeverity = "info" | "warning" | "error";
 
 export interface IngestionActivityLog {

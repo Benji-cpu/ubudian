@@ -1,19 +1,19 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import Link from "next/link";
-import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
 import { SITE_URL } from "@/lib/constants";
-import { formatEventDate, formatEventTime } from "@/lib/utils";
-import { CATEGORY_EMOJI } from "@/lib/constants";
 import { MarkdownContent } from "@/components/blog/markdown-content";
 import { ShareButtons } from "@/components/blog/share-buttons";
 import { EventJsonLd } from "@/components/events/event-json-ld";
 import { EventCard } from "@/components/events/event-card";
-import { Badge } from "@/components/ui/badge";
+import { EventHero } from "@/components/events/event-hero";
+import { EventMap } from "@/components/events/event-map";
+import { FacilitatorCard } from "@/components/events/facilitator-card";
+import { SaveEventButton } from "@/components/dashboard/save-event-button";
 import { Button } from "@/components/ui/button";
-import { MapPin, Clock, Calendar, ExternalLink, User } from "lucide-react";
+import { MapPin, ExternalLink, User } from "lucide-react";
 import { isSafeUrl } from "@/lib/url-validation";
+import { getCurrentProfile } from "@/lib/auth";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -22,7 +22,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import type { Event, Story } from "@/types";
+import type { Event } from "@/types";
 
 interface EventPageProps {
   params: Promise<{ slug: string }>;
@@ -64,7 +64,8 @@ export async function generateMetadata({ params }: EventPageProps): Promise<Meta
 export default async function EventPage({ params }: EventPageProps) {
   let e: Event;
   let related: Event[] = [];
-  let facilitatorStory: Story | null = null;
+  let currentProfileId: string | null = null;
+  let initiallySaved = false;
 
   try {
     const { slug } = await params;
@@ -83,6 +84,18 @@ export default async function EventPage({ params }: EventPageProps) {
 
     e = event as Event;
 
+    const profile = await getCurrentProfile();
+    if (profile) {
+      currentProfileId = profile.id;
+      const { data: saved } = await supabase
+        .from("saved_events")
+        .select("event_id")
+        .eq("profile_id", profile.id)
+        .eq("event_id", e.id)
+        .maybeSingle();
+      initiallySaved = !!saved;
+    }
+
     const { data: relatedEvents, error: relatedError } = await supabase
       .from("events")
       .select("*")
@@ -95,47 +108,27 @@ export default async function EventPage({ params }: EventPageProps) {
 
     if (relatedError) console.error("Related events query error:", relatedError);
     related = (relatedEvents ?? []) as Event[];
-
-    // Query for a story linked to this event's organizer
-    if (e.organizer_name) {
-      const { data: storyData, error: storyError } = await supabase
-        .from("stories")
-        .select("*")
-        .eq("status", "published")
-        .ilike("related_organizer_name", e.organizer_name)
-        .limit(1)
-        .single();
-
-      if (storyError && storyError.code !== "PGRST116") {
-        console.error("Facilitator story query error:", storyError);
-      }
-      facilitatorStory = storyData ? (storyData as Story) : null;
-    }
   } catch {
     notFound();
   }
 
   const eventUrl = `${SITE_URL}/events/${e.slug}`;
 
+  const saveButton = currentProfileId ? (
+    <SaveEventButton
+      eventId={e.id}
+      profileId={currentProfileId}
+      initialSaved={initiallySaved}
+    />
+  ) : null;
+
   return (
     <>
       <EventJsonLd event={e} />
 
-      <article>
-        {/* Cover Image */}
-        {e.cover_image_url && (
-          <div className="w-full">
-            <Image
-              src={e.cover_image_url}
-              alt={e.title}
-              width={0}
-              height={0}
-              priority
-              sizes="100vw"
-              className="h-auto max-h-[500px] w-full object-contain"
-            />
-          </div>
-        )}
+      <article className="pb-24 md:pb-0">
+        {/* Editorial hero */}
+        <EventHero event={e} saveButton={saveButton} />
 
         {/* Breadcrumbs */}
         <nav className="mx-auto max-w-3xl px-4 pt-6 sm:px-6">
@@ -156,80 +149,72 @@ export default async function EventPage({ params }: EventPageProps) {
           </Breadcrumb>
         </nav>
 
-        {/* Header */}
-        <header className="mx-auto max-w-3xl px-4 pt-6 sm:px-6">
-          <Badge variant="outline" className="mb-3">
-            {CATEGORY_EMOJI[e.category] || CATEGORY_EMOJI["Other"]} {e.category}
-          </Badge>
-          <h1 className="font-serif text-3xl font-bold tracking-tight text-brand-deep-green sm:text-4xl lg:text-5xl">
-            {e.title}
-          </h1>
-
-          {/* Event meta */}
-          <div className="mt-6 space-y-3">
-            <div className="flex items-center gap-2 text-foreground">
-              <Calendar className="h-5 w-5 text-brand-gold" />
-              <span className="font-medium">{formatEventDate(e.start_date, e.end_date)}</span>
-            </div>
-
-            {(e.start_time || e.end_time) && (
-              <div className="flex items-center gap-2 text-foreground">
-                <Clock className="h-5 w-5 text-brand-gold" />
-                <span>{formatEventTime(e.start_time, e.end_time)}</span>
-              </div>
-            )}
-
-            {e.venue_name && (
-              <div className="text-foreground">
-                <div className="flex items-center gap-2">
-                  <MapPin className="h-5 w-5 shrink-0 text-brand-gold" />
-                  <span>
-                    {e.venue_name}
-                    {e.venue_address && ` — ${e.venue_address}`}
-                  </span>
-                </div>
-                {e.venue_map_url && isSafeUrl(e.venue_map_url) && (
-                  <a
-                    href={e.venue_map_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="ml-7 mt-1 inline-block text-sm text-primary hover:underline"
-                  >
-                    View on Maps
-                  </a>
-                )}
-              </div>
-            )}
-
-            {e.price_info && (
-              <div className="text-lg font-semibold text-brand-terracotta">
-                {e.price_info}
-              </div>
-            )}
-          </div>
-
-          {/* Ticket button */}
-          {e.external_ticket_url && isSafeUrl(e.external_ticket_url) && (
-            <Button asChild className="mt-6" size="lg">
+        {/* Inline ticket CTA (desktop) */}
+        {e.external_ticket_url && isSafeUrl(e.external_ticket_url) && (
+          <div className="mx-auto mt-4 hidden max-w-3xl px-4 sm:px-6 md:block">
+            <Button asChild size="lg">
               <a href={e.external_ticket_url} target="_blank" rel="noopener noreferrer">
                 <ExternalLink className="mr-2 h-4 w-4" />
                 Get Tickets
               </a>
             </Button>
-          )}
-        </header>
+          </div>
+        )}
 
         {/* Description */}
         <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
           <MarkdownContent content={e.description} />
         </div>
 
+        {/* Facilitator card (renders nothing if no linked story) */}
+        <div className="mx-auto max-w-3xl px-4 sm:px-6">
+          <FacilitatorCard organizerName={e.organizer_name} />
+        </div>
+
+        {/* Location section (map + venue details) */}
+        <section className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
+          <h2 className="font-serif text-2xl font-semibold text-brand-deep-green">
+            Location
+          </h2>
+
+          {e.venue_name && (
+            <div className="mt-3 text-foreground">
+              <div className="flex items-start gap-2">
+                <MapPin className="mt-0.5 h-5 w-5 shrink-0 text-brand-gold" />
+                <div>
+                  <p className="font-medium">{e.venue_name}</p>
+                  {e.venue_address && (
+                    <p className="text-sm text-muted-foreground">{e.venue_address}</p>
+                  )}
+                  {e.venue_map_url && isSafeUrl(e.venue_map_url) && (
+                    <a
+                      href={e.venue_map_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-1 inline-block text-sm text-primary hover:underline"
+                    >
+                      View on Google Maps
+                    </a>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div className="mt-5">
+            <EventMap event={e} />
+          </div>
+        </section>
+
         {/* Organizer info */}
         {e.organizer_name && (
           <div className="mx-auto max-w-3xl border-t px-4 py-6 sm:px-6">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
               <User className="h-4 w-4" />
-              <span>Organized by <strong className="text-foreground">{e.organizer_name}</strong></span>
+              <span>
+                Organized by{" "}
+                <strong className="text-foreground">{e.organizer_name}</strong>
+              </span>
               {e.organizer_instagram && (
                 <a
                   href={`https://instagram.com/${e.organizer_instagram.replace("@", "")}`}
@@ -241,34 +226,6 @@ export default async function EventPage({ params }: EventPageProps) {
                 </a>
               )}
             </div>
-
-            {/* Meet the Facilitator */}
-            {facilitatorStory && (
-              <Link
-                href={`/stories/${facilitatorStory.slug}`}
-                className="mt-4 flex items-center gap-4 rounded-lg bg-brand-cream p-4 transition-shadow hover:shadow-md"
-              >
-                {facilitatorStory.photo_urls?.[0] && (
-                  <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-full">
-                    <Image
-                      src={facilitatorStory.photo_urls[0]}
-                      alt={facilitatorStory.subject_name}
-                      fill
-                      sizes="64px"
-                      className="object-cover"
-                    />
-                  </div>
-                )}
-                <div className="min-w-0">
-                  <p className="text-xs font-medium uppercase tracking-wide text-brand-gold">
-                    Meet the Facilitator
-                  </p>
-                  <p className="mt-0.5 font-serif text-sm font-medium text-brand-deep-green">
-                    Read {facilitatorStory.title} &rarr;
-                  </p>
-                </div>
-              </Link>
-            )}
           </div>
         )}
 
@@ -276,6 +233,18 @@ export default async function EventPage({ params }: EventPageProps) {
         <div className="mx-auto max-w-3xl border-t px-4 py-8 sm:px-6">
           <ShareButtons title={e.title} url={eventUrl} />
         </div>
+
+        {/* Sticky mobile ticket CTA */}
+        {e.external_ticket_url && isSafeUrl(e.external_ticket_url) && (
+          <div className="fixed inset-x-0 bottom-0 z-30 border-t border-brand-gold/20 bg-background/95 px-4 py-3 backdrop-blur-sm md:hidden">
+            <Button asChild className="w-full" size="lg">
+              <a href={e.external_ticket_url} target="_blank" rel="noopener noreferrer">
+                <ExternalLink className="mr-2 h-4 w-4" />
+                Get Tickets
+              </a>
+            </Button>
+          </div>
+        )}
 
         {/* Related Events */}
         {related.length > 0 && (
