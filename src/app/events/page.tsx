@@ -4,14 +4,17 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { queryWithRetry } from "@/lib/supabase/retry";
 import { getCurrentProfile } from "@/lib/auth";
+import { ARCHETYPES } from "@/lib/quiz-data";
 import { Button } from "@/components/ui/button";
+import { AgendaFeed } from "@/components/events/agenda-feed";
 import { PriceFilteredEvents } from "@/components/events/price-filtered-events";
 import { ViewSwitcher } from "@/components/events/view-switcher";
 import { EventSortSelect } from "@/components/events/event-sort-select";
 import { EventFilters } from "@/components/events/event-filters";
 import { EventSearch } from "@/components/events/event-search";
 import { CategoryGuideLink } from "@/components/events/category-guide-link";
-import type { Event, Experience } from "@/types";
+import { EventsMapPlaceholder } from "@/components/events/events-map-placeholder";
+import type { ArchetypeId, Event, Experience, QuizResultRecord } from "@/types";
 
 export const metadata: Metadata = {
   title: "Events in Ubud | The Ubudian",
@@ -49,23 +52,47 @@ interface EventsPageProps {
 
 export default async function EventsPage({ searchParams }: EventsPageProps) {
   const params = await searchParams;
-  const view = params.view || "list";
+  const view = params.view || "feed";
 
   let allEvents: Event[] = [];
   let categoryGuide: Experience | null = null;
   let currentProfileId: string | null = null;
   let savedEventIds: string[] = [];
+  let viewerArchetypes: ArchetypeId[] | null = null;
+  let archetypeLabel: string | null = null;
 
   try {
     const supabase = await createClient();
     const profile = await getCurrentProfile();
     if (profile) {
       currentProfileId = profile.id;
-      const { data: saved } = await supabase
-        .from("saved_events")
-        .select("event_id")
-        .eq("profile_id", profile.id);
-      savedEventIds = ((saved ?? []) as { event_id: string }[]).map((r) => r.event_id);
+
+      const [savedResult, quizResult] = await Promise.all([
+        supabase.from("saved_events").select("event_id").eq("profile_id", profile.id),
+        supabase
+          .from("quiz_results")
+          .select("primary_archetype, secondary_archetype")
+          .eq("profile_id", profile.id)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle(),
+      ]);
+
+      savedEventIds = ((savedResult.data ?? []) as { event_id: string }[]).map(
+        (r) => r.event_id
+      );
+
+      const quiz = quizResult.data as Pick<
+        QuizResultRecord,
+        "primary_archetype" | "secondary_archetype"
+      > | null;
+      if (quiz?.primary_archetype) {
+        viewerArchetypes = [
+          quiz.primary_archetype,
+          ...(quiz.secondary_archetype ? [quiz.secondary_archetype] : []),
+        ];
+        archetypeLabel = ARCHETYPES[quiz.primary_archetype]?.name ?? null;
+      }
     }
 
     // Fetch matching guide for the active category
@@ -82,7 +109,6 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
     }
 
     const { data: events, error } = await queryWithRetry(() => {
-      // Sort order
       const sortByNewest = params.sort === "newest";
       let query = supabase
         .from("events")
@@ -99,8 +125,8 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
         query = query
           .lte("start_date", today)
           .or(`end_date.gte.${today},end_date.is.null`);
-      } else if (view === "list" || view === "grid") {
-        // Only show future events in list/grid view (but include recurring events with past start dates)
+      } else if (view === "list" || view === "grid" || view === "feed") {
+        // Feed/list/grid: only show future events (include recurring past-start)
         query = query.or(`start_date.gte.${today},is_recurring.eq.true`);
       }
 
@@ -108,11 +134,9 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
         query = query.eq("category", params.category);
       }
 
-      // Date range filters (not used with "happening now")
       if (params.from && params.happening !== "true") {
         query = query.gte("start_date", params.from);
       }
-
       if (params.to && params.happening !== "true") {
         query = query.lte("start_date", params.to);
       }
@@ -124,7 +148,6 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
         );
       }
 
-      // Time of Day filter
       if (params.time === "morning") {
         query = query.or("start_time.is.null,start_time.lt.12:00:00");
       } else if (params.time === "afternoon") {
@@ -135,12 +158,10 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
         query = query.or("start_time.is.null,start_time.gte.17:00:00");
       }
 
-      // Venue search
       if (params.venue) {
         query = query.ilike("venue_name", `%${params.venue}%`);
       }
 
-      // Archetype filter
       if (params.archetype) {
         query = query.contains("archetype_tags", [params.archetype]);
       }
@@ -153,10 +174,13 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
     // Supabase unreachable — render with empty state
   }
 
+  const isFeedView = view === "feed";
+  const isMapView = view === "map";
+
   return (
     <div>
       {/* Hero */}
-      <section className="bg-brand-cream px-4 py-16 sm:py-20">
+      <section className="bg-brand-cream px-4 py-12 sm:py-16">
         <div className="mx-auto max-w-3xl text-center">
           <div className="mx-auto mb-6 h-px w-12 bg-brand-gold/40" />
           <h1 className="font-serif text-4xl font-medium tracking-tight text-brand-deep-green sm:text-5xl">
@@ -172,16 +196,18 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
         </div>
       </section>
 
-      {/* Controls & Content */}
-      <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+      {/* Controls */}
+      <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex items-center gap-2">
             <Suspense>
               <ViewSwitcher />
             </Suspense>
-            <Suspense>
-              <EventSortSelect />
-            </Suspense>
+            {!isFeedView && !isMapView && (
+              <Suspense>
+                <EventSortSelect />
+              </Suspense>
+            )}
           </div>
           <div className="w-full sm:max-w-xs">
             <Suspense>
@@ -195,10 +221,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
             <EventFilters />
           </Suspense>
           {params.category && categoryGuide && (
-            <CategoryGuideLink
-              category={params.category}
-              guide={categoryGuide}
-            />
+            <CategoryGuideLink category={params.category} guide={categoryGuide} />
           )}
         </div>
 
@@ -218,8 +241,23 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
             </Link>
           </div>
         )}
+      </section>
 
-        <div className="mt-8">
+      {/* Content */}
+      <section className="mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:px-8">
+        {isFeedView ? (
+          <Suspense>
+            <AgendaFeed
+              events={allEvents}
+              currentProfileId={currentProfileId}
+              savedEventIds={savedEventIds}
+              viewerArchetypes={viewerArchetypes}
+              archetypeLabel={archetypeLabel}
+            />
+          </Suspense>
+        ) : isMapView ? (
+          <EventsMapPlaceholder events={allEvents} />
+        ) : (
           <Suspense>
             <PriceFilteredEvents
               events={allEvents}
@@ -228,7 +266,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
               savedEventIds={savedEventIds}
             />
           </Suspense>
-        </div>
+        )}
       </section>
     </div>
   );

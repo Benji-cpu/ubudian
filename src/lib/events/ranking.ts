@@ -39,15 +39,22 @@ const DAY_MS = 24 * 60 * 60 * 1000;
  * declines gradually out to ~21 days, and is near zero for distant
  * or long-past events. Past events in the last day still carry a
  * small signal so "happening now" isn't zeroed.
+ *
+ * Comparison is done at day granularity so an event whose start_date
+ * is today scores as "today" regardless of the time of day.
  */
 export function timeComponent(startDate: string, now = new Date()): number {
-  const start = Date.parse(startDate);
-  if (Number.isNaN(start)) return 0;
-  const daysOut = (start - now.getTime()) / DAY_MS;
+  // Parse YYYY-MM-DD as a local calendar date, not UTC midnight.
+  const [y, m, d] = startDate.split("-").map(Number);
+  if (!y || !m || !d) return 0;
+  const startMidnight = new Date(y, m - 1, d).getTime();
 
-  // Events already past: tiny within last 24h, otherwise zero.
+  const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+  const daysOut = Math.round((startMidnight - todayMidnight) / DAY_MS);
+
+  // Already past (full day in the past): tiny if yesterday, zero otherwise.
   if (daysOut < -1) return 0;
-  if (daysOut < 0) return 0.5;
+  if (daysOut === -1) return 0.5;
 
   // Sweet spot 0–3 days: near 1.0.
   if (daysOut <= 3) return 1.0 - daysOut * 0.03;
