@@ -81,7 +81,7 @@ export const STORY_THEME_TAGS = [
 export const DASHBOARD_NAV_LINKS = [
   { label: "Overview", href: "/dashboard" },
   { label: "My Spirit", href: "/dashboard/archetype" },
-  { label: "My Events", href: "/dashboard/events" },
+  { label: "My Agenda", href: "/dashboard/events" },
   { label: "Membership", href: "/dashboard/membership" },
   { label: "Settings", href: "/dashboard/settings" },
 ] as const;
