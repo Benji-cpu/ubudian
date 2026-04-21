@@ -36,10 +36,10 @@ export function DedupComparison({ match, eventA, eventB }: DedupComparisonProps)
 
   const confidenceColor =
     match.confidence >= 0.8
-      ? "text-red-600"
+      ? "text-red-600 dark:text-red-400"
       : match.confidence >= 0.6
-        ? "text-yellow-600"
-        : "text-green-600";
+        ? "text-yellow-600 dark:text-yellow-400"
+        : "text-green-600 dark:text-green-400";
 
   return (
     <div className="space-y-4 rounded-lg border p-4">

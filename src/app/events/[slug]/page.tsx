@@ -236,7 +236,7 @@ export default async function EventPage({ params }: EventPageProps) {
 
         {/* Sticky mobile ticket CTA */}
         {e.external_ticket_url && isSafeUrl(e.external_ticket_url) && (
-          <div className="fixed inset-x-0 bottom-0 z-30 border-t border-brand-gold/20 bg-white/95 px-4 py-3 backdrop-blur-sm md:hidden">
+          <div className="fixed inset-x-0 bottom-0 z-30 border-t border-brand-gold/20 bg-background/95 px-4 py-3 backdrop-blur-sm md:hidden">
             <Button asChild className="w-full" size="lg">
               <a href={e.external_ticket_url} target="_blank" rel="noopener noreferrer">
                 <ExternalLink className="mr-2 h-4 w-4" />

@@ -51,13 +51,13 @@ export function QuizPrompt() {
             <p className="font-serif text-lg font-medium text-brand-gold">
               New to Ubud?
             </p>
-            <p className="mt-1 text-sm text-brand-cream/80">
+            <p className="mt-1 text-sm text-brand-off-white/80">
               Take 90 seconds to find your vibe.
             </p>
           </div>
           <button
             onClick={dismiss}
-            className="mt-0.5 rounded-md p-1 text-brand-cream/60 transition-colors hover:bg-white/10 hover:text-brand-cream"
+            className="mt-0.5 rounded-md p-1 text-brand-off-white/60 transition-colors hover:bg-white/10 hover:text-brand-off-white"
             aria-label="Dismiss"
           >
             <X className="h-4 w-4" />
@@ -67,13 +67,13 @@ export function QuizPrompt() {
           <Button
             asChild
             size="sm"
-            className="bg-brand-gold text-brand-deep-green hover:bg-brand-gold/90"
+            className="bg-brand-gold text-[#2C4A3E] hover:bg-brand-gold/90"
           >
             <Link href="/quiz">Find My Fit</Link>
           </Button>
           <button
             onClick={dismiss}
-            className="text-sm text-brand-cream/60 transition-colors hover:text-brand-cream"
+            className="text-sm text-brand-off-white/60 transition-colors hover:text-brand-off-white"
           >
             Maybe later
           </button>

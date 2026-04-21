@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useState } from "react";
+import { useTheme } from "next-themes";
 
 const MDEditor = dynamic(() => import("@uiw/react-md-editor"), { ssr: false });
 
@@ -19,6 +20,7 @@ export function RichTextEditor({
   height = 400,
 }: RichTextEditorProps) {
   const [mounted, setMounted] = useState(false);
+  const { resolvedTheme } = useTheme();
 
   // Ensure client-side only rendering
   if (!mounted) {
@@ -34,7 +36,7 @@ export function RichTextEditor({
   }
 
   return (
-    <div data-color-mode="light">
+    <div data-color-mode={resolvedTheme === "dark" ? "dark" : "light"}>
       <MDEditor
         value={value}
         onChange={(val) => onChange(val || "")}
