@@ -53,18 +53,20 @@ Return ONE of these flags, choosing the strongest that clearly applies:
 Be permissive. When in doubt, return "ok". Only flag content a reasonable moderator would reject.`;
 
 const RESPONSE_SCHEMA = {
-  type: SchemaType.OBJECT,
+  type: SchemaType.OBJECT as const,
   properties: {
     flag: {
-      type: SchemaType.STRING,
+      type: SchemaType.STRING as const,
       enum: ["ok", "spam", "inappropriate", "misleading", "off_topic"],
+      format: "enum" as const,
+      description: "Moderation decision.",
     },
     reason: {
-      type: SchemaType.STRING,
+      type: SchemaType.STRING as const,
       description: "One short sentence explaining the decision. For 'ok', summarize briefly.",
     },
     confidence: {
-      type: SchemaType.NUMBER,
+      type: SchemaType.NUMBER as const,
       description: "0–1, how confident the moderator is. Only reject when >= 0.7.",
     },
   },
