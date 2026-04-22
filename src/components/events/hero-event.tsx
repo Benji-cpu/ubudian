@@ -48,7 +48,7 @@ export function HeroEvent({ event, saveButton }: HeroEventProps) {
               </Badge>
             </div>
             {saveButton && (
-              <div className="absolute right-4 top-4 rounded-full bg-white/90 backdrop-blur-sm">
+              <div className="absolute right-4 top-4 rounded-full bg-background/90 backdrop-blur-sm">
                 {saveButton}
               </div>
             )}

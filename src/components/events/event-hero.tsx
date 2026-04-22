@@ -50,7 +50,7 @@ export function EventHero({ event, saveButton }: EventHeroProps) {
 
         {/* Top-right save button */}
         {saveButton && (
-          <div className="absolute right-4 top-4 rounded-full bg-white/90 shadow-sm backdrop-blur-sm sm:right-6 sm:top-6">
+          <div className="absolute right-4 top-4 rounded-full bg-background/90 shadow-sm backdrop-blur-sm sm:right-6 sm:top-6">
             {saveButton}
           </div>
         )}
@@ -83,7 +83,7 @@ export function EventHero({ event, saveButton }: EventHeroProps) {
 
       {/* Mobile-only: title & meta stacked under the image */}
       <div className="bg-brand-cream/40 px-4 py-6 md:hidden">
-        <h1 className="font-serif text-3xl font-semibold leading-[1.15] tracking-tight text-brand-deep-green sm:text-4xl">
+        <h1 className="font-serif text-3xl font-semibold leading-[1.15] tracking-tight text-brand-deep-green dark:text-foreground sm:text-4xl">
           {event.title}
         </h1>
         <div className="mt-4 flex flex-wrap items-center gap-2">
@@ -120,8 +120,8 @@ function Chip({
     "inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium backdrop-blur-sm";
 
   const styles: Record<typeof variant, string> = {
-    default: "bg-white/95 text-brand-deep-green shadow-sm",
-    light: "bg-white text-brand-deep-green ring-1 ring-brand-gold/20",
+    default: "bg-card text-foreground shadow-sm",
+    light: "bg-card text-foreground ring-1 ring-brand-gold/20",
     price: "bg-brand-terracotta text-white shadow-sm",
     "price-light": "bg-brand-terracotta/10 text-brand-terracotta ring-1 ring-brand-terracotta/20",
   };

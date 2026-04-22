@@ -44,18 +44,18 @@ function getSourceEmoji(sourceType: string | undefined): string {
 
 function getCategoryColor(category: string): string {
   const colors: Record<string, string> = {
-    yoga: "bg-green-100 text-green-700 border-green-200",
-    dance: "bg-pink-100 text-pink-700 border-pink-200",
-    music: "bg-purple-100 text-purple-700 border-purple-200",
-    wellness: "bg-teal-100 text-teal-700 border-teal-200",
-    food: "bg-orange-100 text-orange-700 border-orange-200",
-    art: "bg-indigo-100 text-indigo-700 border-indigo-200",
-    ceremony: "bg-amber-100 text-amber-700 border-amber-200",
-    community: "bg-blue-100 text-blue-700 border-blue-200",
-    workshop: "bg-cyan-100 text-cyan-700 border-cyan-200",
-    market: "bg-lime-100 text-lime-700 border-lime-200",
+    yoga: "bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-200 dark:border-green-800",
+    dance: "bg-pink-100 text-pink-700 border-pink-200 dark:bg-pink-900/30 dark:text-pink-200 dark:border-pink-800",
+    music: "bg-purple-100 text-purple-700 border-purple-200 dark:bg-purple-900/30 dark:text-purple-200 dark:border-purple-800",
+    wellness: "bg-teal-100 text-teal-700 border-teal-200 dark:bg-teal-900/30 dark:text-teal-200 dark:border-teal-800",
+    food: "bg-orange-100 text-orange-700 border-orange-200 dark:bg-orange-900/30 dark:text-orange-200 dark:border-orange-800",
+    art: "bg-indigo-100 text-indigo-700 border-indigo-200 dark:bg-indigo-900/30 dark:text-indigo-200 dark:border-indigo-800",
+    ceremony: "bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-200 dark:border-amber-800",
+    community: "bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-200 dark:border-blue-800",
+    workshop: "bg-cyan-100 text-cyan-700 border-cyan-200 dark:bg-cyan-900/30 dark:text-cyan-200 dark:border-cyan-800",
+    market: "bg-lime-100 text-lime-700 border-lime-200 dark:bg-lime-900/30 dark:text-lime-200 dark:border-lime-800",
   };
-  return colors[category.toLowerCase()] || "bg-gray-100 text-gray-700 border-gray-200";
+  return colors[category.toLowerCase()] || "bg-gray-100 text-gray-700 border-gray-200 dark:bg-muted dark:text-muted-foreground dark:border-border";
 }
 
 export function PendingQueue({ events }: PendingQueueProps) {

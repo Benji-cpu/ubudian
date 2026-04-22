@@ -40,10 +40,10 @@ const LOG_TYPE_CONFIG: Record<
 };
 
 const CHANNEL_COLORS: Record<string, string> = {
-  telegram: "bg-blue-100 text-blue-700 border-blue-200",
-  whatsapp: "bg-green-100 text-green-700 border-green-200",
-  megatix: "bg-purple-100 text-purple-700 border-purple-200",
-  system: "bg-gray-100 text-gray-700 border-gray-200",
+  telegram: "bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-200 dark:border-blue-800",
+  whatsapp: "bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-200 dark:border-green-800",
+  megatix: "bg-purple-100 text-purple-700 border-purple-200 dark:bg-purple-900/30 dark:text-purple-200 dark:border-purple-800",
+  system: "bg-gray-100 text-gray-700 border-gray-200 dark:bg-muted dark:text-muted-foreground dark:border-border",
 };
 
 export function HealthLog({ logs }: HealthLogProps) {

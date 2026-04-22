@@ -27,7 +27,7 @@ export function CopyIcsUrl({ url }: CopyIcsUrlProps) {
         readOnly
         value={url}
         onFocus={(e) => e.currentTarget.select()}
-        className="flex-1 rounded-md border border-brand-gold/20 bg-white px-3 py-2 font-mono text-xs text-muted-foreground"
+        className="flex-1 rounded-md border border-brand-gold/20 bg-card px-3 py-2 font-mono text-xs text-muted-foreground"
         aria-label="ICS calendar URL"
       />
       <Button

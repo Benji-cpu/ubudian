@@ -45,10 +45,10 @@ export async function FacilitatorCard({ organizerName }: FacilitatorCardProps) {
       </p>
       <Link
         href={`/stories/${story.slug}`}
-        className="mt-3 flex items-center gap-4 rounded-lg transition-colors hover:bg-white/60"
+        className="mt-3 flex items-center gap-4 rounded-lg transition-colors hover:bg-muted/60"
       >
         {portrait ? (
-          <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-full ring-2 ring-white">
+          <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-full ring-2 ring-border">
             <Image
               src={portrait}
               alt={story.subject_name}
@@ -58,7 +58,7 @@ export async function FacilitatorCard({ organizerName }: FacilitatorCardProps) {
             />
           </div>
         ) : (
-          <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-brand-deep-green/10 font-serif text-xl text-brand-deep-green ring-2 ring-white">
+          <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-brand-deep-green/10 font-serif text-xl text-brand-deep-green ring-2 ring-border">
             {story.subject_name?.charAt(0) ?? "?"}
           </div>
         )}
