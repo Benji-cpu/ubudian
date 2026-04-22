@@ -1,5 +1,9 @@
 import { describe, it, expect, vi } from "vitest";
-import { enrichFromSourceUrl, applyEnrichment } from "@/lib/ingestion/url-enricher";
+import {
+  enrichFromSourceUrl,
+  enrichFromUrls,
+  applyEnrichment,
+} from "@/lib/ingestion/url-enricher";
 import type { ParsedEvent } from "@/lib/ingestion/types";
 
 function htmlPage(body: string): string {
@@ -163,6 +167,130 @@ describe("enrichFromSourceUrl", () => {
       { fetchPageImpl: makeFetcher(html) }
     );
     expect(r.enrichedFields).toEqual([]);
+  });
+});
+
+describe("DOM image fallback", () => {
+  function fullPage(bodyHtml: string): string {
+    return `<!doctype html><html><head></head><body>${bodyHtml}</body></html>`;
+  }
+
+  it("picks a large content image from <main> when OG/JSON-LD are absent", async () => {
+    const html = fullPage(`
+      <header><img src="/logo.png" width="40" height="40"></header>
+      <main>
+        <img src="https://cdn.example.com/cover.jpg" width="800" height="450">
+      </main>
+    `);
+    const r = await enrichFromSourceUrl(
+      "https://example.com/event",
+      {},
+      { fetchPageImpl: makeFetcher(html) }
+    );
+    expect(r.cover_image_url).toBe("https://cdn.example.com/cover.jpg");
+  });
+
+  it("skips icons, logos, and small images", async () => {
+    const html = fullPage(`
+      <img src="https://cdn.example.com/logo.png" width="800" height="400">
+      <img src="https://cdn.example.com/small.jpg" width="100" height="80">
+      <img src="https://cdn.example.com/favicon.ico" width="32" height="32">
+      <main>
+        <img src="https://cdn.example.com/real-cover.jpg" width="600" height="400">
+      </main>
+    `);
+    const r = await enrichFromSourceUrl(
+      "https://example.com/event",
+      {},
+      { fetchPageImpl: makeFetcher(html) }
+    );
+    expect(r.cover_image_url).toBe("https://cdn.example.com/real-cover.jpg");
+  });
+
+  it("resolves relative image URLs against the page URL", async () => {
+    const html = fullPage(`<main><img src="/uploads/poster.jpg" width="800" height="450"></main>`);
+    const r = await enrichFromSourceUrl(
+      "https://example.com/events/abc",
+      {},
+      { fetchPageImpl: makeFetcher(html) }
+    );
+    expect(r.cover_image_url).toBe("https://example.com/uploads/poster.jpg");
+  });
+
+  it("does not use DOM fallback when OG image is present", async () => {
+    const html = `<!doctype html><html><head>
+      <meta property="og:image" content="https://cdn.example.com/og.jpg">
+    </head><body><main>
+      <img src="https://cdn.example.com/body.jpg" width="800" height="450">
+    </main></body></html>`;
+    const r = await enrichFromSourceUrl(
+      "https://example.com/event",
+      {},
+      { fetchPageImpl: makeFetcher(html) }
+    );
+    expect(r.cover_image_url).toBe("https://cdn.example.com/og.jpg");
+  });
+
+  it("extracts media.megatix.* image from a megatix.co.id page", async () => {
+    const html = fullPage(`
+      <header><img src="https://static.megatix.co.id/logo.png" width="120" height="30"></header>
+      <main>
+        <img src="https://media.megatix.com.au/e/65468/a8SJltcdsfzct3J5ts7mjUmueE4yLKtcvESWd5dE.png" width="1200" height="630">
+      </main>
+    `);
+    const r = await enrichFromSourceUrl(
+      "https://megatix.co.id/events/experience-clarity-breathwork-APRIL",
+      {},
+      { fetchPageImpl: makeFetcher(html) }
+    );
+    expect(r.cover_image_url).toBe(
+      "https://media.megatix.com.au/e/65468/a8SJltcdsfzct3J5ts7mjUmueE4yLKtcvESWd5dE.png"
+    );
+  });
+});
+
+describe("enrichFromUrls", () => {
+  it("returns empty when no candidates are valid", async () => {
+    const r = await enrichFromUrls([null, undefined, "", "   "], {});
+    expect(r.enrichedFields).toEqual([]);
+  });
+
+  it("tries the second candidate when the first returns nothing", async () => {
+    const fetchPageImpl = vi
+      .fn()
+      .mockResolvedValueOnce(htmlPage(`<title>nothing</title>`))
+      .mockResolvedValueOnce(
+        htmlPage(`<meta property="og:image" content="https://cdn.example.com/b.jpg">`)
+      );
+    const r = await enrichFromUrls(
+      ["https://a.com/", "https://b.com/"],
+      {},
+      { fetchPageImpl }
+    );
+    expect(r.cover_image_url).toBe("https://cdn.example.com/b.jpg");
+    expect(fetchPageImpl).toHaveBeenCalledTimes(2);
+  });
+
+  it("stops after finding cover_image_url", async () => {
+    const fetchPageImpl = vi
+      .fn()
+      .mockResolvedValueOnce(
+        htmlPage(`<meta property="og:image" content="https://cdn.example.com/a.jpg">`)
+      )
+      .mockResolvedValueOnce(htmlPage(`<title>should not be fetched</title>`));
+    const r = await enrichFromUrls(
+      ["https://a.com/", "https://b.com/"],
+      {},
+      { fetchPageImpl }
+    );
+    expect(r.cover_image_url).toBe("https://cdn.example.com/a.jpg");
+    expect(fetchPageImpl).toHaveBeenCalledTimes(1);
+  });
+
+  it("deduplicates identical candidate URLs", async () => {
+    const fetchPageImpl = vi.fn().mockResolvedValue(htmlPage(`<title>x</title>`));
+    await enrichFromUrls(["https://a.com/", "https://a.com/"], {}, { fetchPageImpl });
+    expect(fetchPageImpl).toHaveBeenCalledTimes(1);
   });
 });
 

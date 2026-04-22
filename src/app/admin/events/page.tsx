@@ -17,6 +17,7 @@ import { Plus, Calendar, ShieldCheck, Bot, ImageIcon, DollarSign, FileText, MapP
 import { MobileCardField } from "@/components/admin/mobile-card-field";
 import type { Event, EventSource } from "@/types";
 import { DeleteEventButton } from "./delete-button";
+import { BackfillImagesButton } from "@/components/admin/backfill-images-button";
 
 interface TrustedSubmitter {
   email: string;
@@ -305,12 +306,15 @@ export default async function AdminEventsPage() {
     <div>
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Events</h1>
-        <Button asChild>
-          <Link href="/admin/events/new">
-            <Plus className="mr-2 h-4 w-4" />
-            New Event
-          </Link>
-        </Button>
+        <div className="flex items-center gap-2">
+          <BackfillImagesButton />
+          <Button asChild>
+            <Link href="/admin/events/new">
+              <Plus className="mr-2 h-4 w-4" />
+              New Event
+            </Link>
+          </Button>
+        </div>
       </div>
 
       <div className="mt-6">

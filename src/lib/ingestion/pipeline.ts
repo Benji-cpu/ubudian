@@ -18,7 +18,7 @@ import { getAdapter } from "./source-adapter";
 import { validateAndNormalizeDate } from "./date-validator";
 import { logHealthEvent } from "./health-utils";
 import { logActivity } from "./activity-log";
-import { enrichFromSourceUrl, applyEnrichment } from "./url-enricher";
+import { enrichFromUrls, applyEnrichment } from "./url-enricher";
 import { moderateEvent } from "@/lib/events/moderation";
 import { geocodeVenue } from "@/lib/geocoding";
 import type { IngestionRunResult, ParsedEvent, ProcessResult, RawMessage } from "./types";
@@ -28,7 +28,11 @@ import type { IngestionRunResult, ParsedEvent, ProcessResult, RawMessage } from 
  * Best-effort: never throws, never overwrites existing values.
  */
 async function maybeEnrichParsedEvent(parsed: ParsedEvent, sourceId: string): Promise<void> {
-  if (!parsed.source_url) return;
+  const candidates = [parsed.source_url, parsed.external_ticket_url].filter(
+    (u): u is string => typeof u === "string" && u.length > 0
+  );
+  if (candidates.length === 0) return;
+
   const needsEnrichment =
     !parsed.cover_image_url ||
     !parsed.price_info ||
@@ -39,15 +43,15 @@ async function maybeEnrichParsedEvent(parsed: ParsedEvent, sourceId: string): Pr
   if (!needsEnrichment) return;
 
   try {
-    const enrichment = await enrichFromSourceUrl(parsed.source_url, parsed);
+    const enrichment = await enrichFromUrls(candidates, parsed);
     if (enrichment.enrichedFields.length > 0) {
       applyEnrichment(parsed, enrichment);
       await logActivity({
         category: "event_enriched",
-        title: `Enriched from source URL: ${enrichment.enrichedFields.join(", ")}`,
+        title: `Enriched from URL: ${enrichment.enrichedFields.join(", ")}`,
         details: {
           event_title: parsed.title,
-          source_url: parsed.source_url,
+          candidate_urls: candidates,
           enriched_fields: enrichment.enrichedFields,
         },
         sourceId,

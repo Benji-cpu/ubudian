@@ -69,9 +69,9 @@ vi.mock("@/lib/ingestion/source-adapter", () => ({
 }));
 
 // Mock URL enricher
-const mockEnrichFromSourceUrl = vi.fn().mockResolvedValue({ enrichedFields: [] });
+const mockEnrichFromUrls = vi.fn().mockResolvedValue({ enrichedFields: [] });
 vi.mock("@/lib/ingestion/url-enricher", () => ({
-  enrichFromSourceUrl: (...args: unknown[]) => mockEnrichFromSourceUrl(...args),
+  enrichFromUrls: (...args: unknown[]) => mockEnrichFromUrls(...args),
   applyEnrichment: (parsed: Record<string, unknown>, enrichment: { enrichedFields: string[] } & Record<string, unknown>) => {
     for (const k of enrichment.enrichedFields) {
       if (typeof enrichment[k] === "string") parsed[k] = enrichment[k];
@@ -198,7 +198,7 @@ describe("runIngestion", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockValidateDate.mockImplementation(defaultDateValidator);
-    mockEnrichFromSourceUrl.mockResolvedValue({ enrichedFields: [] });
+    mockEnrichFromUrls.mockResolvedValue({ enrichedFields: [] });
     mockModerateEvent.mockResolvedValue({ ok: true });
     setupDefaultMocks();
   });
@@ -288,7 +288,7 @@ describe("processRawMessage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockValidateDate.mockImplementation(defaultDateValidator);
-    mockEnrichFromSourceUrl.mockResolvedValue({ enrichedFields: [] });
+    mockEnrichFromUrls.mockResolvedValue({ enrichedFields: [] });
     mockModerateEvent.mockResolvedValue({ ok: true });
     setupDefaultMocks();
   });
@@ -628,7 +628,7 @@ describe("createEventFromParsed", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockValidateDate.mockImplementation(defaultDateValidator);
-    mockEnrichFromSourceUrl.mockResolvedValue({ enrichedFields: [] });
+    mockEnrichFromUrls.mockResolvedValue({ enrichedFields: [] });
     mockModerateEvent.mockResolvedValue({ ok: true });
     setupDefaultMocks();
     mockFindDuplicates.mockResolvedValue([]);
@@ -647,9 +647,9 @@ describe("createEventFromParsed", () => {
         // cover_image_url is missing → enrichment should fire
       };
       await createEventFromParsed("msg-1", parsed, "src-1", true);
-      expect(mockEnrichFromSourceUrl).toHaveBeenCalledTimes(1);
-      expect(mockEnrichFromSourceUrl).toHaveBeenCalledWith(
-        "https://example.com/event",
+      expect(mockEnrichFromUrls).toHaveBeenCalledTimes(1);
+      expect(mockEnrichFromUrls).toHaveBeenCalledWith(
+        ["https://example.com/event"],
         expect.objectContaining({ source_url: "https://example.com/event" })
       );
     });
@@ -662,7 +662,7 @@ describe("createEventFromParsed", () => {
         start_date: "2026-03-20",
       };
       await createEventFromParsed("msg-1", parsed, "src-1", true);
-      expect(mockEnrichFromSourceUrl).not.toHaveBeenCalled();
+      expect(mockEnrichFromUrls).not.toHaveBeenCalled();
     });
 
     it("skips enrichment when all enrichable fields already present", async () => {
@@ -681,11 +681,11 @@ describe("createEventFromParsed", () => {
         source_url: "https://example.com/event",
       };
       await createEventFromParsed("msg-1", parsed, "src-1", true);
-      expect(mockEnrichFromSourceUrl).not.toHaveBeenCalled();
+      expect(mockEnrichFromUrls).not.toHaveBeenCalled();
     });
 
     it("never crashes the pipeline when enrichment throws", async () => {
-      mockEnrichFromSourceUrl.mockRejectedValue(new Error("boom"));
+      mockEnrichFromUrls.mockRejectedValue(new Error("boom"));
       const parsed: ParsedEvent = {
         title: "Sunset Yoga",
         description: "x",

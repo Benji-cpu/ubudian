@@ -11,6 +11,7 @@ import { EVENT_CATEGORIES } from "@/lib/constants";
 import { safeUrlOrEmpty } from "@/lib/url-validation";
 import { RichTextEditor } from "@/components/admin/rich-text-editor";
 import { ImageUploader } from "@/components/admin/image-uploader";
+import { RefetchImageButton } from "@/components/admin/refetch-image-button";
 import { TagInput } from "@/components/admin/tag-input";
 import { ARCHETYPE_IDS } from "@/lib/quiz-data";
 import { DatePicker } from "@/components/admin/date-picker";
@@ -453,6 +454,16 @@ export function EventForm({ initialData }: EventFormProps) {
                   <FormControl>
                     <ImageUploader folder="events" value={field.value} onChange={field.onChange} />
                   </FormControl>
+                  {isEditMode &&
+                    (initialData?.source_url || initialData?.external_ticket_url) && (
+                      <div className="pt-1">
+                        <RefetchImageButton
+                          eventId={initialData!.id}
+                          onUpdated={(url) => field.onChange(url)}
+                          disabled={saving}
+                        />
+                      </div>
+                    )}
                   <FormMessage />
                 </FormItem>
               )}

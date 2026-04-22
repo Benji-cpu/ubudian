@@ -11,7 +11,7 @@ import { registerAdapter } from "../source-adapter";
 /**
  * Extract file URL from Telegram Bot API using getFile endpoint.
  */
-async function getTelegramFileUrl(fileId: string): Promise<string | null> {
+export async function getTelegramFileUrl(fileId: string): Promise<string | null> {
   const token = process.env.TELEGRAM_BOT_TOKEN;
   if (!token) return null;
 

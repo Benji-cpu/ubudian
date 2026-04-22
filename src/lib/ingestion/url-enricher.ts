@@ -81,11 +81,11 @@ export async function enrichFromSourceUrl(
     result.enrichedFields.push(key as string);
   };
 
-  fillIfMissing(
-    "cover_image_url",
-    existing.cover_image_url,
-    pickFirst(jsonLd?.image, meta.ogImage, meta.twitterImage)
-  );
+  const imageCandidate =
+    pickFirst(jsonLd?.image, meta.ogImage, meta.twitterImage) ??
+    extractImageFromHtml($, url);
+
+  fillIfMissing("cover_image_url", existing.cover_image_url, imageCandidate);
 
   fillIfMissing(
     "short_description",
@@ -302,4 +302,134 @@ function pickFirst(...values: Array<string | undefined>): string | undefined {
     if (typeof v === "string" && v.trim().length > 0) return v;
   }
   return undefined;
+}
+
+/**
+ * Try each candidate URL in order; merge enrichment results.
+ * Stops iterating once `cover_image_url` has been filled.
+ * Other fields keep accumulating across candidates.
+ */
+export async function enrichFromUrls(
+  candidates: Array<string | null | undefined>,
+  existing: EnrichmentInput,
+  options: { fetchPageImpl?: typeof fetchPage } = {}
+): Promise<EnrichmentResult> {
+  const merged: EnrichmentResult = { enrichedFields: [] };
+  const accumulated: EnrichmentInput = { ...existing };
+
+  const seen = new Set<string>();
+  for (const raw of candidates) {
+    if (!raw) continue;
+    const url = raw.trim();
+    if (!url || seen.has(url)) continue;
+    seen.add(url);
+
+    const r = await enrichFromSourceUrl(url, accumulated, options);
+    for (const key of r.enrichedFields) {
+      const value = (r as unknown as Record<string, unknown>)[key];
+      if (typeof value === "string" && value.length > 0) {
+        (merged as unknown as Record<string, unknown>)[key] = value;
+        (accumulated as unknown as Record<string, unknown>)[key] = value;
+        if (!merged.enrichedFields.includes(key)) merged.enrichedFields.push(key);
+      }
+    }
+
+    if (merged.cover_image_url) break;
+  }
+
+  return merged;
+}
+
+/**
+ * DOM-based image fallback when OG/JSON-LD yield nothing.
+ * Picks a plausible cover image from <img> tags, preferring larger,
+ * content-region, non-icon images. Site-specific branches go first.
+ */
+export function extractImageFromHtml(
+  $: cheerio.CheerioAPI,
+  pageUrl: string
+): string | undefined {
+  let host = "";
+  try {
+    host = new URL(pageUrl).hostname.toLowerCase();
+  } catch {
+    host = "";
+  }
+
+  const siteSpecific = extractSiteSpecificImage($, host);
+  if (siteSpecific) return resolveUrl(siteSpecific, pageUrl);
+
+  const generic = extractGenericContentImage($);
+  return generic ? resolveUrl(generic, pageUrl) : undefined;
+}
+
+function extractSiteSpecificImage(
+  $: cheerio.CheerioAPI,
+  host: string
+): string | undefined {
+  if (host.endsWith("megatix.co.id") || host.endsWith("megatix.com.au")) {
+    // Megatix pages embed cover images under media.megatix.{com.au,co.id}
+    const img = $('img[src*="media.megatix."]')
+      .filter((_, el) => !isLikelyIcon($(el).attr("src")))
+      .first()
+      .attr("src");
+    if (img) return img;
+  }
+  return undefined;
+}
+
+function extractGenericContentImage($: cheerio.CheerioAPI): string | undefined {
+  const containers = ["main img", '[role="main"] img', "article img"];
+  for (const sel of containers) {
+    const hit = pickBestImg($, $(sel));
+    if (hit) return hit;
+  }
+  return pickBestImg($, $("img"));
+}
+
+function pickBestImg(
+  $: cheerio.CheerioAPI,
+  selection: cheerio.Cheerio<import("domhandler").AnyNode>
+): string | undefined {
+  let best: { src: string; area: number } | undefined;
+
+  selection.each((_, el) => {
+    const $el = $(el);
+    const src = $el.attr("src") || $el.attr("data-src") || $el.attr("data-lazy-src");
+    if (!src) return;
+    if (isLikelyIcon(src)) return;
+    if (/^data:/i.test(src)) return;
+    if (/\.svg(\?|$)/i.test(src)) return;
+
+    const w = Number($el.attr("width")) || 0;
+    const h = Number($el.attr("height")) || 0;
+    if ((w && w < 200) || (h && h < 200)) return;
+
+    const area = w * h || 1;
+    if (!best || area > best.area) {
+      best = { src, area };
+    }
+  });
+
+  return best?.src;
+}
+
+function isLikelyIcon(src: string | undefined): boolean {
+  if (!src) return true;
+  const lower = src.toLowerCase();
+  return (
+    lower.includes("logo") ||
+    lower.includes("icon") ||
+    lower.includes("favicon") ||
+    lower.includes("sprite") ||
+    lower.includes("avatar")
+  );
+}
+
+function resolveUrl(candidate: string, pageUrl: string): string | undefined {
+  try {
+    return new URL(candidate, pageUrl).toString();
+  } catch {
+    return undefined;
+  }
 }
