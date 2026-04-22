@@ -10,6 +10,7 @@ import { ShareButtons } from "@/components/blog/share-buttons";
 import { NewsletterSignup } from "@/components/layout/newsletter-signup";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { getSiteSettings } from "@/lib/site-settings";
 import type { NewsletterEdition } from "@/types";
 
 interface EditionPageProps {
@@ -44,6 +45,9 @@ export async function generateMetadata({ params }: EditionPageProps): Promise<Me
 }
 
 export default async function EditionPage({ params }: EditionPageProps) {
+  const settings = await getSiteSettings();
+  if (!settings.newsletter_archive_enabled) notFound();
+
   let e: NewsletterEdition;
   let prevEdition: { slug: string; subject: string } | null = null;
   let nextEdition: { slug: string; subject: string } | null = null;

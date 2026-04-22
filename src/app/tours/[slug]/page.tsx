@@ -19,6 +19,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { getSiteSettings } from "@/lib/site-settings";
 import type { Tour } from "@/types";
 
 interface TourPageProps {
@@ -58,6 +59,9 @@ export async function generateMetadata({ params }: TourPageProps): Promise<Metad
 }
 
 export default async function TourPage({ params }: TourPageProps) {
+  const settings = await getSiteSettings();
+  if (!settings.tours_enabled) notFound();
+
   let t: Tour;
   let others: Tour[] = [];
 

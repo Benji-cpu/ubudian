@@ -48,6 +48,9 @@ e2e/test-results/
 
 # tool directories
 .playwright-mcp/
+.agents/
+.superpowers/
+skills-lock.json
 
 # vercel
 .vercel

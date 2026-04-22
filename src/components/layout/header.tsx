@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { SITE_NAME } from "@/lib/constants";
 import { getCurrentProfile } from "@/lib/auth";
+import { getSiteSettings } from "@/lib/site-settings";
 import { UserMenu } from "./user-menu";
 import { MobileMenu } from "./mobile-menu";
 import { ExploreMenu } from "./explore-menu";
@@ -9,11 +10,14 @@ import { Shield } from "lucide-react";
 import { ThemeToggle } from "./theme-toggle";
 
 export async function Header() {
-  const profile = await getCurrentProfile();
+  const [profile, settings] = await Promise.all([
+    getCurrentProfile(),
+    getSiteSettings(),
+  ]);
 
   return (
     <header
-      className="fixed top-0 z-50 w-full border-b border-brand-gold/15 bg-brand-deep-green/85 backdrop-blur-[12px] dark:bg-[#1A1A1A]/90"
+      className="fixed top-0 z-50 w-full border-b border-brand-gold/15 bg-brand-deep-green/85 backdrop-blur-[12px] dark:bg-background/90"
     >
       <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Logo */}
@@ -38,19 +42,23 @@ export async function Header() {
           >
             Events
           </Link>
-          <Link
-            href="/stories"
-            className="text-xs font-semibold uppercase tracking-widest text-brand-off-white transition-colors duration-300 hover:text-brand-gold"
-          >
-            Stories
-          </Link>
-          <Link
-            href="/tours"
-            className="text-xs font-semibold uppercase tracking-widest text-brand-off-white transition-colors duration-300 hover:text-brand-gold"
-          >
-            Tours
-          </Link>
-          <ExploreMenu />
+          {settings.stories_enabled && (
+            <Link
+              href="/stories"
+              className="text-xs font-semibold uppercase tracking-widest text-brand-off-white transition-colors duration-300 hover:text-brand-gold"
+            >
+              Stories
+            </Link>
+          )}
+          {settings.tours_enabled && (
+            <Link
+              href="/tours"
+              className="text-xs font-semibold uppercase tracking-widest text-brand-off-white transition-colors duration-300 hover:text-brand-gold"
+            >
+              Tours
+            </Link>
+          )}
+          <ExploreMenu newsletterEnabled={settings.newsletter_archive_enabled} />
           {profile?.role === "admin" && (
             <Link
               href="/admin"
@@ -77,7 +85,7 @@ export async function Header() {
               <Link href="/login">Sign In</Link>
             </Button>
           )}
-          <MobileMenu profile={profile} />
+          <MobileMenu profile={profile} settings={settings} />
         </div>
       </div>
     </header>

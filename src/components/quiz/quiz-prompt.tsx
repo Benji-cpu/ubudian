@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { X } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
 const RESULT_KEY = "ubudian_quiz_result";
 const DISMISSED_KEY = "ubudian_quiz_dismissed";
@@ -33,7 +32,6 @@ export function QuizPrompt() {
     } catch {
       // ignore
     }
-    // Wait for exit animation before unmounting
     setTimeout(() => setVisible(false), 300);
   }
 
@@ -41,42 +39,55 @@ export function QuizPrompt() {
 
   return (
     <div
-      className={`fixed inset-x-0 bottom-0 z-50 flex justify-center p-4 ${
+      className={`fixed inset-x-0 bottom-0 z-50 flex justify-center px-4 pb-4 sm:pb-6 ${
         closing ? "animate-slide-down" : "animate-slide-up"
       }`}
+      role="dialog"
+      aria-labelledby="quiz-prompt-heading"
     >
-      <div className="w-full max-w-md rounded-xl border border-brand-gold/20 bg-[#2C4A3E] p-5 shadow-2xl dark:bg-[#1A1A1A]">
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex-1">
-            <p className="font-serif text-lg font-medium text-brand-gold">
-              New to Ubud?
-            </p>
-            <p className="mt-1 text-sm text-brand-off-white/80">
-              Take 90 seconds to find your vibe.
-            </p>
+      <div className="relative w-full max-w-sm overflow-hidden rounded-2xl border border-brand-charcoal/10 bg-brand-cream shadow-[0_20px_60px_-20px_rgba(44,74,62,0.35)] dark:border-brand-gold/15 dark:bg-[#1A1A1A] dark:shadow-[0_20px_60px_-20px_rgba(0,0,0,0.6)]">
+        <button
+          onClick={dismiss}
+          className="absolute right-3 top-3 rounded-full p-1.5 text-brand-charcoal/40 transition-colors hover:bg-brand-charcoal/5 hover:text-brand-charcoal dark:text-brand-cream/40 dark:hover:bg-brand-cream/5 dark:hover:text-brand-cream"
+          aria-label="Dismiss"
+        >
+          <X className="h-3.5 w-3.5" />
+        </button>
+
+        <div className="px-6 pb-6 pt-7">
+          <div className="flex items-center gap-2">
+            <span className="h-px w-6 bg-brand-gold" aria-hidden />
+            <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-brand-terracotta">
+              New here?
+            </span>
           </div>
-          <button
-            onClick={dismiss}
-            className="mt-0.5 rounded-md p-1 text-brand-off-white/60 transition-colors hover:bg-white/10 hover:text-brand-off-white"
-            aria-label="Dismiss"
+
+          <h2
+            id="quiz-prompt-heading"
+            className="mt-3 font-serif text-xl leading-tight text-brand-deep-green dark:text-brand-gold"
           >
-            <X className="h-4 w-4" />
-          </button>
-        </div>
-        <div className="mt-4 flex items-center gap-3">
-          <Button
-            asChild
-            size="sm"
-            className="bg-brand-gold text-[#2C4A3E] hover:bg-brand-gold/90"
-          >
-            <Link href="/quiz">Find My Fit</Link>
-          </Button>
-          <button
-            onClick={dismiss}
-            className="text-sm text-brand-off-white/60 transition-colors hover:text-brand-off-white"
-          >
-            Maybe later
-          </button>
+            Find your kind of Ubud<span className="text-brand-gold">.</span>
+          </h2>
+          <p className="mt-1.5 text-sm text-brand-charcoal/70 dark:text-brand-cream/70">
+            Six questions. Ninety seconds. We&rsquo;ll point you to the places, people and
+            moments that fit you.
+          </p>
+
+          <div className="mt-5 flex items-center gap-5">
+            <Link
+              href="/quiz"
+              onClick={dismiss}
+              className="inline-flex items-center justify-center rounded-full bg-brand-deep-green px-5 py-2.5 text-sm font-medium text-brand-cream transition-colors hover:bg-brand-deep-green/90 dark:bg-brand-gold dark:text-brand-deep-green dark:hover:bg-brand-gold/90"
+            >
+              Take the quiz
+            </Link>
+            <button
+              onClick={dismiss}
+              className="text-sm text-brand-charcoal/55 transition-colors hover:text-brand-charcoal dark:text-brand-cream/55 dark:hover:text-brand-cream"
+            >
+              Not now
+            </button>
+          </div>
         </div>
       </div>
     </div>

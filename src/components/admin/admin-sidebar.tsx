@@ -15,6 +15,7 @@ import {
   Zap,
   CreditCard,
   Menu,
+  Settings,
 } from "lucide-react";
 import {
   Sheet,
@@ -33,6 +34,7 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   MapPin,
   Zap,
   CreditCard,
+  Settings,
 };
 
 function NavLinks({ onClick }: { onClick?: () => void }) {

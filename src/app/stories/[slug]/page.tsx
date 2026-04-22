@@ -14,6 +14,7 @@ import { StoryJsonLd } from "@/components/stories/story-json-ld";
 import { getCurrentUser, getCurrentProfile } from "@/lib/auth";
 import { isInsider } from "@/lib/stripe/subscription";
 import { MembersOnlyPaywall } from "@/components/membership/members-only-paywall";
+import { getSiteSettings } from "@/lib/site-settings";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -63,6 +64,9 @@ export async function generateMetadata({ params }: StoryPageProps): Promise<Meta
 }
 
 export default async function StoryPage({ params }: StoryPageProps) {
+  const settings = await getSiteSettings();
+  if (!settings.stories_enabled) notFound();
+
   let s: Story;
   let related: Story[] = [];
   let organizerEvents: Event[] = [];

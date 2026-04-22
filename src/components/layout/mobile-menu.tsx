@@ -10,10 +10,28 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Menu, LogOut, LayoutDashboard, Shield, X } from "lucide-react";
 import { NAV_LINKS, SITE_NAME } from "@/lib/constants";
 import type { Profile } from "@/types";
+import type { SiteSettings } from "@/lib/site-settings";
 
-export function MobileMenu({ profile }: { profile: Profile | null }) {
+const HREF_TO_FLAG: Record<string, keyof SiteSettings> = {
+  "/stories": "stories_enabled",
+  "/tours": "tours_enabled",
+  "/newsletter": "newsletter_archive_enabled",
+};
+
+export function MobileMenu({
+  profile,
+  settings,
+}: {
+  profile: Profile | null;
+  settings: SiteSettings;
+}) {
   const [open, setOpen] = useState(false);
   const router = useRouter();
+
+  const visibleLinks = NAV_LINKS.filter((link) => {
+    const flag = HREF_TO_FLAG[link.href];
+    return !flag || settings[flag];
+  });
 
   async function handleSignOut() {
     const supabase = createClient();
@@ -34,7 +52,7 @@ export function MobileMenu({ profile }: { profile: Profile | null }) {
           <span className="sr-only">Open menu</span>
         </Button>
       </SheetTrigger>
-      <SheetContent side="right" className="w-full border-none bg-[#2C4A3E] dark:bg-[#1A1A1A] sm:max-w-full">
+      <SheetContent side="right" className="w-full border-none bg-brand-deep-green dark:bg-background sm:max-w-full">
         <div className="flex justify-end p-4">
           <SheetClose asChild>
             <button className="text-brand-gold hover:text-brand-gold/80 transition-colors">
@@ -47,7 +65,7 @@ export function MobileMenu({ profile }: { profile: Profile | null }) {
           {SITE_NAME}
         </SheetTitle>
         <nav className="mt-10 flex flex-col items-center gap-4">
-          {NAV_LINKS.map((link) => (
+          {visibleLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}

@@ -1,10 +1,23 @@
 import Link from "next/link";
 import { NAV_LINKS, SITE_NAME } from "@/lib/constants";
+import { getSiteSettings, type SiteSettings } from "@/lib/site-settings";
 import { NewsletterSignup } from "./newsletter-signup";
 
-export function Footer() {
+const HREF_TO_FLAG: Record<string, keyof SiteSettings> = {
+  "/stories": "stories_enabled",
+  "/tours": "tours_enabled",
+  "/newsletter": "newsletter_archive_enabled",
+};
+
+export async function Footer() {
+  const settings = await getSiteSettings();
+  const visibleLinks = NAV_LINKS.filter((link) => {
+    const flag = HREF_TO_FLAG[link.href];
+    return !flag || settings[flag];
+  });
+
   return (
-    <footer className="border-t border-brand-gold/15 bg-[#2C4A3E] dark:bg-[#1A1A1A]">
+    <footer className="border-t border-brand-gold/15 bg-brand-deep-green dark:bg-background">
       <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6 lg:px-8">
         {/* Title */}
         <div className="text-center">
@@ -18,7 +31,7 @@ export function Footer() {
 
         {/* Navigation */}
         <nav className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
-          {NAV_LINKS.map((link) => (
+          {visibleLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}

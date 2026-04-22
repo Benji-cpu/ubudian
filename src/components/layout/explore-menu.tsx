@@ -38,7 +38,10 @@ const EXPLORE_ITEMS = [
   },
 ] as const;
 
-export function ExploreMenu() {
+export function ExploreMenu({ newsletterEnabled = true }: { newsletterEnabled?: boolean } = {}) {
+  const items = EXPLORE_ITEMS.filter(
+    (i) => newsletterEnabled || i.href !== "/newsletter"
+  );
   return (
     <NavigationMenu viewport={false}>
       <NavigationMenuList>
@@ -53,10 +56,10 @@ export function ExploreMenu() {
           </NavigationMenuTrigger>
           <NavigationMenuContent className="border-none bg-transparent p-0 shadow-none">
             <div
-              className="w-[420px] rounded-xl border border-brand-gold/30 bg-[#2C4A3E]/97 p-4 shadow-2xl backdrop-blur-[12px] dark:bg-[#1A1A1A]/97"
+              className="w-[420px] rounded-xl border border-brand-gold/30 bg-brand-deep-green/97 p-4 shadow-2xl backdrop-blur-[12px] dark:bg-background/97"
             >
               <div className="grid grid-cols-2 gap-1">
-                {EXPLORE_ITEMS.map((item) => {
+                {items.map((item) => {
                   const Icon = item.icon;
                   return (
                     <NavigationMenuLink key={item.href} asChild>

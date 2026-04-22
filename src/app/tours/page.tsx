@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { TourCard } from "@/components/tours/tour-card";
 import { NewsletterSignup } from "@/components/layout/newsletter-signup";
+import { getSiteSettings } from "@/lib/site-settings";
 import type { Tour } from "@/types";
 
 export const metadata: Metadata = {
@@ -11,6 +13,9 @@ export const metadata: Metadata = {
 };
 
 export default async function ToursPage() {
+  const settings = await getSiteSettings();
+  if (!settings.tours_enabled) notFound();
+
   let allTours: Tour[] = [];
 
   try {

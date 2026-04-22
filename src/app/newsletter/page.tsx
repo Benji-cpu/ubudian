@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { EditionCard } from "@/components/newsletter/edition-card";
 import { NewsletterSignup } from "@/components/layout/newsletter-signup";
+import { getSiteSettings } from "@/lib/site-settings";
 import type { NewsletterEdition } from "@/types";
 
 export const metadata: Metadata = {
@@ -12,6 +14,9 @@ export const metadata: Metadata = {
 };
 
 export default async function NewsletterPage() {
+  const settings = await getSiteSettings();
+  if (!settings.newsletter_archive_enabled) notFound();
+
   let allEditions: NewsletterEdition[] = [];
 
   try {

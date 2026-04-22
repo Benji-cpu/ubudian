@@ -6,6 +6,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
 import { SITE_URL } from "@/lib/constants";
+import { getSiteSettings } from "@/lib/site-settings";
 
 const bookingSchema = z.object({
   tour_id: z.string().uuid(),
@@ -22,6 +23,11 @@ export async function POST(request: Request) {
   const { success } = rateLimit(`checkout-tour:${ip}`, { limit: 10, windowSeconds: 900 });
   if (!success) {
     return NextResponse.json({ error: "Too many requests. Please try again later." }, { status: 429 });
+  }
+
+  const settings = await getSiteSettings();
+  if (!settings.tours_enabled) {
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
   try {

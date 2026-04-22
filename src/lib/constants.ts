@@ -28,6 +28,8 @@ export const ADMIN_NAV_LINKS: AdminNavItem[] = [
   { type: "link", label: "Tours", href: "/admin/tours", icon: "MapPin" },
   { type: "link", label: "Commerce", href: "/admin/commerce", icon: "CreditCard" },
   { type: "link", label: "Community", href: "/admin/community", icon: "Users" },
+  { type: "divider" },
+  { type: "link", label: "Site Settings", href: "/admin/settings", icon: "Settings" },
 ];
 
 export const ADMIN_GROUPED_ROUTES: Record<string, string[]> = {
