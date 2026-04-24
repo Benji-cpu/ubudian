@@ -730,6 +730,44 @@ export async function createEventFromParsed(
   );
 
   if (insertError || !newEvent) {
+    // Late-arriving duplicate caught by the unique index on
+    // (source_id, normalized_title, start_date). This is the safety net for the
+    // race where two messages pass findDuplicates before either has inserted.
+    const isRaceDup =
+      insertError?.code === "23505" &&
+      typeof insertError?.message === "string" &&
+      insertError.message.includes("events_source_title_date_uniq");
+
+    if (isRaceDup && sourceId) {
+      const normalizeTitle = (t: string) =>
+        t.toLowerCase().replace(/[^\w\s]/g, "").replace(/\s+/g, " ").trim();
+      const normTitle = normalizeTitle(parsed.title);
+
+      const { data: existingEvents } = await supabase
+        .from("events")
+        .select("id, title")
+        .eq("source_id", sourceId)
+        .eq("start_date", parsed.start_date)
+        .neq("status", "archived");
+      const matchedId =
+        existingEvents?.find((e) => normalizeTitle(e.title) === normTitle)?.id ?? null;
+
+      await supabase
+        .from("raw_ingestion_messages")
+        .update({
+          parsed_event_data: {
+            ...((typeof parsed === "object" ? parsed : {}) as Record<string, unknown>),
+            _dedup_skipped: true,
+            _dedup_matched_event_id: matchedId,
+            _dedup_match_type: "unique_constraint_race",
+          },
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", messageId);
+
+      return { messageId, status: "duplicate" };
+    }
+
     return {
       messageId,
       status: "failed",
