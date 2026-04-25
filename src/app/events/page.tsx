@@ -14,6 +14,8 @@ import { EventFilters } from "@/components/events/event-filters";
 import { EventSearch } from "@/components/events/event-search";
 import { CategoryGuideLink } from "@/components/events/category-guide-link";
 import { MapView } from "@/components/events/map-view";
+import { RefreshOnFocus } from "@/components/events/refresh-on-focus";
+import { nowInBali } from "@/lib/events/bali-time";
 import type { ArchetypeId, Event, Experience, QuizResultRecord } from "@/types";
 
 export const metadata: Metadata = {
@@ -118,7 +120,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
           ascending: !sortByNewest,
         });
 
-      const today = new Date().toISOString().split("T")[0];
+      const today = nowInBali().dateStr;
 
       // Happening Now filter
       if (params.happening === "true") {
@@ -179,6 +181,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
 
   return (
     <div>
+      <RefreshOnFocus />
       {/* Hero */}
       <section className="bg-brand-cream px-4 py-12 sm:py-16">
         <div className="mx-auto max-w-3xl text-center">

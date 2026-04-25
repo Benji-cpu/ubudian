@@ -6,27 +6,21 @@
 import { normalizeForComparison } from "./similarity";
 
 /**
- * Sentinel value used when venue is null/missing.
- * Ensures events without venue info produce a distinct fingerprint
- * from events with a venue, preventing false-positive dedup collisions.
- */
-export const NO_VENUE_SENTINEL = "__no_venue__";
-
-/**
  * Generate a SHA-256 content fingerprint from normalized event fields.
- * The fingerprint is based on: normalized title + start_date + normalized venue.
- * This catches events that are the same across different sources even if
- * descriptions differ or formatting varies.
+ * Based on normalized title + start_date. Venue is intentionally excluded because
+ * the same event is often re-posted with venue spelling variations (e.g. "Blossom
+ * Ubud" vs "Blossom Space Ubud") that would otherwise produce different fingerprints
+ * and defeat Layer 2 dedup. Venue is still used in Layer 3 fuzzy matching.
  */
 export async function generateFingerprint(fields: {
   title: string;
   start_date: string;
   venue_name?: string | null;
 }): Promise<string> {
+  void fields.venue_name;
   const normalized = [
     normalizeForComparison(fields.title),
     fields.start_date, // Already in YYYY-MM-DD format
-    fields.venue_name ? normalizeForComparison(fields.venue_name) : NO_VENUE_SENTINEL,
   ].join("|");
 
   // Use Web Crypto API (available in Node.js 18+ and Edge Runtime)
