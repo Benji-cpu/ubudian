@@ -24,6 +24,88 @@ import { geocodeVenue } from "@/lib/geocoding";
 import type { IngestionRunResult, ParsedEvent, ProcessResult, RawMessage } from "./types";
 
 /**
+ * Fields we'll backfill on an existing event when a higher-quality dedup
+ * source (e.g. Megatix) matches it. Only fills NULL/empty — never overwrites.
+ */
+const ENRICH_ON_DUPLICATE_FIELDS = [
+  "cover_image_url",
+  "external_ticket_url",
+  "source_url",
+  "venue_address",
+  "organizer_name",
+  "price_info",
+  "short_description",
+] as const satisfies ReadonlyArray<keyof ParsedEvent>;
+
+type EnrichFieldName = (typeof ENRICH_ON_DUPLICATE_FIELDS)[number];
+
+/**
+ * When dedup matches a raw message to an existing event, backfill the
+ * existing event with any fields the incoming `parsed` has that the existing
+ * event lacks. Best-effort: never throws.
+ *
+ * Returns the list of field names that were enriched (empty if no-op).
+ */
+export async function enrichExistingEvent(
+  eventId: string,
+  parsed: ParsedEvent,
+  sourceId: string
+): Promise<EnrichFieldName[]> {
+  try {
+    const supabase = createAdminClient();
+    const { data: existing, error: readError } = await supabase
+      .from("events")
+      .select(ENRICH_ON_DUPLICATE_FIELDS.join(","))
+      .eq("id", eventId)
+      .single();
+
+    if (readError || !existing) return [];
+
+    const update: Record<string, string> = {};
+    const enrichedFields: EnrichFieldName[] = [];
+
+    for (const field of ENRICH_ON_DUPLICATE_FIELDS) {
+      const incoming = parsed[field];
+      const current = (existing as unknown as Record<string, unknown>)[field];
+      const incomingHasValue = typeof incoming === "string" && incoming.length > 0;
+      const currentIsEmpty = current === null || current === undefined || current === "";
+      if (incomingHasValue && currentIsEmpty) {
+        update[field] = incoming as string;
+        enrichedFields.push(field);
+      }
+    }
+
+    if (enrichedFields.length === 0) return [];
+
+    const { error: updateError } = await supabase
+      .from("events")
+      .update(update)
+      .eq("id", eventId);
+
+    if (updateError) {
+      console.error("[pipeline] enrichExistingEvent update error:", updateError);
+      return [];
+    }
+
+    await logActivity({
+      category: "event_enriched",
+      title: `Enriched existing event from duplicate: ${enrichedFields.join(", ")}`,
+      details: {
+        event_id: eventId,
+        event_title: parsed.title,
+        enriched_fields: enrichedFields,
+      },
+      sourceId,
+    });
+
+    return enrichedFields;
+  } catch (err) {
+    console.error("[pipeline] enrichExistingEvent error:", err);
+    return [];
+  }
+}
+
+/**
  * Fill in missing image / price / description fields by scraping the source URL.
  * Best-effort: never throws, never overwrites existing values.
  */
@@ -628,9 +710,13 @@ export async function createEventFromParsed(
     description: parsed.description,
   }, { normalizedVenue, fingerprint });
 
-  // If high-confidence duplicate, skip creation but store audit trail
+  // If high-confidence duplicate, skip creation but store audit trail.
+  // Before skipping, backfill any missing fields (cover image, ticket URL, etc.)
+  // from the incoming parsed onto the matched event.
   if (duplicates.length > 0 && duplicates[0].confidence >= 0.9) {
     const topMatch = duplicates[0];
+    const enrichedFields = await enrichExistingEvent(topMatch.eventId, parsed, sourceId);
+
     await supabase
       .from("raw_ingestion_messages")
       .update({
@@ -640,6 +726,7 @@ export async function createEventFromParsed(
           _dedup_matched_event_id: topMatch.eventId,
           _dedup_match_type: topMatch.matchType,
           _dedup_confidence: topMatch.confidence,
+          _enriched_fields: enrichedFields.length > 0 ? enrichedFields : undefined,
         },
         updated_at: new Date().toISOString(),
       })

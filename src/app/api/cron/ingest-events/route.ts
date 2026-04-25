@@ -12,6 +12,7 @@ import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { runIngestion, processRawMessage } from "@/lib/ingestion";
 import type { RawMessage } from "@/lib/ingestion";
+import { refreshLinkedEvents } from "@/lib/ingestion/refresher";
 import "@/lib/ingestion/adapters";
 
 export async function GET(request: Request) {
@@ -162,10 +163,38 @@ export async function GET(request: Request) {
     }
   }
 
+  // --- Phase 3: Refresh source-linked events (cover image, price, ticket URL) ---
+  // Tight budget — only run if we still have headroom against the cron timeout.
+  let refreshSummary: { processed: number; updated: number; archived: number; errors: number } | null = null;
+  const remainingMs = MAX_ELAPSED_MS - (Date.now() - startTime);
+  if (remainingMs > 1500) {
+    try {
+      const summary = await refreshLinkedEvents({
+        budgetMs: remainingMs - 500, // leave 500ms slack
+        limit: 8, // pace through queue across daily runs
+        fetchDelayMs: 600,
+      });
+      refreshSummary = {
+        processed: summary.processed,
+        updated: summary.updated,
+        archived: summary.archived,
+        errors: summary.errors,
+      };
+      console.log(
+        `[cron/ingest-events] refresh: processed=${summary.processed} updated=${summary.updated} archived=${summary.archived} errors=${summary.errors}`
+      );
+    } catch (err) {
+      console.error("[cron/ingest-events] refresh phase failed:", err);
+    }
+  } else {
+    console.warn(`[cron/ingest-events] skipping refresh phase, only ${remainingMs}ms left`);
+  }
+
   return NextResponse.json({
     sourcesChecked: sources.length,
     sourcesRun: dueSources.length,
     results,
     stuckMessagesRetried: retriedCount,
+    refresh: refreshSummary,
   });
 }
