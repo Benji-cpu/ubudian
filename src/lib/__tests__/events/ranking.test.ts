@@ -36,6 +36,7 @@ function makeEvent(partial: Partial<Event> & { id: string; start_date: string })
     is_trusted_submitter: false,
     rejection_reason: null,
     is_placeholder: false,
+    is_core: false,
     archetype_tags: partial.archetype_tags ?? [],
     source_id: null,
     source_event_id: null,
@@ -49,6 +50,10 @@ function makeEvent(partial: Partial<Event> & { id: string; start_date: string })
     longitude: null,
     ai_approved_at: null,
     moderation_reason: null,
+    source_kind: null,
+    raw_text_snippet: null,
+    parser_version: null,
+    ingested_at: null,
     created_at: "2026-04-01",
     updated_at: "2026-04-01",
   };

@@ -77,6 +77,7 @@ export interface Event {
   is_trusted_submitter: boolean;
   rejection_reason: string | null;
   is_placeholder: boolean;
+  is_core: boolean;
   archetype_tags: ArchetypeId[];
   // Ingestion fields
   source_id: string | null;
@@ -93,6 +94,11 @@ export interface Event {
   // AI moderation audit
   ai_approved_at: string | null;
   moderation_reason: string | null;
+  // Diagnostic metadata
+  source_kind: "seed" | "llm" | "manual" | "submission" | null;
+  raw_text_snippet: string | null;
+  parser_version: string | null;
+  ingested_at: string | null;
   created_at: string;
   updated_at: string;
 }
