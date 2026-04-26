@@ -29,6 +29,13 @@ export interface ScoredEvent<T extends Event = Event> {
     quality: number;
     popularity: number;
     personalization: number;
+    /** Boost for hand-curated weekly anchors (is_core). */
+    coreBoost: number;
+    /**
+     * Boost for events whose first day is today and that span multiple days
+     * (festival kickoff). Captures "the big thing happening today."
+     */
+    festivalBoost: number;
   };
 }
 
@@ -90,24 +97,50 @@ export function scoreEvent<T extends Event & { save_count?: number }>(
   const now = ctx.now ?? new Date();
 
   const time = timeComponent(event.start_date, now);
-  const quality = typeof event.quality_score === "number" ? clamp01(event.quality_score) : 0.5;
+  // Hand-seeded core anchors don't get LLM quality scores — give them a sane
+  // default rather than penalising them with 0.5.
+  const qualityDefault = event.is_core ? 0.85 : 0.5;
+  const quality =
+    typeof event.quality_score === "number" ? clamp01(event.quality_score) : qualityDefault;
   const saveCount =
     ctx.saveCountByEventId?.get(event.id) ??
     (typeof event.save_count === "number" ? event.save_count : 0);
   const popularity = popularityComponent(saveCount);
   const personalization = personalizationComponent(event.archetype_tags, ctx.viewerArchetypes);
 
+  // Core anchors get a steady visibility boost so they don't drown in one-off noise.
+  const coreBoost = event.is_core ? 0.4 : 0;
+
+  // A festival/multi-day event whose first day is today reads as the big
+  // headline event — outrank the weekly anchors that also fall on this day.
+  const festivalBoost = isFestivalKickoffToday(event, now) ? 0.9 : 0;
+
   const score =
     time + // 0–1
     0.8 * quality + // 0–0.8
     0.6 * popularity + // ~0–1.5 in practice
-    1.2 * personalization; // 0–1.2
+    1.2 * personalization + // 0–1.2
+    coreBoost + // 0 or 0.4
+    festivalBoost; // 0 or 0.9
 
   return {
     event,
     score,
-    components: { time, quality, popularity, personalization },
+    components: { time, quality, popularity, personalization, coreBoost, festivalBoost },
   };
+}
+
+function isFestivalKickoffToday(event: Event, now: Date): boolean {
+  if (!event.end_date || event.end_date <= event.start_date) return false;
+  const todayStr = formatLocalYMD(now);
+  return event.start_date === todayStr;
+}
+
+function formatLocalYMD(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
 }
 
 export function rankEvents<T extends Event & { save_count?: number }>(

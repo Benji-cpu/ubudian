@@ -1,28 +1,36 @@
 /**
  * Time bucketing for the agenda feed.
  *
- * Groups events into discrete, human-meaningful windows relative to now:
+ * Groups events into human-meaningful windows relative to now, anchored to
+ * Bali local time (Asia/Makassar) — not server UTC.
  *
- *   happening_now  — started (start_date <= today) but not yet finished
- *                    (end_date null or >= today)
- *   today          — starting later today (start_date == today, and not
- *                    already in happening_now)
- *   tomorrow       — starting tomorrow
+ *   happening_now  — started and not yet ended by the Bali clock
+ *   today          — starting later today in Bali
+ *   tomorrow       — starting tomorrow (Bali)
  *   weekend        — starting on the next upcoming Sat or Sun (skipped if
  *                    those are already covered by today/tomorrow)
  *   next_week      — starting in the next 7 days but not in earlier buckets
  *   later          — everything else in the future
  *
- * Each event lands in exactly one bucket. Past events without a forward
- * end_date are excluded.
+ * Events whose end time has passed (same day, known end_time) are dropped.
  */
 
 import type { Event } from "@/types";
+import {
+  nowInBali,
+  eventIsHappeningNow,
+  eventIsInProgress,
+  eventEndedToday,
+  parseTimeToMinutes,
+  type BaliNow,
+} from "./bali-time";
+import { parseRecurrenceRule } from "@/lib/recurrence";
 
 export type EventBucket =
   | "happening_now"
   | "today"
   | "tomorrow"
+  | "in_progress"
   | "weekend"
   | "next_week"
   | "later";
@@ -31,29 +39,28 @@ export type BucketedEvents = Record<EventBucket, Event[]>;
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
-export function bucketEventsByTime(events: Event[], now = new Date()): BucketedEvents {
+export function bucketEventsByTime(events: Event[], now: Date = new Date()): BucketedEvents {
   const buckets: BucketedEvents = {
     happening_now: [],
     today: [],
     tomorrow: [],
+    in_progress: [],
     weekend: [],
     next_week: [],
     later: [],
   };
 
-  const todayStr = toDateString(now);
-  const tomorrow = new Date(now.getTime() + DAY_MS);
-  const tomorrowStr = toDateString(tomorrow);
-
-  // Saturday = 6, Sunday = 0
-  const weekendDates = upcomingWeekendDates(now);
+  const bali = nowInBali(now);
+  const todayStr = bali.dateStr;
+  const tomorrowStr = addDays(todayStr, 1);
+  const weekendDates = upcomingWeekendDates(todayStr, bali.dayOfWeek);
 
   for (const event of events) {
-    const bucket = pickBucket(event, now, todayStr, tomorrowStr, weekendDates);
-    if (bucket) buckets[bucket].push(event);
+    const effective = nextOccurrence(event, todayStr);
+    const bucket = pickBucket(effective, bali, todayStr, tomorrowStr, weekendDates);
+    if (bucket) buckets[bucket].push(effective);
   }
 
-  // Each bucket is sorted by start_date then start_time for a stable render.
   for (const key of Object.keys(buckets) as EventBucket[]) {
     buckets[key].sort(compareEvents);
   }
@@ -63,7 +70,7 @@ export function bucketEventsByTime(events: Event[], now = new Date()): BucketedE
 
 function pickBucket(
   event: Event,
-  now: Date,
+  bali: BaliNow,
   todayStr: string,
   tomorrowStr: string,
   weekendDates: Set<string>
@@ -71,46 +78,35 @@ function pickBucket(
   const start = event.start_date;
   const end = event.end_date || event.start_date;
 
-  // Drop past events (end before today) unless they're still running today.
   if (end < todayStr) return null;
 
-  // Happening now — started, still running
-  if (start <= todayStr && end >= todayStr) {
-    // If start is strictly before today, or start is today but time has passed
-    if (start < todayStr || hasEventStarted(event, now)) {
-      return "happening_now";
-    }
+  if (eventIsHappeningNow(event, bali)) return "happening_now";
+
+  // Multi-day event already past its first day but still in span:
+  // belongs in "in progress this week", not in today's drop-in list.
+  if (start < todayStr && end >= todayStr && eventIsInProgress(event, bali)) {
+    return "in_progress";
   }
+
+  // Same-day event whose end_time already passed: drop (not "today" anymore).
+  if (start === todayStr && eventEndedToday(event, bali)) return null;
 
   if (start === todayStr) return "today";
   if (start === tomorrowStr) return "tomorrow";
   if (weekendDates.has(start)) return "weekend";
 
-  const startDate = new Date(start + "T00:00:00");
-  const daysOut = Math.floor((startDate.getTime() - startOfDay(now).getTime()) / DAY_MS);
+  const daysOut = daysBetween(todayStr, start);
   if (daysOut <= 7) return "next_week";
 
   return "later";
 }
 
-function hasEventStarted(event: Event, now: Date): boolean {
-  if (!event.start_time) return false;
-  const [h, m] = event.start_time.split(":").map(Number);
-  if (Number.isNaN(h) || Number.isNaN(m)) return false;
-  const today = startOfDay(now);
-  const startTime = new Date(today);
-  startTime.setHours(h, m, 0, 0);
-  return now.getTime() >= startTime.getTime();
-}
-
-function upcomingWeekendDates(now: Date): Set<string> {
+function upcomingWeekendDates(todayStr: string, todayDow: number): Set<string> {
   const dates = new Set<string>();
-  const today = startOfDay(now);
   for (let offset = 0; offset <= 7; offset++) {
-    const d = new Date(today.getTime() + offset * DAY_MS);
-    const dow = d.getDay();
+    const dow = (todayDow + offset) % 7;
     if (dow === 6 || dow === 0) {
-      dates.add(toDateString(d));
+      dates.add(addDays(todayStr, offset));
     }
   }
   return dates;
@@ -118,20 +114,86 @@ function upcomingWeekendDates(now: Date): Set<string> {
 
 function compareEvents(a: Event, b: Event): number {
   if (a.start_date !== b.start_date) return a.start_date.localeCompare(b.start_date);
-  const at = a.start_time ?? "00:00";
-  const bt = b.start_time ?? "00:00";
-  return at.localeCompare(bt);
+  const at = parseTimeToMinutes(a.start_time) ?? 0;
+  const bt = parseTimeToMinutes(b.start_time) ?? 0;
+  return at - bt;
 }
 
-function startOfDay(d: Date): Date {
-  const out = new Date(d);
-  out.setHours(0, 0, 0, 0);
-  return out;
-}
-
-function toDateString(d: Date): string {
-  const yyyy = d.getFullYear();
-  const mm = String(d.getMonth() + 1).padStart(2, "0");
-  const dd = String(d.getDate()).padStart(2, "0");
+/** Add N days to a YYYY-MM-DD string, returning a YYYY-MM-DD string. */
+function addDays(dateStr: string, days: number): string {
+  const [y, m, d] = dateStr.split("-").map(Number);
+  const t = Date.UTC(y, m - 1, d) + days * DAY_MS;
+  const out = new Date(t);
+  const yyyy = out.getUTCFullYear();
+  const mm = String(out.getUTCMonth() + 1).padStart(2, "0");
+  const dd = String(out.getUTCDate()).padStart(2, "0");
   return `${yyyy}-${mm}-${dd}`;
+}
+
+/** Whole-day delta between two YYYY-MM-DD strings (b - a). */
+function daysBetween(a: string, b: string): number {
+  const [ay, am, ad] = a.split("-").map(Number);
+  const [by, bm, bd] = b.split("-").map(Number);
+  const at = Date.UTC(ay, am - 1, ad);
+  const bt = Date.UTC(by, bm - 1, bd);
+  return Math.round((bt - at) / DAY_MS);
+}
+
+/**
+ * For a recurring event, return a copy whose `start_date` (and `end_date`,
+ * if it was a same-length span) has been rolled forward to the next
+ * occurrence on or after `today`. Non-recurring events pass through
+ * unchanged.
+ *
+ * We only handle daily / weekly / biweekly / monthly frequencies — that's
+ * what `recurrence.ts` supports.
+ */
+function nextOccurrence(event: Event, today: string): Event {
+  if (!event.is_recurring || !event.recurrence_rule) return event;
+  const rule = parseRecurrenceRule(event.recurrence_rule);
+  if (!rule) return event;
+
+  const spanDays =
+    event.end_date && event.end_date >= event.start_date
+      ? daysBetween(event.start_date, event.end_date)
+      : 0;
+
+  // If currently inside an active instance (today within span), don't roll.
+  const endAnchor = event.end_date ?? event.start_date;
+  if (event.start_date <= today && endAnchor >= today) return event;
+  // Already upcoming — leave alone.
+  if (event.start_date >= today) return event;
+
+  // Roll forward by the rule's step until start >= today.
+  // Safety cap at 400 iterations (over a year for weekly).
+  let start = event.start_date;
+  for (let i = 0; i < 400; i++) {
+    if (start >= today) break;
+    start = advanceByRule(start, rule);
+  }
+
+  const newEnd = spanDays > 0 ? addDays(start, spanDays) : event.end_date;
+  return { ...event, start_date: start, end_date: newEnd };
+}
+
+function advanceByRule(
+  dateStr: string,
+  rule: { frequency: "daily" | "weekly" | "biweekly" | "monthly" }
+): string {
+  switch (rule.frequency) {
+    case "daily":
+      return addDays(dateStr, 1);
+    case "weekly":
+      return addDays(dateStr, 7);
+    case "biweekly":
+      return addDays(dateStr, 14);
+    case "monthly": {
+      const [y, m, d] = dateStr.split("-").map(Number);
+      const nextMonth = new Date(Date.UTC(y, m, d));
+      const yy = nextMonth.getUTCFullYear();
+      const mm = String(nextMonth.getUTCMonth() + 1).padStart(2, "0");
+      const dd = String(nextMonth.getUTCDate()).padStart(2, "0");
+      return `${yy}-${mm}-${dd}`;
+    }
+  }
 }

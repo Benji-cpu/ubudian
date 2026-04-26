@@ -138,6 +138,44 @@ describe("rankEvents", () => {
     expect(ranked[0].score).toBeGreaterThan(ranked[1].score);
   });
 
+  it("ranks a festival starting today above a weekly core anchor on the same day", () => {
+    const today = "2026-04-21";
+    const festival = makeEvent({
+      id: "festival",
+      start_date: today,
+      quality_score: 0.95,
+    });
+    festival.end_date = "2026-04-22"; // multi-day → festival kickoff
+    const weekly = makeEvent({ id: "weekly-core", start_date: today });
+    weekly.is_core = true;
+    weekly.quality_score = null;
+
+    const ranked = rankEvents([weekly, festival], { now: new Date(`${today}T12:00:00`) });
+    expect(ranked[0].event.id).toBe("festival");
+  });
+
+  it("ranks a core weekly anchor above a generic same-day event when no festival is running", () => {
+    const today = "2026-04-21";
+    const weekly = makeEvent({ id: "core", start_date: today });
+    weekly.is_core = true;
+    weekly.quality_score = null;
+    const generic = makeEvent({ id: "generic", start_date: today, quality_score: 0.5 });
+
+    const ranked = rankEvents([generic, weekly], { now: new Date(`${today}T12:00:00`) });
+    expect(ranked[0].event.id).toBe("core");
+  });
+
+  it("does not boost a multi-day event already mid-span", () => {
+    const today = "2026-04-21";
+    const midSpan = makeEvent({ id: "mid", start_date: "2026-04-19", quality_score: 0.9 });
+    midSpan.end_date = "2026-04-23";
+    const todayStarter = makeEvent({ id: "today", start_date: today, quality_score: 0.5 });
+
+    const ranked = rankEvents([midSpan, todayStarter], { now: new Date(`${today}T12:00:00`) });
+    // Today's event has a strong time signal even at lower quality.
+    expect(ranked[0].event.id).toBe("today");
+  });
+
   it("scoreEvent produces consistent component breakdowns", () => {
     const event = makeEvent({
       id: "x",

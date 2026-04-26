@@ -68,33 +68,73 @@ export function parseTimeToMinutes(value: string | null): number | null {
 }
 
 /**
- * Is the event currently happening in Bali time?
+ * Strict "you can show up right now" predicate for the Happening Now bucket.
  *
- * True when today falls inside the event's date span AND the event has
- * started by Bali wall-clock AND (if end_time is known) hasn't ended yet.
- * Multi-day events (end_date > today) are always "live" regardless of time.
+ * True only for events you could plausibly drop in on this minute:
+ *   - Same-day events that have started (by start_time) and not yet ended.
+ *   - Same-day events with no time info, on their start day.
+ *   - Multi-day events on their FIRST day, after start_time has passed.
+ *
+ * A retreat already on day 3 of 5 is *in progress* but not "happening now" —
+ * use eventIsInProgress for that.
  */
-export function eventIsLive(event: Event, now: BaliNow): boolean {
+export function eventIsHappeningNow(event: Event, now: BaliNow): boolean {
+  const { dateStr: today, timeMinutes } = now;
+  const start = event.start_date;
+  const end = event.end_date || event.start_date;
+
+  // Outside the event's overall span.
+  if (start > today || end < today) return false;
+
+  // Already past on a multi-day event whose end is in the past (handled above)
+  // or a same-day event whose end_time has passed.
+  const endMin = parseTimeToMinutes(event.end_time);
+  if (start === today && end === today && endMin !== null && timeMinutes >= endMin) {
+    return false;
+  }
+
+  // Past the first day of a multi-day workshop: in_progress, not happening_now.
+  if (start < today) return false;
+
+  // start === today from here on.
+  const startMin = parseTimeToMinutes(event.start_time);
+  if (startMin === null) {
+    // No time info — count as happening from start of day.
+    return true;
+  }
+  return timeMinutes >= startMin;
+}
+
+/**
+ * Broader "the event is in progress" predicate.
+ *
+ * True any time `today` falls inside the [start_date, end_date] span and
+ * (for same-day events) the times bracket "now". Used for the in_progress
+ * bucket — multi-day workshops, retreats, festivals after their first day.
+ */
+export function eventIsInProgress(event: Event, now: BaliNow): boolean {
   const { dateStr: today, timeMinutes } = now;
   const start = event.start_date;
   const end = event.end_date || event.start_date;
 
   if (start > today || end < today) return false;
 
-  // Multi-day event that's in-progress: always live.
+  // Multi-day event mid-span (after its first day, before its last): always in progress.
   if (start < today && end > today) return true;
 
   const startMin = parseTimeToMinutes(event.start_time);
   const endMin = parseTimeToMinutes(event.end_time);
 
-  // Same-day event with no start_time known — treat as live while today is the start day.
   if (start === today && end === today && startMin === null) return true;
-
-  // If we have start but not end, consider live after start (same day only).
   if (startMin !== null && timeMinutes < startMin) return false;
   if (endMin !== null && timeMinutes >= endMin) return false;
 
   return true;
+}
+
+/** @deprecated Use eventIsHappeningNow or eventIsInProgress. Kept for callers outside the agenda. */
+export function eventIsLive(event: Event, now: BaliNow): boolean {
+  return eventIsInProgress(event, now);
 }
 
 /**

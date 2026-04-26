@@ -18,6 +18,7 @@ const BUCKET_ORDER: { key: EventBucket; label: string; subtitle?: string }[] = [
   { key: "happening_now", label: "Happening now", subtitle: "Drop in if you're nearby" },
   { key: "today", label: "Later today" },
   { key: "tomorrow", label: "Tomorrow" },
+  { key: "in_progress", label: "Running this week", subtitle: "Multi-day workshops you can join mid-flow" },
   { key: "weekend", label: "This weekend" },
   { key: "next_week", label: "Next week" },
   { key: "later", label: "Later this month and beyond" },

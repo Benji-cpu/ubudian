@@ -1,9 +1,9 @@
 import Link from "next/link";
 import Image from "next/image";
-import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { formatEventTime, isRecentlyAddedEvent } from "@/lib/utils";
 import { CATEGORY_EMOJI } from "@/lib/constants";
+import { formatEventDateLine } from "@/lib/events/format";
 import { EventCardPlaceholder } from "./event-card-placeholder";
 import { EventCardExternalLinks } from "./event-card-external-links";
 import { MapPin, Clock, Calendar, User } from "lucide-react";
@@ -15,7 +15,7 @@ interface EventCardProps {
 }
 
 export function EventCard({ event, saveButton }: EventCardProps) {
-  const startDate = new Date(event.start_date);
+  const dateLine = formatEventDateLine(event);
   const emoji = CATEGORY_EMOJI[event.category] || CATEGORY_EMOJI["Other"];
 
   return (
@@ -49,6 +49,14 @@ export function EventCard({ event, saveButton }: EventCardProps) {
             <Badge variant="outline" className="text-xs">
               {emoji} {event.category}
             </Badge>
+            {event.is_core && (
+              <span
+                title="Weekly community anchor"
+                className="rounded border border-brand-gold/60 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-brand-gold"
+              >
+                Core
+              </span>
+            )}
             {isRecentlyAddedEvent(event.created_at, event.start_date) && (
               <span className="rounded bg-brand-gold px-1.5 py-0.5 text-xs font-medium text-white">
                 New
@@ -56,7 +64,7 @@ export function EventCard({ event, saveButton }: EventCardProps) {
             )}
             <span className="flex items-center gap-1">
               <Calendar className="h-3 w-3" />
-              {format(startDate, "MMM d")}
+              {dateLine}
             </span>
             {(event.start_time || event.end_time) && (
               <span className="flex items-center gap-1">

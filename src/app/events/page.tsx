@@ -128,8 +128,13 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
           .lte("start_date", today)
           .or(`end_date.gte.${today},end_date.is.null`);
       } else if (view === "list" || view === "grid" || view === "feed") {
-        // Feed/list/grid: only show future events (include recurring past-start)
-        query = query.or(`start_date.gte.${today},is_recurring.eq.true`);
+        // Feed/list/grid: future events, recurring past-start (rolled forward
+        // by the bucket logic), AND multi-day events still in their span
+        // (so day-3-of-5 retreats land in the in_progress bucket instead of
+        // being filtered out by the start_date floor).
+        query = query.or(
+          `start_date.gte.${today},is_recurring.eq.true,end_date.gte.${today}`
+        );
       }
 
       if (params.category) {

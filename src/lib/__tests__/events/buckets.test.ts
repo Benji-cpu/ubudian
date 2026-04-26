@@ -115,14 +115,40 @@ describe("bucketEventsByTime", () => {
     expect(Object.values(buckets).flat()).toHaveLength(0);
   });
 
-  it("keeps multi-day ongoing events in happening_now", () => {
+  it("places multi-day mid-span events in in_progress, not happening_now", () => {
+    // A 7-day retreat on its day 4 is in progress but not "drop in now".
     const event = makeEvent({
       id: "retreat",
       start_date: "2026-04-18",
       end_date: "2026-04-24",
     });
     const buckets = bucketEventsByTime([event], TUES_8AM);
-    expect(buckets.happening_now.map((e) => e.id)).toEqual(["retreat"]);
+    expect(buckets.in_progress.map((e) => e.id)).toEqual(["retreat"]);
+    expect(buckets.happening_now).toHaveLength(0);
+  });
+
+  it("treats day-1 of a multi-day event as happening_now once start_time has passed", () => {
+    const event = makeEvent({
+      id: "festival",
+      start_date: "2026-04-21",
+      end_date: "2026-04-22",
+      start_time: "07:00",
+      end_time: "11:00",
+    });
+    const buckets = bucketEventsByTime([event], TUES_8AM);
+    expect(buckets.happening_now.map((e) => e.id)).toEqual(["festival"]);
+  });
+
+  it("does not put a same-day-on-its-last-day workshop in happening_now without a start_time", () => {
+    // A 3-day workshop ending today, no start_time. Should be in_progress, not happening_now.
+    const event = makeEvent({
+      id: "workshop",
+      start_date: "2026-04-19",
+      end_date: "2026-04-21",
+    });
+    const buckets = bucketEventsByTime([event], TUES_11AM);
+    expect(buckets.in_progress.map((e) => e.id)).toEqual(["workshop"]);
+    expect(buckets.happening_now).toHaveLength(0);
   });
 
   it("sorts within each bucket by start_time", () => {
