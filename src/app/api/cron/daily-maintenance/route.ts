@@ -18,6 +18,8 @@ import {
   purgeFailedMessages,
 } from "@/lib/maintenance/cleanups";
 import { buildReviewQueue } from "@/lib/maintenance/review-queue";
+import { sendTransactionalEmail } from "@/lib/email";
+import { dailyMaintenanceDigest } from "@/lib/email-templates";
 
 export async function GET(request: Request) {
   const authHeader = request.headers.get("authorization");
@@ -50,7 +52,7 @@ export async function GET(request: Request) {
     return null;
   });
 
-  return NextResponse.json({
+  const payload = {
     startedAt,
     finishedAt: new Date().toISOString(),
     autonomous: {
@@ -61,5 +63,22 @@ export async function GET(request: Request) {
     },
     review,
     errors,
-  });
+  };
+
+  // Optional: ?digest=true sends an email digest to ADMIN_EMAIL. Used by the
+  // GitHub Actions nightly workflow so CI doesn't need its own Resend creds.
+  const url = new URL(request.url);
+  if (url.searchParams.get("digest") === "true" && process.env.ADMIN_EMAIL) {
+    try {
+      await sendTransactionalEmail(
+        process.env.ADMIN_EMAIL,
+        "Ubudian — daily maintenance digest",
+        dailyMaintenanceDigest(payload),
+      );
+    } catch (err) {
+      payload.errors.push(`digest email: ${err instanceof Error ? err.message : String(err)}`);
+    }
+  }
+
+  return NextResponse.json(payload);
 }
