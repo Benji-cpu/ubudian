@@ -1,19 +1,21 @@
 import Link from "next/link";
 import Image from "next/image";
-import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
-import { formatEventTime } from "@/lib/utils";
+import { formatEventTime, isRecentlyAddedEvent } from "@/lib/utils";
 import { CATEGORY_EMOJI } from "@/lib/constants";
+import { formatEventDateLine } from "@/lib/events/format";
 import { EventCardPlaceholder } from "./event-card-placeholder";
+import { EventCardExternalLinks } from "./event-card-external-links";
 import { MapPin, Clock, Calendar, User } from "lucide-react";
 import type { Event } from "@/types";
 
 interface EventGridCardProps {
   event: Event;
+  saveButton?: React.ReactNode;
 }
 
-export function EventGridCard({ event }: EventGridCardProps) {
-  const startDate = new Date(event.start_date);
+export function EventGridCard({ event, saveButton }: EventGridCardProps) {
+  const dateLine = formatEventDateLine(event);
   const emoji = CATEGORY_EMOJI[event.category] || CATEGORY_EMOJI["Other"];
 
   return (
@@ -36,11 +38,23 @@ export function EventGridCard({ event }: EventGridCardProps) {
             />
           )}
 
+          {/* Save button overlay (top-right) */}
+          {saveButton && (
+            <div className="absolute right-2 top-2 rounded-full bg-background/80 backdrop-blur-sm">
+              {saveButton}
+            </div>
+          )}
+
           {/* Category badge overlay (bottom-left) */}
-          <div className="absolute bottom-2 left-2">
+          <div className="absolute bottom-2 left-2 flex items-center gap-1.5">
             <Badge className="bg-black/60 text-white backdrop-blur-sm hover:bg-black/60">
               {emoji} {event.category}
             </Badge>
+            {isRecentlyAddedEvent(event.created_at, event.start_date) && (
+              <span className="rounded bg-brand-gold px-1.5 py-0.5 text-xs font-medium text-white">
+                New
+              </span>
+            )}
           </div>
         </div>
 
@@ -53,7 +67,7 @@ export function EventGridCard({ event }: EventGridCardProps) {
           <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
             <span className="flex items-center gap-1">
               <Calendar className="h-3 w-3" />
-              {format(startDate, "MMM d")}
+              {dateLine}
             </span>
             {(event.start_time || event.end_time) && (
               <span className="flex items-center gap-1">
@@ -76,11 +90,17 @@ export function EventGridCard({ event }: EventGridCardProps) {
           )}
 
           <div className="mt-3 flex items-center justify-between">
-            {event.price_info && (
-              <span className="text-sm font-medium text-brand-terracotta">
-                {event.price_info}
-              </span>
-            )}
+            <div className="flex items-center gap-2">
+              {event.price_info && (
+                <span className="text-sm font-medium text-brand-terracotta">
+                  {event.price_info}
+                </span>
+              )}
+              <EventCardExternalLinks
+                venueMapUrl={event.venue_map_url}
+                externalTicketUrl={event.external_ticket_url}
+              />
+            </div>
             {event.organizer_name && (
               <span className="flex items-center gap-1 text-xs text-muted-foreground">
                 <User className="h-3 w-3" />

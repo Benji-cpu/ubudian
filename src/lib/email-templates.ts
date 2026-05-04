@@ -94,6 +94,10 @@ export function newsletterWelcome(): string {
     <p style="margin-top:20px;">
       <a href="${SITE_URL}/events" style="display:inline-block;padding:10px 24px;background-color:${COLORS.deepGreen};color:#ffffff;text-decoration:none;border-radius:4px;font-weight:600;">Browse Events</a>
     </p>
+    <p style="margin-top:24px;padding-top:20px;border-top:1px solid #eee;font-size:14px;color:#666;">
+      Want personalized event recommendations? Take the 90-second Ubud Spirit Quiz:
+      <a href="${SITE_URL}/quiz" style="color:#B85C3F;text-decoration:underline;font-weight:600;">Take the Quiz</a>
+    </p>
   `);
 }
 
@@ -167,6 +171,160 @@ export function bookingCancellation(opts: {
     <p>Hi ${escapeHtml(opts.guestName)}, your booking for <strong>${escapeHtml(opts.tourTitle)}</strong> (${escapeHtml(opts.bookingReference)}) has been cancelled.</p>
     ${refundMsg}
     <p style="margin-top:16px;">If you have questions, just reply to this email.</p>
+  `);
+}
+
+export function feedbackNotification(opts: {
+  type: string;
+  message: string;
+  pageUrl: string | null;
+  pageTitle?: string | null;
+  imageUrl?: string | null;
+  email: string | null;
+}): string {
+  const typeLabel = opts.type.charAt(0).toUpperCase() + opts.type.slice(1);
+  const preview = opts.message.length > 400 ? opts.message.slice(0, 400) + "..." : opts.message;
+  const pageRow = opts.pageUrl
+    ? `<tr><td style="padding:8px 0;color:#888;">Page</td><td style="padding:8px 0;"><a href="${escapeHtml(opts.pageUrl)}" style="color:${COLORS.deepGreen};text-decoration:underline;">${escapeHtml(opts.pageTitle || opts.pageUrl)}</a></td></tr>`
+    : "";
+  const emailRow = opts.email
+    ? `<tr><td style="padding:8px 0;color:#888;">From</td><td style="padding:8px 0;">${escapeHtml(opts.email)}</td></tr>`
+    : "";
+  const imageBlock = opts.imageUrl
+    ? `<div style="margin:16px 0;"><a href="${escapeHtml(opts.imageUrl)}"><img src="${escapeHtml(opts.imageUrl)}" alt="Feedback screenshot" style="max-width:100%;border-radius:4px;border:1px solid #eee;" /></a></div>`
+    : "";
+
+  return layout(`
+    <h2 style="margin:0 0 16px;font-family:'Lora',Georgia,serif;color:${COLORS.deepGreen};">New Feedback: ${typeLabel}</h2>
+    <table style="margin:16px 0;width:100%;border-collapse:collapse;font-size:14px;">
+      <tr><td style="padding:8px 0;color:#888;">Type</td><td style="padding:8px 0;font-weight:600;">${typeLabel}</td></tr>
+      ${emailRow}
+      ${pageRow}
+    </table>
+    <div style="margin:16px 0;padding:12px 16px;background-color:${COLORS.cream};border-radius:4px;font-size:14px;white-space:pre-wrap;">${escapeHtml(preview)}</div>
+    ${imageBlock}
+    <p style="margin-top:20px;">
+      <a href="${SITE_URL}/admin/community" style="display:inline-block;padding:10px 24px;background-color:${COLORS.deepGreen};color:#ffffff;text-decoration:none;border-radius:4px;font-weight:600;">View in Admin</a>
+    </p>
+  `);
+}
+
+export function weeklyIngestionDigest(opts: {
+  eventCount: number;
+  errorCount: number;
+  runCount: number;
+  quietGroupAlerts: number;
+  eventsBySource: Record<string, number>;
+  errorsBySource: Record<string, number>;
+  totalMessages: number;
+  successRate: number;
+}): string {
+  const sourceRows = Object.entries(opts.eventsBySource)
+    .sort(([, a], [, b]) => b - a)
+    .map(([name, count]) => `<tr><td style="padding:4px 8px;">${escapeHtml(name)}</td><td style="padding:4px 8px;text-align:right;font-weight:600;">${count}</td></tr>`)
+    .join("");
+
+  const errorRows = Object.entries(opts.errorsBySource)
+    .sort(([, a], [, b]) => b - a)
+    .map(([name, count]) => `<tr><td style="padding:4px 8px;">${escapeHtml(name)}</td><td style="padding:4px 8px;text-align:right;color:#B85C3F;font-weight:600;">${count}</td></tr>`)
+    .join("");
+
+  return layout(`
+    <h2 style="margin:0 0 16px;font-family:'Lora',Georgia,serif;color:${COLORS.deepGreen};">Weekly Ingestion Summary</h2>
+
+    <table style="margin:16px 0;width:100%;border-collapse:collapse;font-size:14px;">
+      <tr><td style="padding:8px 0;color:#888;">Events Created</td><td style="padding:8px 0;font-weight:600;font-size:18px;">${opts.eventCount}</td></tr>
+      <tr><td style="padding:8px 0;color:#888;">Messages Processed</td><td style="padding:8px 0;">${opts.totalMessages}</td></tr>
+      <tr><td style="padding:8px 0;color:#888;">Ingestion Runs</td><td style="padding:8px 0;">${opts.runCount}</td></tr>
+      <tr><td style="padding:8px 0;color:#888;">Success Rate</td><td style="padding:8px 0;">${opts.successRate}%</td></tr>
+      <tr><td style="padding:8px 0;color:#888;">Source Errors</td><td style="padding:8px 0;${opts.errorCount > 0 ? 'color:#B85C3F;font-weight:600;' : ''}">${opts.errorCount}</td></tr>
+      <tr><td style="padding:8px 0;color:#888;">Quiet Group Alerts</td><td style="padding:8px 0;${opts.quietGroupAlerts > 0 ? 'color:#C9A84C;font-weight:600;' : ''}">${opts.quietGroupAlerts}</td></tr>
+    </table>
+
+    ${sourceRows ? `
+    <h3 style="margin:24px 0 8px;font-family:'Lora',Georgia,serif;color:${COLORS.deepGreen};font-size:16px;">Events by Source</h3>
+    <table style="width:100%;border-collapse:collapse;font-size:14px;">
+      ${sourceRows}
+    </table>` : ""}
+
+    ${errorRows ? `
+    <h3 style="margin:24px 0 8px;font-family:'Lora',Georgia,serif;color:${COLORS.deepGreen};font-size:16px;">Errors by Source</h3>
+    <table style="width:100%;border-collapse:collapse;font-size:14px;">
+      ${errorRows}
+    </table>` : ""}
+
+    <p style="margin-top:24px;">
+      <a href="${SITE_URL}/admin/ingestion" style="display:inline-block;padding:10px 24px;background-color:${COLORS.deepGreen};color:#ffffff;text-decoration:none;border-radius:4px;font-weight:600;">View Dashboard</a>
+    </p>
+  `);
+}
+
+interface DailyMaintenancePayload {
+  startedAt: string;
+  finishedAt: string;
+  autonomous: {
+    archivedPendingEvents: number;
+    purgedFailedMessages: number;
+    cancelledStaleBookings: number;
+    archivedDuplicateEvents: number;
+  };
+  review: {
+    feedback: { id: string; type: string; status: string; message: string; page_url: string | null; created_at: string }[];
+    dedupBacklog: number;
+    unresolvedVenuesLowConfidence: number;
+    incompleteSubscriptions: number;
+    eventDateInconsistencies: { id: string; title: string; reason: string }[];
+  } | null;
+  errors: string[];
+}
+
+export function dailyMaintenanceDigest(p: DailyMaintenancePayload): string {
+  const a = p.autonomous;
+  const r = p.review;
+  const fbCount = r?.feedback.length ?? 0;
+  const fbRows = (r?.feedback ?? [])
+    .slice(0, 15)
+    .map((f) => {
+      const preview = f.message.length > 140 ? f.message.slice(0, 140) + "\u2026" : f.message;
+      const pageBit = f.page_url
+        ? ` <a href="${escapeHtml(f.page_url)}" style="color:${COLORS.deepGreen};">page</a>`
+        : "";
+      return `<li style="margin-bottom:10px;"><strong>[${escapeHtml(f.type)}]</strong> ${escapeHtml(preview)}${pageBit}</li>`;
+    })
+    .join("");
+
+  const inconsistencyRows = (r?.eventDateInconsistencies ?? [])
+    .slice(0, 10)
+    .map((e) => `<li>${escapeHtml(e.title)} — <em>${escapeHtml(e.reason)}</em></li>`)
+    .join("");
+
+  const errorBlock = p.errors.length
+    ? `<div style="margin:16px 0;padding:12px 16px;background-color:#FCE8E0;border-radius:4px;font-size:14px;"><strong>Errors:</strong><ul style="margin:8px 0;padding-left:20px;">${p.errors.map((e) => `<li>${escapeHtml(e)}</li>`).join("")}</ul></div>`
+    : "";
+
+  return layout(`
+    <h2 style="margin:0 0 16px;font-family:'Lora',Georgia,serif;color:${COLORS.deepGreen};">Daily Maintenance — ${escapeHtml(p.startedAt.split("T")[0])}</h2>
+
+    <h3 style="margin:24px 0 8px;font-family:'Lora',Georgia,serif;color:${COLORS.deepGreen};font-size:16px;">Auto-fixed</h3>
+    <table style="margin:8px 0;width:100%;border-collapse:collapse;font-size:14px;">
+      <tr><td style="padding:6px 0;color:#888;">Past-pending events archived</td><td style="padding:6px 0;text-align:right;font-weight:600;">${a.archivedPendingEvents}</td></tr>
+      <tr><td style="padding:6px 0;color:#888;">Failed messages purged</td><td style="padding:6px 0;text-align:right;font-weight:600;">${a.purgedFailedMessages}</td></tr>
+      <tr><td style="padding:6px 0;color:#888;">Stale bookings cancelled</td><td style="padding:6px 0;text-align:right;font-weight:600;">${a.cancelledStaleBookings}</td></tr>
+      <tr><td style="padding:6px 0;color:#888;">Duplicate events archived</td><td style="padding:6px 0;text-align:right;font-weight:600;">${a.archivedDuplicateEvents}</td></tr>
+    </table>
+
+    ${errorBlock}
+
+    <h3 style="margin:24px 0 8px;font-family:'Lora',Georgia,serif;color:${COLORS.deepGreen};font-size:16px;">Needs your attention</h3>
+    <p style="margin:0 0 8px;font-size:14px;color:#666;">${fbCount} open feedback · ${r?.dedupBacklog ?? 0} stale dedup · ${r?.unresolvedVenuesLowConfidence ?? 0} low-confidence venues · ${r?.incompleteSubscriptions ?? 0} stuck subscriptions · ${r?.eventDateInconsistencies.length ?? 0} event date issues</p>
+
+    ${fbRows ? `<h4 style="margin:16px 0 4px;font-size:14px;color:${COLORS.charcoal};">Recent feedback</h4><ul style="margin:0 0 16px;padding-left:20px;font-size:14px;">${fbRows}</ul>` : ""}
+
+    ${inconsistencyRows ? `<h4 style="margin:16px 0 4px;font-size:14px;color:${COLORS.charcoal};">Event date issues</h4><ul style="margin:0 0 16px;padding-left:20px;font-size:14px;">${inconsistencyRows}</ul>` : ""}
+
+    <p style="margin-top:20px;">
+      <a href="${SITE_URL}/admin/community" style="display:inline-block;padding:10px 24px;background-color:${COLORS.deepGreen};color:#ffffff;text-decoration:none;border-radius:4px;font-weight:600;">Open Admin</a>
+    </p>
   `);
 }
 

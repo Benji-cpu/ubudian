@@ -5,6 +5,8 @@ import { generateBookingReference } from "@/lib/stripe/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
+import { SITE_URL } from "@/lib/constants";
+import { getSiteSettings } from "@/lib/site-settings";
 
 const bookingSchema = z.object({
   tour_id: z.string().uuid(),
@@ -21,6 +23,11 @@ export async function POST(request: Request) {
   const { success } = rateLimit(`checkout-tour:${ip}`, { limit: 10, windowSeconds: 900 });
   if (!success) {
     return NextResponse.json({ error: "Too many requests. Please try again later." }, { status: 429 });
+  }
+
+  const settings = await getSiteSettings();
+  if (!settings.tours_enabled) {
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
   try {
@@ -91,34 +98,37 @@ export async function POST(request: Request) {
 
     // Create Stripe Checkout Session
     const stripe = getStripe();
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:4000";
+    const siteUrl = SITE_URL;
 
-    const session = await stripe.checkout.sessions.create({
-      mode: "payment",
-      currency: "usd",
-      customer_email: data.guest_email,
-      line_items: [
-        {
-          price_data: {
-            currency: "usd",
-            product_data: {
-              name: tour.title,
-              description: `${data.num_guests} guest${data.num_guests > 1 ? "s" : ""} — ${data.preferred_date}`,
+    const session = await stripe.checkout.sessions.create(
+      {
+        mode: "payment",
+        currency: "usd",
+        customer_email: data.guest_email,
+        line_items: [
+          {
+            price_data: {
+              currency: "usd",
+              product_data: {
+                name: tour.title,
+                description: `${data.num_guests} guest${data.num_guests > 1 ? "s" : ""} — ${data.preferred_date}`,
+              },
+              unit_amount: tour.price_per_person,
             },
-            unit_amount: tour.price_per_person,
+            quantity: data.num_guests,
           },
-          quantity: data.num_guests,
+        ],
+        metadata: {
+          booking_id: booking.id,
+          booking_reference: bookingReference,
+          tour_id: data.tour_id,
+          type: "tour_booking",
         },
-      ],
-      metadata: {
-        booking_id: booking.id,
-        booking_reference: bookingReference,
-        tour_id: data.tour_id,
-        type: "tour_booking",
+        success_url: `${siteUrl}/booking/success?ref=${bookingReference}`,
+        cancel_url: `${siteUrl}/booking/cancel?ref=${bookingReference}`,
       },
-      success_url: `${siteUrl}/booking/success?ref=${bookingReference}`,
-      cancel_url: `${siteUrl}/booking/cancel?ref=${bookingReference}`,
-    });
+      { idempotencyKey: `tour-checkout:${booking.id}` }
+    );
 
     // Update booking with Stripe session ID
     await supabaseAdmin

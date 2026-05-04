@@ -9,6 +9,20 @@ export default function GlobalError({
 }) {
   return (
     <html lang="en">
+      <head>
+        <style
+          dangerouslySetInnerHTML={{
+            __html: `
+              @media (prefers-color-scheme: dark) {
+                body { background-color: #1A1A1A !important; }
+                h1 { color: #8BAF8A !important; }
+                p { color: #B0B0B0 !important; }
+                button { background-color: #8BAF8A !important; color: #1A1A1A !important; }
+              }
+            `,
+          }}
+        />
+      </head>
       <body style={{ fontFamily: "system-ui, sans-serif", margin: 0, backgroundColor: "#FAF5EC" }}>
         <div
           style={{

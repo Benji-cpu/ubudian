@@ -19,9 +19,12 @@ import {
   AlertTriangle,
   Clock,
   Globe,
+  Users,
 } from "lucide-react";
 import { CreateSourceButton } from "@/components/admin/ingestion/create-source-button";
 import { TelegramRegisterButton } from "@/components/admin/ingestion/telegram-register-button";
+import { TelegramGroupList } from "@/components/admin/ingestion/telegram-group-list";
+import type { TelegramGroup } from "@/components/admin/ingestion/telegram-group-list";
 import { formatDistanceToNow } from "date-fns";
 import type { EventSource, RawIngestionMessage } from "@/types";
 
@@ -48,6 +51,7 @@ export default async function TelegramIngestionPage() {
   const webhookUrl = process.env.NEXT_PUBLIC_SITE_URL
     ? `${process.env.NEXT_PUBLIC_SITE_URL}/api/webhooks/telegram`
     : "(NEXT_PUBLIC_SITE_URL not set)";
+  const isLocalhost = !process.env.NEXT_PUBLIC_SITE_URL?.startsWith("https://");
 
   // Fetch Telegram event source
   const { data: sourceData } = await supabase
@@ -114,6 +118,67 @@ export default async function TelegramIngestionPage() {
 
   const recentMessages = (messagesData ?? []) as RawIngestionMessage[];
 
+  // Fetch messages with chat_name + raw_data for group aggregation (need raw_data for chat_id)
+  const { data: groupMsgData } = source
+    ? await supabase
+        .from("raw_ingestion_messages")
+        .select("chat_name, status, created_at, raw_data")
+        .eq("source_id", source.id)
+        .not("chat_name", "is", null)
+    : { data: [] };
+
+  // Build group summaries keyed by chat_id (extracted from raw_data)
+  type GroupStatus = "active" | "quiet" | "stale";
+
+  function extractChatId(rawData: unknown): string {
+    const data = rawData as { message?: { chat?: { id?: number } }; channel_post?: { chat?: { id?: number } } } | null;
+    const id = data?.message?.chat?.id || data?.channel_post?.chat?.id;
+    return id ? String(id) : "";
+  }
+
+  function getGroupStatus(lastMessageAt: string): GroupStatus {
+    const hoursAgo = (Date.now() - new Date(lastMessageAt).getTime()) / (1000 * 60 * 60);
+    if (hoursAgo <= 6) return "active";
+    if (hoursAgo <= 24) return "quiet";
+    return "stale";
+  }
+
+  const groupMap = new Map<string, { chatName: string; total: number; parsed: number; lastAt: string }>();
+  for (const msg of groupMsgData ?? []) {
+    const chatId = extractChatId(msg.raw_data);
+    if (!chatId) continue;
+    const name = msg.chat_name as string;
+    const createdAt = msg.created_at as string;
+    const existing = groupMap.get(chatId);
+    if (existing) {
+      existing.total++;
+      if (msg.status === "parsed") existing.parsed++;
+      if (createdAt > existing.lastAt) existing.lastAt = createdAt;
+    } else {
+      groupMap.set(chatId, {
+        chatName: name,
+        total: 1,
+        parsed: msg.status === "parsed" ? 1 : 0,
+        lastAt: createdAt,
+      });
+    }
+  }
+
+  const groups: TelegramGroup[] = Array.from(groupMap.entries())
+    .map(([chatId, data]) => ({
+      chatId,
+      chatName: data.chatName,
+      totalMessages: data.total,
+      eventsCreated: data.parsed,
+      lastMessageAt: data.lastAt,
+      status: getGroupStatus(data.lastAt),
+    }))
+    .sort((a, b) => new Date(b.lastMessageAt).getTime() - new Date(a.lastMessageAt).getTime());
+
+  // Read allowed_groups from source config
+  const sourceConfig = (source?.config || {}) as Record<string, unknown>;
+  const allowedGroups = (sourceConfig.allowed_groups as string[] | undefined) ?? [];
+
   // Staleness indicator
   const lastMessageAt = lastMessageData?.[0]?.created_at as string | null;
   let stalenessColor = "text-muted-foreground";
@@ -141,7 +206,7 @@ export default async function TelegramIngestionPage() {
     <div className="space-y-6">
       <div className="flex items-center gap-3">
         <Button asChild variant="ghost" size="sm">
-          <Link href="/admin/ingestion">
+          <Link href="/admin/sources">
             <ArrowLeft className="h-4 w-4" />
           </Link>
         </Button>
@@ -168,7 +233,7 @@ export default async function TelegramIngestionPage() {
             <EnvBadge name="TELEGRAM_WEBHOOK_SECRET" isSet={hasWebhookSecret} />
             <EnvBadge name="NEXT_PUBLIC_SITE_URL" isSet={hasSiteUrl} />
           </div>
-          <TelegramRegisterButton />
+          <TelegramRegisterButton isLocalhost={isLocalhost} />
         </CardContent>
       </Card>
 
@@ -230,6 +295,21 @@ export default async function TelegramIngestionPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Groups with filtering toggles */}
+      {source && (
+        <div>
+          <h2 className="mb-3 text-lg font-semibold flex items-center gap-2">
+            <Users className="h-4 w-4" />
+            Groups ({groups.length})
+          </h2>
+          <TelegramGroupList
+            sourceId={source.id}
+            groups={groups}
+            allowedGroups={allowedGroups}
+          />
+        </div>
+      )}
 
       {/* Recent messages */}
       <div>

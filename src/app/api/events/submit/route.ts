@@ -4,6 +4,7 @@ import { slugify } from "@/lib/utils";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
 import { sendTransactionalEmail } from "@/lib/email";
 import { eventSubmissionConfirmation } from "@/lib/email-templates";
+import { moderateEvent } from "@/lib/events/moderation";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { safeUrlOrEmpty } from "@/lib/url-validation";
@@ -41,14 +42,46 @@ export async function POST(request: Request) {
     const body = await request.json();
     const data = submissionSchema.parse(body);
 
-    // Honeypot check
+    // Honeypot
     if (data.website) {
       return NextResponse.json({ success: true });
     }
 
+    // AI moderation gate — auto-reject hard red flags, everything else publishes.
+    const moderation = await moderateEvent({
+      title: data.title,
+      description: data.description,
+      organizer_name: data.organizer_name,
+      venue_name: data.venue_name || null,
+      source_url: data.external_ticket_url || null,
+      origin: "user_submission",
+    });
+
+    if (!moderation.ok) {
+      return NextResponse.json(
+        {
+          error:
+            "We couldn't publish this submission. " +
+            (moderation.reason || "Please review and try again."),
+          flag: moderation.flag,
+        },
+        { status: 422 }
+      );
+    }
+
     const supabase = createAdminClient();
 
-    // Check if trusted submitter
+    // Generate unique slug
+    let slug = slugify(data.title);
+    const { data: existing } = await queryWithRetry(
+      () => supabase.from("events").select("slug").eq("slug", slug).single(),
+      "event-submit-slug"
+    );
+    if (existing) {
+      slug = `${slug}-${Date.now().toString(36)}`;
+    }
+
+    // Trusted submitter flag is now purely for analytics — everyone publishes.
     const { data: trusted } = await queryWithRetry(
       () =>
         supabase
@@ -58,24 +91,7 @@ export async function POST(request: Request) {
           .single(),
       "event-submit-trusted"
     );
-
-    const autoApprove = (trusted as { auto_approve: boolean } | null)?.auto_approve ?? false;
-
-    // Generate unique slug
-    let slug = slugify(data.title);
-    const { data: existing } = await queryWithRetry(
-      () =>
-        supabase
-          .from("events")
-          .select("slug")
-          .eq("slug", slug)
-          .single(),
-      "event-submit-slug"
-    );
-
-    if (existing) {
-      slug = `${slug}-${Date.now().toString(36)}`;
-    }
+    const isTrusted = (trusted as { auto_approve: boolean } | null)?.auto_approve ?? false;
 
     const { error } = await queryWithRetry(
       () =>
@@ -99,8 +115,9 @@ export async function POST(request: Request) {
           is_recurring: data.is_recurring || false,
           recurrence_rule: data.recurrence_rule || null,
           submitted_by_email: data.submitted_by_email.toLowerCase(),
-          is_trusted_submitter: autoApprove,
-          status: autoApprove ? "approved" : "pending",
+          is_trusted_submitter: isTrusted,
+          status: "approved",
+          ai_approved_at: new Date().toISOString(),
         }),
       "event-submit-insert"
     );
@@ -116,11 +133,16 @@ export async function POST(request: Request) {
     // Fire-and-forget confirmation email
     sendTransactionalEmail(
       data.submitted_by_email,
-      "Your event has been submitted!",
-      eventSubmissionConfirmation(data.title, autoApprove)
+      "Your event is live!",
+      eventSubmissionConfirmation(data.title, true)
     );
 
-    return NextResponse.json({ success: true, autoApproved: autoApprove });
+    return NextResponse.json({
+      success: true,
+      autoApproved: true,
+      slug,
+      url: `/events/${slug}`,
+    });
   } catch (err) {
     if (err instanceof z.ZodError) {
       return NextResponse.json(
@@ -128,9 +150,6 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
-    return NextResponse.json(
-      { error: "Invalid request" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Invalid request" }, { status: 400 });
   }
 }

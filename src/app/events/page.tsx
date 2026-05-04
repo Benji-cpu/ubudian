@@ -3,20 +3,33 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { queryWithRetry } from "@/lib/supabase/retry";
+import { getCurrentProfile } from "@/lib/auth";
+import { ARCHETYPES } from "@/lib/quiz-data";
 import { Button } from "@/components/ui/button";
-import { EventList } from "@/components/events/event-list";
-import { EventGridView } from "@/components/events/event-grid-view";
-import { EventCalendar } from "@/components/events/event-calendar";
-import { EventWeekView } from "@/components/events/event-week-view";
+import { AgendaFeed } from "@/components/events/agenda-feed";
+import { PriceFilteredEvents } from "@/components/events/price-filtered-events";
 import { ViewSwitcher } from "@/components/events/view-switcher";
+import { EventSortSelect } from "@/components/events/event-sort-select";
 import { EventFilters } from "@/components/events/event-filters";
 import { EventSearch } from "@/components/events/event-search";
-import type { Event } from "@/types";
+import { CategoryGuideLink } from "@/components/events/category-guide-link";
+import { MapView } from "@/components/events/map-view";
+import { RefreshOnFocus } from "@/components/events/refresh-on-focus";
+import { nowInBali } from "@/lib/events/bali-time";
+import type { ArchetypeId, Event, Experience, QuizResultRecord } from "@/types";
 
 export const metadata: Metadata = {
   title: "Events in Ubud | The Ubudian",
   description:
     "Tantra workshops, sound journeys, breathwork, ecstatic dance, medicine song circles, and sacred ceremonies happening in Ubud this week.",
+};
+
+const ARCHETYPE_NAMES: Record<string, string> = {
+  seeker: "The Seeker",
+  explorer: "The Explorer",
+  creative: "The Creative",
+  connector: "The Connector",
+  epicurean: "The Epicurean",
 };
 
 interface EventsPageProps {
@@ -28,46 +41,136 @@ interface EventsPageProps {
     q?: string;
     month?: string;
     week?: string;
+    time?: string;
+    sort?: string;
+    venue?: string;
+    happening?: string;
+    price?: string;
+    archetype?: string;
+    free?: string;
+    hasImage?: string;
   }>;
 }
 
 export default async function EventsPage({ searchParams }: EventsPageProps) {
   const params = await searchParams;
-  const view = params.view || "list";
+  const view = params.view || "feed";
 
   let allEvents: Event[] = [];
+  let categoryGuide: Experience | null = null;
+  let currentProfileId: string | null = null;
+  let savedEventIds: string[] = [];
+  let viewerArchetypes: ArchetypeId[] | null = null;
+  let archetypeLabel: string | null = null;
 
   try {
     const supabase = await createClient();
+    const profile = await getCurrentProfile();
+    if (profile) {
+      currentProfileId = profile.id;
+
+      const [savedResult, quizResult] = await Promise.all([
+        supabase.from("saved_events").select("event_id").eq("profile_id", profile.id),
+        supabase
+          .from("quiz_results")
+          .select("primary_archetype, secondary_archetype")
+          .eq("profile_id", profile.id)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle(),
+      ]);
+
+      savedEventIds = ((savedResult.data ?? []) as { event_id: string }[]).map(
+        (r) => r.event_id
+      );
+
+      const quiz = quizResult.data as Pick<
+        QuizResultRecord,
+        "primary_archetype" | "secondary_archetype"
+      > | null;
+      if (quiz?.primary_archetype) {
+        viewerArchetypes = [
+          quiz.primary_archetype,
+          ...(quiz.secondary_archetype ? [quiz.secondary_archetype] : []),
+        ];
+        archetypeLabel = ARCHETYPES[quiz.primary_archetype]?.name ?? null;
+      }
+    }
+
+    // Fetch matching guide for the active category
+    if (params.category) {
+      const { data: guide } = await supabase
+        .from("experiences")
+        .select("*")
+        .eq("category", params.category)
+        .eq("is_active", true)
+        .order("sort_order", { ascending: true })
+        .limit(1)
+        .single();
+      categoryGuide = (guide as Experience) ?? null;
+    }
 
     const { data: events, error } = await queryWithRetry(() => {
+      const sortByNewest = params.sort === "newest";
       let query = supabase
         .from("events")
         .select("*")
         .eq("status", "approved")
-        .order("start_date", { ascending: true });
+        .order(sortByNewest ? "created_at" : "start_date", {
+          ascending: !sortByNewest,
+        });
 
-      // Only show future events in list/grid view (but include recurring events with past start dates)
-      if (view === "list" || view === "grid") {
-        const today = new Date().toISOString().split("T")[0];
-        query = query.or(`start_date.gte.${today},is_recurring.eq.true`);
+      const today = nowInBali().dateStr;
+
+      // Happening Now filter
+      if (params.happening === "true") {
+        query = query
+          .lte("start_date", today)
+          .or(`end_date.gte.${today},end_date.is.null`);
+      } else if (view === "list" || view === "grid" || view === "feed") {
+        // Feed/list/grid: future events, recurring past-start (rolled forward
+        // by the bucket logic), AND multi-day events still in their span
+        // (so day-3-of-5 retreats land in the in_progress bucket instead of
+        // being filtered out by the start_date floor).
+        query = query.or(
+          `start_date.gte.${today},is_recurring.eq.true,end_date.gte.${today}`
+        );
       }
 
       if (params.category) {
         query = query.eq("category", params.category);
       }
 
-      if (params.from) {
+      if (params.from && params.happening !== "true") {
         query = query.gte("start_date", params.from);
       }
-
-      if (params.to) {
+      if (params.to && params.happening !== "true") {
         query = query.lte("start_date", params.to);
       }
 
       if (params.q) {
         const q = `%${params.q}%`;
-        query = query.or(`title.ilike.${q},short_description.ilike.${q},venue_name.ilike.${q},category.ilike.${q}`);
+        query = query.or(
+          `title.ilike.${q},short_description.ilike.${q},venue_name.ilike.${q},category.ilike.${q}`
+        );
+      }
+
+      if (params.time === "morning") {
+        query = query.or("start_time.is.null,start_time.lt.12:00:00");
+      } else if (params.time === "afternoon") {
+        query = query.or(
+          "start_time.is.null,and(start_time.gte.12:00:00,start_time.lt.17:00:00)"
+        );
+      } else if (params.time === "evening") {
+        query = query.or("start_time.is.null,start_time.gte.17:00:00");
+      }
+
+      if (params.venue) {
+        query = query.ilike("venue_name", `%${params.venue}%`);
+      }
+
+      if (params.archetype) {
+        query = query.contains("archetype_tags", [params.archetype]);
       }
 
       return query;
@@ -78,10 +181,14 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
     // Supabase unreachable — render with empty state
   }
 
+  const isFeedView = view === "feed";
+  const isMapView = view === "map";
+
   return (
     <div>
+      <RefreshOnFocus />
       {/* Hero */}
-      <section className="bg-brand-cream px-4 py-16 sm:py-20">
+      <section className="bg-brand-cream px-4 py-12 sm:py-16">
         <div className="mx-auto max-w-3xl text-center">
           <div className="mx-auto mb-6 h-px w-12 bg-brand-gold/40" />
           <h1 className="font-serif text-4xl font-medium tracking-tight text-brand-deep-green sm:text-5xl">
@@ -97,12 +204,19 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
         </div>
       </section>
 
-      {/* Controls & Content */}
-      <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+      {/* Controls */}
+      <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-          <Suspense>
-            <ViewSwitcher />
-          </Suspense>
+          <div className="flex items-center gap-2">
+            <Suspense>
+              <ViewSwitcher />
+            </Suspense>
+            {!isFeedView && !isMapView && (
+              <Suspense>
+                <EventSortSelect />
+              </Suspense>
+            )}
+          </div>
           <div className="w-full sm:max-w-xs">
             <Suspense>
               <EventSearch />
@@ -114,21 +228,53 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
           <Suspense>
             <EventFilters />
           </Suspense>
+          {params.category && categoryGuide && (
+            <CategoryGuideLink category={params.category} guide={categoryGuide} />
+          )}
         </div>
 
-        <div className="mt-8">
+        {params.archetype && ARCHETYPE_NAMES[params.archetype] && (
+          <div className="mt-4 flex items-center justify-between rounded-lg border border-brand-gold/20 bg-brand-gold/5 px-4 py-3">
+            <p className="text-sm text-brand-charcoal">
+              Showing events matched to your archetype:{" "}
+              <span className="font-semibold text-brand-deep-green">
+                {ARCHETYPE_NAMES[params.archetype]}
+              </span>
+            </p>
+            <Link
+              href="/events"
+              className="text-sm font-medium text-brand-deep-green underline underline-offset-2 hover:text-brand-gold"
+            >
+              Show all events
+            </Link>
+          </div>
+        )}
+      </section>
+
+      {/* Content */}
+      <section className="mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:px-8">
+        {isFeedView ? (
           <Suspense>
-            {view === "calendar" ? (
-              <EventCalendar events={allEvents} />
-            ) : view === "week" ? (
-              <EventWeekView events={allEvents} />
-            ) : view === "grid" ? (
-              <EventGridView events={allEvents} />
-            ) : (
-              <EventList events={allEvents} />
-            )}
+            <AgendaFeed
+              events={allEvents}
+              currentProfileId={currentProfileId}
+              savedEventIds={savedEventIds}
+              viewerArchetypes={viewerArchetypes}
+              archetypeLabel={archetypeLabel}
+            />
           </Suspense>
-        </div>
+        ) : isMapView ? (
+          <MapView events={allEvents} />
+        ) : (
+          <Suspense>
+            <PriceFilteredEvents
+              events={allEvents}
+              view={view}
+              currentProfileId={currentProfileId}
+              savedEventIds={savedEventIds}
+            />
+          </Suspense>
+        )}
       </section>
     </div>
   );

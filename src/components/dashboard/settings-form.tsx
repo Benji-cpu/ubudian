@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -17,7 +18,15 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Loader2, LogOut } from "lucide-react";
-import type { Profile } from "@/types";
+import type { Profile, ArchetypeId } from "@/types";
+
+const ARCHETYPE_NAMES: Record<ArchetypeId, string> = {
+  seeker: "The Seeker",
+  explorer: "The Explorer",
+  creative: "The Creative",
+  connector: "The Connector",
+  epicurean: "The Epicurean",
+};
 
 const settingsSchema = z.object({
   display_name: z
@@ -31,9 +40,10 @@ type SettingsFormValues = z.infer<typeof settingsSchema>;
 interface SettingsFormProps {
   profile: Profile;
   isSubscribed: boolean;
+  archetype: ArchetypeId | null;
 }
 
-export function SettingsForm({ profile, isSubscribed }: SettingsFormProps) {
+export function SettingsForm({ profile, isSubscribed, archetype }: SettingsFormProps) {
   const router = useRouter();
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -116,6 +126,25 @@ export function SettingsForm({ profile, isSubscribed }: SettingsFormProps) {
             ? "You're getting the weekly Ubudian — one email, every week."
             : "You're not subscribed yet — you're missing the weekly roundup."}
         </p>
+
+        <div className="mt-4">
+          <h3 className="text-sm font-medium text-brand-charcoal">Newsletter Preferences</h3>
+          {archetype ? (
+            <p className="mt-1.5 text-sm text-muted-foreground">
+              Your weekly newsletter is personalized for{" "}
+              <span className="inline-flex items-center rounded-full bg-brand-deep-green/10 px-2.5 py-0.5 text-xs font-semibold text-brand-deep-green">
+                {ARCHETYPE_NAMES[archetype]}
+              </span>
+            </p>
+          ) : (
+            <p className="mt-1.5 text-sm text-muted-foreground">
+              <Link href="/quiz" className="font-medium text-brand-terracotta hover:underline">
+                Take the Ubud Spirit Quiz
+              </Link>{" "}
+              to get personalized newsletter recommendations.
+            </p>
+          )}
+        </div>
       </div>
 
       <div className="border-t border-brand-gold/10 pt-6">

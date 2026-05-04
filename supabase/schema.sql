@@ -11,6 +11,7 @@ CREATE TABLE profiles (
   display_name TEXT,
   avatar_url TEXT,
   role TEXT DEFAULT 'user',  -- 'user' | 'admin'
+  ics_token TEXT UNIQUE,     -- Per-user token for ICS calendar feed subscription
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -169,6 +170,12 @@ CREATE TABLE events (
   llm_parsed BOOLEAN DEFAULT FALSE,
   quality_score REAL,
   content_flags TEXT[] DEFAULT '{}',
+  -- Geo (populated by Nominatim geocoding on venue normalization)
+  latitude DOUBLE PRECISION,
+  longitude DOUBLE PRECISION,
+  -- AI moderation audit trail
+  ai_approved_at TIMESTAMPTZ,
+  moderation_reason TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -240,6 +247,18 @@ CREATE TABLE venue_aliases (
   alias TEXT NOT NULL,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   UNIQUE(alias)
+);
+
+-- Canonical venue → lat/lng cache backing the map-based events discovery view.
+-- Populated by the Nominatim geocoder on ingestion (and a backfill script).
+CREATE TABLE venue_coordinates (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  canonical_name TEXT UNIQUE NOT NULL,
+  latitude DOUBLE PRECISION NOT NULL,
+  longitude DOUBLE PRECISION NOT NULL,
+  geocoded_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  source TEXT NOT NULL DEFAULT 'nominatim',  -- nominatim | manual
+  confidence REAL
 );
 
 CREATE TABLE dedup_matches (
@@ -737,6 +756,71 @@ CREATE POLICY "Admins can manage payments"
   USING (public.is_admin());
 
 -- ============================================
+-- FEEDBACK TABLE
+-- ============================================
+
+CREATE TABLE feedback (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  type TEXT NOT NULL DEFAULT 'general', -- 'bug' | 'suggestion' | 'general'
+  message TEXT NOT NULL,
+  email TEXT,
+  page_url TEXT,
+  page_title TEXT,
+  user_agent TEXT,
+  profile_id UUID REFERENCES profiles(id) ON DELETE SET NULL,
+  image_url TEXT,
+  status TEXT NOT NULL DEFAULT 'new', -- 'new' | 'reviewed' | 'resolved' | 'dismissed'
+  admin_notes TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE feedback ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Admins can manage feedback"
+  ON feedback FOR ALL
+  USING (public.is_admin());
+
+-- ============================================
+-- PIPELINE HEALTH LOGS TABLE
+-- ============================================
+
+CREATE TABLE pipeline_health_logs (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  log_type TEXT NOT NULL,  -- 'success' | 'warning' | 'error' | 'info'
+  channel TEXT,            -- 'telegram' | 'whatsapp' | 'megatix' | 'system'
+  group_name TEXT,
+  message TEXT NOT NULL,
+  metadata JSONB DEFAULT '{}',
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE pipeline_health_logs ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Admins can manage health logs"
+  ON pipeline_health_logs FOR ALL
+  USING (public.is_admin());
+
+-- ============================================
+-- INGESTION ACTIVITY LOG
+-- ============================================
+
+CREATE TABLE ingestion_activity_log (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  category TEXT NOT NULL,       -- event_created | event_enriched | event_moderation | source_error | source_recovered | group_quiet | run_summary
+  severity TEXT NOT NULL DEFAULT 'info', -- info | warning | error
+  title TEXT NOT NULL,          -- Short human-readable description
+  details JSONB,                -- Structured metadata
+  source_id UUID REFERENCES event_sources(id) ON DELETE SET NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE ingestion_activity_log ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Admins can manage activity log"
+  ON ingestion_activity_log FOR ALL
+  USING (public.is_admin());
+
+-- ============================================
 -- PERFORMANCE INDEXES
 -- ============================================
 
@@ -781,6 +865,44 @@ CREATE INDEX idx_payments_booking ON payments(booking_id);
 CREATE INDEX idx_payments_subscription ON payments(subscription_id);
 CREATE INDEX idx_payments_stripe_pi ON payments(stripe_payment_intent_id);
 CREATE INDEX idx_profiles_stripe_customer ON profiles(stripe_customer_id);
+
+-- Feedback indexes
+CREATE INDEX idx_feedback_status ON feedback(status);
+CREATE INDEX idx_feedback_created_at ON feedback(created_at DESC);
+
+-- Pipeline health logs indexes
+CREATE INDEX idx_health_logs_created_at ON pipeline_health_logs(created_at DESC);
+CREATE INDEX idx_health_logs_log_type ON pipeline_health_logs(log_type);
+CREATE INDEX idx_health_logs_channel ON pipeline_health_logs(channel);
+
+-- Activity log indexes
+CREATE INDEX idx_activity_log_category ON ingestion_activity_log(category);
+CREATE INDEX idx_activity_log_created ON ingestion_activity_log(created_at DESC);
+CREATE INDEX idx_activity_log_source ON ingestion_activity_log(source_id);
+
+-- ==========================================
+-- Site Settings (singleton row)
+-- Admin-controlled public visibility flags.
+-- Added 2026-04-21.
+-- ==========================================
+CREATE TABLE site_settings (
+  id                          INT PRIMARY KEY DEFAULT 1 CHECK (id = 1),
+  blog_enabled                BOOLEAN NOT NULL DEFAULT FALSE,
+  stories_enabled             BOOLEAN NOT NULL DEFAULT FALSE,
+  tours_enabled               BOOLEAN NOT NULL DEFAULT FALSE,
+  newsletter_archive_enabled  BOOLEAN NOT NULL DEFAULT FALSE,
+  updated_at                  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+INSERT INTO site_settings (id) VALUES (1) ON CONFLICT (id) DO NOTHING;
+
+ALTER TABLE site_settings ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "site_settings public read" ON site_settings
+  FOR SELECT USING (true);
+
+CREATE POLICY "site_settings admin update" ON site_settings
+  FOR UPDATE USING (is_admin()) WITH CHECK (is_admin());
 
 -- ============================================
 -- QUIZ REDESIGN: SEGMENT COLUMNS

@@ -21,6 +21,7 @@ import {
 import { getCurrentUser, getCurrentProfile } from "@/lib/auth";
 import { isInsider } from "@/lib/stripe/subscription";
 import { MembersOnlyPaywall } from "@/components/membership/members-only-paywall";
+import { getSiteSettings } from "@/lib/site-settings";
 import type { BlogPost } from "@/types";
 
 interface BlogPostPageProps {
@@ -62,6 +63,9 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
 }
 
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
+  const settings = await getSiteSettings();
+  if (!settings.blog_enabled) notFound();
+
   let blogPost: BlogPost;
   let related: BlogPost[] = [];
   let showPaywall = false;

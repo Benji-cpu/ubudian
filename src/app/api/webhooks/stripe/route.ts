@@ -322,7 +322,8 @@ async function upsertSubscription(
       interval,
       current_period_start: periodStart ? new Date(periodStart * 1000).toISOString() : null,
       current_period_end: periodEnd ? new Date(periodEnd * 1000).toISOString() : null,
-      cancel_at_period_end: subscription.cancel_at_period_end,
+      cancel_at_period_end:
+        subscription.cancel_at_period_end || subscription.cancel_at !== null,
       updated_at: new Date().toISOString(),
     },
     { onConflict: "stripe_subscription_id" }

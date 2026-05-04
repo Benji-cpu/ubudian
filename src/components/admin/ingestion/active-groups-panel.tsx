@@ -31,9 +31,12 @@ function getGroupStatus(lastMessageAt: string): GroupStatus {
 }
 
 const statusStyles: Record<GroupStatus, string> = {
-  active: "border-green-300 text-green-700 bg-green-50",
-  quiet: "border-yellow-300 text-yellow-700 bg-yellow-50",
-  stale: "border-red-300 text-red-700 bg-red-50",
+  active:
+    "border-green-300 text-green-700 bg-green-50 dark:border-green-800 dark:text-green-300 dark:bg-green-950",
+  quiet:
+    "border-yellow-300 text-yellow-700 bg-yellow-50 dark:border-yellow-800 dark:text-yellow-300 dark:bg-yellow-950",
+  stale:
+    "border-red-300 text-red-700 bg-red-50 dark:border-red-800 dark:text-red-300 dark:bg-red-950",
 };
 
 const sourceEmoji: Record<string, string> = {

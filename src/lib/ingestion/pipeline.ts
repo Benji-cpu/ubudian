@@ -16,7 +16,134 @@ import { normalizeVenue } from "./venue-normalizer";
 import { generateFingerprint } from "./fingerprint";
 import { getAdapter } from "./source-adapter";
 import { validateAndNormalizeDate } from "./date-validator";
+import { logHealthEvent } from "./health-utils";
+import { logActivity } from "./activity-log";
+import { enrichFromUrls, applyEnrichment } from "./url-enricher";
+import { moderateEvent } from "@/lib/events/moderation";
+import { geocodeVenue } from "@/lib/geocoding";
 import type { IngestionRunResult, ParsedEvent, ProcessResult, RawMessage } from "./types";
+
+/**
+ * Fields we'll backfill on an existing event when a higher-quality dedup
+ * source (e.g. Megatix) matches it. Only fills NULL/empty — never overwrites.
+ */
+const ENRICH_ON_DUPLICATE_FIELDS = [
+  "cover_image_url",
+  "external_ticket_url",
+  "source_url",
+  "venue_address",
+  "organizer_name",
+  "price_info",
+  "short_description",
+] as const satisfies ReadonlyArray<keyof ParsedEvent>;
+
+type EnrichFieldName = (typeof ENRICH_ON_DUPLICATE_FIELDS)[number];
+
+/**
+ * When dedup matches a raw message to an existing event, backfill the
+ * existing event with any fields the incoming `parsed` has that the existing
+ * event lacks. Best-effort: never throws.
+ *
+ * Returns the list of field names that were enriched (empty if no-op).
+ */
+export async function enrichExistingEvent(
+  eventId: string,
+  parsed: ParsedEvent,
+  sourceId: string
+): Promise<EnrichFieldName[]> {
+  try {
+    const supabase = createAdminClient();
+    const { data: existing, error: readError } = await supabase
+      .from("events")
+      .select(ENRICH_ON_DUPLICATE_FIELDS.join(","))
+      .eq("id", eventId)
+      .single();
+
+    if (readError || !existing) return [];
+
+    const update: Record<string, string> = {};
+    const enrichedFields: EnrichFieldName[] = [];
+
+    for (const field of ENRICH_ON_DUPLICATE_FIELDS) {
+      const incoming = parsed[field];
+      const current = (existing as unknown as Record<string, unknown>)[field];
+      const incomingHasValue = typeof incoming === "string" && incoming.length > 0;
+      const currentIsEmpty = current === null || current === undefined || current === "";
+      if (incomingHasValue && currentIsEmpty) {
+        update[field] = incoming as string;
+        enrichedFields.push(field);
+      }
+    }
+
+    if (enrichedFields.length === 0) return [];
+
+    const { error: updateError } = await supabase
+      .from("events")
+      .update(update)
+      .eq("id", eventId);
+
+    if (updateError) {
+      console.error("[pipeline] enrichExistingEvent update error:", updateError);
+      return [];
+    }
+
+    await logActivity({
+      category: "event_enriched",
+      title: `Enriched existing event from duplicate: ${enrichedFields.join(", ")}`,
+      details: {
+        event_id: eventId,
+        event_title: parsed.title,
+        enriched_fields: enrichedFields,
+      },
+      sourceId,
+    });
+
+    return enrichedFields;
+  } catch (err) {
+    console.error("[pipeline] enrichExistingEvent error:", err);
+    return [];
+  }
+}
+
+/**
+ * Fill in missing image / price / description fields by scraping the source URL.
+ * Best-effort: never throws, never overwrites existing values.
+ */
+async function maybeEnrichParsedEvent(parsed: ParsedEvent, sourceId: string): Promise<void> {
+  const candidates = [parsed.source_url, parsed.external_ticket_url].filter(
+    (u): u is string => typeof u === "string" && u.length > 0
+  );
+  if (candidates.length === 0) return;
+
+  const needsEnrichment =
+    !parsed.cover_image_url ||
+    !parsed.price_info ||
+    !parsed.short_description ||
+    !parsed.organizer_name ||
+    !parsed.venue_address ||
+    !parsed.external_ticket_url;
+  if (!needsEnrichment) return;
+
+  try {
+    const enrichment = await enrichFromUrls(candidates, parsed);
+    if (enrichment.enrichedFields.length > 0) {
+      applyEnrichment(parsed, enrichment);
+      await logActivity({
+        category: "event_enriched",
+        title: `Enriched from URL: ${enrichment.enrichedFields.join(", ")}`,
+        details: {
+          event_title: parsed.title,
+          candidate_urls: candidates,
+          enriched_fields: enrichment.enrichedFields,
+        },
+        sourceId,
+      });
+    }
+  } catch (err) {
+    // Enrichment failures are never fatal
+    console.error("[pipeline] enrichment error:", err);
+  }
+}
 
 /**
  * Run the full ingestion pipeline for a given source.
@@ -105,9 +232,12 @@ export async function runIngestion(sourceId: string): Promise<IngestionRunResult
     ...(source.config || {}),
     _autoApproveEnabled: source.auto_approve_enabled ?? false,
     _autoApproveThreshold: source.auto_approve_threshold ?? 0.85,
+    _sourceName: source.name,
   };
 
   try {
+    const startTime = Date.now();
+
     // Fetch raw messages from adapter
     const since = source.last_fetched_at ? new Date(source.last_fetched_at) : undefined;
     const rawMessages = await adapter.fetchMessages(source.config || {}, since);
@@ -196,6 +326,19 @@ export async function runIngestion(sourceId: string): Promise<IngestionRunResult
       })
       .eq("id", runId);
 
+    // Log recovery if source previously had an error
+    if (source.last_error) {
+      await logActivity({
+        category: "source_recovered",
+        title: `${source.name} recovered`,
+        details: {
+          source_name: source.name,
+          previous_error: source.last_error,
+        },
+        sourceId,
+      });
+    }
+
     // Update source timestamps
     await supabase
       .from("event_sources")
@@ -207,6 +350,22 @@ export async function runIngestion(sourceId: string): Promise<IngestionRunResult
         updated_at: new Date().toISOString(),
       })
       .eq("id", sourceId);
+
+    await logActivity({
+      category: "run_summary",
+      title: `${source.name}: ${eventsCreated} events from ${messagesFetched} messages`,
+      details: {
+        source_name: source.name,
+        run_id: runId,
+        messages_fetched: messagesFetched,
+        messages_parsed: messagesParsed,
+        events_created: eventsCreated,
+        duplicates: duplicatesFound,
+        errors_count: errors.length,
+        duration_s: Math.round((Date.now() - startTime) / 1000),
+      },
+      sourceId,
+    });
 
     return {
       runId,
@@ -247,6 +406,19 @@ export async function runIngestion(sourceId: string): Promise<IngestionRunResult
         updated_at: new Date().toISOString(),
       })
       .eq("id", sourceId);
+
+    // Fire-and-forget in error path — don't compound latency during failures
+    logActivity({
+      category: "source_error",
+      severity: "error",
+      title: `${source.name} failed: ${errorMsg}`,
+      details: {
+        source_name: source.name,
+        error_message: errorMsg,
+        run_id: runId,
+      },
+      sourceId,
+    });
 
     return {
       runId,
@@ -497,8 +669,28 @@ export async function createEventFromParsed(
   );
   const category = validCategory || "Other";
 
+  // Best-effort enrichment from source URL (image, price, description, etc.)
+  await maybeEnrichParsedEvent(parsed, sourceId);
+
   // Normalize venue
   const normalizedVenue = await normalizeVenue(parsed.venue_name);
+
+  // Best-effort geocoding — populates lat/lng for the map view. Never throws:
+  // any failure just leaves the event without coordinates.
+  let latitude: number | null = null;
+  let longitude: number | null = null;
+  const venueForGeocode = normalizedVenue || parsed.venue_name;
+  if (venueForGeocode) {
+    try {
+      const geo = await geocodeVenue(venueForGeocode, parsed.venue_address);
+      if (geo) {
+        latitude = geo.latitude;
+        longitude = geo.longitude;
+      }
+    } catch (err) {
+      console.error("[pipeline] geocoding error:", err);
+    }
+  }
 
   // Generate fingerprint
   const fingerprint = await generateFingerprint({
@@ -518,9 +710,13 @@ export async function createEventFromParsed(
     description: parsed.description,
   }, { normalizedVenue, fingerprint });
 
-  // If high-confidence duplicate, skip creation but store audit trail
+  // If high-confidence duplicate, skip creation but store audit trail.
+  // Before skipping, backfill any missing fields (cover image, ticket URL, etc.)
+  // from the incoming parsed onto the matched event.
   if (duplicates.length > 0 && duplicates[0].confidence >= 0.9) {
     const topMatch = duplicates[0];
+    const enrichedFields = await enrichExistingEvent(topMatch.eventId, parsed, sourceId);
+
     await supabase
       .from("raw_ingestion_messages")
       .update({
@@ -530,6 +726,7 @@ export async function createEventFromParsed(
           _dedup_matched_event_id: topMatch.eventId,
           _dedup_match_type: topMatch.matchType,
           _dedup_confidence: topMatch.confidence,
+          _enriched_fields: enrichedFields.length > 0 ? enrichedFields : undefined,
         },
         updated_at: new Date().toISOString(),
       })
@@ -554,18 +751,25 @@ export async function createEventFromParsed(
     slug = `${slug}-${Date.now().toString(36)}`;
   }
 
-  // Determine auto-approve eligibility
+  // AI moderation gate. Hard red flags → rejected; everything else publishes.
   const qualityScore = parsed.quality_score ?? 0;
   const contentFlags = parsed.content_flags ?? [];
-  let eventStatus: "pending" | "approved" = "pending";
+  const moderation = await moderateEvent({
+    title: parsed.title,
+    description: parsed.description || parsed.title,
+    organizer_name: parsed.organizer_name || null,
+    venue_name: parsed.venue_name || null,
+    source_url: parsed.source_url || null,
+    origin: "ingestion",
+    source_id: sourceId,
+  });
 
-  if (
-    sourceConfig._autoApproveEnabled &&
-    qualityScore >= ((sourceConfig._autoApproveThreshold as number) ?? 0.85) &&
-    contentFlags.length === 0
-  ) {
-    eventStatus = "approved";
-  }
+  const eventStatus: "approved" | "rejected" = moderation.ok ? "approved" : "rejected";
+  const moderationReason = moderation.ok ? null : moderation.reason;
+  const aiApprovedAt = moderation.ok ? new Date().toISOString() : null;
+  const mergedFlags = moderation.ok
+    ? contentFlags
+    : Array.from(new Set([...contentFlags, moderation.flag]));
 
   // Insert the event
   const { data: newEvent, error: insertError } = await queryWithRetry(
@@ -600,8 +804,15 @@ export async function createEventFromParsed(
           content_fingerprint: fingerprint,
           raw_message_id: messageId,
           llm_parsed: llmParsed,
+          source_kind: llmParsed ? "llm" : "manual",
+          parser_version: llmParsed ? "gemini-2.5-flash-lite" : null,
+          ingested_at: new Date().toISOString(),
           quality_score: qualityScore || null,
-          content_flags: contentFlags,
+          content_flags: mergedFlags,
+          ai_approved_at: aiApprovedAt,
+          moderation_reason: moderationReason,
+          latitude,
+          longitude,
         })
         .select("id")
         .single(),
@@ -609,12 +820,64 @@ export async function createEventFromParsed(
   );
 
   if (insertError || !newEvent) {
+    // Late-arriving duplicate caught by the unique index on
+    // (source_id, normalized_title, start_date). This is the safety net for the
+    // race where two messages pass findDuplicates before either has inserted.
+    const isRaceDup =
+      insertError?.code === "23505" &&
+      typeof insertError?.message === "string" &&
+      insertError.message.includes("events_source_title_date_uniq");
+
+    if (isRaceDup && sourceId) {
+      const normalizeTitle = (t: string) =>
+        t.toLowerCase().replace(/[^\w\s]/g, "").replace(/\s+/g, " ").trim();
+      const normTitle = normalizeTitle(parsed.title);
+
+      const { data: existingEvents } = await supabase
+        .from("events")
+        .select("id, title")
+        .eq("source_id", sourceId)
+        .eq("start_date", parsed.start_date)
+        .neq("status", "archived");
+      const matchedId =
+        existingEvents?.find((e) => normalizeTitle(e.title) === normTitle)?.id ?? null;
+
+      await supabase
+        .from("raw_ingestion_messages")
+        .update({
+          parsed_event_data: {
+            ...((typeof parsed === "object" ? parsed : {}) as Record<string, unknown>),
+            _dedup_skipped: true,
+            _dedup_matched_event_id: matchedId,
+            _dedup_match_type: "unique_constraint_race",
+          },
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", messageId);
+
+      return { messageId, status: "duplicate" };
+    }
+
     return {
       messageId,
       status: "failed",
       error: `Failed to insert event: ${insertError?.message}`,
     };
   }
+
+  await logActivity({
+    category: "event_created",
+    title: `Event created: ${parsed.title}`,
+    details: {
+      event_id: newEvent.id,
+      event_title: parsed.title,
+      category,
+      venue: normalizedVenue || parsed.venue_name || null,
+      source_name: (sourceConfig._sourceName as string) || null,
+      auto_approved: eventStatus === "approved",
+    },
+    sourceId,
+  });
 
   // Record any lower-confidence dedup matches for admin review
   for (const dup of duplicates) {

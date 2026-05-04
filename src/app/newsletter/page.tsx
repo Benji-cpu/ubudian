@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
+import Link from "next/link";
+import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { EditionCard } from "@/components/newsletter/edition-card";
 import { NewsletterSignup } from "@/components/layout/newsletter-signup";
+import { getSiteSettings } from "@/lib/site-settings";
 import type { NewsletterEdition } from "@/types";
 
 export const metadata: Metadata = {
@@ -11,6 +14,9 @@ export const metadata: Metadata = {
 };
 
 export default async function NewsletterPage() {
+  const settings = await getSiteSettings();
+  if (!settings.newsletter_archive_enabled) notFound();
+
   let allEditions: NewsletterEdition[] = [];
 
   try {
@@ -42,6 +48,13 @@ export default async function NewsletterPage() {
             community stories, and conversations that matter in Ubud right now.
           </p>
           <NewsletterSignup className="mx-auto mt-8 max-w-md" />
+          <p className="mx-auto mt-4 max-w-md text-sm text-muted-foreground">
+            Already subscribed?{" "}
+            <Link href="/quiz" className="font-medium text-brand-terracotta hover:underline">
+              Take the Ubud Spirit Quiz
+            </Link>{" "}
+            to get personalized picks in your weekly email.
+          </p>
         </div>
       </section>
 

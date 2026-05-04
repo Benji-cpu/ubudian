@@ -79,8 +79,8 @@ export function QuizQuestion({ question, onAnswer }: QuizQuestionProps) {
               selected === answer.id
                 ? "border-brand-gold bg-brand-gold/10 text-brand-charcoal"
                 : selected
-                  ? "border-brand-cream/50 bg-white/50 text-brand-charcoal-light/50"
-                  : "border-brand-cream bg-white text-brand-charcoal hover:border-brand-gold/50 hover:bg-brand-gold/5"
+                  ? "border-brand-cream/50 bg-card/50 text-brand-charcoal-light/50"
+                  : "border-brand-cream bg-card text-brand-charcoal hover:border-brand-gold/50 hover:bg-brand-gold/5"
             }`}
           >
             <span className="text-base leading-relaxed">{answer.text}</span>

@@ -1,10 +1,11 @@
 import Link from "next/link";
 import Image from "next/image";
-import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
-import { formatEventTime } from "@/lib/utils";
+import { formatEventTime, isRecentlyAddedEvent } from "@/lib/utils";
 import { CATEGORY_EMOJI } from "@/lib/constants";
+import { formatEventDateLine } from "@/lib/events/format";
 import { EventCardPlaceholder } from "./event-card-placeholder";
+import { EventCardExternalLinks } from "./event-card-external-links";
 import { MapPin, Clock, Calendar, User } from "lucide-react";
 import type { Event } from "@/types";
 
@@ -14,7 +15,7 @@ interface EventCardProps {
 }
 
 export function EventCard({ event, saveButton }: EventCardProps) {
-  const startDate = new Date(event.start_date);
+  const dateLine = formatEventDateLine(event);
   const emoji = CATEGORY_EMOJI[event.category] || CATEGORY_EMOJI["Other"];
 
   return (
@@ -48,9 +49,22 @@ export function EventCard({ event, saveButton }: EventCardProps) {
             <Badge variant="outline" className="text-xs">
               {emoji} {event.category}
             </Badge>
+            {event.is_core && (
+              <span
+                title="Weekly community anchor"
+                className="rounded border border-brand-gold/60 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-brand-gold"
+              >
+                Core
+              </span>
+            )}
+            {isRecentlyAddedEvent(event.created_at, event.start_date) && (
+              <span className="rounded bg-brand-gold px-1.5 py-0.5 text-xs font-medium text-white">
+                New
+              </span>
+            )}
             <span className="flex items-center gap-1">
               <Calendar className="h-3 w-3" />
-              {format(startDate, "MMM d")}
+              {dateLine}
             </span>
             {(event.start_time || event.end_time) && (
               <span className="flex items-center gap-1">
@@ -66,18 +80,29 @@ export function EventCard({ event, saveButton }: EventCardProps) {
             )}
           </div>
 
-          {event.organizer_name && (
-            <span className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
-              <User className="h-3 w-3" />
-              {event.organizer_name}
-            </span>
+          {event.short_description && (
+            <p className="mt-1.5 text-sm text-muted-foreground line-clamp-1">
+              {event.short_description}
+            </p>
           )}
 
-          {event.price_info && (
-            <span className="mt-1 inline-block text-sm font-medium text-brand-terracotta">
-              {event.price_info}
-            </span>
-          )}
+          <div className="mt-1.5 flex items-center gap-2">
+            {event.price_info && (
+              <span className="text-sm font-medium text-brand-terracotta">
+                {event.price_info}
+              </span>
+            )}
+            <EventCardExternalLinks
+              venueMapUrl={event.venue_map_url}
+              externalTicketUrl={event.external_ticket_url}
+            />
+            {event.organizer_name && (
+              <span className="ml-auto flex items-center gap-1 text-xs text-muted-foreground truncate">
+                <User className="h-3 w-3 shrink-0" />
+                <span className="truncate">{event.organizer_name}</span>
+              </span>
+            )}
+          </div>
         </div>
 
         {/* Save button */}

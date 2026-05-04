@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Loader2, CheckCircle, XCircle, Info } from "lucide-react";
+import { Loader2, CheckCircle, XCircle, Info, AlertTriangle } from "lucide-react";
 
 interface WebhookStatus {
   registered_url: string | null;
@@ -13,7 +13,11 @@ interface WebhookStatus {
   last_error_message: string | null;
 }
 
-export function TelegramRegisterButton() {
+interface TelegramRegisterButtonProps {
+  isLocalhost?: boolean;
+}
+
+export function TelegramRegisterButton({ isLocalhost = false }: TelegramRegisterButtonProps) {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<{ ok: boolean; message: string } | null>(null);
   const [statusLoading, setStatusLoading] = useState(false);
@@ -66,8 +70,31 @@ export function TelegramRegisterButton() {
 
   return (
     <div className="space-y-3">
+      {isLocalhost && (
+        <div className="rounded-md border border-yellow-300 bg-yellow-50 p-3 text-sm">
+          <div className="flex items-center gap-2 font-medium text-yellow-800">
+            <AlertTriangle className="h-4 w-4 shrink-0" />
+            Webhook registration requires HTTPS
+          </div>
+          <p className="mt-1 text-yellow-700">
+            You&apos;re running locally. Register the webhook from the{" "}
+            <a
+              href="https://ubudian-v1.vercel.app/admin/ingestion/telegram"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline"
+            >
+              production admin panel
+            </a>{" "}
+            instead.
+          </p>
+          <p className="mt-1 text-yellow-600 text-xs">
+            Tip: <code className="font-mono">npm run dev</code> uses polling mode and doesn&apos;t need a webhook.
+          </p>
+        </div>
+      )}
       <div className="flex items-center gap-3">
-        <Button size="sm" variant="outline" onClick={handleRegister} disabled={loading}>
+        <Button size="sm" variant="outline" onClick={handleRegister} disabled={loading || isLocalhost}>
           {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           Register Webhook
         </Button>

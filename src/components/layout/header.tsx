@@ -1,18 +1,23 @@
 import Link from "next/link";
-import { NAV_LINKS, SITE_NAME } from "@/lib/constants";
+import { SITE_NAME } from "@/lib/constants";
 import { getCurrentProfile } from "@/lib/auth";
+import { getSiteSettings } from "@/lib/site-settings";
 import { UserMenu } from "./user-menu";
 import { MobileMenu } from "./mobile-menu";
+import { ExploreMenu } from "./explore-menu";
 import { Button } from "@/components/ui/button";
 import { Shield } from "lucide-react";
+import { ThemeToggle } from "./theme-toggle";
 
 export async function Header() {
-  const profile = await getCurrentProfile();
+  const [profile, settings] = await Promise.all([
+    getCurrentProfile(),
+    getSiteSettings(),
+  ]);
 
   return (
     <header
-      className="fixed top-0 z-50 w-full border-b border-brand-gold/15"
-      style={{ background: "rgba(44,74,62,0.85)", backdropFilter: "blur(12px)" }}
+      className="fixed top-0 z-50 w-full border-b border-brand-gold/15 bg-brand-deep-green/85 backdrop-blur-[12px] dark:border-brand-gold/25 dark:bg-background/40"
     >
       <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Logo */}
@@ -25,15 +30,35 @@ export async function Header() {
 
         {/* Desktop Nav */}
         <nav className="hidden items-center gap-6 md:flex">
-          {NAV_LINKS.map((link) => (
+          <Link
+            href="/quiz"
+            className="text-xs font-semibold uppercase tracking-widest text-brand-off-white transition-colors duration-300 hover:text-brand-gold"
+          >
+            Quiz
+          </Link>
+          <Link
+            href="/events"
+            className="text-xs font-semibold uppercase tracking-widest text-brand-off-white transition-colors duration-300 hover:text-brand-gold"
+          >
+            Events
+          </Link>
+          {settings.stories_enabled && (
             <Link
-              key={link.href}
-              href={link.href}
+              href="/stories"
               className="text-xs font-semibold uppercase tracking-widest text-brand-off-white transition-colors duration-300 hover:text-brand-gold"
             >
-              {link.label}
+              Stories
             </Link>
-          ))}
+          )}
+          {settings.tours_enabled && (
+            <Link
+              href="/tours"
+              className="text-xs font-semibold uppercase tracking-widest text-brand-off-white transition-colors duration-300 hover:text-brand-gold"
+            >
+              Tours
+            </Link>
+          )}
+          <ExploreMenu newsletterEnabled={settings.newsletter_archive_enabled} />
           {profile?.role === "admin" && (
             <Link
               href="/admin"
@@ -47,6 +72,7 @@ export async function Header() {
 
         {/* Right side: Auth + Mobile */}
         <div className="flex items-center gap-2">
+          <ThemeToggle />
           {profile ? (
             <UserMenu profile={profile} />
           ) : (
@@ -54,12 +80,12 @@ export async function Header() {
               asChild
               variant="ghost"
               size="sm"
-              className="hidden border border-brand-gold/30 bg-transparent text-brand-gold hover:bg-brand-gold/10 hover:text-brand-gold md:inline-flex"
+              className="hidden border border-brand-gold/30 bg-transparent text-brand-gold hover:bg-brand-gold/10 hover:text-brand-gold dark:bg-transparent dark:text-brand-gold dark:hover:bg-brand-gold/10 dark:hover:text-brand-gold md:inline-flex"
             >
               <Link href="/login">Sign In</Link>
             </Button>
           )}
-          <MobileMenu profile={profile} />
+          <MobileMenu profile={profile} settings={settings} />
         </div>
       </div>
     </header>

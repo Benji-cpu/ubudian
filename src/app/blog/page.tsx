@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { queryWithRetry } from "@/lib/supabase/retry";
 import { PostCard } from "@/components/blog/post-card";
+import { getSiteSettings } from "@/lib/site-settings";
 import type { BlogPost } from "@/types";
 
 export const metadata: Metadata = {
@@ -11,6 +13,9 @@ export const metadata: Metadata = {
 };
 
 export default async function BlogPage() {
+  const settings = await getSiteSettings();
+  if (!settings.blog_enabled) notFound();
+
   let blogPosts: BlogPost[] = [];
 
   try {

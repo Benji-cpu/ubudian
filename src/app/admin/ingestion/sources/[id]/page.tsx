@@ -106,7 +106,7 @@ export default async function SourceDetailPage({
       {/* Back link + Header */}
       <div>
         <Link
-          href="/admin/ingestion/sources"
+          href="/admin/sources"
           className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-3"
         >
           <ArrowLeft className="mr-1 h-4 w-4" />

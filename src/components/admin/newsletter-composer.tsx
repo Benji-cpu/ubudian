@@ -146,7 +146,7 @@ export function NewsletterComposer({ initialData }: NewsletterComposerProps) {
       return;
     }
 
-    router.push("/admin/newsletter");
+    router.push("/admin/content");
     router.refresh();
   }
 
@@ -188,7 +188,7 @@ export function NewsletterComposer({ initialData }: NewsletterComposerProps) {
     }
 
     setDeleteOpen(false);
-    router.push("/admin/newsletter");
+    router.push("/admin/content");
     router.refresh();
   }
 

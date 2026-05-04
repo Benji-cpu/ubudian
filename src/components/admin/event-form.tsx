@@ -11,6 +11,7 @@ import { EVENT_CATEGORIES } from "@/lib/constants";
 import { safeUrlOrEmpty } from "@/lib/url-validation";
 import { RichTextEditor } from "@/components/admin/rich-text-editor";
 import { ImageUploader } from "@/components/admin/image-uploader";
+import { RefetchImageButton } from "@/components/admin/refetch-image-button";
 import { TagInput } from "@/components/admin/tag-input";
 import { ARCHETYPE_IDS } from "@/lib/quiz-data";
 import { DatePicker } from "@/components/admin/date-picker";
@@ -65,6 +66,7 @@ const eventSchema = z.object({
   end_time: z.string().optional().or(z.literal("")),
   is_recurring: z.boolean(),
   recurrence_rule: z.string().optional().or(z.literal("")),
+  is_core: z.boolean(),
   venue_name: z.string().optional().or(z.literal("")),
   venue_address: z.string().optional().or(z.literal("")),
   venue_map_url: z.string().optional().or(z.literal("")).refine(safeUrlOrEmpty, "URL must use http or https"),
@@ -108,6 +110,7 @@ export function EventForm({ initialData }: EventFormProps) {
       end_time: initialData?.end_time ?? "",
       is_recurring: initialData?.is_recurring ?? false,
       recurrence_rule: initialData?.recurrence_rule ?? "",
+      is_core: initialData?.is_core ?? false,
       venue_name: initialData?.venue_name ?? "",
       venue_address: initialData?.venue_address ?? "",
       venue_map_url: initialData?.venue_map_url ?? "",
@@ -147,6 +150,7 @@ export function EventForm({ initialData }: EventFormProps) {
       end_time: data.end_time || null,
       is_recurring: data.is_recurring,
       recurrence_rule: data.is_recurring && data.recurrence_rule ? data.recurrence_rule : null,
+      is_core: data.is_core,
       venue_name: data.venue_name || null,
       venue_address: data.venue_address || null,
       venue_map_url: data.venue_map_url || null,
@@ -453,6 +457,16 @@ export function EventForm({ initialData }: EventFormProps) {
                   <FormControl>
                     <ImageUploader folder="events" value={field.value} onChange={field.onChange} />
                   </FormControl>
+                  {isEditMode &&
+                    (initialData?.source_url || initialData?.external_ticket_url) && (
+                      <div className="pt-1">
+                        <RefetchImageButton
+                          eventId={initialData!.id}
+                          onUpdated={(url) => field.onChange(url)}
+                          disabled={saving}
+                        />
+                      </div>
+                    )}
                   <FormMessage />
                 </FormItem>
               )}
@@ -595,6 +609,24 @@ export function EventForm({ initialData }: EventFormProps) {
                 )}
               />
 
+              <FormField
+                control={form.control}
+                name="is_core"
+                render={({ field }) => (
+                  <FormItem className="flex items-center gap-2 space-y-0">
+                    <FormControl>
+                      <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                    </FormControl>
+                    <FormLabel className="font-normal">
+                      Core community anchor
+                      <span className="ml-2 text-xs text-muted-foreground">
+                        (weekly rhythm — shows a Core badge)
+                      </span>
+                    </FormLabel>
+                  </FormItem>
+                )}
+              />
+
               {isRecurring && (
                 <FormField
                   control={form.control}
@@ -707,6 +739,34 @@ export function EventForm({ initialData }: EventFormProps) {
             </Dialog>
           )}
         </div>
+
+        {initialData && (
+          <details className="rounded-md border border-border/60 bg-muted/30 px-4 py-3 text-sm">
+            <summary className="cursor-pointer font-medium text-muted-foreground">
+              Diagnostics
+            </summary>
+            <dl className="mt-3 grid grid-cols-[max-content_1fr] gap-x-4 gap-y-1 text-xs">
+              <dt className="text-muted-foreground">Source kind</dt>
+              <dd>{initialData.source_kind ?? "—"}</dd>
+              <dt className="text-muted-foreground">Parser version</dt>
+              <dd>{initialData.parser_version ?? "—"}</dd>
+              <dt className="text-muted-foreground">Source URL</dt>
+              <dd className="break-all">
+                {initialData.source_url ? (
+                  <a href={initialData.source_url} target="_blank" rel="noreferrer" className="underline">
+                    {initialData.source_url}
+                  </a>
+                ) : "—"}
+              </dd>
+              <dt className="text-muted-foreground">Ingested at</dt>
+              <dd>{initialData.ingested_at ?? "—"}</dd>
+              <dt className="text-muted-foreground">Raw message id</dt>
+              <dd className="break-all">{initialData.raw_message_id ?? "—"}</dd>
+              <dt className="text-muted-foreground">Raw text snippet</dt>
+              <dd className="whitespace-pre-wrap">{initialData.raw_text_snippet ?? "—"}</dd>
+            </dl>
+          </details>
+        )}
       </form>
     </Form>
   );

@@ -19,6 +19,12 @@ export function DedupComparison({ match, eventA, eventB }: DedupComparisonProps)
   const [loading, setLoading] = useState<string | null>(null);
 
   async function resolveMatch(resolution: "confirmed_dup" | "not_dup" | "merged") {
+    if (resolution === "merged") {
+      const ok = window.confirm(
+        "Merge any fields the older event is missing from the newer one, then archive the newer event. This can't be undone. Continue?"
+      );
+      if (!ok) return;
+    }
     setLoading(resolution);
     try {
       await fetch("/api/admin/ingestion/dedup/resolve", {
@@ -36,21 +42,21 @@ export function DedupComparison({ match, eventA, eventB }: DedupComparisonProps)
 
   const confidenceColor =
     match.confidence >= 0.8
-      ? "text-red-600"
+      ? "text-red-600 dark:text-red-400"
       : match.confidence >= 0.6
-        ? "text-yellow-600"
-        : "text-green-600";
+        ? "text-yellow-600 dark:text-yellow-400"
+        : "text-green-600 dark:text-green-400";
 
   return (
     <div className="space-y-4 rounded-lg border p-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-2">
           <Badge variant="outline">{match.match_type}</Badge>
           <span className={`text-sm font-medium ${confidenceColor}`}>
             {Math.round(match.confidence * 100)}% confidence
           </span>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Button
             variant="outline"
             size="sm"
@@ -63,6 +69,20 @@ export function DedupComparison({ match, eventA, eventB }: DedupComparisonProps)
               <X className="mr-1 h-3 w-3" />
             )}
             Not Duplicate
+          </Button>
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => resolveMatch("merged")}
+            disabled={loading !== null}
+            title="Copy non-empty fields from the newer event into the older, then archive the newer"
+          >
+            {loading === "merged" ? (
+              <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+            ) : (
+              <Merge className="mr-1 h-3 w-3" />
+            )}
+            Merge
           </Button>
           <Button
             variant="destructive"

@@ -115,7 +115,7 @@ export function SourceForm({ source }: { source?: EventSource }) {
         return;
       }
 
-      router.push("/admin/ingestion/sources");
+      router.push("/admin/sources");
       router.refresh();
     } catch {
       setError("Failed to save source");

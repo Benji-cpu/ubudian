@@ -4,6 +4,7 @@ import { getStripe } from "@/lib/stripe/server";
 import { getOrCreateStripeCustomer } from "@/lib/stripe/helpers";
 import { createClient } from "@/lib/supabase/server";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
+import { SITE_URL } from "@/lib/constants";
 
 const subscriptionSchema = z.object({
   price_id: z.string().min(1),
@@ -36,19 +37,22 @@ export async function POST(request: Request) {
 
     // Create Stripe Checkout Session for subscription
     const stripe = getStripe();
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:4000";
+    const siteUrl = SITE_URL;
 
-    const session = await stripe.checkout.sessions.create({
-      mode: "subscription",
-      customer: customerId,
-      line_items: [{ price: price_id, quantity: 1 }],
-      metadata: {
-        profile_id: user.id,
-        type: "subscription",
+    const session = await stripe.checkout.sessions.create(
+      {
+        mode: "subscription",
+        customer: customerId,
+        line_items: [{ price: price_id, quantity: 1 }],
+        metadata: {
+          profile_id: user.id,
+          type: "subscription",
+        },
+        success_url: `${siteUrl}/dashboard/membership?success=true`,
+        cancel_url: `${siteUrl}/membership?cancelled=true`,
       },
-      success_url: `${siteUrl}/dashboard/membership?success=true`,
-      cancel_url: `${siteUrl}/membership?cancelled=true`,
-    });
+      { idempotencyKey: `sub-checkout:${user.id}:${price_id}` }
+    );
 
     return NextResponse.json({ url: session.url });
   } catch (err) {

@@ -35,6 +35,13 @@ export function calculateReadTime(content: string): number {
   return Math.max(1, minutes)
 }
 
+export function isRecentlyAddedEvent(createdAt: string, startDate: string): boolean {
+  const fortyEightHoursAgo = Date.now() - 48 * 60 * 60 * 1000
+  const created = new Date(createdAt).getTime()
+  if (created < fortyEightHoursAgo) return false
+  return new Date(startDate).getTime() >= Date.now()
+}
+
 export function formatEventDate(startDate: string, endDate?: string | null): string {
   const start = new Date(startDate)
   if (!endDate || isSameDay(start, new Date(endDate))) {

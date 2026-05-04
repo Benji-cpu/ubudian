@@ -15,7 +15,7 @@ export type { ClassifyAndParseResult } from "./llm-parser";
 export { withLLMRetry } from "./llm-retry";
 
 // Fingerprint
-export { generateFingerprint, NO_VENUE_SENTINEL } from "./fingerprint";
+export { generateFingerprint } from "./fingerprint";
 
 // Venue Normalizer
 export { normalizeVenue, clearVenueAliasCache } from "./venue-normalizer";

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { generateFingerprint, NO_VENUE_SENTINEL } from "@/lib/ingestion/fingerprint";
+import { generateFingerprint } from "@/lib/ingestion/fingerprint";
 
 describe("generateFingerprint", () => {
   it("returns a 64-character hex string (SHA-256)", async () => {
@@ -18,7 +18,7 @@ describe("generateFingerprint", () => {
     expect(hash1).toBe(hash2);
   });
 
-  it("produces different hashes for different inputs", async () => {
+  it("produces different hashes for different titles", async () => {
     const hash1 = await generateFingerprint({
       title: "Sunset Yoga",
       start_date: "2026-03-15",
@@ -32,22 +32,27 @@ describe("generateFingerprint", () => {
     expect(hash1).not.toBe(hash2);
   });
 
-  it("uses NO_VENUE_SENTINEL when venue_name is null", async () => {
+  it("produces the same hash regardless of venue (venue excluded to defeat re-post variants)", async () => {
+    const hashA = await generateFingerprint({
+      title: "Creative Voices",
+      start_date: "2026-04-23",
+      venue_name: "Blossom Ubud",
+    });
+    const hashB = await generateFingerprint({
+      title: "Creative Voices",
+      start_date: "2026-04-23",
+      venue_name: "Blossom Space Ubud",
+    });
     const hashNull = await generateFingerprint({
-      title: "Sunset Yoga",
-      start_date: "2026-03-15",
+      title: "Creative Voices",
+      start_date: "2026-04-23",
       venue_name: null,
     });
-    const hashVenue = await generateFingerprint({
-      title: "Sunset Yoga",
-      start_date: "2026-03-15",
-      venue_name: "Yoga Barn",
-    });
-    expect(hashNull).not.toBe(hashVenue);
-    expect(hashNull).toMatch(/^[0-9a-f]{64}$/);
+    expect(hashA).toBe(hashB);
+    expect(hashA).toBe(hashNull);
   });
 
-  it("normalizes title and venue for consistent fingerprints", async () => {
+  it("normalizes title for consistent fingerprints", async () => {
     const hash1 = await generateFingerprint({
       title: "Sunset Yoga!",
       start_date: "2026-03-15",
@@ -56,14 +61,8 @@ describe("generateFingerprint", () => {
     const hash2 = await generateFingerprint({
       title: "sunset yoga",
       start_date: "2026-03-15",
-      venue_name: "the yoga barn",
+      venue_name: "different venue",
     });
     expect(hash1).toBe(hash2);
-  });
-});
-
-describe("NO_VENUE_SENTINEL", () => {
-  it("is a defined string constant", () => {
-    expect(NO_VENUE_SENTINEL).toBe("__no_venue__");
   });
 });

@@ -32,6 +32,13 @@ export function EventJsonLd({ event }: EventJsonLdProps) {
             addressCountry: "ID",
           },
         }),
+        ...(event.latitude != null && event.longitude != null && {
+          geo: {
+            "@type": "GeoCoordinates",
+            latitude: event.latitude,
+            longitude: event.longitude,
+          },
+        }),
       },
     }),
     ...(event.cover_image_url && { image: event.cover_image_url }),

@@ -5,6 +5,7 @@ import {
   normalizeForComparison,
   titlesMatch,
   eventSimilarityScore,
+  tokenOverlap,
 } from "@/lib/ingestion/similarity";
 
 describe("levenshteinDistance", () => {
@@ -97,6 +98,64 @@ describe("titlesMatch", () => {
     expect(titlesMatch("yoga", "yogi", 0.7)).toBe(true);
     expect(titlesMatch("yoga", "yogi", 0.8)).toBe(false);
   });
+
+  it("matches when shorter title's tokens are fully contained in longer (subset case)", () => {
+    // Levenshtein would fail (length difference too large) but token overlap = 1.0
+    expect(
+      titlesMatch(
+        "Experience Clarity Breathwork",
+        "Experience Clarity Breathwork w/ Ashanna Solaris & Dana Dharma Devi"
+      )
+    ).toBe(true);
+  });
+
+  it("matches prefix duplicates with suffix subtitles", () => {
+    expect(
+      titlesMatch(
+        "Experience Clarity Breathwork",
+        "Experience Clarity Breathwork - Post Balispirit Festival"
+      )
+    ).toBe(true);
+  });
+
+  it("does not match a single-token subset (avoids false positives)", () => {
+    // "Yoga" alone is too short to confidently match; min token count guard protects.
+    expect(titlesMatch("Yoga", "Yoga with Sarah at the Barn")).toBe(false);
+  });
+
+  it("does not match partially overlapping titles with distinct events", () => {
+    // "Sunset Yoga" vs "Morning Yoga" share only 1 of 2 tokens → overlap 0.5, not enough
+    expect(titlesMatch("Sunset Yoga", "Morning Yoga")).toBe(false);
+  });
+});
+
+describe("tokenOverlap", () => {
+  it("returns 1.0 when shorter title's tokens are fully contained in longer", () => {
+    expect(
+      tokenOverlap(
+        "Experience Clarity Breathwork",
+        "Experience Clarity Breathwork w/ Ashanna Solaris"
+      )
+    ).toBe(1);
+  });
+
+  it("returns 0 for disjoint token sets", () => {
+    expect(tokenOverlap("Yoga Flow", "Jazz Night")).toBe(0);
+  });
+
+  it("returns 0 when either input has no tokens", () => {
+    expect(tokenOverlap("", "Yoga")).toBe(0);
+    expect(tokenOverlap("!!!", "Yoga")).toBe(0);
+  });
+
+  it("ignores case and punctuation", () => {
+    expect(tokenOverlap("Sunset YOGA!", "sunset yoga")).toBe(1);
+  });
+
+  it("computes Szymkiewicz–Simpson overlap coefficient", () => {
+    // {a,b,c} vs {a,b,d,e} → common=2, min=3 → 2/3
+    expect(tokenOverlap("a b c", "a b d e")).toBeCloseTo(2 / 3, 5);
+  });
 });
 
 describe("eventSimilarityScore", () => {
@@ -151,5 +210,20 @@ describe("eventSimilarityScore", () => {
       { title: "Jazz Night", venue: "Bridges Bali", date: "2026-04-01" }
     );
     expect(score).toBeLessThan(0.5);
+  });
+
+  it("uses token overlap when title lengths differ but shorter is a token-subset", () => {
+    // Same event re-posted with extra facilitator names in the title.
+    // Levenshtein similarity is ~0.48 (below threshold) but token overlap = 1.0.
+    const score = eventSimilarityScore(
+      { title: "Experience Clarity Breathwork", venue: "The Yoga Barn", date: "2026-04-22" },
+      {
+        title: "Experience Clarity Breathwork w/ Ashanna Solaris & Dana Dharma Devi",
+        venue: "The Yoga Barn",
+        date: "2026-04-22",
+      }
+    );
+    // title contribution should come from the overlap, not Levenshtein
+    expect(score).toBeGreaterThanOrEqual(0.8);
   });
 });

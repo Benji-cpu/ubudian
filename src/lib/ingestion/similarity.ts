@@ -56,13 +56,37 @@ export function normalizeForComparison(text: string): string {
 }
 
 /**
+ * Szymkiewicz–Simpson overlap coefficient on whitespace-split tokens of the
+ * normalized strings: |A ∩ B| / min(|A|, |B|). Complements Levenshtein, which
+ * is penalized by length differences — e.g. "Clarity Breathwork" vs "Clarity
+ * Breathwork w/ Ashanna Solaris & Dana Dharma Devi" has low Levenshtein
+ * similarity but token overlap = 1.0 because the shorter title's tokens are a
+ * full subset. Returns 0 if either input has no tokens after normalization.
+ */
+export function tokenOverlap(a: string, b: string): number {
+  const tokensA = new Set(normalizeForComparison(a).split(" ").filter(Boolean));
+  const tokensB = new Set(normalizeForComparison(b).split(" ").filter(Boolean));
+  if (tokensA.size === 0 || tokensB.size === 0) return 0;
+  let common = 0;
+  for (const t of tokensA) if (tokensB.has(t)) common++;
+  return common / Math.min(tokensA.size, tokensB.size);
+}
+
+/**
  * Check if two event titles are likely the same event based on fuzzy matching.
- * Uses a threshold of 0.8 similarity after normalization.
+ * Accepts either (a) Levenshtein similarity >= threshold, or (b) token overlap
+ * >= 0.9 with both sides having >= 2 tokens. The token-overlap branch catches
+ * the common "same event, extra facilitators/subtitle" pattern that Levenshtein
+ * misses because of length differences.
  */
 export function titlesMatch(titleA: string, titleB: string, threshold = 0.8): boolean {
   const normA = normalizeForComparison(titleA);
   const normB = normalizeForComparison(titleB);
-  return stringSimilarity(normA, normB) >= threshold;
+  if (stringSimilarity(normA, normB) >= threshold) return true;
+  const tokensA = normA.split(" ").filter(Boolean);
+  const tokensB = normB.split(" ").filter(Boolean);
+  if (tokensA.length < 2 || tokensB.length < 2) return false;
+  return tokenOverlap(titleA, titleB) >= 0.9;
 }
 
 /**
@@ -73,10 +97,18 @@ export function eventSimilarityScore(
   eventA: { title: string; venue?: string | null; date?: string | null },
   eventB: { title: string; venue?: string | null; date?: string | null }
 ): number {
-  const titleSim = stringSimilarity(
-    normalizeForComparison(eventA.title),
-    normalizeForComparison(eventB.title)
-  );
+  const normTitleA = normalizeForComparison(eventA.title);
+  const normTitleB = normalizeForComparison(eventB.title);
+  const levTitleSim = stringSimilarity(normTitleA, normTitleB);
+  const tokensA = normTitleA.split(" ").filter(Boolean);
+  const tokensB = normTitleB.split(" ").filter(Boolean);
+  // Use token overlap as a second signal when both sides have enough tokens.
+  // Cap at 0.95 so exact string matches still score strictly higher.
+  const overlapTitleSim =
+    tokensA.length >= 2 && tokensB.length >= 2
+      ? tokenOverlap(eventA.title, eventB.title) * 0.95
+      : 0;
+  const titleSim = Math.max(levTitleSim, overlapTitleSim);
 
   let venueSim = 0;
   if (eventA.venue && eventB.venue) {

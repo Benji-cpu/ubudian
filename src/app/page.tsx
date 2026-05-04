@@ -9,10 +9,12 @@ import { FeaturedEvents } from "@/components/homepage/featured-events";
 import { FeaturedTours } from "@/components/homepage/featured-tours";
 import { FeaturedExperiences } from "@/components/homepage/featured-experiences";
 import { QuizCtaHomepage } from "@/components/quiz/quiz-cta-homepage";
+import { QuizPrompt } from "@/components/quiz/quiz-prompt";
 import { StoryCardSkeleton } from "@/components/skeletons/story-card-skeleton";
 import { EventCardSkeleton } from "@/components/skeletons/event-card-skeleton";
 import { TourCardSkeleton } from "@/components/skeletons/tour-card-skeleton";
 import { SITE_URL, SITE_NAME, SITE_DESCRIPTION } from "@/lib/constants";
+import { getSiteSettings } from "@/lib/site-settings";
 
 export const metadata: Metadata = {
   title: "The Ubudian — Ubud's Conscious Community",
@@ -76,7 +78,9 @@ function ToursSkeleton() {
   );
 }
 
-export default function HomePage() {
+export default async function HomePage() {
+  const settings = await getSiteSettings();
+
   return (
     <>
       <script
@@ -86,7 +90,7 @@ export default function HomePage() {
       <HomepageScrollSnap />
       <div className="-mt-14">
         {/* Canopy (Hero) */}
-        <section className="relative flex min-h-[100dvh] items-center justify-center overflow-hidden bg-gradient-to-b from-brand-deep-green via-brand-mid-green to-brand-sage">
+        <section className="relative flex min-h-[100dvh] items-center justify-center overflow-hidden bg-gradient-to-b from-[#2C4A3E] via-[#3A5F50] to-[#8BAF8A] dark:from-[#0D1A14] dark:via-[#152820] dark:to-[#1A2A22]">
           <svg
             className="pointer-events-none absolute inset-0 h-full w-full opacity-5"
             xmlns="http://www.w3.org/2000/svg"
@@ -107,20 +111,32 @@ export default function HomePage() {
               The Ubudian
             </h1>
             <p className="mt-6 font-serif text-xl italic text-brand-cream sm:text-2xl">
-              Tantra. Sound journeys. Shadow work. Ecstatic dance. All in one place.
+              Your guide to Ubud&apos;s conscious community.
             </p>
-            <p className="mx-auto mt-4 max-w-lg text-base text-brand-off-white/70">
-              <Link href="/events" className="text-brand-off-white underline decoration-brand-off-white/30 underline-offset-2 transition-colors hover:text-brand-gold hover:decoration-brand-gold">Events</Link>,{" "}
-              <Link href="/stories" className="text-brand-off-white underline decoration-brand-off-white/30 underline-offset-2 transition-colors hover:text-brand-gold hover:decoration-brand-gold">stories</Link>,{" "}
-              <Link href="/tours" className="text-brand-off-white underline decoration-brand-off-white/30 underline-offset-2 transition-colors hover:text-brand-gold hover:decoration-brand-gold">tours</Link>, and a{" "}
-              <Link href="/newsletter" className="text-brand-off-white underline decoration-brand-off-white/30 underline-offset-2 transition-colors hover:text-brand-gold hover:decoration-brand-gold">weekly newsletter</Link>{" "}
-              — sound journeys, tantra workshops, medicine song circles, and everything in between.
+            <p className="mx-auto mt-4 max-w-lg text-base text-brand-off-white/80">
+              Ceremonies, sound journeys, ecstatic dance, tantra workshops, and everything
+              in between —{" "}
+              <Link href="/events" className="text-brand-off-white underline decoration-brand-off-white/30 underline-offset-2 transition-colors hover:text-brand-gold hover:decoration-brand-gold">events</Link>
+              {settings.stories_enabled && (
+                <>
+                  ,{" "}
+                  <Link href="/stories" className="text-brand-off-white underline decoration-brand-off-white/30 underline-offset-2 transition-colors hover:text-brand-gold hover:decoration-brand-gold">stories</Link>
+                </>
+              )}
+              {settings.tours_enabled && (
+                <>
+                  ,{" "}
+                  <Link href="/tours" className="text-brand-off-white underline decoration-brand-off-white/30 underline-offset-2 transition-colors hover:text-brand-gold hover:decoration-brand-gold">tours</Link>
+                </>
+              )}
+              , and a{" "}
+              <Link href="#newsletter" className="text-brand-off-white underline decoration-brand-off-white/30 underline-offset-2 transition-colors hover:text-brand-gold hover:decoration-brand-gold">weekly newsletter</Link>.
             </p>
             <Link
               href="/quiz"
               className="mt-6 inline-block font-serif text-sm italic text-brand-gold transition-colors hover:text-brand-cream"
             >
-              Take the quiz — find your archetype, find your corner of Ubud &rarr;
+              Six questions. Your Ubud, sorted &rarr;
             </Link>
           </div>
 
@@ -129,71 +145,8 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Quiz CTA */}
-        <QuizCtaHomepage />
-
-        {/* Transition: Hero → Humans */}
-        <p className="bg-brand-cream px-4 py-10 text-center font-serif text-sm italic text-brand-charcoal-light/70">
-          Meet the humans behind the ceremonies, the kitchens, and the circles...
-        </p>
-
-        {/* Garden (Humans of Ubud) */}
-        <section className="bg-brand-cream px-4 py-20 sm:py-28">
-          <div className="mx-auto max-w-6xl">
-            <div className="text-center">
-              <h2 className="font-serif text-3xl font-medium text-brand-deep-green sm:text-4xl">
-                Humans of Ubud
-              </h2>
-              <p className="mx-auto mt-4 max-w-2xl text-lg leading-relaxed text-brand-charcoal-light">
-                Mask carvers, breathwork guides, tantra facilitators, organic farmers,
-                and the dreamers who followed something to Bali and stayed.
-              </p>
-            </div>
-
-            <Suspense fallback={<StoriesSkeleton />}>
-              <FeaturedStories />
-            </Suspense>
-
-            <div className="mt-10 text-center">
-              <Link
-                href="/stories"
-                className="font-semibold text-brand-deep-green underline underline-offset-4 transition-colors hover:text-brand-gold"
-              >
-                Read their stories
-              </Link>
-            </div>
-          </div>
-        </section>
-
-        {/* Transition: Humans → Newsletter */}
-        <p className="bg-brand-pale-green px-4 py-10 text-center font-serif text-sm italic text-brand-charcoal-light/70">
-          Never miss a full moon ceremony or a last-minute sound bath...
-        </p>
-
-        {/* Water (Newsletter) */}
-        <section className="flex min-h-[100dvh] items-center bg-brand-pale-green px-4 py-20 sm:py-28">
-          <div className="mx-auto w-full max-w-xl text-center">
-            <h2 className="font-serif text-3xl italic text-brand-deep-green sm:text-4xl">
-              Flow with us.
-            </h2>
-            <p className="mt-4 text-lg text-brand-charcoal-light">
-              One email a week with the events, stories, and community happenings
-              that matter — so you never hear about the good ones after they sell out.
-            </p>
-            <NewsletterSignup className="mx-auto mt-8 max-w-md" />
-            <p className="mt-3 text-sm text-brand-charcoal-light/60">
-              No spam, unsubscribe anytime.
-            </p>
-          </div>
-        </section>
-
-        {/* Transition: Newsletter → Events */}
-        <p className="bg-gradient-to-b from-brand-pale-green to-brand-warm-cream px-4 py-10 text-center font-serif text-sm italic text-brand-charcoal-light/70">
-          See what the community is gathering for this week...
-        </p>
-
-        {/* Earth (Events) */}
-        <section className="bg-gradient-to-b from-brand-warm-cream to-brand-off-white px-4 py-20 sm:py-28">
+        {/* Earth (Events) — moved up to section 2 */}
+        <section className="flex min-h-[100dvh] items-center bg-gradient-to-b from-brand-warm-cream to-brand-off-white px-4 py-20 sm:py-28">
           <div className="mx-auto w-full max-w-3xl">
             <div className="text-center">
               <div className="mx-auto mb-8 h-px w-16 bg-brand-gold/40" />
@@ -222,16 +175,15 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Experiences */}
-        <section className="bg-brand-cream px-4 py-20 sm:py-28">
-          <div className="mx-auto max-w-6xl">
+        {/* Guides (Experiences) — moved up to after Events */}
+        <section className="flex min-h-[100dvh] items-center bg-brand-cream px-4 py-20 sm:py-28">
+          <div className="mx-auto w-full max-w-6xl">
             <div className="text-center">
               <h2 className="font-serif text-3xl font-medium text-brand-deep-green sm:text-4xl">
-                Ubud Experiences
+                Understand the Practices
               </h2>
               <p className="mx-auto mt-4 max-w-2xl text-lg leading-relaxed text-brand-charcoal-light">
-                Embodiment workshops, cacao ceremonies, tantric temples, sound journeys — the
-                practices that make Ubud unlike anywhere else.
+                Evergreen guides to the practices that define life in Ubud.
               </p>
             </div>
 
@@ -244,46 +196,94 @@ export default function HomePage() {
                 href="/experiences"
                 className="font-semibold text-brand-deep-green underline underline-offset-4 transition-colors hover:text-brand-gold"
               >
-                View all experiences
+                View all guides
               </Link>
             </div>
           </div>
         </section>
 
-        {/* Transition: Experiences → Tours */}
-        <p className="bg-brand-cream px-4 py-10 text-center font-serif text-sm italic text-brand-charcoal-light/70">
-          When you want to leave the ceremony and explore the land...
-        </p>
+        {/* Garden (Humans of Ubud) */}
+        {settings.stories_enabled && (
+          <section className="flex min-h-[100dvh] items-center bg-brand-cream px-4 py-20 sm:py-28">
+            <div className="mx-auto w-full max-w-6xl">
+              <div className="text-center">
+                <h2 className="font-serif text-3xl font-medium text-brand-deep-green sm:text-4xl">
+                  Humans of Ubud
+                </h2>
+                <p className="mx-auto mt-4 max-w-2xl text-lg leading-relaxed text-brand-charcoal-light">
+                  Mask carvers, breathwork guides, tantra facilitators, organic farmers,
+                  and the dreamers who followed something to Bali and stayed.
+                </p>
+              </div>
+
+              <Suspense fallback={<StoriesSkeleton />}>
+                <FeaturedStories />
+              </Suspense>
+
+              <div className="mt-10 text-center">
+                <Link
+                  href="/stories"
+                  className="font-semibold text-brand-deep-green underline underline-offset-4 transition-colors hover:text-brand-gold"
+                >
+                  Read their stories
+                </Link>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* Quiz CTA — moved down to after content */}
+        <QuizCtaHomepage />
 
         {/* Path (Tours) */}
-        <section className="bg-brand-cream px-4 py-20 sm:py-28">
-          <div className="mx-auto max-w-6xl">
-            <div className="text-center">
-              <h2 className="font-serif text-3xl italic text-brand-deep-green sm:text-4xl">
-                Explore the Land Beneath the Rituals
-              </h2>
-              <p className="mx-auto mt-4 max-w-xl text-lg text-brand-charcoal-light">
-                Rice terraces, water temples, jungle treks, and food trails
-                with guides who actually live here — the Ubud that exists between
-                the ceremonies.
-              </p>
-            </div>
+        {settings.tours_enabled && (
+          <section className="flex min-h-[100dvh] items-center bg-brand-cream px-4 py-20 sm:py-28">
+            <div className="mx-auto w-full max-w-6xl">
+              <div className="text-center">
+                <h2 className="font-serif text-3xl italic text-brand-deep-green sm:text-4xl">
+                  Explore the Land Beneath the Rituals
+                </h2>
+                <p className="mx-auto mt-4 max-w-xl text-lg text-brand-charcoal-light">
+                  Rice terraces, water temples, jungle treks, and food trails
+                  with guides who actually live here — the Ubud that exists between
+                  the ceremonies.
+                </p>
+              </div>
 
-            <Suspense fallback={<ToursSkeleton />}>
-              <FeaturedTours />
-            </Suspense>
+              <Suspense fallback={<ToursSkeleton />}>
+                <FeaturedTours />
+              </Suspense>
 
-            <div className="mt-10 text-center">
-              <Link
-                href="/tours"
-                className="font-semibold text-brand-deep-green underline underline-offset-4 transition-colors hover:text-brand-gold"
-              >
-                Explore tours
-              </Link>
+              <div className="mt-10 text-center">
+                <Link
+                  href="/tours"
+                  className="font-semibold text-brand-deep-green underline underline-offset-4 transition-colors hover:text-brand-gold"
+                >
+                  Explore tours
+                </Link>
+              </div>
             </div>
+          </section>
+        )}
+
+        {/* Water (Newsletter) — moved to bottom */}
+        <section id="newsletter" className="flex min-h-[100dvh] items-center bg-brand-pale-green px-4 py-20 sm:py-28 scroll-mt-14">
+          <div className="mx-auto w-full max-w-xl text-center">
+            <h2 className="font-serif text-3xl italic text-brand-deep-green sm:text-4xl">
+              Flow with us.
+            </h2>
+            <p className="mt-4 text-lg text-brand-charcoal-light">
+              One email a week with the events, stories, and community happenings
+              that matter — so you never hear about the good ones after they sell out.
+            </p>
+            <NewsletterSignup className="mx-auto mt-8 max-w-md" />
+            <p className="mt-3 text-sm text-brand-charcoal-light/60">
+              No spam, unsubscribe anytime.
+            </p>
           </div>
         </section>
       </div>
+      <QuizPrompt />
     </>
   );
 }

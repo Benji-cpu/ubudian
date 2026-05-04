@@ -37,6 +37,21 @@ yarn-error.log*
 # worktrees
 .worktrees/
 
+# claude code settings (contains secrets + machine-specific paths)
+.claude/
+
+# screenshots & test artifacts
+*.png
+*.jpeg
+reparse-check.md
+e2e/test-results/
+
+# tool directories
+.playwright-mcp/
+.agents/
+.superpowers/
+skills-lock.json
+
 # vercel
 .vercel
 

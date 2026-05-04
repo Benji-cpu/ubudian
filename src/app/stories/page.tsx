@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { queryWithRetry } from "@/lib/supabase/retry";
 import { StoryCard } from "@/components/stories/story-card";
 import { ThemeFilter } from "@/components/stories/theme-filter";
+import { getSiteSettings } from "@/lib/site-settings";
 import type { Story } from "@/types";
 
 export const metadata: Metadata = {
@@ -17,6 +19,9 @@ interface StoriesPageProps {
 }
 
 export default async function StoriesPage({ searchParams }: StoriesPageProps) {
+  const settings = await getSiteSettings();
+  if (!settings.stories_enabled) notFound();
+
   const { theme } = await searchParams;
 
   let allStories: Story[] = [];

@@ -140,6 +140,15 @@ export default async function ArchetypeResultPage({ params }: PageProps) {
           {archetype.description}
         </p>
 
+        {/* Browse events for archetype */}
+        <div className="mt-6">
+          <Button asChild variant="outline" size="lg" className="w-full sm:w-auto">
+            <Link href={`/events?archetype=${archetype.id}`}>
+              Browse all events for {archetype.name} &rarr;
+            </Link>
+          </Button>
+        </div>
+
         {/* Take the quiz CTA */}
         <div className="mt-8 rounded-xl border border-brand-gold/30 bg-brand-gold/5 p-6 text-center">
           <p className="font-serif text-lg text-brand-charcoal">

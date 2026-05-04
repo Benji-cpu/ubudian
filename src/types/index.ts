@@ -5,6 +5,7 @@ export interface Profile {
   avatar_url: string | null;
   role: "user" | "admin";
   stripe_customer_id: string | null;
+  ics_token: string | null;
   created_at: string;
   updated_at: string;
   primary_archetype?: string | null;
@@ -46,6 +47,7 @@ export interface Story {
   is_placeholder: boolean;
   is_members_only: boolean;
   archetype_tags: ArchetypeId[];
+  related_organizer_name: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -77,6 +79,7 @@ export interface Event {
   is_trusted_submitter: boolean;
   rejection_reason: string | null;
   is_placeholder: boolean;
+  is_core: boolean;
   archetype_tags: ArchetypeId[];
   // Ingestion fields
   source_id: string | null;
@@ -87,8 +90,29 @@ export interface Event {
   llm_parsed: boolean;
   quality_score: number | null;
   content_flags: string[];
+  // Geo (populated by venue geocoding)
+  latitude: number | null;
+  longitude: number | null;
+  // AI moderation audit
+  ai_approved_at: string | null;
+  moderation_reason: string | null;
+  // Diagnostic metadata
+  source_kind: "seed" | "llm" | "manual" | "submission" | null;
+  raw_text_snippet: string | null;
+  parser_version: string | null;
+  ingested_at: string | null;
   created_at: string;
   updated_at: string;
+}
+
+export interface VenueCoordinates {
+  id: string;
+  canonical_name: string;
+  latitude: number;
+  longitude: number;
+  geocoded_at: string;
+  source: "nominatim" | "manual";
+  confidence: number | null;
 }
 
 export interface Tour {
@@ -394,9 +418,62 @@ export interface UnresolvedVenue {
   resolved_by: string | null;
 }
 
+export type ActivityCategory = "event_created" | "event_enriched" | "event_moderation" | "source_error" | "source_recovered" | "group_quiet" | "run_summary";
+export type ActivitySeverity = "info" | "warning" | "error";
+
+export interface IngestionActivityLog {
+  id: string;
+  category: ActivityCategory;
+  severity: ActivitySeverity;
+  title: string;
+  details: Record<string, unknown> | null;
+  source_id: string | null;
+  created_at: string;
+}
+
 export interface SavedEvent {
   id: string;
   profile_id: string;
   event_id: string;
+  created_at: string;
+}
+
+// ============================================
+// FEEDBACK TYPES
+// ============================================
+
+export type FeedbackType = "bug" | "suggestion" | "general";
+export type FeedbackStatus = "new" | "reviewed" | "resolved" | "dismissed";
+
+export interface Feedback {
+  id: string;
+  type: FeedbackType;
+  message: string;
+  email: string | null;
+  page_url: string | null;
+  page_title: string | null;
+  user_agent: string | null;
+  profile_id: string | null;
+  image_url: string | null;
+  status: FeedbackStatus;
+  admin_notes: string | null;
+  pr_url: string | null;
+  created_at: string;
+}
+
+// ============================================
+// PIPELINE HEALTH LOG TYPES
+// ============================================
+
+export type HealthLogType = "success" | "warning" | "error" | "info";
+export type HealthLogChannel = "telegram" | "whatsapp" | "megatix" | "system";
+
+export interface PipelineHealthLog {
+  id: string;
+  log_type: HealthLogType;
+  channel: HealthLogChannel | null;
+  group_name: string | null;
+  message: string;
+  metadata: Record<string, unknown>;
   created_at: string;
 }

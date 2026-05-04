@@ -198,3 +198,25 @@ npx vitest run src/lib/__tests__/ingestion/        # Ingestion tests only
 - Use Playwright MCP to navigate to affected pages and take screenshots
 - Verify on both desktop and mobile (390px) viewports
 - Use `/api/auth/test-login` for authenticated pages (append `?role=admin` for admin pages)
+
+## Claude Autonomy & DB Workflow
+
+Claude is pre-authorized to apply migrations and mutate production Supabase directly via MCP. The safety net is discipline around *how* changes are made, not permission prompts.
+
+### Always
+- **Write a migration file first.** Every schema change (DDL) and any data change touching >10 rows must live in `supabase/migrations/<timestamp>_<name>.sql` before being applied. This gives a git-reviewable audit trail of every DB mutation.
+- **Preview before apply.** For any data mutation, run a `SELECT COUNT(*)` with the same WHERE clause first and report the row count. If it's surprising, stop.
+- **Apply via `mcp__supabase__apply_migration`** (preferred) or `npx supabase db push` for bulk local flushes. Do not run ad-hoc `execute_sql` writes when a migration file would work.
+- **Verify after apply** with a read-only MCP query and a front-end Playwright check if the change is user-visible.
+
+### Ask first (even though the tool is technically allowed)
+- **DROP TABLE / TRUNCATE / DELETE without WHERE** — irreversible.
+- **Any change touching >500 rows in prod** — use a Supabase branch instead (create_branch → apply → verify → merge_branch). If the cost of being wrong is high, isolate first.
+- **Rotating or revoking API keys, webhook secrets, Stripe webhooks** — shared external state.
+- **Deleting a Supabase branch that isn't one Claude just created** — might be the user's in-progress work.
+
+### Never (without an explicit, same-session instruction from the user)
+- Force-push to main.
+- Delete user data (profiles, bookings, subscriptions) for reasons other than a specifically requested cleanup.
+- Disable RLS on a table.
+- Share secrets (service role keys, Stripe live keys, webhook secrets) outside the local machine — never paste into chat, external tools, or PR descriptions.

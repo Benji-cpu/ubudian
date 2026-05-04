@@ -31,7 +31,7 @@ export default async function BookingDetailPage({ params }: BookingDetailPagePro
     <div>
       <div className="mb-6">
         <Button asChild variant="ghost" size="sm">
-          <Link href="/admin/bookings">
+          <Link href="/admin/commerce">
             <ArrowLeft className="mr-2 h-4 w-4" />
             All Bookings
           </Link>

@@ -7,12 +7,14 @@ import { SITE_URL } from "@/lib/constants";
 import { MarkdownContent } from "@/components/blog/markdown-content";
 import { ShareButtons } from "@/components/blog/share-buttons";
 import { NewsletterSignup } from "@/components/layout/newsletter-signup";
+import { EventCard } from "@/components/events/event-card";
 import { StoryCard } from "@/components/stories/story-card";
 import { Badge } from "@/components/ui/badge";
 import { StoryJsonLd } from "@/components/stories/story-json-ld";
 import { getCurrentUser, getCurrentProfile } from "@/lib/auth";
 import { isInsider } from "@/lib/stripe/subscription";
 import { MembersOnlyPaywall } from "@/components/membership/members-only-paywall";
+import { getSiteSettings } from "@/lib/site-settings";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -21,7 +23,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import type { Story } from "@/types";
+import type { Story, Event } from "@/types";
 
 interface StoryPageProps {
   params: Promise<{ slug: string }>;
@@ -62,8 +64,12 @@ export async function generateMetadata({ params }: StoryPageProps): Promise<Meta
 }
 
 export default async function StoryPage({ params }: StoryPageProps) {
+  const settings = await getSiteSettings();
+  if (!settings.stories_enabled) notFound();
+
   let s: Story;
   let related: Story[] = [];
+  let organizerEvents: Event[] = [];
   let showPaywall = false;
 
   try {
@@ -101,6 +107,22 @@ export default async function StoryPage({ params }: StoryPageProps) {
 
     if (relatedError) console.error("Related stories query error:", relatedError);
     related = (relatedStories ?? []) as Story[];
+
+    // Query upcoming events by the related organizer
+    if (s.related_organizer_name) {
+      const today = new Date().toISOString().split("T")[0];
+      const { data: orgEvents, error: orgEventsError } = await supabase
+        .from("events")
+        .select("*")
+        .eq("status", "approved")
+        .ilike("organizer_name", s.related_organizer_name)
+        .gte("start_date", today)
+        .order("start_date", { ascending: true })
+        .limit(4);
+
+      if (orgEventsError) console.error("Organizer events query error:", orgEventsError);
+      organizerEvents = (orgEvents ?? []) as Event[];
+    }
   } catch {
     notFound();
   }
@@ -209,6 +231,20 @@ export default async function StoryPage({ params }: StoryPageProps) {
       <div className="mx-auto max-w-3xl border-t px-4 py-8 sm:px-6">
         <ShareButtons title={`${s.subject_name} — Humans of Ubud`} url={storyUrl} />
       </div>
+
+      {/* Upcoming Events by Organizer */}
+      {organizerEvents.length > 0 && s.related_organizer_name && (
+        <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+          <h2 className="font-serif text-2xl font-bold text-brand-deep-green">
+            Upcoming Events by {s.related_organizer_name}
+          </h2>
+          <div className="mt-8 grid gap-3 md:grid-cols-2">
+            {organizerEvents.map((event) => (
+              <EventCard key={event.id} event={event} />
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Newsletter CTA */}
       <section className="bg-brand-pale-green px-4 py-14">
