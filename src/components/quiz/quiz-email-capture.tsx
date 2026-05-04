@@ -4,12 +4,15 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Loader2 } from "lucide-react";
+import type { UserSegment } from "@/types";
 
 interface QuizEmailCaptureProps {
   onSubmit: (email: string) => void;
+  onSkip: () => void;
+  userSegment?: UserSegment | null;
 }
 
-export function QuizEmailCapture({ onSubmit }: QuizEmailCaptureProps) {
+export function QuizEmailCapture({ onSubmit, onSkip, userSegment }: QuizEmailCaptureProps) {
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -28,6 +31,11 @@ export function QuizEmailCapture({ onSubmit }: QuizEmailCaptureProps) {
     onSubmit(email.toLowerCase().trim());
   }
 
+  const subtitleText =
+    userSegment === "curious"
+      ? "Enter your email to get a personalized Ubud guide matched to your spirit"
+      : "Save your results and get events matched to your archetype in the weekly newsletter.";
+
   return (
     <div className="mx-auto max-w-md text-center">
       <div className="mb-2 text-4xl">&#10024;</div>
@@ -35,8 +43,7 @@ export function QuizEmailCapture({ onSubmit }: QuizEmailCaptureProps) {
         Your Ubud Spirit is ready!
       </h2>
       <p className="mt-4 text-lg text-brand-charcoal-light">
-        Save your results and get events matched to your archetype in the
-        weekly newsletter.
+        {subtitleText}
       </p>
 
       <form onSubmit={handleSubmit} className="mt-8">
@@ -55,6 +62,13 @@ export function QuizEmailCapture({ onSubmit }: QuizEmailCaptureProps) {
         {error && <p className="mt-2 text-sm text-destructive">{error}</p>}
       </form>
 
+      <button
+        type="button"
+        onClick={onSkip}
+        className="mt-4 text-sm text-brand-charcoal-light underline underline-offset-4 hover:text-brand-charcoal"
+      >
+        Skip — show my results
+      </button>
     </div>
   );
 }

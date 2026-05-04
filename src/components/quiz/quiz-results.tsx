@@ -11,7 +11,7 @@ import { StoryCard } from "@/components/stories/story-card";
 import { ExperienceCard } from "@/components/experiences/experience-card";
 import { Button } from "@/components/ui/button";
 import { SITE_URL } from "@/lib/constants";
-import type { ArchetypeId, QuizScores, Event, Tour, Story, Experience } from "@/types";
+import type { ArchetypeId, QuizScores, Event, Tour, Story, Experience, UserSegment } from "@/types";
 
 interface QuizResultsProps {
   primary: ArchetypeId;
@@ -22,6 +22,7 @@ interface QuizResultsProps {
   stories: Story[];
   experiences: Experience[];
   onRetake: () => void;
+  userSegment?: UserSegment | null;
 }
 
 export function QuizResults({
@@ -33,6 +34,7 @@ export function QuizResults({
   stories,
   experiences,
   onRetake,
+  userSegment,
 }: QuizResultsProps) {
   const archetype = ARCHETYPES[primary];
   const secondaryArchetype = ARCHETYPES[secondary];
@@ -43,6 +45,56 @@ export function QuizResults({
   const matchedEvents = getEventsForArchetype(events, primary);
   const matchedTours = getToursForArchetype(tours, primary);
   const matchedStories = getStoriesForArchetype(stories, primary);
+
+  const segmentCTA = (() => {
+    const segment = userSegment || "visiting";
+
+    if (segment === "curious") {
+      return (
+        <div className="space-y-3">
+          <Button asChild size="lg">
+            <Link href="/login?redirect=/dashboard">
+              Get your personalized Ubud guide
+            </Link>
+          </Button>
+          <p className="text-sm text-brand-charcoal-light">
+            Or{" "}
+            <Link
+              href="/login?redirect=/dashboard"
+              className="font-semibold text-brand-deep-green underline underline-offset-4 hover:text-brand-gold"
+            >
+              create an account
+            </Link>{" "}
+            to save your archetype
+          </p>
+        </div>
+      );
+    }
+
+    if (segment === "local") {
+      return (
+        <Button asChild size="lg">
+          <Link href="/login?redirect=/dashboard">
+            Sign in to unlock your personalized dashboard
+          </Link>
+        </Button>
+      );
+    }
+
+    // visiting or legacy (null)
+    return (
+      <div className="space-y-3">
+        <Button asChild size="lg">
+          <Link href="/login?redirect=/dashboard">
+            Sign in to see your full event feed
+          </Link>
+        </Button>
+        <p className="text-sm text-brand-charcoal-light">
+          We also send a weekly email with events matched to your spirit.
+        </p>
+      </div>
+    );
+  })();
 
   return (
     <div className="mx-auto max-w-3xl">
@@ -112,6 +164,62 @@ export function QuizResults({
         })}
       </div>
 
+      {/* Conversion block — matched events preview + gated CTA */}
+      <div className="mt-10">
+        <h3 className="font-serif text-2xl font-medium text-brand-deep-green">
+          Events Matched to Your Spirit
+        </h3>
+        <p className="mt-2 text-brand-charcoal-light">
+          Real events happening in Ubud, picked for {archetype.name}.
+        </p>
+
+        {/* Show first 3 event cards */}
+        {matchedEvents.length > 0 && (
+          <div className="mt-6 space-y-3">
+            {matchedEvents.slice(0, 3).map((event) => (
+              <EventCard key={event.id} event={event} />
+            ))}
+          </div>
+        )}
+
+        {/* Gated card — blurred preview with lock */}
+        <div className="relative mt-3 overflow-hidden rounded-xl border border-brand-cream bg-white p-4">
+          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-deep-green/10">
+              <svg
+                className="h-5 w-5 text-brand-deep-green"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                />
+              </svg>
+            </div>
+            <p className="mt-2 text-center text-sm font-medium text-brand-charcoal">
+              {matchedEvents.length > 3
+                ? `${matchedEvents.length - 3} more events matched to your spirit`
+                : "More events matched weekly to your spirit"}
+            </p>
+          </div>
+          {/* Blurred placeholder content */}
+          <div className="select-none opacity-30" aria-hidden="true">
+            <div className="h-4 w-3/4 rounded bg-brand-cream" />
+            <div className="mt-2 h-3 w-1/2 rounded bg-brand-cream" />
+            <div className="mt-2 h-3 w-2/3 rounded bg-brand-cream" />
+          </div>
+        </div>
+
+        {/* Segment-aware CTA */}
+        <div className="mt-6 text-center">
+          {segmentCTA}
+        </div>
+      </div>
+
       {/* Share */}
       <div className="mt-8 rounded-xl border border-brand-cream bg-card p-6 text-center">
         <p className="mb-4 font-serif text-lg text-brand-charcoal">Share your Ubud Spirit</p>
@@ -131,31 +239,6 @@ export function QuizResults({
             {matchedExperiences.map((experience) => (
               <ExperienceCard key={experience.id} experience={experience} />
             ))}
-          </div>
-        </div>
-      )}
-
-      {/* Recommended events */}
-      {matchedEvents.length > 0 && (
-        <div className="mt-12">
-          <h3 className="font-serif text-2xl font-medium text-brand-deep-green">
-            Events for {archetype.name}
-          </h3>
-          <p className="mt-2 text-brand-charcoal-light">
-            Happening soon in Ubud.
-          </p>
-          <div className="mt-6 space-y-3">
-            {matchedEvents.map((event) => (
-              <EventCard key={event.id} event={event} />
-            ))}
-          </div>
-          <div className="mt-4 text-center">
-            <Link
-              href="/events"
-              className="text-sm font-semibold text-brand-deep-green underline underline-offset-4 hover:text-brand-gold"
-            >
-              Browse all events
-            </Link>
           </div>
         </div>
       )}

@@ -903,3 +903,11 @@ CREATE POLICY "site_settings public read" ON site_settings
 
 CREATE POLICY "site_settings admin update" ON site_settings
   FOR UPDATE USING (is_admin()) WITH CHECK (is_admin());
+
+-- ============================================
+-- QUIZ REDESIGN: SEGMENT COLUMNS
+-- ============================================
+
+ALTER TABLE quiz_results ADD COLUMN IF NOT EXISTS user_segment TEXT;
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS primary_archetype TEXT;
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS user_segment TEXT;

@@ -12,6 +12,7 @@ const quizSubmitSchema = z.object({
   scores: z.record(z.string(), z.number()),
   answers: z.record(z.string(), z.string()),
   email: z.string().email().optional().or(z.literal("")),
+  user_segment: z.enum(["curious", "visiting", "local"]).optional(),
 });
 
 export async function POST(request: Request) {
@@ -32,7 +33,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const { primary_archetype, secondary_archetype, scores, answers, email } = parsed.data;
+    const { primary_archetype, secondary_archetype, scores, answers, email, user_segment } = parsed.data;
 
     const supabase = createAdminClient();
 
@@ -57,6 +58,7 @@ export async function POST(request: Request) {
           scores,
           answers,
           email: email || null,
+          user_segment: user_segment || null,
           ...(profileId ? { profile_id: profileId } : {}),
         }),
       "quiz-submit-insert"
@@ -68,6 +70,17 @@ export async function POST(request: Request) {
         { error: "Failed to save quiz results" },
         { status: 500 }
       );
+    }
+
+    // If authenticated, update profile with archetype and segment
+    if (profileId) {
+      await supabase
+        .from("profiles")
+        .update({
+          primary_archetype,
+          user_segment: user_segment || null,
+        })
+        .eq("id", profileId);
     }
 
     // If email provided, upsert newsletter subscriber

@@ -7,12 +7,13 @@ import { QuizQuestion } from "./quiz-question";
 import { QuizEmailCapture } from "./quiz-email-capture";
 import { QuizResults } from "./quiz-results";
 import { QuizImmersiveShell } from "./quiz-immersive-shell";
+import { QuizRouterQuestion } from "./quiz-router-question";
 import { Button } from "@/components/ui/button";
-import type { ArchetypeId, QuizScores, Event, Tour, Story, Experience } from "@/types";
+import type { ArchetypeId, QuizScores, Event, Tour, Story, Experience, UserSegment } from "@/types";
 
 const STORAGE_KEY = "ubudian_quiz_result";
 
-type Step = "intro" | "questions" | "email" | "results";
+type Step = "intro" | "router" | "questions" | "email" | "results";
 
 interface StoredResult {
   primary: ArchetypeId;
@@ -21,6 +22,7 @@ interface StoredResult {
   answers: { question_id: number; answer_id: string }[];
   completedAt: string;
   email?: string;
+  userSegment?: UserSegment;
 }
 
 interface QuizContainerProps {
@@ -35,6 +37,7 @@ export function QuizContainer({ events, tours, stories, experiences }: QuizConta
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<{ question_id: number; answer_id: string }[]>([]);
   const [result, setResult] = useState<{ primary: ArchetypeId; secondary: ArchetypeId; scores: QuizScores } | null>(null);
+  const [userSegment, setUserSegment] = useState<UserSegment | null>(null);
 
   // Check for stored result on mount
   useEffect(() => {
@@ -48,6 +51,9 @@ export function QuizContainer({ events, tours, stories, experiences }: QuizConta
           scores: parsed.scores,
         });
         setAnswers(parsed.answers);
+        if (parsed.userSegment) {
+          setUserSegment(parsed.userSegment);
+        }
         setStep("results");
       }
     } catch {
@@ -71,13 +77,14 @@ export function QuizContainer({ events, tours, stories, experiences }: QuizConta
             scores: computed.scores,
             answers: userAnswers,
             email,
+            user_segment: userSegment,
           }),
         });
       } catch {
         // graceful fallback — results are in localStorage
       }
     },
-    []
+    [userSegment]
   );
 
   function handleAnswer(answerId: string) {
@@ -103,9 +110,24 @@ export function QuizContainer({ events, tours, stories, experiences }: QuizConta
       answers,
       completedAt: new Date().toISOString(),
       email,
+      userSegment: userSegment || undefined,
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(stored));
     submitToServer(result, answers, email);
+    setStep("results");
+  }
+
+  function handleEmailSkip() {
+    if (!result) return;
+
+    const stored: StoredResult = {
+      ...result,
+      answers,
+      completedAt: new Date().toISOString(),
+      userSegment: userSegment || undefined,
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(stored));
+    submitToServer(result, answers);
     setStep("results");
   }
 
@@ -115,6 +137,7 @@ export function QuizContainer({ events, tours, stories, experiences }: QuizConta
     setCurrentQuestion(0);
     setAnswers([]);
     setResult(null);
+    setUserSegment(null);
   }
 
   // ---- Render ----
@@ -130,6 +153,7 @@ export function QuizContainer({ events, tours, stories, experiences }: QuizConta
         stories={stories}
         experiences={experiences}
         onRetake={handleRetake}
+        userSegment={userSegment}
       />
     );
   }
@@ -137,7 +161,18 @@ export function QuizContainer({ events, tours, stories, experiences }: QuizConta
   if (step === "email") {
     return (
       <QuizImmersiveShell>
-        <QuizEmailCapture onSubmit={handleEmailSubmit} />
+        <QuizEmailCapture onSubmit={handleEmailSubmit} onSkip={handleEmailSkip} userSegment={userSegment} />
+      </QuizImmersiveShell>
+    );
+  }
+
+  if (step === "router") {
+    return (
+      <QuizImmersiveShell>
+        <QuizRouterQuestion onSelect={(segment) => {
+          setUserSegment(segment);
+          setStep("questions");
+        }} />
       </QuizImmersiveShell>
     );
   }
@@ -169,11 +204,11 @@ export function QuizContainer({ events, tours, stories, experiences }: QuizConta
           Discover Your Ubud Spirit
         </h1>
         <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-brand-charcoal-light">
-          Answer 6 questions and we&apos;ll match you to one of 5 Ubud
+          Answer 5 questions and we&apos;ll match you to one of 5 Ubud
           archetypes — then show you the events, tours, and stories that fit.
         </p>
 
-        <Button size="lg" className="mt-8" onClick={() => setStep("questions")}>
+        <Button size="lg" className="mt-8" onClick={() => setStep("router")}>
           Start the Quiz
         </Button>
       </div>

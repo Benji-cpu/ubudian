@@ -1,4 +1,4 @@
-import type { ArchetypeId, ArchetypeResult, QuizQuestion, QuizScores } from "@/types";
+import type { ArchetypeId, ArchetypeResult, QuizQuestion, QuizScores, UserSegment } from "@/types";
 
 // ============================================
 // ARCHETYPES
@@ -80,7 +80,25 @@ export const ARCHETYPES: Record<ArchetypeId, ArchetypeResult> = {
 export const ARCHETYPE_IDS: ArchetypeId[] = ["seeker", "explorer", "creative", "connector", "epicurean"];
 
 // ============================================
-// QUIZ QUESTIONS (6 questions, ~90 seconds)
+// ROUTER QUESTION (segments users before quiz)
+// ============================================
+
+export interface RouterQuestion {
+  question: string;
+  options: { id: UserSegment; label: string; description: string }[];
+}
+
+export const ROUTER_QUESTION: RouterQuestion = {
+  question: "What's your Ubud story?",
+  options: [
+    { id: "curious", label: "I've never been — but I'm curious", description: "You haven't visited Ubud yet" },
+    { id: "visiting", label: "I'm visiting soon (or I'm here now)", description: "You're planning a trip or currently in Ubud" },
+    { id: "local", label: "I live here", description: "Ubud is home" },
+  ],
+};
+
+// ============================================
+// QUIZ QUESTIONS (5 universal questions)
 // ============================================
 
 function scores(primary: ArchetypeId, secondary?: ArchetypeId): Record<ArchetypeId, number> {
@@ -96,164 +114,57 @@ function scores(primary: ArchetypeId, secondary?: ArchetypeId): Record<Archetype
 export const QUIZ_QUESTIONS: QuizQuestion[] = [
   {
     id: 1,
-    question: "It's Saturday night in Ubud. Where are you?",
+    question: "You have a free day with zero plans. What pulls you?",
     type: "text",
     answers: [
-      {
-        id: "1a",
-        text: "A cacao ceremony and sound journey under the stars",
-        scores: scores("seeker", "epicurean"),
-      },
-      {
-        id: "1b",
-        text: "Ecstatic dance — barefoot, eyes closed, sweat dripping, no rules",
-        scores: scores("explorer", "connector"),
-      },
-      {
-        id: "1c",
-        text: "A live music night where someone's playing medicine songs by firelight",
-        scores: scores("creative", "seeker"),
-      },
-      {
-        id: "1d",
-        text: "A tantric temple exploring conscious touch with strangers",
-        scores: scores("epicurean", "explorer"),
-      },
+      { id: "1a", text: "A quiet place to sit with my thoughts and go inward", scores: scores("seeker", "creative") },
+      { id: "1b", text: "Something physical I've never tried before", scores: scores("explorer", "epicurean") },
+      { id: "1c", text: "Finding the local spot where interesting people gather", scores: scores("connector", "explorer") },
+      { id: "1d", text: "A sensory experience — live music, incredible food, or a long walk somewhere beautiful", scores: scores("epicurean", "creative") },
     ],
   },
   {
     id: 2,
-    question: "Someone hands you a flyer at the café. Which one makes you say 'I'm going'?",
+    question: "A friend invites you to something you've never done. What makes you say yes?",
     type: "text",
     answers: [
-      {
-        id: "2a",
-        text: "3-day shadow work and breathwork retreat",
-        scores: scores("seeker", "explorer"),
-      },
-      {
-        id: "2b",
-        text: "Embodied Tantra Level 1 Weekend Workshop",
-        scores: scores("explorer", "epicurean"),
-      },
-      {
-        id: "2c",
-        text: "Medicine songs circle — a community devotional gathering",
-        scores: scores("creative", "connector"),
-      },
-      {
-        id: "2d",
-        text: "Community dinner — twenty strangers, one long table, no phones",
-        scores: scores("connector", "epicurean"),
-      },
+      { id: "2a", text: "It involves going deep — breathwork, ceremony, or something transformative", scores: scores("seeker", "explorer") },
+      { id: "2b", text: "It's a little scary and I might be bad at it", scores: scores("explorer", "connector") },
+      { id: "2c", text: "There's a creative element — music, art, or something I can make", scores: scores("creative", "seeker") },
+      { id: "2d", text: "Good people will be there and conversations will be real", scores: scores("connector", "epicurean") },
     ],
   },
   {
     id: 3,
-    question: "Why did you really come to Ubud?",
+    question: "What kind of travel experience stays with you longest?",
     type: "text",
     answers: [
-      {
-        id: "3a",
-        text: "Something broke open and I needed somewhere safe to put it back together",
-        scores: scores("seeker", "connector"),
-      },
-      {
-        id: "3b",
-        text: "I wanted to feel alive in my body again",
-        scores: scores("epicurean", "explorer"),
-      },
-      {
-        id: "3c",
-        text: "I followed the creative energy — this place has been pulling artists for a century",
-        scores: scores("creative", "seeker"),
-      },
-      {
-        id: "3d",
-        text: "I kept meeting people who'd been here and they all had that glow",
-        scores: scores("connector", "explorer"),
-      },
+      { id: "3a", text: "The one that changed how I see myself", scores: scores("seeker", "connector") },
+      { id: "3b", text: "The one where I pushed past my comfort zone", scores: scores("explorer", "epicurean") },
+      { id: "3c", text: "The one where I discovered something beautiful I didn't know existed", scores: scores("creative", "connector") },
+      { id: "3d", text: "The one I can still taste, hear, and feel in my body", scores: scores("epicurean", "seeker") },
     ],
   },
   {
     id: 4,
-    question: "A friend back home asks what Ubud is really like. What do you tell them?",
+    question: "You're at a gathering where you don't know anyone. What do you do?",
     type: "text",
     answers: [
-      {
-        id: "4a",
-        text: "It's where you go when you're ready to deal with your stuff",
-        scores: scores("seeker", "connector"),
-      },
-      {
-        id: "4b",
-        text: "You'll try things that terrify you and thank yourself for every single one",
-        scores: scores("explorer", "epicurean"),
-      },
-      {
-        id: "4c",
-        text: "It's the most creatively alive place I've ever been",
-        scores: scores("creative", "connector"),
-      },
-      {
-        id: "4d",
-        text: "It's sensory overload in the best way — ceremonies, food, music, touch, all of it",
-        scores: scores("epicurean", "creative"),
-      },
+      { id: "4a", text: "Find the quietest corner and have one deep conversation", scores: scores("seeker", "creative") },
+      { id: "4b", text: "Try whatever activity is happening — I'll figure it out", scores: scores("explorer", "epicurean") },
+      { id: "4c", text: "Observe everything — the music, the space, the energy", scores: scores("creative", "epicurean") },
+      { id: "4d", text: "Start introducing yourself and connecting people to each other", scores: scores("connector", "seeker") },
     ],
   },
   {
     id: 5,
-    question: "What's your perfect Ubud morning?",
+    question: "What would make you feel most alive right now?",
     type: "text",
     answers: [
-      {
-        id: "5a",
-        text: "Breathwork at sunrise, then sitting quietly with whatever came up",
-        scores: scores("seeker", "creative"),
-      },
-      {
-        id: "5b",
-        text: "An embodiment practice I've never tried, then the best smoothie bowl on the island",
-        scores: scores("explorer", "epicurean"),
-      },
-      {
-        id: "5c",
-        text: "Slow breakfast at a warung, journal open, listening to someone's transformation story",
-        scores: scores("creative", "connector"),
-      },
-      {
-        id: "5d",
-        text: "A long conversation with someone I just met who's doing the exact same inner work",
-        scores: scores("connector", "seeker"),
-      },
-    ],
-  },
-  {
-    id: 6,
-    question: "What keeps you coming back to Ubud?",
-    type: "text",
-    answers: [
-      {
-        id: "6a",
-        text: "The ceremonies — full moons, temple nights, things that don't exist anywhere else",
-        scores: scores("seeker", "epicurean"),
-      },
-      {
-        id: "6b",
-        text: "The edge — every week there's something I've never done before",
-        scores: scores("explorer", "creative"),
-      },
-      {
-        id: "6c",
-        text: "The people — I've never felt this kind of community anywhere",
-        scores: scores("connector", "seeker"),
-      },
-      {
-        id: "6d",
-        text: "Everything here is designed to make you feel something — and I'm addicted to feeling",
-        scores: scores("epicurean", "connector"),
-      },
+      { id: "5a", text: "A practice that strips away the noise and brings me back to what matters", scores: scores("seeker", "epicurean") },
+      { id: "5b", text: "Saying yes to something that genuinely scares me", scores: scores("explorer", "creative") },
+      { id: "5c", text: "Making something — writing, music, art, movement", scores: scores("creative", "connector") },
+      { id: "5d", text: "Being in a room full of people where every conversation matters", scores: scores("connector", "explorer") },
     ],
   },
 ];
