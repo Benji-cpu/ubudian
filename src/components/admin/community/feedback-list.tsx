@@ -28,6 +28,15 @@ const typeVariant: Record<string, "default" | "secondary" | "destructive" | "out
   general: "outline",
 };
 
+function pagePath(raw: string | null): string {
+  if (!raw) return "\u2014";
+  try {
+    return new URL(raw).pathname;
+  } catch {
+    return raw.length > 40 ? raw.slice(0, 40) + "\u2026" : raw;
+  }
+}
+
 interface FeedbackListProps {
   feedback: Feedback[];
 }
@@ -79,7 +88,7 @@ export function FeedbackList({ feedback }: FeedbackListProps) {
                   </Link>
                 </TableCell>
                 <TableCell className="max-w-[200px] truncate text-xs text-muted-foreground">
-                  {item.page_url ? new URL(item.page_url).pathname : "\u2014"}
+                  {pagePath(item.page_url)}
                 </TableCell>
                 <TableCell className="text-sm text-muted-foreground">
                   {item.email ?? "\u2014"}
@@ -119,7 +128,7 @@ export function FeedbackList({ feedback }: FeedbackListProps) {
               </Link>
               <dl className="mt-2 grid grid-cols-2 gap-2">
                 <MobileCardField label="Page">
-                  {item.page_url ? new URL(item.page_url).pathname : "\u2014"}
+                  {pagePath(item.page_url)}
                 </MobileCardField>
                 <MobileCardField label="Date">
                   {new Date(item.created_at).toLocaleDateString()}

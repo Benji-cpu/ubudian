@@ -452,6 +452,7 @@ export interface Feedback {
   image_url: string | null;
   status: FeedbackStatus;
   admin_notes: string | null;
+  pr_url: string | null;
   created_at: string;
 }
 

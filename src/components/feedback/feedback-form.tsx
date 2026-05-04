@@ -12,12 +12,19 @@ import { Loader2, ImagePlus, X } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
 const feedbackSchema = z.object({
+  type: z.enum(["bug", "suggestion", "general"]),
   message: z.string().min(10, "Please provide at least 10 characters").max(2000),
   image_url: z.string().url().optional().or(z.literal("")),
   page_url: z.string().optional(),
   page_title: z.string().optional(),
   website: z.string().optional(),
 });
+
+const FEEDBACK_TYPES = [
+  { value: "bug" as const, label: "Bug" },
+  { value: "suggestion" as const, label: "Suggestion" },
+  { value: "general" as const, label: "General" },
+];
 
 type FeedbackFormData = z.infer<typeof feedbackSchema>;
 
@@ -34,11 +41,13 @@ export function FeedbackForm({ onSuccess }: FeedbackFormProps) {
     register,
     handleSubmit,
     setValue,
+    watch,
     reset,
     formState: { errors, isSubmitting },
   } = useForm<FeedbackFormData>({
     resolver: zodResolver(feedbackSchema),
     defaultValues: {
+      type: "general",
       message: "",
       image_url: "",
       page_url: typeof window !== "undefined" ? window.location.href : "",
@@ -46,6 +55,8 @@ export function FeedbackForm({ onSuccess }: FeedbackFormProps) {
       website: "",
     },
   });
+
+  const selectedType = watch("type");
 
   async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -64,7 +75,12 @@ export function FeedbackForm({ onSuccess }: FeedbackFormProps) {
     setIsUploading(true);
     try {
       const supabase = createClient();
-      const fileName = `feedback/${Date.now()}-${file.name}`;
+      const ext = (file.name.split(".").pop() || "png").toLowerCase().replace(/[^a-z0-9]/g, "");
+      const id =
+        typeof crypto !== "undefined" && "randomUUID" in crypto
+          ? crypto.randomUUID()
+          : `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+      const fileName = `feedback/${id}.${ext || "png"}`;
       const { error } = await supabase.storage.from("images").upload(fileName, file);
 
       if (error) {
@@ -115,6 +131,32 @@ export function FeedbackForm({ onSuccess }: FeedbackFormProps) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <div>
+        <Label className="mb-2 block">Type</Label>
+        <div className="flex gap-2" role="radiogroup" aria-label="Feedback type">
+          {FEEDBACK_TYPES.map((opt) => {
+            const isActive = selectedType === opt.value;
+            return (
+              <button
+                key={opt.value}
+                type="button"
+                role="radio"
+                aria-checked={isActive}
+                onClick={() => setValue("type", opt.value, { shouldValidate: true })}
+                className={
+                  "flex-1 rounded-md border px-3 py-2 text-sm transition " +
+                  (isActive
+                    ? "border-[var(--brand-deep-green)] bg-[var(--brand-deep-green)] text-white"
+                    : "border-input bg-background hover:bg-muted")
+                }
+              >
+                {opt.label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
       <div>
         <Label htmlFor="feedback-message">Message</Label>
         <Textarea
