@@ -66,11 +66,12 @@ export async function POST(request: Request) {
       update.message?.chat?.id || update.channel_post?.chat?.id || ""
     );
 
-    if (allowedGroups?.length && chatId && !allowedGroups.includes(chatId)) {
-      return NextResponse.json({ ok: true }); // Silently ignore non-allowed groups
-    }
+    const groupAllowed =
+      !allowedGroups?.length || !chatId || allowedGroups.includes(chatId);
 
-    // Check for duplicate message (same external_id from same source)
+    // Check for duplicate message (same external_id from same source).
+    // We do this before potentially writing an ignored_group row so we don't
+    // accumulate duplicates for unknown groups either.
     if (rawMsg.external_id) {
       const { data: existing } = await supabase
         .from("raw_ingestion_messages")
@@ -82,6 +83,24 @@ export async function POST(request: Request) {
       if (existing?.length) {
         return NextResponse.json({ ok: true, status: "duplicate" });
       }
+    }
+
+    // Messages from groups the admin hasn't enabled yet are still stored
+    // (with status='ignored_group') so they surface in the admin Groups list
+    // and can be promoted. LLM processing is skipped.
+    if (!groupAllowed) {
+      await supabase.from("raw_ingestion_messages").insert({
+        source_id: source.id,
+        external_id: rawMsg.external_id || null,
+        content_text: rawMsg.content_text || null,
+        image_urls: null, // skip storage upload for ignored groups
+        sender_name: rawMsg.sender_name || null,
+        sender_id: rawMsg.sender_id || null,
+        chat_name: rawMsg.chat_name || null,
+        raw_data: rawMsg.raw_data || null,
+        status: "ignored_group",
+      });
+      return NextResponse.json({ ok: true, status: "ignored_group" });
     }
 
     // Persist Telegram images to Supabase Storage

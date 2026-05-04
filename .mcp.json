@@ -18,7 +18,7 @@
     },
     "vercel": {
       "command": "npx",
-      "args": ["-y", "vercel-mcp@latest"]
+      "args": ["-y", "vercel-mcp@latest", "VERCEL_API_KEY=${VERCEL_API_KEY}"]
     },
     "beehiiv": {
       "command": "npx",

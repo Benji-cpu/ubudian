@@ -114,6 +114,25 @@ export const CATEGORY_GRADIENTS: Record<string, string> = {
   "Other": "from-gray-500 to-slate-700",
 };
 
+/**
+ * Brand-toned gradients used by the event-card placeholder. Quieter than
+ * CATEGORY_GRADIENTS (which still powers chips and small accents) — these
+ * stay in the deep-green / terracotta / charcoal / gold palette so empty
+ * cards sit alongside real imagery without screaming.
+ */
+export const CATEGORY_BRAND_GRADIENTS: Record<string, string> = {
+  "Dance & Movement": "from-[#2C4A3E] via-[#3A5A4A] to-[#B85C3F]",
+  "Tantra & Intimacy": "from-[#B85C3F] via-[#7A3E2B] to-[#2D2D2D]",
+  "Ceremony & Sound": "from-[#2C4A3E] via-[#1F3A32] to-[#2D2D2D]",
+  "Yoga & Meditation": "from-[#2C4A3E] via-[#355B4C] to-[#4A7561]",
+  "Healing & Bodywork": "from-[#C9A84C] via-[#A8853A] to-[#B85C3F]",
+  "Circle & Community": "from-[#B85C3F] via-[#A8853A] to-[#C9A84C]",
+  "Music & Performance": "from-[#2D2D2D] via-[#1F3A32] to-[#2C4A3E]",
+  "Art & Culture": "from-[#B85C3F] via-[#7A3E2B] to-[#2C4A3E]",
+  "Retreat & Training": "from-[#2C4A3E] via-[#253D33] to-[#2D2D2D]",
+  "Other": "from-[#2D2D2D] via-[#2C4A3E] to-[#3A5A4A]",
+};
+
 export const TOUR_THEMES = [
   "Cultural & Heritage",
   "Nature & Rice Terraces",

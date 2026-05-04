@@ -17,7 +17,7 @@ export async function Header() {
 
   return (
     <header
-      className="fixed top-0 z-50 w-full border-b border-brand-gold/15 bg-brand-deep-green/85 backdrop-blur-[12px] dark:bg-background/90"
+      className="fixed top-0 z-50 w-full border-b border-brand-gold/15 bg-brand-deep-green/85 backdrop-blur-[12px] dark:border-brand-gold/25 dark:bg-background/40"
     >
       <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Logo */}
@@ -80,7 +80,7 @@ export async function Header() {
               asChild
               variant="ghost"
               size="sm"
-              className="hidden border border-brand-gold/30 bg-transparent text-brand-gold hover:bg-brand-gold/10 hover:text-brand-gold md:inline-flex"
+              className="hidden border border-brand-gold/30 bg-transparent text-brand-gold hover:bg-brand-gold/10 hover:text-brand-gold dark:bg-transparent dark:text-brand-gold dark:hover:bg-brand-gold/10 dark:hover:text-brand-gold md:inline-flex"
             >
               <Link href="/login">Sign In</Link>
             </Button>
