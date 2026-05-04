@@ -259,6 +259,75 @@ export function weeklyIngestionDigest(opts: {
   `);
 }
 
+interface DailyMaintenancePayload {
+  startedAt: string;
+  finishedAt: string;
+  autonomous: {
+    archivedPendingEvents: number;
+    purgedFailedMessages: number;
+    cancelledStaleBookings: number;
+    archivedDuplicateEvents: number;
+  };
+  review: {
+    feedback: { id: string; type: string; status: string; message: string; page_url: string | null; created_at: string }[];
+    dedupBacklog: number;
+    unresolvedVenuesLowConfidence: number;
+    incompleteSubscriptions: number;
+    eventDateInconsistencies: { id: string; title: string; reason: string }[];
+  } | null;
+  errors: string[];
+}
+
+export function dailyMaintenanceDigest(p: DailyMaintenancePayload): string {
+  const a = p.autonomous;
+  const r = p.review;
+  const fbCount = r?.feedback.length ?? 0;
+  const fbRows = (r?.feedback ?? [])
+    .slice(0, 15)
+    .map((f) => {
+      const preview = f.message.length > 140 ? f.message.slice(0, 140) + "\u2026" : f.message;
+      const pageBit = f.page_url
+        ? ` <a href="${escapeHtml(f.page_url)}" style="color:${COLORS.deepGreen};">page</a>`
+        : "";
+      return `<li style="margin-bottom:10px;"><strong>[${escapeHtml(f.type)}]</strong> ${escapeHtml(preview)}${pageBit}</li>`;
+    })
+    .join("");
+
+  const inconsistencyRows = (r?.eventDateInconsistencies ?? [])
+    .slice(0, 10)
+    .map((e) => `<li>${escapeHtml(e.title)} — <em>${escapeHtml(e.reason)}</em></li>`)
+    .join("");
+
+  const errorBlock = p.errors.length
+    ? `<div style="margin:16px 0;padding:12px 16px;background-color:#FCE8E0;border-radius:4px;font-size:14px;"><strong>Errors:</strong><ul style="margin:8px 0;padding-left:20px;">${p.errors.map((e) => `<li>${escapeHtml(e)}</li>`).join("")}</ul></div>`
+    : "";
+
+  return layout(`
+    <h2 style="margin:0 0 16px;font-family:'Lora',Georgia,serif;color:${COLORS.deepGreen};">Daily Maintenance — ${escapeHtml(p.startedAt.split("T")[0])}</h2>
+
+    <h3 style="margin:24px 0 8px;font-family:'Lora',Georgia,serif;color:${COLORS.deepGreen};font-size:16px;">Auto-fixed</h3>
+    <table style="margin:8px 0;width:100%;border-collapse:collapse;font-size:14px;">
+      <tr><td style="padding:6px 0;color:#888;">Past-pending events archived</td><td style="padding:6px 0;text-align:right;font-weight:600;">${a.archivedPendingEvents}</td></tr>
+      <tr><td style="padding:6px 0;color:#888;">Failed messages purged</td><td style="padding:6px 0;text-align:right;font-weight:600;">${a.purgedFailedMessages}</td></tr>
+      <tr><td style="padding:6px 0;color:#888;">Stale bookings cancelled</td><td style="padding:6px 0;text-align:right;font-weight:600;">${a.cancelledStaleBookings}</td></tr>
+      <tr><td style="padding:6px 0;color:#888;">Duplicate events archived</td><td style="padding:6px 0;text-align:right;font-weight:600;">${a.archivedDuplicateEvents}</td></tr>
+    </table>
+
+    ${errorBlock}
+
+    <h3 style="margin:24px 0 8px;font-family:'Lora',Georgia,serif;color:${COLORS.deepGreen};font-size:16px;">Needs your attention</h3>
+    <p style="margin:0 0 8px;font-size:14px;color:#666;">${fbCount} open feedback · ${r?.dedupBacklog ?? 0} stale dedup · ${r?.unresolvedVenuesLowConfidence ?? 0} low-confidence venues · ${r?.incompleteSubscriptions ?? 0} stuck subscriptions · ${r?.eventDateInconsistencies.length ?? 0} event date issues</p>
+
+    ${fbRows ? `<h4 style="margin:16px 0 4px;font-size:14px;color:${COLORS.charcoal};">Recent feedback</h4><ul style="margin:0 0 16px;padding-left:20px;font-size:14px;">${fbRows}</ul>` : ""}
+
+    ${inconsistencyRows ? `<h4 style="margin:16px 0 4px;font-size:14px;color:${COLORS.charcoal};">Event date issues</h4><ul style="margin:0 0 16px;padding-left:20px;font-size:14px;">${inconsistencyRows}</ul>` : ""}
+
+    <p style="margin-top:20px;">
+      <a href="${SITE_URL}/admin/community" style="display:inline-block;padding:10px 24px;background-color:${COLORS.deepGreen};color:#ffffff;text-decoration:none;border-radius:4px;font-weight:600;">Open Admin</a>
+    </p>
+  `);
+}
+
 function escapeHtml(str: string): string {
   return str
     .replace(/&/g, "&amp;")
