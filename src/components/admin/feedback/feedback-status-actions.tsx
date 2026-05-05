@@ -11,7 +11,7 @@ import type { FeedbackStatus } from "@/types";
 
 const STATUS_ACTIONS: { label: string; value: FeedbackStatus; variant: "default" | "secondary" | "destructive" | "outline" }[] = [
   { label: "Mark Reviewed", value: "reviewed", variant: "secondary" },
-  { label: "Mark Resolved", value: "resolved", variant: "default" },
+  { label: "Mark Actioned", value: "actioned", variant: "default" },
   { label: "Dismiss", value: "dismissed", variant: "destructive" },
 ];
 

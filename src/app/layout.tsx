@@ -6,6 +6,7 @@ import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { Toaster } from "@/components/ui/sonner";
 import { FeedbackFab } from "@/components/feedback/feedback-fab";
+import { ActivityTrailInstaller } from "@/components/feedback/activity-trail-installer";
 import { ThemeProvider } from "@/components/theme-provider";
 import { SITE_NAME, SITE_DESCRIPTION } from "@/lib/constants";
 import "./globals.css";
@@ -50,6 +51,7 @@ export default function RootLayout({
           </div>
           <Toaster />
           <FeedbackFab />
+          <ActivityTrailInstaller />
         </ThemeProvider>
         <Analytics />
         <SpeedInsights />

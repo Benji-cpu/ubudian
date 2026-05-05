@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 
 const updateSchema = z.object({
-  status: z.enum(["new", "reviewed", "resolved", "dismissed"]).optional(),
+  status: z.enum(["new", "reviewed", "actioned", "dismissed"]).optional(),
   admin_notes: z.string().nullable().optional(),
 });
 

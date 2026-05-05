@@ -11,7 +11,7 @@ import type { Feedback } from "@/types";
 const statusVariant: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
   new: "default",
   reviewed: "secondary",
-  resolved: "outline",
+  actioned: "outline",
   dismissed: "destructive",
 };
 
@@ -75,10 +75,70 @@ export default async function FeedbackDetailPage({ params }: FeedbackDetailPageP
             <DetailRow label="Email" value={item.email ?? "Anonymous"} />
             <DetailRow label="Page URL" value={item.page_url ?? "—"} />
             <DetailRow label="Page Title" value={item.page_title ?? "—"} />
+            <DetailRow
+              label="Viewport"
+              value={
+                item.viewport_width && item.viewport_height
+                  ? `${item.viewport_width} × ${item.viewport_height}`
+                  : "—"
+              }
+            />
             <DetailRow label="User Agent" value={item.user_agent ?? "—"} />
             <DetailRow label="Submitted" value={new Date(item.created_at).toLocaleString()} />
           </CardContent>
         </Card>
+
+        {item.image_url && (
+          <Card className="lg:col-span-2">
+            <CardHeader>
+              <CardTitle>Screenshot</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={item.image_url}
+                alt="Feedback screenshot"
+                className="max-h-[600px] w-auto rounded-md border"
+              />
+            </CardContent>
+          </Card>
+        )}
+
+        {item.route_params && Object.keys(item.route_params).length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Route Params</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <pre className="overflow-x-auto rounded-md bg-muted p-3 text-xs">
+                {JSON.stringify(item.route_params, null, 2)}
+              </pre>
+            </CardContent>
+          </Card>
+        )}
+
+        {item.activity_trail && item.activity_trail.length > 0 && (
+          <Card className="lg:col-span-2">
+            <CardHeader>
+              <CardTitle>Activity Trail</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ol className="space-y-1 font-mono text-xs">
+                {item.activity_trail.map((evt, i) => (
+                  <li key={i} className="flex gap-3">
+                    <span className="w-12 shrink-0 text-muted-foreground">
+                      {evt.t.toFixed(1)}s
+                    </span>
+                    <span className="w-14 shrink-0 uppercase text-muted-foreground">
+                      {evt.kind}
+                    </span>
+                    <span className="break-all">{evt.detail}</span>
+                  </li>
+                ))}
+              </ol>
+            </CardContent>
+          </Card>
+        )}
 
         <Card className="lg:col-span-2">
           <CardHeader>

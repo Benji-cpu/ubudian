@@ -443,7 +443,13 @@ export interface SavedEvent {
 // ============================================
 
 export type FeedbackType = "bug" | "suggestion" | "general";
-export type FeedbackStatus = "new" | "reviewed" | "resolved" | "dismissed";
+export type FeedbackStatus = "new" | "reviewed" | "actioned" | "dismissed";
+
+export interface ActivityEvent {
+  t: number;
+  kind: "route" | "click" | "fetch" | "error";
+  detail: string;
+}
 
 export interface Feedback {
   id: string;
@@ -458,6 +464,10 @@ export interface Feedback {
   status: FeedbackStatus;
   admin_notes: string | null;
   pr_url: string | null;
+  route_params: Record<string, string> | null;
+  viewport_width: number | null;
+  viewport_height: number | null;
+  activity_trail: ActivityEvent[] | null;
   created_at: string;
 }
 

@@ -769,8 +769,13 @@ CREATE TABLE feedback (
   user_agent TEXT,
   profile_id UUID REFERENCES profiles(id) ON DELETE SET NULL,
   image_url TEXT,
-  status TEXT NOT NULL DEFAULT 'new', -- 'new' | 'reviewed' | 'resolved' | 'dismissed'
+  status TEXT NOT NULL DEFAULT 'new', -- 'new' | 'reviewed' | 'actioned' | 'dismissed'
   admin_notes TEXT,
+  pr_url TEXT,
+  route_params JSONB,
+  viewport_width INTEGER,
+  viewport_height INTEGER,
+  activity_trail JSONB,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 

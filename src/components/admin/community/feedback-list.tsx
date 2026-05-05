@@ -18,7 +18,7 @@ import type { Feedback } from "@/types";
 const statusVariant: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
   new: "default",
   reviewed: "secondary",
-  resolved: "outline",
+  actioned: "outline",
   dismissed: "destructive",
 };
 

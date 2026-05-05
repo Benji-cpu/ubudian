@@ -6,12 +6,22 @@ import { feedbackNotification } from "@/lib/email-templates";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
+const activityEventSchema = z.object({
+  t: z.number(),
+  kind: z.enum(["route", "click", "fetch", "error"]),
+  detail: z.string().max(300),
+});
+
 const feedbackSchema = z.object({
   type: z.enum(["bug", "suggestion", "general"]).default("general"),
   message: z.string().min(10).max(2000),
   image_url: z.string().url().optional().or(z.literal("")),
-  page_url: z.string().optional().or(z.literal("")),
-  page_title: z.string().optional().or(z.literal("")),
+  page_url: z.string().nullable().optional(),
+  page_title: z.string().nullable().optional(),
+  route_params: z.record(z.string(), z.string()).optional(),
+  viewport_width: z.number().int().positive().nullable().optional(),
+  viewport_height: z.number().int().positive().nullable().optional(),
+  activity_trail: z.array(activityEventSchema).max(80).optional(),
   website: z.string().optional().or(z.literal("")), // honeypot
 });
 
@@ -50,6 +60,10 @@ export async function POST(request: Request) {
 
     // Honeypot check
     if (data.website) {
+      console.warn("[feedback] honeypot triggered", {
+        userId: user.id,
+        pageUrl: data.page_url,
+      });
       return NextResponse.json({ success: true });
     }
 
@@ -66,6 +80,10 @@ export async function POST(request: Request) {
       page_url: pageUrl,
       page_title: data.page_title || null,
       user_agent: userAgent,
+      route_params: data.route_params ?? null,
+      viewport_width: data.viewport_width ?? null,
+      viewport_height: data.viewport_height ?? null,
+      activity_trail: data.activity_trail ?? null,
     });
 
     if (error) {
