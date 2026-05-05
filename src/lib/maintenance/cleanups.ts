@@ -6,6 +6,120 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { titleSimilarity } from "@/lib/maintenance/similarity";
 
+export type BrokenLink = {
+  entity: "event" | "venue";
+  id: string;
+  url: string;
+  status: number | string;
+};
+
+export type LinkHealthReport = {
+  checked: number;
+  broken: BrokenLink[];
+};
+
+const LINK_TIMEOUT_MS = 5000;
+const LINK_CONCURRENCY = 10;
+
+async function headOnce(url: string): Promise<number | string> {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), LINK_TIMEOUT_MS);
+  try {
+    const res = await fetch(url, { method: "HEAD", redirect: "follow", signal: ctrl.signal });
+    return res.status;
+  } catch (err) {
+    return err instanceof Error ? err.name : "fetch_error";
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function runWithConcurrency<T, R>(
+  items: T[],
+  limit: number,
+  worker: (item: T) => Promise<R>,
+): Promise<PromiseSettledResult<R>[]> {
+  const results: PromiseSettledResult<R>[] = new Array(items.length);
+  let cursor = 0;
+  const runners = Array.from({ length: Math.min(limit, items.length) }, async () => {
+    while (true) {
+      const idx = cursor++;
+      if (idx >= items.length) return;
+      try {
+        results[idx] = { status: "fulfilled", value: await worker(items[idx]) };
+      } catch (reason) {
+        results[idx] = { status: "rejected", reason };
+      }
+    }
+  });
+  await Promise.all(runners);
+  return results;
+}
+
+/**
+ * HEAD every external_ticket_url on approved/pending events and every
+ * venue_map_url (deduped by url) sourced from events. Returns a report of
+ * URLs that returned 4xx/5xx or failed to fetch within {@link LINK_TIMEOUT_MS}.
+ *
+ * Throws on missing DB connection — the route's `.catch()` converts that into
+ * an entry in `errors[]` so the rest of the digest still ships.
+ */
+export async function checkExternalLinkHealth(): Promise<LinkHealthReport> {
+  const supabase = createAdminClient();
+
+  const eventsRes = await supabase
+    .from("events")
+    .select("id, external_ticket_url, venue_name, venue_map_url, status")
+    .in("status", ["approved", "pending"])
+    .or("external_ticket_url.not.is.null,venue_map_url.not.is.null");
+
+  if (eventsRes.error) throw new Error(`checkExternalLinkHealth fetch: ${eventsRes.error.message}`);
+
+  type Row = {
+    id: string;
+    external_ticket_url: string | null;
+    venue_name: string | null;
+    venue_map_url: string | null;
+  };
+  const rows = (eventsRes.data ?? []) as Row[];
+
+  type Target = { entity: "event" | "venue"; id: string; url: string };
+  const targets: Target[] = [];
+  const seenVenue = new Set<string>();
+  for (const row of rows) {
+    if (row.external_ticket_url) {
+      targets.push({ entity: "event", id: row.id, url: row.external_ticket_url });
+    }
+    if (row.venue_map_url && !seenVenue.has(row.venue_map_url)) {
+      seenVenue.add(row.venue_map_url);
+      targets.push({
+        entity: "venue",
+        id: row.venue_name ?? row.venue_map_url,
+        url: row.venue_map_url,
+      });
+    }
+  }
+
+  const settled = await runWithConcurrency(targets, LINK_CONCURRENCY, (t) => headOnce(t.url));
+
+  const broken: BrokenLink[] = [];
+  settled.forEach((res, i) => {
+    const t = targets[i];
+    if (res.status === "rejected") {
+      broken.push({ entity: t.entity, id: t.id, url: t.url, status: "fetch_error" });
+      return;
+    }
+    const status = res.value;
+    if (typeof status === "number") {
+      if (status >= 400) broken.push({ entity: t.entity, id: t.id, url: t.url, status });
+    } else {
+      broken.push({ entity: t.entity, id: t.id, url: t.url, status });
+    }
+  });
+
+  return { checked: targets.length, broken };
+}
+
 /**
  * Hard-delete raw_ingestion_messages with status='failed' that are older than
  * 30 days. The pipeline retries failed messages for 24h then leaves them.

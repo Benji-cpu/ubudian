@@ -15,7 +15,9 @@ import { archivePastPendingEvents } from "@/lib/ingestion/alerts";
 import {
   archiveFuzzyDuplicateEvents,
   cancelStaleBookings,
+  checkExternalLinkHealth,
   purgeFailedMessages,
+  type LinkHealthReport,
 } from "@/lib/maintenance/cleanups";
 import { buildReviewQueue } from "@/lib/maintenance/review-queue";
 import { sendTransactionalEmail } from "@/lib/email";
@@ -47,7 +49,12 @@ export async function GET(request: Request) {
     return 0;
   });
 
-  const review = await buildReviewQueue().catch((err) => {
+  const linkHealth: LinkHealthReport = await checkExternalLinkHealth().catch((err) => {
+    errors.push(`checkExternalLinkHealth: ${err?.message ?? String(err)}`);
+    return { checked: 0, broken: [] };
+  });
+
+  const review = await buildReviewQueue(linkHealth).catch((err) => {
     errors.push(`buildReviewQueue: ${err?.message ?? String(err)}`);
     return null;
   });
@@ -61,6 +68,7 @@ export async function GET(request: Request) {
       cancelledStaleBookings: cancelledBookings,
       archivedDuplicateEvents: archivedDuplicates,
     },
+    linkHealth,
     review,
     errors,
   };

@@ -268,12 +268,17 @@ interface DailyMaintenancePayload {
     cancelledStaleBookings: number;
     archivedDuplicateEvents: number;
   };
+  linkHealth?: {
+    checked: number;
+    broken: { entity: "event" | "venue"; id: string; url: string; status: number | string }[];
+  };
   review: {
     feedback: { id: string; type: string; status: string; message: string; page_url: string | null; created_at: string }[];
     dedupBacklog: number;
     unresolvedVenuesLowConfidence: number;
     incompleteSubscriptions: number;
     eventDateInconsistencies: { id: string; title: string; reason: string }[];
+    brokenLinks?: { entity: "event" | "venue"; id: string; url: string; status: number | string }[];
   } | null;
   errors: string[];
 }
@@ -298,6 +303,18 @@ export function dailyMaintenanceDigest(p: DailyMaintenancePayload): string {
     .map((e) => `<li>${escapeHtml(e.title)} — <em>${escapeHtml(e.reason)}</em></li>`)
     .join("");
 
+  const broken = p.linkHealth?.broken ?? r?.brokenLinks ?? [];
+  const brokenRows = broken
+    .slice(0, 25)
+    .map(
+      (b) =>
+        `<li style="margin-bottom:6px;"><strong>[${escapeHtml(b.entity)}]</strong> ${escapeHtml(String(b.id))} — <a href="${escapeHtml(b.url)}" style="color:${COLORS.deepGreen};">${escapeHtml(b.url)}</a> <span style="color:#B85C3F;font-weight:600;">(${escapeHtml(String(b.status))})</span></li>`,
+    )
+    .join("");
+  const linkHealthBlock = broken.length
+    ? `<h4 style="margin:16px 0 4px;font-size:14px;color:${COLORS.charcoal};">Broken links (${broken.length})</h4><p style="margin:0 0 4px;font-size:13px;color:#666;">Checked ${p.linkHealth?.checked ?? "?"} URLs.</p><ul style="margin:0 0 16px;padding-left:20px;font-size:14px;">${brokenRows}</ul>`
+    : "";
+
   const errorBlock = p.errors.length
     ? `<div style="margin:16px 0;padding:12px 16px;background-color:#FCE8E0;border-radius:4px;font-size:14px;"><strong>Errors:</strong><ul style="margin:8px 0;padding-left:20px;">${p.errors.map((e) => `<li>${escapeHtml(e)}</li>`).join("")}</ul></div>`
     : "";
@@ -316,11 +333,13 @@ export function dailyMaintenanceDigest(p: DailyMaintenancePayload): string {
     ${errorBlock}
 
     <h3 style="margin:24px 0 8px;font-family:'Lora',Georgia,serif;color:${COLORS.deepGreen};font-size:16px;">Needs your attention</h3>
-    <p style="margin:0 0 8px;font-size:14px;color:#666;">${fbCount} open feedback · ${r?.dedupBacklog ?? 0} stale dedup · ${r?.unresolvedVenuesLowConfidence ?? 0} low-confidence venues · ${r?.incompleteSubscriptions ?? 0} stuck subscriptions · ${r?.eventDateInconsistencies.length ?? 0} event date issues</p>
+    <p style="margin:0 0 8px;font-size:14px;color:#666;">${fbCount} open feedback · ${r?.dedupBacklog ?? 0} stale dedup · ${r?.unresolvedVenuesLowConfidence ?? 0} low-confidence venues · ${r?.incompleteSubscriptions ?? 0} stuck subscriptions · ${r?.eventDateInconsistencies.length ?? 0} event date issues · ${broken.length} broken links</p>
 
     ${fbRows ? `<h4 style="margin:16px 0 4px;font-size:14px;color:${COLORS.charcoal};">Recent feedback</h4><ul style="margin:0 0 16px;padding-left:20px;font-size:14px;">${fbRows}</ul>` : ""}
 
     ${inconsistencyRows ? `<h4 style="margin:16px 0 4px;font-size:14px;color:${COLORS.charcoal};">Event date issues</h4><ul style="margin:0 0 16px;padding-left:20px;font-size:14px;">${inconsistencyRows}</ul>` : ""}
+
+    ${linkHealthBlock}
 
     <p style="margin-top:20px;">
       <a href="${SITE_URL}/admin/community" style="display:inline-block;padding:10px 24px;background-color:${COLORS.deepGreen};color:#ffffff;text-decoration:none;border-radius:4px;font-weight:600;">Open Admin</a>

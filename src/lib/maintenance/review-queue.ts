@@ -4,6 +4,7 @@
  * isn't safe to auto-resolve.
  */
 import { createAdminClient } from "@/lib/supabase/admin";
+import type { BrokenLink, LinkHealthReport } from "@/lib/maintenance/cleanups";
 
 export interface FeedbackItem {
   id: string;
@@ -24,9 +25,10 @@ export interface ReviewQueue {
   unresolvedVenuesLowConfidence: number;
   incompleteSubscriptions: number;
   eventDateInconsistencies: { id: string; title: string; reason: string }[];
+  brokenLinks: BrokenLink[];
 }
 
-export async function buildReviewQueue(): Promise<ReviewQueue> {
+export async function buildReviewQueue(linkHealth?: LinkHealthReport): Promise<ReviewQueue> {
   const supabase = createAdminClient();
   const fourteenDaysAgo = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString();
   const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
@@ -81,5 +83,6 @@ export async function buildReviewQueue(): Promise<ReviewQueue> {
     unresolvedVenuesLowConfidence: venues.count ?? 0,
     incompleteSubscriptions: subs.count ?? 0,
     eventDateInconsistencies: inconsistencies,
+    brokenLinks: linkHealth?.broken ?? [],
   };
 }
