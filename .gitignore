@@ -38,7 +38,9 @@ yarn-error.log*
 .worktrees/
 
 # claude code settings (contains secrets + machine-specific paths)
-.claude/
+.claude/*
+# but DO track committed agent prompts — these are versioned alongside the code
+!.claude/agents/
 
 # screenshots & test artifacts
 *.png
