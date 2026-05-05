@@ -1,0 +1,1 @@
+{"blocked":true,"reason":"Host not in allowlist","status":403,"url":"https://ubudian-v1.vercel.app/api/cron/daily-maintenance?digest=true","attemptedAt":"2026-05-06T00:00:00.000Z","note":"Vercel edge returned 403 before the route was reached. Agent IP/host is not in Vercel's deployment allowlist."}
