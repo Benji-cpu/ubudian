@@ -31,9 +31,10 @@ npm run test:e2e   # Playwright E2E tests
 - **Platform**: Vercel (Hobby plan)
 - **Project**: `ubudian-v1`
 - **Production URL**: https://ubudian-v1.vercel.app
-- **Cron jobs** (2 — Hobby plan max):
-  - `/api/cron/ingest-events` — daily at 6 AM UTC
-  - `/api/cron/ingestion-health` — daily at 9 AM UTC
+- **Cron jobs**:
+  - `/api/cron/ingest-events` — Vercel Cron, daily at 6 AM UTC
+  - `/api/cron/ingestion-health` — Vercel Cron, daily at 9 AM UTC
+  - `/api/cron/daily-maintenance` — called by Claude Code remote agent at `17 19 * * *` UTC (≈03:17 Bali). Agent prompt at `.claude/agents/nightly-routine.md`. Trigger registered via claude.ai (https://claude.ai/code/scheduled).
 - **Images**: `unoptimized: true` (no Next.js Image Optimization)
 - **Remote image hosts**: Unsplash, `*.supabase.co`, `api.telegram.org`
 
