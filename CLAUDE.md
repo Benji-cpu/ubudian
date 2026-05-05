@@ -199,6 +199,16 @@ npx vitest run src/lib/__tests__/ingestion/        # Ingestion tests only
 - Verify on both desktop and mobile (390px) viewports
 - Use `/api/auth/test-login` for authenticated pages (append `?role=admin` for admin pages)
 
+## Worktree & Branch Hygiene
+
+This project is in **direct-to-production mode** — no long-running speculative branches. Every session must end with `main` clean.
+
+- Before stopping: `git worktree list` shows only the main worktree, `git status` is clean, and `git branch --no-merged main` is empty.
+- Subagents that use `Agent({ isolation: "worktree" })` create worktrees under `.worktrees/` or `.claude/worktrees/`. Empty worktrees are auto-removed by the runtime; populated ones are not — close them out before session end via `git worktree remove <path>` after merging or discarding.
+- Prefer working on a single feature branch and merging it before starting the next. Avoid juggling 3+ open feature branches.
+- For tiny tweaks (color, copy, single-file fix), commit on `main` directly — auto-push handles the rest.
+- If a branch can't be finished this session: either commit the WIP and push to remote so it's not lost, or delete the branch outright. Never leave uncommitted files in a worktree across sessions.
+
 ## Claude Autonomy & DB Workflow
 
 Claude is pre-authorized to apply migrations and mutate production Supabase directly via MCP. The safety net is discipline around *how* changes are made, not permission prompts.

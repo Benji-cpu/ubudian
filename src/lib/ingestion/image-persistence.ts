@@ -33,7 +33,7 @@ export async function persistRemoteImage(
     const res = await fetch(remoteUrl, {
       signal: controller.signal,
       redirect: "follow",
-      headers: { "user-agent": "UbudianBot/1.0 (+https://ubudian-v1.vercel.app)" },
+      headers: { "user-agent": "UbudianBot/1.0 (+https://theubudian.life)" },
     });
     clearTimeout(timer);
 

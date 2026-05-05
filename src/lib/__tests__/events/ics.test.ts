@@ -56,7 +56,7 @@ function makeEvent(overrides: Partial<Event> = {}): Event {
 
 const OPTIONS = {
   calendarName: "My Ubudian Agenda",
-  calendarUrl: "https://ubudian-v1.vercel.app",
+  calendarUrl: "https://theubudian.life",
 };
 
 describe("buildICS", () => {
@@ -83,11 +83,11 @@ describe("buildICS", () => {
     const ics = buildICS(events, OPTIONS);
     const matches = ics.match(/BEGIN:VEVENT/g);
     expect(matches?.length).toBe(2);
-    expect(ics).toContain("UID:a@ubudian-v1.vercel.app");
-    expect(ics).toContain("UID:b@ubudian-v1.vercel.app");
+    expect(ics).toContain("UID:a@theubudian.life");
+    expect(ics).toContain("UID:b@theubudian.life");
     expect(ics).toContain("SUMMARY:Morning Yoga");
     expect(ics).toContain("SUMMARY:Cacao Ceremony");
-    expect(ics).toContain("URL:https://ubudian-v1.vercel.app/events/a");
+    expect(ics).toContain("URL:https://theubudian.life/events/a");
     expect(ics).toContain("DTSTAMP:");
   });
 

@@ -18,7 +18,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import type { VenueCoordinates } from "@/types";
 
 const NOMINATIM_URL = "https://nominatim.openstreetmap.org/search";
-const USER_AGENT = "the-ubudian/1.0 (https://ubudian-v1.vercel.app)";
+const USER_AGENT = "the-ubudian/1.0 (https://theubudian.life)";
 const MIN_INTERVAL_MS = 1100;
 const UBUD_VIEWBOX = "115.23,-8.47,115.30,-8.55"; // W,N,E,S around Ubud
 

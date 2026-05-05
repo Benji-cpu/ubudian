@@ -79,7 +79,7 @@ export function TelegramRegisterButton({ isLocalhost = false }: TelegramRegister
           <p className="mt-1 text-yellow-700">
             You&apos;re running locally. Register the webhook from the{" "}
             <a
-              href="https://ubudian-v1.vercel.app/admin/ingestion/telegram"
+              href="https://theubudian.life/admin/ingestion/telegram"
               target="_blank"
               rel="noopener noreferrer"
               className="underline"

@@ -140,7 +140,7 @@ function buildLocation(event: Event): string | null {
 function buildVEvent(event: Event, options: BuildICSOptions): string[] {
   const lines: string[] = ["BEGIN:VEVENT"];
 
-  const uid = `${event.id}@ubudian-v1.vercel.app`;
+  const uid = `${event.id}@theubudian.life`;
   lines.push(`UID:${uid}`);
 
   // DTSTAMP is required — use now in UTC
