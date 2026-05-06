@@ -202,13 +202,51 @@ npx vitest run src/lib/__tests__/ingestion/        # Ingestion tests only
 
 ## Worktree & Branch Hygiene
 
-This project is in **direct-to-production mode** — no long-running speculative branches. Every session must end with `main` clean.
+This project is in **direct-to-production mode** — no long-running speculative branches, no PRs anywhere (interactive or scheduled). See master `Code/CLAUDE.md` "Shipping Standard." Scheduled routines commit and push their output directly to `main`; they do not open draft PRs. Every session must end with `main` clean.
 
 - Before stopping: `git worktree list` shows only the main worktree, `git status` is clean, and `git branch --no-merged main` is empty.
 - Subagents that use `Agent({ isolation: "worktree" })` create worktrees under `.worktrees/` or `.claude/worktrees/`. Empty worktrees are auto-removed by the runtime; populated ones are not — close them out before session end via `git worktree remove <path>` after merging or discarding.
 - Prefer working on a single feature branch and merging it before starting the next. Avoid juggling 3+ open feature branches.
 - For tiny tweaks (color, copy, single-file fix), commit on `main` directly — auto-push handles the rest.
 - If a branch can't be finished this session: either commit the WIP and push to remote so it's not lost, or delete the branch outright. Never leave uncommitted files in a worktree across sessions.
+
+## Trigger Maintenance
+
+The nightly `daily-maintenance` agent runs as a **claude.ai remote trigger**, editable from any Claude Code session via the `RemoteTrigger` deferred tool (load with `ToolSearch select:RemoteTrigger`). The previous assumption that triggers are claude.ai-UI-only is wrong.
+
+| Field | Value |
+|-------|-------|
+| Trigger ID | `trig_01CnuNJSs8m8wdVyeVrDHrKq` |
+| Name | `Ubudian — daily maintenance digest` |
+| Cron | `17 19 * * *` UTC (≈03:17 Bali / WITA) |
+| Environment | `env_013bqn65fNb8N1mWyLSMV78w` (Default — anthropic_cloud) |
+| Repo | `https://github.com/Benji-cpu/ubudian` |
+| Model | `claude-sonnet-4-6` |
+| Agent file (source of truth) | `.claude/agents/nightly-routine.md` |
+| Endpoint hit | `GET https://theubudian.life/api/cron/daily-maintenance?digest=true` |
+
+The trigger prompt is a **thin shim**: it points the agent at `.claude/agents/nightly-routine.md`, seeds `CRON_SECRET`, names the production host (`theubudian.life`, NOT `*.vercel.app` — see failure playbook), and tells it to commit `digests/YYYY-MM-DD.{md,json}` directly to `main`. All real instructions live in the agent file. If you change the agent file's behaviour (host, endpoint, output format), reconcile the seed-context lines in the trigger prompt too.
+
+**Common operations:**
+
+```text
+RemoteTrigger { action: "list" }                                    # find all triggers
+RemoteTrigger { action: "get",  trigger_id: "trig_01CnuNJSs8m8wdVyeVrDHrKq" }
+RemoteTrigger { action: "run",  trigger_id: "trig_01CnuNJSs8m8wdVyeVrDHrKq" }   # fire ad-hoc
+RemoteTrigger { action: "update", trigger_id: "trig_01CnuNJSs8m8wdVyeVrDHrKq",
+                body: { cron_expression: "17 19 * * *" } }          # partial update
+```
+
+`RemoteTrigger` cannot delete — for that, visit https://claude.ai/code/scheduled/trig_01CnuNJSs8m8wdVyeVrDHrKq.
+
+**Failure playbook** (in order of likelihood, based on observed runs):
+
+1. **403 "Host not in allowlist"** — sandbox egress blocks `*.vercel.app`. The trigger prompt and agent file already pin `theubudian.life`; if it reappears, double-check the prompt didn't drift back to `ubudian-v1.vercel.app`. The trigger's egress allowlist itself is **UI-only** at https://claude.ai/code/scheduled/{TRIGGER_ID} — not editable via the API as of this writing.
+2. **401 from `/api/cron/daily-maintenance`** — `CRON_SECRET` mismatch. The seeded value in the trigger prompt must match Vercel env (`CRON_SECRET`). Rotate in Vercel first, then `RemoteTrigger update` the prompt's seed line. Never paste the secret into commits, PR bodies, or chat.
+3. **5xx from the route** — the route is partly fault-tolerant; a 5xx means an uncaught failure (Supabase down, link-health hammered, etc.). Agent commits a stub `digests/YYYY-MM-DD.md` to `main` per the agent file. Investigate the route, don't retry the trigger.
+4. **Sandbox blocks the agent itself (no commit lands)** — check the run history at https://claude.ai/code/scheduled/trig_01CnuNJSs8m8wdVyeVrDHrKq. If the sandbox killed the run before any output, there's nothing to commit; re-fire via `RemoteTrigger action: "run"` after the underlying egress / connector issue is fixed.
+
+Sister triggers (same family, different repos): MysTech `trig_01TKZ5AcWYUjmXPffoRd1qaz` (19:22 UTC), WordZoo `trig_01Dnx4XZjFoduw1SEfio9vPy` (19:32 UTC), The Programme `trig_01QaE3psDNRrhF51N6UFSey6` (19:07 UTC), CC Mastery `trig_01FRSrj9oJguHBmUhnhhmBbJ` (20:17 UTC).
 
 ## Claude Autonomy & DB Workflow
 
