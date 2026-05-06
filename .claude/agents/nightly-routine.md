@@ -10,8 +10,8 @@ You are The Ubudian's daily nightly-routine agent.
 
 This agent does **not** call the Vercel cron route directly. Anthropic's sandbox egress allowlist blocks `theubudian.life` and `*.vercel.app`, so HTTP-from-the-agent does not work (see anthropics/claude-code#41565). Instead:
 
-1. The GitHub Actions workflow `.github/workflows/daily-maintenance-fetch.yml` runs at **19:15 UTC** (≈03:15 WITA). It curls `https://theubudian.life/api/cron/daily-maintenance?digest=true` from GH's runners (which have unrestricted egress), runs the autonomous cleanups + assembles the review queue + sends the Resend digest email, and commits the JSON response to `digests/$(TZ=Asia/Makassar date +%F).json` on `main`.
-2. **You fire 2 minutes later** at 19:17 UTC. Your job is to pull `main`, read that JSON, synthesise a markdown digest, and commit `digests/$(TZ=Asia/Makassar date +%F).md` to `main`.
+1. The GitHub Actions workflow `.github/workflows/daily-maintenance-fetch.yml` runs at **19:02 UTC** (≈03:02 WITA). It curls `https://theubudian.life/api/cron/daily-maintenance?digest=true` from GH's runners (which have unrestricted egress), runs the autonomous cleanups + assembles the review queue + sends the Resend digest email, and commits the JSON response to `digests/$(TZ=Asia/Makassar date +%F).json` on `main`.
+2. **You fire 15 minutes later** at 19:17 UTC. Your job is to pull `main`, read that JSON, synthesise a markdown digest, and commit `digests/$(TZ=Asia/Makassar date +%F).md` to `main`.
 
 GitHub is the message bus between the workflow and you. You only need to reach `github.com`, which is allowlisted.
 

@@ -214,7 +214,7 @@ This project is in **direct-to-production mode** — no long-running speculative
 
 The nightly `daily-maintenance` agent runs as a **claude.ai remote trigger**, editable from any Claude Code session via the `RemoteTrigger` deferred tool (load with `ToolSearch select:RemoteTrigger`). The previous assumption that triggers are claude.ai-UI-only is wrong.
 
-**Architecture: GH Actions ferries data, Claude trigger synthesises.** Anthropic's sandbox egress allowlist blocks `theubudian.life` and `*.vercel.app` (anthropics/claude-code#41565), so the trigger does not call Vercel directly. Instead, the GitHub Actions workflow `.github/workflows/daily-maintenance-fetch.yml` runs at 19:15 UTC, curls `/api/cron/daily-maintenance?digest=true` from GH's runners (which have unrestricted egress), and commits the JSON response to `digests/YYYY-MM-DD.json` on `main`. The Claude trigger fires 2 minutes later at 19:17 UTC, pulls main, reads the JSON, synthesises the markdown digest, and commits `digests/YYYY-MM-DD.md`. GitHub is the message bus.
+**Architecture: GH Actions ferries data, Claude trigger synthesises.** Anthropic's sandbox egress allowlist blocks `theubudian.life` and `*.vercel.app` (anthropics/claude-code#41565), so the trigger does not call Vercel directly. Instead, the GitHub Actions workflow `.github/workflows/daily-maintenance-fetch.yml` runs at 19:02 UTC, curls `/api/cron/daily-maintenance?digest=true` from GH's runners (which have unrestricted egress), and commits the JSON response to `digests/YYYY-MM-DD.json` on `main`. The Claude trigger fires 15 minutes later at 19:17 UTC, pulls main, reads the JSON, synthesises the markdown digest, and commits `digests/YYYY-MM-DD.md`. GitHub is the message bus. (The 15-minute gap absorbs GH cron drift — first scheduled run on 2026-05-06 fired 40 minutes late, which left the Claude agent staring at a missing JSON. Off-minute `02` and 15-minute slack both dodge the quarter-hour pile-up.)
 
 | Field | Value |
 |-------|-------|
@@ -225,7 +225,7 @@ The nightly `daily-maintenance` agent runs as a **claude.ai remote trigger**, ed
 | Repo | `https://github.com/Benji-cpu/ubudian` |
 | Model | `claude-sonnet-4-6` |
 | Agent file (source of truth) | `.claude/agents/nightly-routine.md` |
-| Upstream data source | GH Actions workflow `daily-maintenance-fetch.yml` (cron `15 19 * * *`) writes `digests/YYYY-MM-DD.json` to `main` |
+| Upstream data source | GH Actions workflow `daily-maintenance-fetch.yml` (cron `2 19 * * *`) writes `digests/YYYY-MM-DD.json` to `main` |
 | Network reach needed | `github.com` only (no HTTP egress to Vercel/Supabase/Resend from the trigger) |
 
 The trigger prompt is a **thin shim**: it points the agent at `.claude/agents/nightly-routine.md` and reminds it that the GH workflow has already produced the JSON payload it needs to read. The agent does **not** receive `CRON_SECRET` — that secret only lives in Vercel and in GH repo secrets. If you change the agent file's behaviour (input source, output format), reconcile the seed-context lines in the trigger prompt too.
