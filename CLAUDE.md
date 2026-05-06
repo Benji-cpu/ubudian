@@ -214,6 +214,8 @@ This project is in **direct-to-production mode** — no long-running speculative
 
 The nightly `daily-maintenance` agent runs as a **claude.ai remote trigger**, editable from any Claude Code session via the `RemoteTrigger` deferred tool (load with `ToolSearch select:RemoteTrigger`). The previous assumption that triggers are claude.ai-UI-only is wrong.
 
+**Architecture: GH Actions ferries data, Claude trigger synthesises.** Anthropic's sandbox egress allowlist blocks `theubudian.life` and `*.vercel.app` (anthropics/claude-code#41565), so the trigger does not call Vercel directly. Instead, the GitHub Actions workflow `.github/workflows/daily-maintenance-fetch.yml` runs at 19:15 UTC, curls `/api/cron/daily-maintenance?digest=true` from GH's runners (which have unrestricted egress), and commits the JSON response to `digests/YYYY-MM-DD.json` on `main`. The Claude trigger fires 2 minutes later at 19:17 UTC, pulls main, reads the JSON, synthesises the markdown digest, and commits `digests/YYYY-MM-DD.md`. GitHub is the message bus.
+
 | Field | Value |
 |-------|-------|
 | Trigger ID | `trig_01CnuNJSs8m8wdVyeVrDHrKq` |
@@ -223,9 +225,10 @@ The nightly `daily-maintenance` agent runs as a **claude.ai remote trigger**, ed
 | Repo | `https://github.com/Benji-cpu/ubudian` |
 | Model | `claude-sonnet-4-6` |
 | Agent file (source of truth) | `.claude/agents/nightly-routine.md` |
-| Endpoint hit | `GET https://theubudian.life/api/cron/daily-maintenance?digest=true` |
+| Upstream data source | GH Actions workflow `daily-maintenance-fetch.yml` (cron `15 19 * * *`) writes `digests/YYYY-MM-DD.json` to `main` |
+| Network reach needed | `github.com` only (no HTTP egress to Vercel/Supabase/Resend from the trigger) |
 
-The trigger prompt is a **thin shim**: it points the agent at `.claude/agents/nightly-routine.md`, seeds `CRON_SECRET`, names the production host (`theubudian.life`, NOT `*.vercel.app` — see failure playbook), and tells it to commit `digests/YYYY-MM-DD.{md,json}` directly to `main`. All real instructions live in the agent file. If you change the agent file's behaviour (host, endpoint, output format), reconcile the seed-context lines in the trigger prompt too.
+The trigger prompt is a **thin shim**: it points the agent at `.claude/agents/nightly-routine.md` and reminds it that the GH workflow has already produced the JSON payload it needs to read. The agent does **not** receive `CRON_SECRET` — that secret only lives in Vercel and in GH repo secrets. If you change the agent file's behaviour (input source, output format), reconcile the seed-context lines in the trigger prompt too.
 
 **Common operations:**
 
@@ -241,10 +244,12 @@ RemoteTrigger { action: "update", trigger_id: "trig_01CnuNJSs8m8wdVyeVrDHrKq",
 
 **Failure playbook** (in order of likelihood, based on observed runs):
 
-1. **403 "Host not in allowlist"** — sandbox egress blocks `*.vercel.app`. The trigger prompt and agent file already pin `theubudian.life`; if it reappears, double-check the prompt didn't drift back to `ubudian-v1.vercel.app`. The trigger's egress allowlist itself is **UI-only** at https://claude.ai/code/scheduled/{TRIGGER_ID} — not editable via the API as of this writing.
-2. **401 from `/api/cron/daily-maintenance`** — `CRON_SECRET` mismatch. The seeded value in the trigger prompt must match Vercel env (`CRON_SECRET`). Rotate in Vercel first, then `RemoteTrigger update` the prompt's seed line. Never paste the secret into commits, PR bodies, or chat.
-3. **5xx from the route** — the route is partly fault-tolerant; a 5xx means an uncaught failure (Supabase down, link-health hammered, etc.). Agent commits a stub `digests/YYYY-MM-DD.md` to `main` per the agent file. Investigate the route, don't retry the trigger.
-4. **Sandbox blocks the agent itself (no commit lands)** — check the run history at https://claude.ai/code/scheduled/trig_01CnuNJSs8m8wdVyeVrDHrKq. If the sandbox killed the run before any output, there's nothing to commit; re-fire via `RemoteTrigger action: "run"` after the underlying egress / connector issue is fixed.
+1. **JSON payload missing on main** (`digests/${TODAY}.json` not present when trigger fires) — the GH workflow `daily-maintenance-fetch` either didn't run, ran late, or failed. Check `gh run list --workflow=daily-maintenance-fetch.yml --limit 5`. The agent waits 60s and retries `git pull` before giving up; if it gives up it commits a `payload missing` stub. Common causes: GH cron drift (best-effort scheduling), `CRON_SECRET` rotated in Vercel but not in GH repo secrets, Vercel route 5xxing.
+2. **5xx from the Vercel route** (visible inside the GH Actions run logs) — the route is partly fault-tolerant; a 5xx means an uncaught failure (Supabase down, link-health hammered, etc.). The GH workflow turns red and no JSON is committed → cascades into failure mode #1. Investigate the route; re-fire the GH workflow via `gh workflow run daily-maintenance-fetch.yml` once it's healthy.
+3. **`CRON_SECRET` mismatch** (401 from the route in GH Actions logs) — `CRON_SECRET` rotated in Vercel without updating the GH repo secret. Run `gh secret set CRON_SECRET --repo Benji-cpu/ubudian` to re-sync, then re-fire the workflow. Never paste the secret into commits or chat.
+4. **Sandbox blocks the trigger itself (no commit lands)** — check the run history at https://claude.ai/code/scheduled/trig_01CnuNJSs8m8wdVyeVrDHrKq. If the sandbox killed the run before any output, the JSON should still be on main from the GH workflow — investigate the trigger separately and re-fire via `RemoteTrigger action: "run"` once the underlying issue is fixed.
+
+**Historical note:** Before 2026-05-06 this trigger called the Vercel route directly. That broke when Anthropic's sandbox egress allowlist rejected `theubudian.life`. Failed-run audit trail: commits 4a50d05 and 7d4109f. The git-as-bus refactor moved the HTTP egress into GH Actions, where it's been reachable all along.
 
 Sister triggers (same family, different repos): MysTech `trig_01TKZ5AcWYUjmXPffoRd1qaz` (19:22 UTC), WordZoo `trig_01Dnx4XZjFoduw1SEfio9vPy` (19:32 UTC), The Programme `trig_01QaE3psDNRrhF51N6UFSey6` (19:07 UTC), CC Mastery `trig_01FRSrj9oJguHBmUhnhhmBbJ` (20:17 UTC).
 

@@ -1,46 +1,101 @@
 ---
 name: nightly-routine
-description: The Ubudian's daily Claude Code remote agent. Calls /api/cron/daily-maintenance to run the autonomous cleanups + build the review queue, then writes a digest report and commits it directly to main for any items needing human attention. Replaces the GH Actions daily-maintenance.yml workflow.
+description: The Ubudian's daily Claude Code remote agent. Reads the JSON maintenance payload that the GitHub Actions workflow `daily-maintenance-fetch` commits to `main` ~2 minutes earlier, synthesises a human-readable digest with the review queue + autonomous cleanup counts, and commits `digests/YYYY-MM-DD.md` directly to `main`.
 tools: Bash, Read, Grep, Glob, Edit, Write, WebFetch
 ---
 
-You are The Ubudian's daily nightly-routine agent — a community media platform for Ubud, Bali at `https://theubudian.life` (use the custom domain — the `*.vercel.app` hosts are blocked by the Claude Code sandbox egress allowlist and return a generic 403 "Host not in allowlist").
+You are The Ubudian's daily nightly-routine agent.
 
-The trigger prompt should say "read .claude/agents/nightly-routine.md and follow it exactly," then supply the seed `CRON_SECRET`.
+## Architecture (read this first)
 
-## What this agent does
+This agent does **not** call the Vercel cron route directly. Anthropic's sandbox egress allowlist blocks `theubudian.life` and `*.vercel.app`, so HTTP-from-the-agent does not work (see anthropics/claude-code#41565). Instead:
 
-1. Calls `/api/cron/daily-maintenance` (existing endpoint — runs autonomous cleanups + assembles a review queue + emails a digest if `?digest=true`).
-2. Parses the JSON: takes the `review` queue, the `autonomous` counts, and any `errors`.
-3. Writes `digests/YYYY-MM-DD.md` summarising the run plus listing each review-queue item with a one-line action note.
-4. Commits that file directly to `main` and pushes. The commit is the audit trail; Vercel auto-deploys but no app code changed.
-5. If the review queue is empty AND no errors AND no autonomous work happened: writes a one-line "no activity" entry and **does not** create a commit. (Skip the empty day rather than spamming `main` with empty digests.)
+1. The GitHub Actions workflow `.github/workflows/daily-maintenance-fetch.yml` runs at **19:15 UTC** (≈03:15 WITA). It curls `https://theubudian.life/api/cron/daily-maintenance?digest=true` from GH's runners (which have unrestricted egress), runs the autonomous cleanups + assembles the review queue + sends the Resend digest email, and commits the JSON response to `digests/$(TZ=Asia/Makassar date +%F).json` on `main`.
+2. **You fire 2 minutes later** at 19:17 UTC. Your job is to pull `main`, read that JSON, synthesise a markdown digest, and commit `digests/$(TZ=Asia/Makassar date +%F).md` to `main`.
+
+GitHub is the message bus between the workflow and you. You only need to reach `github.com`, which is allowlisted.
 
 This project ships direct-to-production for both interactive sessions and scheduled routines. **No PRs.** See `CLAUDE.md` and master `Code/CLAUDE.md` "Shipping Standard."
 
-## Inputs
+## Step 1: read the JSON payload
 
 ```bash
 TODAY=$(TZ=Asia/Makassar date +%F)
-RESPONSE=$(curl -sf \
-  -H "Authorization: Bearer $CRON_SECRET" \
-  "https://theubudian.life/api/cron/daily-maintenance?digest=true")
-```
-
-`?digest=true` triggers the existing Resend email path, so Benji still gets the email-style digest. The agent's job is the human-review layer on top.
-
-If the call returns non-200, do **not** retry. Commit a stub digest file (`digests/${TODAY}.md` containing the response body and a "blocked" header) directly to `main`, push, and exit.
-
-## Output: commit directly to main
-
-```bash
 git checkout main
 git pull --ff-only origin main
-mkdir -p digests
-echo "$RESPONSE" > "digests/${TODAY}.json"
+
+if [ ! -f "digests/${TODAY}.json" ]; then
+  echo "JSON missing — waiting 60s in case GH workflow is still running…"
+  sleep 60
+  git pull --ff-only origin main
+fi
+
+if [ ! -f "digests/${TODAY}.json" ]; then
+  # Workflow didn't run or failed. Commit a stub and exit.
+  cat > "digests/${TODAY}.md" <<EOF
+# Daily maintenance — ${TODAY}
+
+**Status: BLOCKED — payload missing**
+
+The GitHub Actions workflow \`daily-maintenance-fetch\` did not produce \`digests/${TODAY}.json\` before this agent ran. Check run history at https://github.com/Benji-cpu/ubudian/actions/workflows/daily-maintenance-fetch.yml.
+
+No autonomous cleanups verified, no review queue assembled by this agent.
+EOF
+  git add "digests/${TODAY}.md"
+  git commit -m "digest: ${TODAY} — payload missing"
+  git push origin main
+  exit 0
+fi
 ```
 
-Then synthesise `digests/${TODAY}.md`:
+## Step 2: parse the payload
+
+The JSON has this shape (verified):
+
+```jsonc
+{
+  "startedAt": "ISO timestamp",
+  "finishedAt": "ISO timestamp",
+  "autonomous": {
+    "archivedPendingEvents": number,
+    "purgedFailedMessages": number,
+    "cancelledStaleBookings": number,
+    "archivedDuplicateEvents": number
+  },
+  "linkHealth": { "checked": number, "broken": [string] },
+  "review": {
+    "feedback":                       [{ /* feedback row */ }],
+    "dedupBacklog":                   number,
+    "unresolvedVenuesLowConfidence":  number,
+    "incompleteSubscriptions":        number,
+    "eventDateInconsistencies":       [{ id, title, reason }],
+    "brokenLinks":                    [{ entity, id, url, status }]
+  } | null,
+  "errors": [string]
+}
+```
+
+Parse with `jq` and pull the fields you need. Use:
+
+```bash
+PAYLOAD="digests/${TODAY}.json"
+AUTO_TOTAL=$(jq '[.autonomous[]] | add' "$PAYLOAD")
+REVIEW_FEEDBACK=$(jq '.review.feedback // [] | length' "$PAYLOAD")
+REVIEW_DEDUP=$(jq '.review.dedupBacklog // 0' "$PAYLOAD")
+REVIEW_VENUES=$(jq '.review.unresolvedVenuesLowConfidence // 0' "$PAYLOAD")
+REVIEW_SUBS=$(jq '.review.incompleteSubscriptions // 0' "$PAYLOAD")
+REVIEW_DATES=$(jq '.review.eventDateInconsistencies // [] | length' "$PAYLOAD")
+REVIEW_LINKS=$(jq '.review.brokenLinks // [] | length' "$PAYLOAD")
+ERROR_COUNT=$(jq '.errors | length' "$PAYLOAD")
+```
+
+## Step 3: skip rule (no-activity day)
+
+If `AUTO_TOTAL` is 0 AND every review counter is 0 AND `ERROR_COUNT` is 0, write a one-line summary to stdout (`echo "no activity ${TODAY} — skipping commit"`) and **do not commit**. Exit 0. We don't spam `main` with empty digests.
+
+## Step 4: synthesise `digests/${TODAY}.md`
+
+Structure:
 
 ```markdown
 # Daily maintenance — YYYY-MM-DD
@@ -52,41 +107,60 @@ Then synthesise `digests/${TODAY}.md`:
 - Archived duplicate events: N
 
 ## Review queue (needs human attention)
-For each item: `- [ ] <kind>: <one-line summary> · <link or id>`
-Group by kind. If a kind has 0 items, omit the section.
+
+(Group only the kinds with depth > 0. Omit empty kinds entirely.)
+
+### Feedback (N)
+- [ ] One line per row from `.review.feedback[]`. Use `id` + `message` (truncate to ~100 chars).
+
+### Event date inconsistencies (N)
+- [ ] `<title>` (id: `<id>`) — <reason>
+(One per item from `.review.eventDateInconsistencies[]`.)
+
+### Broken links (N)
+- [ ] `<entity>` `<id>` — `<url>` (HTTP <status>)
+(One per item from `.review.brokenLinks[]`.)
+
+### Backlog counts
+- Dedup backlog: N
+- Unresolved venues (low confidence): N
+- Incomplete subscriptions: N
 
 ## Errors during run
-List any entries in the `errors` array verbatim. Empty list = no section.
+(Verbatim from `.errors[]`. Omit section if empty.)
 
-## Theme summary (optional)
-One sentence if there's an obvious pattern across the review queue.
+## Theme summary
+(Optional. One sentence if there's a clear pattern across the queue — e.g. "Most broken links are megatix.co.id 404s; consider scrubbing that source.")
 ```
 
-Then commit and push to `main`:
+Write the markdown using whatever combination of `jq` + heredocs feels cleanest. The exact formatting is yours to judge — the structure above is the spec, not a template you have to copy line-for-line.
+
+## Step 5: commit and push
 
 ```bash
-git add digests/
+git add "digests/${TODAY}.md"
 git commit -m "digest: ${TODAY}"
 git push origin main
 ```
 
-Do **NOT** open a PR. The commit is the audit trail. Vercel auto-deploys on push (no app code changed for digest-only commits, so the deploy is a no-op rebuild).
+The commit is the audit trail. Vercel auto-deploys but no app code changed, so the deploy is a no-op rebuild.
 
-## What this agent does NOT do (yet)
+## What this agent does NOT do
 
 - Does **not** apply code fixes. Ubudian's review queue items typically need editorial judgement (was this event a duplicate? is this venue real?), not code changes.
-- Does **not** modify Supabase data. The autonomous cleanups in the route already do that.
-- Does **not** echo `CRON_SECRET` in any committed file or commit message.
+- Does **not** modify Supabase data. The autonomous cleanups in the route already did that — you are reading after-the-fact counts.
+- Does **not** call any external HTTP service. GitHub via `git` is the only network you need.
 
 ## Failure modes
 
-- 401 from the route → `CRON_SECRET` is wrong. Commit a stub `digests/${TODAY}.md` explaining the failure to `main` and exit.
-- 5xx from the route → log and commit a stub `digests/${TODAY}.md` with the body. The route is partially fault-tolerant, so a 5xx means something the route itself can't catch went wrong.
-- Sandbox egress blocks `theubudian.life` → commit a stub `digests/${TODAY}.md` titled `digest: blocked — sandbox egress YYYY-MM-DD` to `main` and exit. (Do NOT fall back to `*.vercel.app` hosts — they are also blocked at the sandbox egress layer.)
+- **JSON missing after 60s retry** → commit the BLOCKED stub from Step 1 and exit. Do not fall back to anything.
+- **JSON malformed (`jq` errors out)** → commit a stub `digests/${TODAY}.md` titled `digest: ${TODAY} — payload malformed` containing the `jq` error, push, exit.
+- **Errors array non-empty** → not a failure of the agent; copy them into the "Errors during run" section verbatim and proceed normally.
 
 ## Completion signal
 
 Output ≤4 lines:
-- Autonomous counts in one line
-- Review queue depth
-- Commit SHA on `main` or "no commit (empty run)"
+- `auto: archived=N purged=N cancelled=N duplicates=N`
+- `review depth: feedback=N dates=N links=N · backlog dedup=N venues=N subs=N`
+- Commit SHA on `main`, or `no commit (empty run)`
+- Errors count
