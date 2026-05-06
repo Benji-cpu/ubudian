@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { NAV_LINKS, SITE_NAME } from "@/lib/constants";
 import { getSiteSettings, type SiteSettings } from "@/lib/site-settings";
@@ -21,7 +22,14 @@ export async function Footer() {
       <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6 lg:px-8">
         {/* Title */}
         <div className="text-center">
-          <h3 className="font-serif text-2xl font-normal text-brand-gold">
+          <Image
+            src="/brand/logo.svg"
+            alt=""
+            width={56}
+            height={56}
+            className="mx-auto h-14 w-14"
+          />
+          <h3 className="mt-4 font-serif text-2xl font-normal text-brand-gold">
             {SITE_NAME}
           </h3>
           <p className="mt-2 text-sm text-brand-sage">

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -24,6 +25,13 @@ export function LoginForm() {
     <div className="flex min-h-[80vh] items-center justify-center px-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
+          <Image
+            src="/brand/logo.svg"
+            alt=""
+            width={64}
+            height={64}
+            className="mx-auto mb-4 h-16 w-16"
+          />
           <CardTitle className="text-2xl">{SITE_NAME}</CardTitle>
           <CardDescription>
             Sign in to submit events, save your favorites, and find what&apos;s happening this week

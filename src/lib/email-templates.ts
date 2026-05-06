@@ -20,7 +20,8 @@ function layout(body: string): string {
           <!-- Header -->
           <tr>
             <td style="background-color:${COLORS.deepGreen};padding:20px 24px;text-align:center;">
-              <span style="font-family:'Lora',Georgia,serif;font-size:22px;font-weight:700;color:${COLORS.gold};">The Ubudian</span>
+              <img src="${SITE_URL}/brand/logo-192.png" width="48" height="48" alt="" style="display:inline-block;vertical-align:middle;margin-right:10px;border:0;" />
+              <span style="font-family:'Lora',Georgia,serif;font-size:22px;font-weight:700;color:${COLORS.gold};vertical-align:middle;">The Ubudian</span>
             </td>
           </tr>
           <!-- Body -->

@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { SITE_NAME } from "@/lib/constants";
 import { getCurrentProfile } from "@/lib/auth";
@@ -23,9 +24,17 @@ export async function Header() {
         {/* Logo */}
         <Link
           href="/"
-          className="py-2 font-serif text-xl font-normal tracking-wide text-brand-gold sm:text-2xl"
+          className="flex items-center gap-2 py-2 font-serif text-xl font-normal tracking-wide text-brand-gold sm:text-2xl"
         >
-          {SITE_NAME}
+          <Image
+            src="/brand/logo.svg"
+            alt=""
+            width={32}
+            height={32}
+            priority
+            className="h-7 w-7 sm:h-8 sm:w-8"
+          />
+          <span>{SITE_NAME}</span>
         </Link>
 
         {/* Desktop Nav */}

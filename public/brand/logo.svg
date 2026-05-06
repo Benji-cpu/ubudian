@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <rect width="1024" height="1024" rx="184.32" ry="184.32" fill="#2C4A3E"/>
+  <line x1="348.15999999999997" y1="184.32" x2="675.84" y2="184.32"
+        stroke="#C9A84C" stroke-width="5.12" stroke-linecap="round" opacity="0.55"/>
+  <line x1="348.15999999999997" y1="839.68" x2="675.84" y2="839.68"
+        stroke="#C9A84C" stroke-width="5.12" stroke-linecap="round" opacity="0.55"/>
+  <text x="512" y="633.6512"
+        font-family="Lora, 'EB Garamond', Georgia, 'Times New Roman', serif"
+        font-style="italic"
+        font-weight="400"
+        font-size="675.84"
+        fill="#C9A84C"
+        text-anchor="middle">u</text>
+</svg>

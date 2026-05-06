@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -65,8 +66,15 @@ export function MobileMenu({
             </button>
           </SheetClose>
         </div>
-        <SheetTitle className="text-center font-serif text-2xl font-normal text-brand-gold">
-          {SITE_NAME}
+        <SheetTitle className="flex items-center justify-center gap-2 text-center font-serif text-2xl font-normal text-brand-gold">
+          <Image
+            src="/brand/logo.svg"
+            alt=""
+            width={28}
+            height={28}
+            className="h-7 w-7"
+          />
+          <span>{SITE_NAME}</span>
         </SheetTitle>
         <nav className="mt-10 flex flex-col items-center gap-4">
           {visibleLinks.map((link) => (

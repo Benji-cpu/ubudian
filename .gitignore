@@ -48,6 +48,12 @@ yarn-error.log*
 reparse-check.md
 e2e/test-results/
 
+# but DO track brand assets and Next.js metadata route images
+!public/brand/*.png
+!src/app/icon.png
+!src/app/apple-icon.png
+!src/app/opengraph-image.png
+
 # tool directories
 .playwright-mcp/
 .agents/
