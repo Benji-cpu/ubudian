@@ -1,0 +1,58 @@
+name: daily-maintenance-fetch
+
+on:
+  schedule:
+    # 19:15 UTC ≈ 03:15 WITA — 2 minutes before the Claude Code remote trigger
+    # (trig_01CnuNJSs8m8wdVyeVrDHrKq) fires at 19:17 UTC and reads the JSON
+    # this workflow commits.
+    - cron: "15 19 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-maintenance-fetch
+  cancel-in-progress: false
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+          fetch-depth: 1
+
+      - name: Compute Bali date
+        id: date
+        run: echo "today=$(TZ=Asia/Makassar date +%F)" >> "$GITHUB_OUTPUT"
+
+      - name: Fetch maintenance payload
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          TODAY: ${{ steps.date.outputs.today }}
+        run: |
+          set -euo pipefail
+          mkdir -p digests
+          curl -fsS \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            "https://theubudian.life/api/cron/daily-maintenance?digest=true" \
+            -o "digests/${TODAY}.json"
+          jq -e '.startedAt' "digests/${TODAY}.json" > /dev/null
+
+      - name: Commit JSON to main
+        env:
+          TODAY: ${{ steps.date.outputs.today }}
+        run: |
+          set -euo pipefail
+          git config user.name  "ubudian-bot"
+          git config user.email "ubudian-bot@users.noreply.github.com"
+          git add "digests/${TODAY}.json"
+          if git diff --cached --quiet; then
+            echo "No change in payload — nothing to commit."
+            exit 0
+          fi
+          git commit -m "digest payload: ${TODAY} (auto)"
+          git push origin HEAD:main
