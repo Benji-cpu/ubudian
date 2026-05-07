@@ -45,7 +45,7 @@ export async function generateMetadata({ params }: JourneyPageProps): Promise<Me
     if (!journey) return { title: "Journey Not Found | The Ubudian" };
     const j = journey as Journey;
     return {
-      title: `${j.title} — Ubud Journey`,
+      title: `${j.title} — Ubud Retreat`,
       description: j.summary || j.subtitle || undefined,
       openGraph: {
         title: j.title,
@@ -163,7 +163,7 @@ export default async function JourneyPage({ params }: JourneyPageProps) {
                   {journey.length_days} {journey.length_days === 1 ? "day" : "days"}
                 </span>
                 <span>·</span>
-                <span>Living Guide</span>
+                <span>Ubud Retreat</span>
               </div>
               <h1 className="mt-3 font-serif text-4xl font-medium tracking-tight sm:text-5xl">
                 {journey.title}
@@ -191,7 +191,7 @@ export default async function JourneyPage({ params }: JourneyPageProps) {
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbLink href="/experiences">Experiences</BreadcrumbLink>
+              <BreadcrumbLink href="/experiences">Ubud Retreats</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>

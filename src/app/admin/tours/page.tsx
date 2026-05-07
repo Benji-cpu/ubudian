@@ -40,7 +40,7 @@ export default async function AdminToursPage() {
             <DropdownMenuItem asChild>
               <Link href="/admin/journeys">
                 <Sparkles className="mr-2 h-4 w-4" />
-                Journeys
+                Ubud Retreats
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>

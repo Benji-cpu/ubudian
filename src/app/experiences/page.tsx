@@ -8,9 +8,9 @@ import { rankJourneysByArchetype } from "@/lib/journeys/journey-personalization"
 import type { ArchetypeId, Journey, QuizResultRecord } from "@/types";
 
 export const metadata: Metadata = {
-  title: "Ubud Experiences | The Ubudian",
+  title: "Ubud Retreats | The Ubudian",
   description:
-    "Curated journeys through Ubud's conscious-community scene — packaged paths of one good thing per day, with rest, integration, and room to meet people.",
+    "Curated retreats through Ubud's conscious-community scene — full-board paths of one good thing per day, with the villa sorted, rest built in, and room to meet people.",
 };
 
 export default async function ExperiencesPage() {
@@ -56,26 +56,28 @@ export default async function ExperiencesPage() {
         <div className="mx-auto max-w-3xl text-center">
           <div className="mx-auto mb-6 h-px w-12 bg-brand-gold/40" />
           <h1 className="font-serif text-4xl font-medium tracking-tight text-brand-deep-green sm:text-5xl">
-            Ubud Experiences
+            Ubud Retreats
           </h1>
           <p className="mt-4 text-lg text-muted-foreground">
-            Curated journeys — one good invitation per day, with room to eat slowly,
-            wander into something unplanned, and meet people. Pick a thread and
-            follow it.
+            Full-board retreats through Ubud&rsquo;s conscious-community scene —
+            one good invitation per day, the villa and the meals taken care of,
+            and room to eat slowly, wander into something unplanned, and meet
+            people. Pick a thread and follow it.
           </p>
         </div>
       </section>
 
-      {/* Living Guides — public, free, the discovery surface */}
+      {/* Public retreats — free to read, the discovery surface */}
       <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="mb-8 flex items-end justify-between border-b border-brand-gold/20 pb-3">
           <div>
             <h2 className="font-serif text-2xl font-medium text-brand-deep-green">
-              Living Guides
+              The Retreats
             </h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Free to read. Each guide is a flexible recipe — a way of moving
-              through Ubud, with current real events folded in.
+              Free to read. Each retreat is a flexible recipe — a way of moving
+              through Ubud, with current real events folded in and the villa,
+              meals, and key practitioners curated.
             </p>
           </div>
           {primary && (
@@ -88,7 +90,7 @@ export default async function ExperiencesPage() {
         {livingGuides.length === 0 ? (
           <div className="py-12 text-center">
             <p className="text-lg text-muted-foreground">
-              The first guides are being threaded together. Back soon.
+              The first retreats are being threaded together. Back soon.
             </p>
           </div>
         ) : (
@@ -107,10 +109,10 @@ export default async function ExperiencesPage() {
             Coming for Insiders
           </span>
           <h2 className="mt-3 font-serif text-2xl font-medium text-brand-deep-green sm:text-3xl">
-            Self-paced journeys, threaded for you
+            Self-paced retreats, threaded for you
           </h2>
           <p className="mt-3 text-base text-muted-foreground">
-            Begin a journey on your own day one. Each morning we surface what
+            Begin a retreat on your own day one. Each morning we surface what
             today&apos;s invitation looks like — the right ceremony, the right walk,
             the right table to sit at — and quietly connect you to others on the
             same path. Insider opens later this season.
@@ -131,7 +133,7 @@ export default async function ExperiencesPage() {
             A small handful, fully held
           </h2>
           <p className="mt-3 text-base text-muted-foreground">
-            A few times a year we run a journey ourselves — the villa, the table,
+            A few times a year we run a retreat ourselves — the villa, the table,
             the practitioners, the closing circle. Capped, hand-curated, all in
             one price. We&apos;ll announce the first cohort to subscribers first.
           </p>
@@ -145,11 +147,11 @@ export default async function ExperiencesPage() {
       <section className="bg-brand-pale-green px-4 py-14">
         <div className="mx-auto max-w-xl text-center">
           <h2 className="font-serif text-2xl font-bold text-brand-deep-green">
-            Not sure which thread to pull?
+            Not sure which retreat fits?
           </h2>
           <p className="mt-2 text-muted-foreground">
-            Take the quiz. We&apos;ll show you the journey that fits where
-            you&apos;re standing now.
+            Take the quiz. We&apos;ll show you the retreat that lines up with
+            where you&apos;re standing now.
           </p>
           <Button asChild className="mt-6">
             <Link href="/quiz">Take the Quiz</Link>

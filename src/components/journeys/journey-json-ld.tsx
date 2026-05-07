@@ -18,7 +18,7 @@ export function JourneyJsonLd({ journey }: JourneyJsonLdProps) {
     url,
     datePublished: journey.created_at,
     dateModified: journey.updated_at,
-    keywords: (journey.archetype_tags ?? []).join(", "),
+    keywords: ["Ubud retreat", "Bali retreat", `${journey.length_days}-day retreat`, ...(journey.archetype_tags ?? [])].join(", "),
     publisher: {
       "@type": "Organization",
       name: SITE_NAME,

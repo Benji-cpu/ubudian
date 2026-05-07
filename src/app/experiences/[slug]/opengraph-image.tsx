@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { SITE_NAME } from "@/lib/constants";
 import type { Journey } from "@/types";
 
-export const alt = "Ubudian Journey";
+export const alt = "Ubudian Retreat";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -54,7 +54,7 @@ export default async function JourneyOgImage({
       ? "Signature Cohort"
       : journey.tier === "self_paced"
       ? "Insider Self-Paced"
-      : "Living Guide";
+      : "Ubud Retreat";
 
   const dayLabel = `${journey.length_days} ${journey.length_days === 1 ? "day" : "days"}`;
   const archetypes = (journey.archetype_tags ?? []).slice(0, 3);
