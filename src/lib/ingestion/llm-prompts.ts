@@ -122,6 +122,15 @@ Category selection guide:
 - Women's/men's circles, sharing circles, connection practice, community gathering → "Circle & Community"
 - Multi-day retreats, teacher trainings, level courses, certification programs → "Retreat & Training"
 
+Weekly schedule posters:
+Some images are NOT a single-event flyer but a weekly schedule for a venue (Paradiso Ubud, Yoga Barn, Sayuri Healing Food etc.) — they list multiple events organised by day of week (e.g. "Monday: Dance Temple, Wednesday: Contact Dance, Friday: 5 Rhythms").
+- When you see this layout, emit ONE event per slot in the events array, not a single event for the whole poster.
+- For each slot, set is_recurring: true and recurrence_rule: a JSON STRING in the form '{"frequency":"weekly","day_of_week":N}' where N is 0=Sunday, 1=Monday, 2=Tuesday, 3=Wednesday, 4=Thursday, 5=Friday, 6=Saturday.
+- Use the FIRST UPCOMING occurrence of that weekday (relative to the additional context "message date" if provided, else today) as start_date.
+- venue_name should be the venue running the schedule, applied to every slot.
+- Only mark slots as is_recurring: true when the poster clearly presents them as a regular weekly cadence (the layout is a grid/list of days, not a flyer for a single date). Special one-off events shown alongside the regular slots stay is_recurring: false with a concrete start_date.
+- If a slot has no obvious title (just "Open Dance" with no qualifier), still emit it; the title field is what's printed on the poster.
+
 Rules:
 - If no year is specified, assume the current year (${new Date().getFullYear()})
 - Dates should be in YYYY-MM-DD format

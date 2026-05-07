@@ -31,6 +31,8 @@ export interface DedupInput {
   source_id?: string | null;
   source_event_id?: string | null;
   description?: string | null;
+  is_recurring?: boolean | null;
+  recurrence_rule?: string | null;
 }
 
 export interface DedupPrecomputed {
@@ -94,6 +96,8 @@ export async function findDuplicates(input: DedupInput, precomputed?: DedupPreco
     title: input.title,
     start_date: input.start_date,
     venue_name: normalizedVenue,
+    is_recurring: input.is_recurring,
+    recurrence_rule: input.recurrence_rule,
   });
 
   const { data: fpMatches } = await supabase

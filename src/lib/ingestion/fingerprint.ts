@@ -4,24 +4,40 @@
  */
 
 import { normalizeForComparison } from "./similarity";
+import { parseRecurrenceRule } from "@/lib/recurrence";
 
 /**
  * Generate a SHA-256 content fingerprint from normalized event fields.
- * Based on normalized title + start_date. Venue is intentionally excluded because
- * the same event is often re-posted with venue spelling variations (e.g. "Blossom
- * Ubud" vs "Blossom Space Ubud") that would otherwise produce different fingerprints
- * and defeat Layer 2 dedup. Venue is still used in Layer 3 fuzzy matching.
+ *
+ * For one-off events: normalized title + start_date. Venue is excluded so that
+ * re-posts with venue spelling variations ("Blossom Ubud" vs "Blossom Space
+ * Ubud") still match. Layer 3 fuzzy still considers venue.
+ *
+ * For recurring events with a parseable rule: normalized title + venue +
+ * canonical rule signature, *replacing* start_date. Otherwise next week's
+ * re-ingestion of the same weekly slot would generate a fresh seed date,
+ * a fresh fingerprint, and slip past Layer 2 dedup.
  */
 export async function generateFingerprint(fields: {
   title: string;
   start_date: string;
   venue_name?: string | null;
+  is_recurring?: boolean | null;
+  recurrence_rule?: string | null;
 }): Promise<string> {
-  void fields.venue_name;
-  const normalized = [
-    normalizeForComparison(fields.title),
-    fields.start_date, // Already in YYYY-MM-DD format
-  ].join("|");
+  const rule = fields.is_recurring ? parseRecurrenceRule(fields.recurrence_rule ?? null) : null;
+  let dateOrRuleKey: string;
+  if (rule) {
+    const venueKey = fields.venue_name
+      ? normalizeForComparison(fields.venue_name)
+      : "novenue";
+    const ruleKey = `recurring:${rule.frequency}:${rule.day_of_week ?? rule.day_of_month ?? "x"}`;
+    dateOrRuleKey = `${ruleKey}|${venueKey}`;
+  } else {
+    dateOrRuleKey = fields.start_date;
+  }
+
+  const normalized = [normalizeForComparison(fields.title), dateOrRuleKey].join("|");
 
   // Use Web Crypto API (available in Node.js 18+ and Edge Runtime)
   const encoder = new TextEncoder();

@@ -692,11 +692,13 @@ export async function createEventFromParsed(
     }
   }
 
-  // Generate fingerprint
+  // Generate fingerprint (recurring-aware: weekly slots fingerprint on rule, not seed date)
   const fingerprint = await generateFingerprint({
     title: parsed.title,
     start_date: parsed.start_date,
     venue_name: normalizedVenue,
+    is_recurring: parsed.is_recurring,
+    recurrence_rule: parsed.recurrence_rule,
   });
 
   // Run dedup (pass precomputed venue/fingerprint to avoid redundant calls)
@@ -708,6 +710,8 @@ export async function createEventFromParsed(
     source_id: sourceId,
     source_event_id: parsed.source_event_id,
     description: parsed.description,
+    is_recurring: parsed.is_recurring,
+    recurrence_rule: parsed.recurrence_rule,
   }, { normalizedVenue, fingerprint });
 
   // If high-confidence duplicate, skip creation but store audit trail.

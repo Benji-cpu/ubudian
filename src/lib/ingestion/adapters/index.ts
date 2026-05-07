@@ -1,5 +1,6 @@
 // Import all adapters to trigger registration side effects
 import "./allevents";
+import "./apify-instagram";
 import "./bookretreats";
 import "./eventbrite";
 import "./facebook";
