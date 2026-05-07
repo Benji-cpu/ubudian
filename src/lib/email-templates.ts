@@ -268,6 +268,7 @@ interface DailyMaintenancePayload {
     purgedFailedMessages: number;
     cancelledStaleBookings: number;
     archivedDuplicateEvents: number;
+    collectedArchivedImages: number;
   };
   linkHealth?: {
     checked: number;
@@ -329,6 +330,7 @@ export function dailyMaintenanceDigest(p: DailyMaintenancePayload): string {
       <tr><td style="padding:6px 0;color:#888;">Failed messages purged</td><td style="padding:6px 0;text-align:right;font-weight:600;">${a.purgedFailedMessages}</td></tr>
       <tr><td style="padding:6px 0;color:#888;">Stale bookings cancelled</td><td style="padding:6px 0;text-align:right;font-weight:600;">${a.cancelledStaleBookings}</td></tr>
       <tr><td style="padding:6px 0;color:#888;">Duplicate events archived</td><td style="padding:6px 0;text-align:right;font-weight:600;">${a.archivedDuplicateEvents}</td></tr>
+      <tr><td style="padding:6px 0;color:#888;">Archived event images GC'd</td><td style="padding:6px 0;text-align:right;font-weight:600;">${a.collectedArchivedImages}</td></tr>
     </table>
 
     ${errorBlock}

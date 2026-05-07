@@ -916,3 +916,26 @@ CREATE POLICY "site_settings admin update" ON site_settings
 ALTER TABLE quiz_results ADD COLUMN IF NOT EXISTS user_segment TEXT;
 ALTER TABLE profiles ADD COLUMN IF NOT EXISTS primary_archetype TEXT;
 ALTER TABLE profiles ADD COLUMN IF NOT EXISTS user_segment TEXT;
+
+-- ============================================
+-- IMAGE GC LOG (audit trail for archived event image deletions)
+-- Added 2026-05-07.
+-- ============================================
+
+CREATE TABLE image_gc_log (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  entity_type TEXT NOT NULL,
+  entity_id UUID NOT NULL,
+  storage_path TEXT NOT NULL,
+  original_url TEXT NOT NULL,
+  collected_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX image_gc_log_entity_idx ON image_gc_log (entity_type, entity_id);
+CREATE INDEX image_gc_log_collected_at_idx ON image_gc_log (collected_at DESC);
+
+ALTER TABLE image_gc_log ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Admins can view image_gc_log"
+  ON image_gc_log FOR SELECT
+  USING (is_admin());

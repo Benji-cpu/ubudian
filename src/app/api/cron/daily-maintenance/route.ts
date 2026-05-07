@@ -19,6 +19,7 @@ import {
   purgeFailedMessages,
   type LinkHealthReport,
 } from "@/lib/maintenance/cleanups";
+import { garbageCollectArchivedEventImages, type ImageGcResult } from "@/lib/maintenance/image-gc";
 import { buildReviewQueue } from "@/lib/maintenance/review-queue";
 import { sendTransactionalEmail } from "@/lib/email";
 import { dailyMaintenanceDigest } from "@/lib/email-templates";
@@ -48,6 +49,11 @@ export async function GET(request: Request) {
     errors.push(`archiveFuzzyDuplicateEvents: ${err?.message ?? String(err)}`);
     return 0;
   });
+  const imageGc: ImageGcResult = await garbageCollectArchivedEventImages().catch((err) => {
+    errors.push(`garbageCollectArchivedEventImages: ${err?.message ?? String(err)}`);
+    return { scanned: 0, collected: 0, errors: [] };
+  });
+  if (imageGc.errors.length) errors.push(...imageGc.errors.map((e) => `imageGc: ${e}`));
 
   const linkHealth: LinkHealthReport = await checkExternalLinkHealth().catch((err) => {
     errors.push(`checkExternalLinkHealth: ${err?.message ?? String(err)}`);
@@ -67,6 +73,7 @@ export async function GET(request: Request) {
       purgedFailedMessages: purgedMessages,
       cancelledStaleBookings: cancelledBookings,
       archivedDuplicateEvents: archivedDuplicates,
+      collectedArchivedImages: imageGc.collected,
     },
     linkHealth,
     review,
