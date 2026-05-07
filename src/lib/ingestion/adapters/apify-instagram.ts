@@ -33,6 +33,11 @@ interface ApifyPost {
   ownerId?: string | null;
 }
 
+interface ApifyProfile {
+  username?: string;
+  latestPosts?: ApifyPost[];
+}
+
 const apifyInstagramAdapter: SourceAdapter = {
   sourceSlug: "apify-instagram",
 
@@ -62,6 +67,8 @@ const apifyInstagramAdapter: SourceAdapter = {
 
     const url = `${APIFY_BASE}/acts/${ACTOR_ID}/run-sync-get-dataset-items?token=${encodeURIComponent(token)}`;
 
+    // Actor returns one row per username with `latestPosts` nested inside —
+    // flatten across all profiles to get a flat post stream.
     let posts: ApifyPost[];
     try {
       const res = await fetch(url, {
@@ -73,7 +80,8 @@ const apifyInstagramAdapter: SourceAdapter = {
         console.error(`[apify-instagram] Actor run failed: ${res.status} ${await res.text().catch(() => "")}`);
         return [];
       }
-      posts = (await res.json()) as ApifyPost[];
+      const profiles = (await res.json()) as ApifyProfile[];
+      posts = profiles.flatMap((p) => p.latestPosts ?? []);
     } catch (err) {
       console.error("[apify-instagram] Fetch error:", err);
       return [];
