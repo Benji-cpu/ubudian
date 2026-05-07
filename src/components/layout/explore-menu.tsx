@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Compass, Mail, Sparkles, Info, ChevronDown } from "lucide-react";
+import { Mail, Sparkles, Info, ChevronDown } from "lucide-react";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -12,12 +12,6 @@ import {
 } from "@/components/ui/navigation-menu";
 
 const EXPLORE_ITEMS = [
-  {
-    label: "Guides",
-    href: "/experiences",
-    icon: Compass,
-    description: "Understand the practices",
-  },
   {
     label: "Newsletter",
     href: "/newsletter",
@@ -56,9 +50,9 @@ export function ExploreMenu({ newsletterEnabled = true }: { newsletterEnabled?: 
           </NavigationMenuTrigger>
           <NavigationMenuContent className="border-none bg-transparent p-0 shadow-none">
             <div
-              className="w-[420px] rounded-xl border border-brand-gold/30 bg-brand-deep-green/97 p-4 shadow-2xl backdrop-blur-[12px] dark:bg-background/97"
+              className="w-[280px] rounded-xl border border-brand-gold/30 bg-brand-deep-green/97 p-4 shadow-2xl backdrop-blur-[12px] dark:bg-background/97"
             >
-              <div className="grid grid-cols-2 gap-1">
+              <div className="grid grid-cols-1 gap-1">
                 {items.map((item) => {
                   const Icon = item.icon;
                   return (

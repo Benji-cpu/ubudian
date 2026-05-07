@@ -7,7 +7,7 @@ export const SITE_URL =
 export const NAV_LINKS = [
   { label: "Quiz", href: "/quiz" },
   { label: "Events", href: "/events" },
-  { label: "Guides", href: "/experiences" },
+  { label: "Journeys", href: "/experiences" },
   { label: "Humans of Ubud", href: "/stories" },
   { label: "Tours", href: "/tours" },
   { label: "Newsletter", href: "/newsletter" },

@@ -51,6 +51,12 @@ export async function Header() {
           >
             Events
           </Link>
+          <Link
+            href="/experiences"
+            className="text-xs font-semibold uppercase tracking-widest text-brand-off-white transition-colors duration-300 hover:text-brand-gold"
+          >
+            Journeys
+          </Link>
           {settings.stories_enabled && (
             <Link
               href="/stories"
