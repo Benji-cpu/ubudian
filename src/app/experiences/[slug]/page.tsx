@@ -9,6 +9,8 @@ import { MarkdownContent } from "@/components/blog/markdown-content";
 import { ShareButtons } from "@/components/blog/share-buttons";
 import { JourneyCard } from "@/components/journeys/journey-card";
 import { JourneyDayCard } from "@/components/journeys/journey-day-card";
+import { JourneyJsonLd } from "@/components/journeys/journey-json-ld";
+import { NewsletterSignup } from "@/components/layout/newsletter-signup";
 import { resolveDayCandidates } from "@/lib/journeys/slot-resolver";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -43,12 +45,18 @@ export async function generateMetadata({ params }: JourneyPageProps): Promise<Me
     if (!journey) return { title: "Journey Not Found | The Ubudian" };
     const j = journey as Journey;
     return {
-      title: `${j.title} | Ubud Experiences | The Ubudian`,
+      title: `${j.title} — Ubud Journey`,
       description: j.summary || j.subtitle || undefined,
       openGraph: {
         title: j.title,
         description: j.summary || j.subtitle || undefined,
-        images: j.cover_image_url ? [j.cover_image_url] : undefined,
+        // Images intentionally omitted — `opengraph-image.tsx` in this route
+        // segment auto-generates a branded card and Next.js wires it in.
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: j.title,
+        description: j.summary || j.subtitle || undefined,
       },
     };
   } catch {
@@ -134,6 +142,7 @@ export default async function JourneyPage({ params }: JourneyPageProps) {
 
   return (
     <article>
+      <JourneyJsonLd journey={journey} />
       {/* Cover */}
       {journey.cover_image_url ? (
         <div className="relative h-[420px] w-full sm:h-[520px]">
@@ -282,8 +291,26 @@ export default async function JourneyPage({ params }: JourneyPageProps) {
 
       {/* Share */}
       <div className="mx-auto max-w-3xl border-t px-4 py-8 sm:px-6">
-        <ShareButtons title={journey.title} url={journeyUrl} />
+        <ShareButtons
+          title={journey.title}
+          url={journeyUrl}
+          text={journey.subtitle ?? journey.summary?.split("\n")[0] ?? undefined}
+        />
       </div>
+
+      {/* Newsletter CTA */}
+      <section className="bg-brand-pale-green px-4 py-14">
+        <div className="mx-auto max-w-xl text-center">
+          <h2 className="font-serif text-2xl font-bold text-brand-deep-green">
+            Want more journeys like this?
+          </h2>
+          <p className="mt-2 text-muted-foreground">
+            One email a week with new threads, the events that matter this week,
+            and the rituals quietly shaping Ubud&apos;s conscious community.
+          </p>
+          <NewsletterSignup className="mx-auto mt-6 max-w-md" />
+        </div>
+      </section>
 
       {/* More journeys */}
       {moreJourneys.length > 0 && (

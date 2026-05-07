@@ -8,7 +8,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { FeedbackFab } from "@/components/feedback/feedback-fab";
 import { ActivityTrailInstaller } from "@/components/feedback/activity-trail-installer";
 import { ThemeProvider } from "@/components/theme-provider";
-import { SITE_NAME, SITE_DESCRIPTION } from "@/lib/constants";
+import { SITE_NAME, SITE_DESCRIPTION, SITE_URL } from "@/lib/constants";
 import "./globals.css";
 
 const sourceSans = Source_Sans_3({
@@ -25,6 +25,7 @@ const lora = Lora({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: {
     default: SITE_NAME,
     template: `%s | ${SITE_NAME}`,
