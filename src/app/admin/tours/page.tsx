@@ -7,7 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Plus, MapPin, Compass } from "lucide-react";
+import { Plus, MapPin, Compass, Sparkles } from "lucide-react";
 import { ToursTabs } from "@/components/admin/tours/tours-tabs";
 import type { Tour, Experience } from "@/types";
 
@@ -38,6 +38,12 @@ export default async function AdminToursPage() {
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem asChild>
+              <Link href="/admin/journeys">
+                <Sparkles className="mr-2 h-4 w-4" />
+                Journeys
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
               <Link href="/admin/tours/new">
                 <MapPin className="mr-2 h-4 w-4" />
                 Tour
@@ -46,7 +52,7 @@ export default async function AdminToursPage() {
             <DropdownMenuItem asChild>
               <Link href="/admin/experiences/new">
                 <Compass className="mr-2 h-4 w-4" />
-                Experience
+                Legacy Experience
               </Link>
             </DropdownMenuItem>
           </DropdownMenuContent>

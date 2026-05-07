@@ -157,6 +157,148 @@ export interface Experience {
   updated_at: string;
 }
 
+// ============================================
+// Journeys (the new "Experiences" — time-bounded curated paths)
+// ============================================
+
+export type JourneyTier = "living_guide" | "self_paced" | "signature_cohort";
+export type JourneyDayType = "arrival" | "light" | "active" | "rest" | "closing";
+export type JourneyDayWindow = "morning" | "afternoon" | "evening";
+export type JourneyAtomKind =
+  | "event_ref"
+  | "accommodation"
+  | "restaurant"
+  | "practitioner"
+  | "place"
+  | "ritual"
+  | "reflection";
+export type PartnerKind =
+  | "villa"
+  | "hotel"
+  | "homestay"
+  | "restaurant"
+  | "cafe"
+  | "studio"
+  | "spa"
+  | "other";
+
+export interface Journey {
+  id: string;
+  slug: string;
+  title: string;
+  subtitle: string | null;
+  tier: JourneyTier;
+  length_days: number;
+  archetype_tags: ArchetypeId[];
+  cover_image_url: string | null;
+  hero_quote: string | null;
+  summary: string | null;
+  whats_included: string | null;
+  who_its_for: string | null;
+  practical_info: string | null;
+  is_published: boolean;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface JourneyDay {
+  id: string;
+  journey_id: string;
+  day_number: number;
+  day_type: JourneyDayType;
+  theme: string;
+  theme_subtitle: string | null;
+  intention: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface JourneyDaySlot {
+  id: string;
+  journey_day_id: string;
+  slot_window: JourneyDayWindow;
+  position: number;
+  is_optional: boolean;
+  atom_kinds: JourneyAtomKind[];
+  theme_tags: string[];
+  curated_atom_id: string | null;
+  prompt: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface JourneyAtom {
+  id: string;
+  kind: JourneyAtomKind;
+  title: string;
+  description: string | null;
+  short_description: string | null;
+  theme_tags: string[];
+  archetype_tags: ArchetypeId[];
+  image_url: string | null;
+  affiliate_url: string | null;
+  event_id: string | null;
+  practitioner_id: string | null;
+  partner_id: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  google_maps_url: string | null;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Practitioner {
+  id: string;
+  slug: string;
+  name: string;
+  modalities: string[];
+  bio: string | null;
+  photo_url: string | null;
+  contact_whatsapp: string | null;
+  contact_email: string | null;
+  contact_instagram: string | null;
+  base_location: string | null;
+  theme_tags: string[];
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Partner {
+  id: string;
+  slug: string;
+  name: string;
+  kind: PartnerKind;
+  description: string | null;
+  affiliate_url: string | null;
+  commission_rate: number | null;
+  contact_whatsapp: string | null;
+  contact_email: string | null;
+  base_location: string | null;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+/**
+ * A `JourneyDay` enriched with its ordered slots and (optionally) the resolved
+ * atom candidates per slot — the shape the public journey detail page consumes.
+ */
+export interface JourneyDayWithSlots extends JourneyDay {
+  slots: (JourneyDaySlot & {
+    candidates: JourneyAtom[];   // [] when no candidates resolve for this user/date
+  })[];
+}
+
+/**
+ * A full `Journey` enriched with days + their slots + resolved candidates.
+ */
+export interface JourneyWithDays extends Journey {
+  days: JourneyDayWithSlots[];
+}
+
 export interface NewsletterEdition {
   id: string;
   subject: string;

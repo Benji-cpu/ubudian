@@ -1,31 +1,50 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { ExperienceCard } from "@/components/experiences/experience-card";
+import { getCurrentProfile } from "@/lib/auth";
+import { JourneyCard } from "@/components/journeys/journey-card";
 import { Button } from "@/components/ui/button";
-import type { Experience } from "@/types";
+import { rankJourneysByArchetype } from "@/lib/journeys/journey-personalization";
+import type { ArchetypeId, Journey, QuizResultRecord } from "@/types";
 
 export const metadata: Metadata = {
   title: "Ubud Experiences | The Ubudian",
   description:
-    "Embodiment workshops, cacao ceremonies, tantric temples, sound journeys — the practices that define life in Ubud.",
+    "Curated journeys through Ubud's conscious-community scene — packaged paths of one good thing per day, with rest, integration, and room to meet people.",
 };
 
 export default async function ExperiencesPage() {
-  let allExperiences: Experience[] = [];
+  let livingGuides: Journey[] = [];
+  let primary: ArchetypeId | null = null;
+  let secondary: ArchetypeId | null = null;
 
   try {
     const supabase = await createClient();
 
-    const { data: experiences, error } = await supabase
-      .from("experiences")
+    const profile = await getCurrentProfile();
+    if (profile) {
+      const { data: quiz } = await supabase
+        .from("quiz_results")
+        .select("primary_archetype, secondary_archetype")
+        .eq("profile_id", profile.id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      const q = quiz as Pick<QuizResultRecord, "primary_archetype" | "secondary_archetype"> | null;
+      primary = (q?.primary_archetype as ArchetypeId) ?? null;
+      secondary = (q?.secondary_archetype as ArchetypeId) ?? null;
+    }
+
+    const { data: journeys, error } = await supabase
+      .from("journeys")
       .select("*")
-      .eq("is_active", true)
+      .eq("is_published", true)
+      .eq("tier", "living_guide")
       .order("sort_order", { ascending: true })
       .order("created_at", { ascending: false });
 
-    if (error) console.error("Experiences query error:", error);
-    allExperiences = (experiences ?? []) as Experience[];
+    if (error) console.error("Journeys query error:", error);
+    livingGuides = rankJourneysByArchetype((journeys ?? []) as Journey[], { primary, secondary });
   } catch {
     // Supabase unreachable — render with empty state
   }
@@ -40,37 +59,97 @@ export default async function ExperiencesPage() {
             Ubud Experiences
           </h1>
           <p className="mt-4 text-lg text-muted-foreground">
-            Embodiment workshops, cacao ceremonies, tantric temples, sound
-            journeys — the practices that define life in Ubud, matched to your archetype.
+            Curated journeys — one good invitation per day, with room to eat slowly,
+            wander into something unplanned, and meet people. Pick a thread and
+            follow it.
           </p>
         </div>
       </section>
 
-      {/* Experiences Grid */}
+      {/* Living Guides — public, free, the discovery surface */}
       <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        {allExperiences.length === 0 ? (
+        <div className="mb-8 flex items-end justify-between border-b border-brand-gold/20 pb-3">
+          <div>
+            <h2 className="font-serif text-2xl font-medium text-brand-deep-green">
+              Living Guides
+            </h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Free to read. Each guide is a flexible recipe — a way of moving
+              through Ubud, with current real events folded in.
+            </p>
+          </div>
+          {primary && (
+            <span className="hidden text-xs uppercase tracking-wider text-brand-gold sm:block">
+              Sorted for The {primary[0].toUpperCase() + primary.slice(1)}
+            </span>
+          )}
+        </div>
+
+        {livingGuides.length === 0 ? (
           <div className="py-12 text-center">
             <p className="text-lg text-muted-foreground">
-              Experiences are coming soon! Check back shortly.
+              The first guides are being threaded together. Back soon.
             </p>
           </div>
         ) : (
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {allExperiences.map((experience) => (
-              <ExperienceCard key={experience.id} experience={experience} />
+            {livingGuides.map((j) => (
+              <JourneyCard key={j.id} journey={j} />
             ))}
           </div>
         )}
       </section>
 
-      {/* Quiz CTA */}
+      {/* Self-Paced (Insider) preview */}
+      <section className="border-t bg-brand-cream/40 px-4 py-14 sm:px-6">
+        <div className="mx-auto max-w-3xl text-center">
+          <span className="text-xs uppercase tracking-[0.2em] text-brand-gold">
+            Coming for Insiders
+          </span>
+          <h2 className="mt-3 font-serif text-2xl font-medium text-brand-deep-green sm:text-3xl">
+            Self-paced journeys, threaded for you
+          </h2>
+          <p className="mt-3 text-base text-muted-foreground">
+            Begin a journey on your own day one. Each morning we surface what
+            today&apos;s invitation looks like — the right ceremony, the right walk,
+            the right table to sit at — and quietly connect you to others on the
+            same path. Insider opens later this season.
+          </p>
+          <Button asChild variant="outline" className="mt-6">
+            <Link href="/membership">Read about Insider</Link>
+          </Button>
+        </div>
+      </section>
+
+      {/* Signature Cohort waitlist */}
+      <section className="px-4 py-14 sm:px-6">
+        <div className="mx-auto max-w-3xl text-center">
+          <span className="text-xs uppercase tracking-[0.2em] text-brand-terracotta">
+            Signature Cohorts
+          </span>
+          <h2 className="mt-3 font-serif text-2xl font-medium text-brand-deep-green sm:text-3xl">
+            A small handful, fully held
+          </h2>
+          <p className="mt-3 text-base text-muted-foreground">
+            A few times a year we run a journey ourselves — the villa, the table,
+            the practitioners, the closing circle. Capped, hand-curated, all in
+            one price. We&apos;ll announce the first cohort to subscribers first.
+          </p>
+          <Button asChild className="mt-6">
+            <Link href="/newsletter">Join the list</Link>
+          </Button>
+        </div>
+      </section>
+
+      {/* Quiz CTA — kept from previous version */}
       <section className="bg-brand-pale-green px-4 py-14">
         <div className="mx-auto max-w-xl text-center">
           <h2 className="font-serif text-2xl font-bold text-brand-deep-green">
-            Not sure where to start?
+            Not sure which thread to pull?
           </h2>
           <p className="mt-2 text-muted-foreground">
-            Take the quiz to find your archetype — and see which experiences have your name on them.
+            Take the quiz. We&apos;ll show you the journey that fits where
+            you&apos;re standing now.
           </p>
           <Button asChild className="mt-6">
             <Link href="/quiz">Take the Quiz</Link>

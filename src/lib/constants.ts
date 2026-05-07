@@ -34,7 +34,7 @@ export const ADMIN_NAV_LINKS: AdminNavItem[] = [
 
 export const ADMIN_GROUPED_ROUTES: Record<string, string[]> = {
   "/admin/content": ["/admin/blog", "/admin/stories", "/admin/newsletter"],
-  "/admin/tours": ["/admin/tours", "/admin/experiences"],
+  "/admin/tours": ["/admin/tours", "/admin/experiences", "/admin/journeys"],
   "/admin/commerce": ["/admin/bookings", "/admin/subscriptions"],
   "/admin/community": ["/admin/subscribers", "/admin/trusted-submitters", "/admin/feedback"],
   "/admin/sources": ["/admin/ingestion"],
