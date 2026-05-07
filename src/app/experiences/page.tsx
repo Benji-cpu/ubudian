@@ -3,6 +3,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/lib/auth";
 import { JourneyCard } from "@/components/journeys/journey-card";
+import { WhatsIncludedIcons } from "@/components/journeys/whats-included-icons";
 import { Button } from "@/components/ui/button";
 import { rankJourneysByArchetype } from "@/lib/journeys/journey-personalization";
 import type { ArchetypeId, Journey, QuizResultRecord } from "@/types";
@@ -65,6 +66,19 @@ export default async function ExperiencesPage() {
             people. Pick a thread and follow it.
           </p>
         </div>
+      </section>
+
+      {/* What every Ubud Retreat holds — icon row */}
+      <section className="mx-auto max-w-5xl px-4 pt-12 sm:px-6">
+        <div className="mb-6 text-center">
+          <span className="text-xs uppercase tracking-[0.2em] text-brand-gold">
+            What every Ubud Retreat holds
+          </span>
+          <h2 className="mt-2 font-serif text-2xl font-medium text-brand-deep-green sm:text-3xl">
+            One good thing a day. The rest, sorted.
+          </h2>
+        </div>
+        <WhatsIncludedIcons variant="card" />
       </section>
 
       {/* Public retreats — free to read, the discovery surface */}

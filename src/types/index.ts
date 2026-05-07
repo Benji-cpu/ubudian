@@ -283,6 +283,20 @@ export interface Partner {
   updated_at: string;
 }
 
+export interface JourneyTestimonial {
+  id: string;
+  journey_id: string;
+  attendee_name: string;
+  attendee_origin: string | null;
+  quote: string;
+  journey_day_referenced: number | null;
+  avatar_url: string | null;
+  sort_order: number;
+  is_published: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 /**
  * A `JourneyDay` enriched with its ordered slots and (optionally) the resolved
  * atom candidates per slot — the shape the public journey detail page consumes.

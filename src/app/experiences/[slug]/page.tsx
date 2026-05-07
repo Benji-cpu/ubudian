@@ -10,6 +10,9 @@ import { ShareButtons } from "@/components/blog/share-buttons";
 import { JourneyCard } from "@/components/journeys/journey-card";
 import { JourneyDayCard } from "@/components/journeys/journey-day-card";
 import { JourneyJsonLd } from "@/components/journeys/journey-json-ld";
+import { JourneyTestimonials } from "@/components/journeys/journey-testimonials";
+import { JourneyFaq } from "@/components/journeys/journey-faq";
+import { WhatsIncludedIcons } from "@/components/journeys/whats-included-icons";
 import { NewsletterSignup } from "@/components/layout/newsletter-signup";
 import { resolveDayCandidates } from "@/lib/journeys/slot-resolver";
 import { Badge } from "@/components/ui/badge";
@@ -26,6 +29,7 @@ import type {
   JourneyDay,
   JourneyDaySlot,
   JourneyAtom,
+  JourneyTestimonial,
 } from "@/types";
 
 interface JourneyPageProps {
@@ -71,6 +75,7 @@ export default async function JourneyPage({ params }: JourneyPageProps) {
   let candidatesBySlot = new Map<string, JourneyAtom[]>();
   const eventSlugs = new Map<string, string>();
   let moreJourneys: Journey[] = [];
+  let testimonials: JourneyTestimonial[] = [];
 
   try {
     const { slug } = await params;
@@ -86,7 +91,7 @@ export default async function JourneyPage({ params }: JourneyPageProps) {
     if (!journeyRow) notFound();
     journey = journeyRow as Journey;
 
-    const [daysRes, moreRes] = await Promise.all([
+    const [daysRes, moreRes, testRes] = await Promise.all([
       supabase
         .from("journey_days")
         .select("*")
@@ -100,10 +105,17 @@ export default async function JourneyPage({ params }: JourneyPageProps) {
         .neq("id", journey.id)
         .order("sort_order", { ascending: true })
         .limit(3),
+      supabase
+        .from("journey_testimonials")
+        .select("*")
+        .eq("journey_id", journey.id)
+        .eq("is_published", true)
+        .order("sort_order", { ascending: true }),
     ]);
 
     days = (daysRes.data ?? []) as JourneyDay[];
     moreJourneys = (moreRes.data ?? []) as Journey[];
+    testimonials = (testRes.data ?? []) as JourneyTestimonial[];
 
     if (days.length > 0) {
       const { data: slots } = await supabase
@@ -226,13 +238,18 @@ export default async function JourneyPage({ params }: JourneyPageProps) {
           </div>
         )}
 
-        {/* What's included */}
+        {/* What this retreat holds — icon row */}
+        <section className="mt-12">
+          <h2 className="mb-5 font-serif text-xl font-medium text-brand-deep-green">
+            What this retreat holds
+          </h2>
+          <WhatsIncludedIcons variant="card" />
+        </section>
+
+        {/* What's included — narrative (kept where author has written it) */}
         {journey.whats_included && (
-          <section className="mt-12 rounded-md border border-brand-gold/20 bg-brand-cream/40 p-6">
-            <h2 className="font-serif text-xl font-medium text-brand-deep-green">
-              What this journey holds
-            </h2>
-            <div className="mt-4 text-base">
+          <section className="mt-10 rounded-md border border-brand-gold/20 bg-brand-cream/40 p-6">
+            <div className="text-base">
               <MarkdownContent content={journey.whats_included} />
             </div>
           </section>
@@ -247,7 +264,7 @@ export default async function JourneyPage({ params }: JourneyPageProps) {
               The {journey.length_days} days
             </h2>
             <p className="mt-2 text-sm text-muted-foreground">
-              The journey is light by design — most days hold one good thing,
+              The retreat is light by design — most days hold one good thing,
               with rest, food, and unplanned encounters around it.
             </p>
             <div className="mt-8 space-y-6">
@@ -264,6 +281,12 @@ export default async function JourneyPage({ params }: JourneyPageProps) {
           </div>
         </section>
       )}
+
+      {/* Testimonials */}
+      <JourneyTestimonials testimonials={testimonials} journeyTitle={journey.title} />
+
+      {/* FAQ */}
+      <JourneyFaq journey={journey} />
 
       {/* Who it's for */}
       {journey.who_its_for && (
@@ -302,7 +325,7 @@ export default async function JourneyPage({ params }: JourneyPageProps) {
       <section className="bg-brand-pale-green px-4 py-14">
         <div className="mx-auto max-w-xl text-center">
           <h2 className="font-serif text-2xl font-bold text-brand-deep-green">
-            Want more journeys like this?
+            Want more retreats like this?
           </h2>
           <p className="mt-2 text-muted-foreground">
             One email a week with new threads, the events that matter this week,
@@ -333,7 +356,7 @@ export default async function JourneyPage({ params }: JourneyPageProps) {
             Not sure if this one fits?
           </h2>
           <p className="mt-2 text-muted-foreground">
-            Take the quiz — we&apos;ll point you to the journey that lines up with
+            Take the quiz — we&apos;ll point you to the retreat that lines up with
             where you&apos;re standing.
           </p>
           <Link
