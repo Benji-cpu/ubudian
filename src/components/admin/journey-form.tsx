@@ -9,11 +9,13 @@ import { createClient } from "@/lib/supabase/client";
 import { slugify } from "@/lib/utils";
 import { RichTextEditor } from "@/components/admin/rich-text-editor";
 import { TagInput } from "@/components/admin/tag-input";
+import { ImageUploader } from "@/components/admin/image-uploader";
 import { ARCHETYPE_IDS } from "@/lib/quiz-data";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Sparkles } from "lucide-react";
 import {
   Form,
   FormControl,
@@ -82,6 +84,7 @@ export function JourneyForm({ initialData }: JourneyFormProps) {
   const router = useRouter();
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [generatingCover, setGeneratingCover] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [slugManuallyEdited, setSlugManuallyEdited] = useState(!!initialData);
   const isEditMode = !!initialData;
@@ -410,10 +413,62 @@ export function JourneyForm({ initialData }: JourneyFormProps) {
               name="cover_image_url"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Cover Image URL</FormLabel>
+                  <FormLabel>Cover image</FormLabel>
                   <FormControl>
-                    <Input placeholder="https://..." {...field} />
+                    <ImageUploader
+                      bucket="images"
+                      folder="experiences"
+                      value={field.value || ""}
+                      onChange={field.onChange}
+                    />
                   </FormControl>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="mt-2 w-full"
+                    disabled={generatingCover || !form.getValues("title")}
+                    onClick={async () => {
+                      const title = form.getValues("title");
+                      const subtitle = form.getValues("subtitle");
+                      if (!title) return;
+                      setGeneratingCover(true);
+                      try {
+                        const prompt = [
+                          subtitle
+                            ? `${title} — ${subtitle}.`
+                            : `${title}, an Ubud retreat.`,
+                          "Painterly cinematic photograph, golden hour Ubud Bali light,",
+                          "deep green and gold and terracotta palette, soft mist, atmospheric,",
+                          "depth of field, no text, no logos.",
+                        ].join(" ");
+                        const res = await fetch("/api/images/generate", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ prompt, folder: "experiences" }),
+                        });
+                        const json = (await res.json()) as { url?: string; error?: string };
+                        if (!res.ok || !json.url) {
+                          form.setError("root", { message: json.error || `Generation failed (${res.status})` });
+                          return;
+                        }
+                        field.onChange(json.url);
+                      } catch (err) {
+                        form.setError("root", {
+                          message: err instanceof Error ? err.message : "Generation failed",
+                        });
+                      } finally {
+                        setGeneratingCover(false);
+                      }
+                    }}
+                  >
+                    {generatingCover ? (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                      <Sparkles className="mr-2 h-4 w-4" />
+                    )}
+                    Generate cover image
+                  </Button>
                   <FormMessage />
                 </FormItem>
               )}

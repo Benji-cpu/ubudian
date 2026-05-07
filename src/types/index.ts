@@ -210,6 +210,7 @@ export interface JourneyDay {
   theme: string;
   theme_subtitle: string | null;
   intention: string | null;
+  background_image_url: string | null;
   created_at: string;
   updated_at: string;
 }

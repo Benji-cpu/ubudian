@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { Sun, Sunrise, Moon, ExternalLink } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -65,7 +66,20 @@ export function JourneyDayCard({ day, slots, candidatesBySlot, eventSlugs }: Jou
 
   return (
     <article className="overflow-hidden rounded-md border border-brand-gold/20 bg-card">
-      <header className="border-b border-brand-gold/15 bg-brand-cream/30 px-5 py-4 sm:px-6">
+      <header className="relative overflow-hidden border-b border-brand-gold/15 bg-brand-cream/30 px-5 py-6 sm:px-6 sm:py-8">
+        {day.background_image_url && (
+          <>
+            <Image
+              src={day.background_image_url}
+              alt=""
+              fill
+              sizes="(max-width: 768px) 100vw, 768px"
+              className="absolute inset-0 -z-10 object-cover opacity-25"
+              aria-hidden
+            />
+            <div className="absolute inset-0 -z-10 bg-gradient-to-r from-brand-cream/80 via-brand-cream/55 to-brand-cream/30" aria-hidden />
+          </>
+        )}
         <div className="flex items-center gap-3">
           <span className="rounded-full bg-brand-deep-green px-3 py-1 text-xs font-semibold uppercase tracking-wider text-brand-cream">
             Day {day.day_number}
@@ -163,10 +177,30 @@ function AtomLine({ atom, eventSlugs }: { atom: JourneyAtom; eventSlugs: Map<str
   const href = atomHref(atom, eventSlugs);
   const inner = (
     <>
-      <Badge variant="outline" className="shrink-0 text-[10px] uppercase tracking-wider">
-        {ATOM_KIND_LABEL[atom.kind]}
-      </Badge>
+      {atom.image_url ? (
+        <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-sm border border-brand-gold/20">
+          <Image
+            src={atom.image_url}
+            alt=""
+            fill
+            sizes="48px"
+            className="object-cover"
+            aria-hidden
+          />
+        </div>
+      ) : (
+        <Badge variant="outline" className="shrink-0 text-[10px] uppercase tracking-wider">
+          {ATOM_KIND_LABEL[atom.kind]}
+        </Badge>
+      )}
       <div className="min-w-0">
+        <div className="flex items-center gap-2">
+          {atom.image_url && (
+            <span className="text-[10px] uppercase tracking-wider text-brand-gold">
+              {ATOM_KIND_LABEL[atom.kind]}
+            </span>
+          )}
+        </div>
         <p className="truncate text-sm font-medium text-foreground">{atom.title}</p>
         {atom.short_description && (
           <p className="text-xs text-muted-foreground line-clamp-2">{atom.short_description}</p>
