@@ -29,20 +29,42 @@ if [ ! -f "digests/${TODAY}.json" ]; then
   sleep 60
   git pull --ff-only origin main
 fi
+```
+
+### Self-heal branch — JSON still missing after 60s
+
+If `digests/${TODAY}.json` is still absent, GH cron drifted hard (observed >40min on 2026-05-06). Use the seeded `GITHUB_PAT` to dispatch the workflow yourself, wait for it to finish, then pull again. **Do not** echo the PAT in any logged output.
+
+```bash
+if [ ! -f "digests/${TODAY}.json" ]; then
+  export GH_TOKEN="$GITHUB_PAT"     # gh CLI reads GH_TOKEN
+  echo "Dispatching daily-maintenance-fetch workflow…"
+  gh workflow run daily-maintenance-fetch.yml --repo Benji-cpu/ubudian --ref main
+
+  # Poll for the dispatched run to complete (timeout 5 min).
+  for i in $(seq 1 30); do
+    sleep 10
+    LATEST=$(gh run list --workflow=daily-maintenance-fetch.yml --repo Benji-cpu/ubudian --limit 1 --json status,conclusion --jq '.[0]')
+    STATUS=$(echo "$LATEST" | jq -r '.status')
+    if [ "$STATUS" = "completed" ]; then break; fi
+  done
+
+  git pull --ff-only origin main
+fi
 
 if [ ! -f "digests/${TODAY}.json" ]; then
-  # Workflow didn't run or failed. Commit a stub and exit.
+  # Self-heal failed too. Commit a stub and exit so the failure is visible in git log.
   cat > "digests/${TODAY}.md" <<EOF
 # Daily maintenance — ${TODAY}
 
-**Status: BLOCKED — payload missing**
+**Status: BLOCKED — payload missing (self-heal failed)**
 
-The GitHub Actions workflow \`daily-maintenance-fetch\` did not produce \`digests/${TODAY}.json\` before this agent ran. Check run history at https://github.com/Benji-cpu/ubudian/actions/workflows/daily-maintenance-fetch.yml.
+The GitHub Actions workflow \`daily-maintenance-fetch\` did not produce \`digests/${TODAY}.json\` before this agent ran, and the self-heal dispatch via \`gh workflow run\` did not produce one either within 5 minutes. Check run history at https://github.com/Benji-cpu/ubudian/actions/workflows/daily-maintenance-fetch.yml — likely causes: \`CRON_SECRET\` rotated in Vercel without re-syncing the GH repo secret, or the Vercel route 5xx'd.
 
 No autonomous cleanups verified, no review queue assembled by this agent.
 EOF
   git add "digests/${TODAY}.md"
-  git commit -m "digest: ${TODAY} — payload missing"
+  git commit -m "digest: ${TODAY} — payload missing (self-heal failed)"
   git push origin main
   exit 0
 fi
@@ -153,9 +175,14 @@ The commit is the audit trail. Vercel auto-deploys but no app code changed, so t
 
 ## Failure modes
 
-- **JSON missing after 60s retry** → commit the BLOCKED stub from Step 1 and exit. Do not fall back to anything.
+- **JSON missing after 60s retry** → run the self-heal branch (Step 1): dispatch `daily-maintenance-fetch.yml` via `gh` with `GH_TOKEN=$GITHUB_PAT`, wait up to 5min, retry pull. If that still fails, commit the BLOCKED stub.
 - **JSON malformed (`jq` errors out)** → commit a stub `digests/${TODAY}.md` titled `digest: ${TODAY} — payload malformed` containing the `jq` error, push, exit.
 - **Errors array non-empty** → not a failure of the agent; copy them into the "Errors during run" section verbatim and proceed normally.
+- **`gh workflow run` fails (PAT expired/wrong scopes)** → fall through to the BLOCKED stub. The stub message points at where to investigate.
+
+## Cross-app GitHub bus
+
+`GITHUB_PAT` is also available to push to or read from sister repos (MysTech, WordZoo, The Programme, CC Mastery) when a future enhancement needs cross-app coordination. Authentication pattern is the same: `export GH_TOKEN="$GITHUB_PAT"` then use `gh` CLI. **Never** echo the PAT, never write it to a committed file, never include it in a commit message.
 
 ## Completion signal
 
