@@ -7,7 +7,7 @@ import { HomepageScrollSnap } from "@/components/homepage/scroll-snap";
 import { FeaturedStories } from "@/components/homepage/featured-stories";
 import { FeaturedEvents } from "@/components/homepage/featured-events";
 import { FeaturedTours } from "@/components/homepage/featured-tours";
-import { FeaturedExperiences } from "@/components/homepage/featured-experiences";
+import { FeaturedJourneys } from "@/components/homepage/featured-journeys";
 import { QuizCtaHomepage } from "@/components/quiz/quiz-cta-homepage";
 import { QuizPrompt } from "@/components/quiz/quiz-prompt";
 import { StoryCardSkeleton } from "@/components/skeletons/story-card-skeleton";
@@ -132,12 +132,23 @@ export default async function HomePage() {
               , and a{" "}
               <Link href="#newsletter" className="text-brand-off-white underline decoration-brand-off-white/30 underline-offset-2 transition-colors hover:text-brand-gold hover:decoration-brand-gold">weekly newsletter</Link>.
             </p>
-            <Link
-              href="/quiz"
-              className="mt-6 inline-block font-serif text-sm italic text-brand-gold transition-colors hover:text-brand-cream"
-            >
-              Six questions. Your Ubud, sorted &rarr;
-            </Link>
+            <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
+              <Button
+                asChild
+                size="lg"
+                className="bg-brand-gold text-brand-deep-green hover:bg-brand-gold/90 dark:bg-brand-gold dark:text-brand-deep-green dark:hover:bg-brand-gold/90"
+              >
+                <Link href="/experiences/3-day-ubud-reset">
+                  Start with a 3-Day Reset &rarr;
+                </Link>
+              </Button>
+              <Link
+                href="/quiz"
+                className="font-serif text-sm italic text-brand-cream/90 underline decoration-brand-cream/30 underline-offset-4 transition-colors hover:text-brand-gold hover:decoration-brand-gold/60"
+              >
+                Or take the 6-question quiz
+              </Link>
+            </div>
           </div>
 
           <div className="absolute bottom-10 left-1/2 -translate-x-1/2">
@@ -175,29 +186,34 @@ export default async function HomePage() {
           </div>
         </section>
 
-        {/* Guides (Experiences) — moved up to after Events */}
+        {/* Journeys — curated paths into Ubud */}
         <section className="flex min-h-[100dvh] items-center bg-brand-cream px-4 py-20 sm:py-28">
           <div className="mx-auto w-full max-w-6xl">
             <div className="text-center">
-              <h2 className="font-serif text-3xl font-medium text-brand-deep-green sm:text-4xl">
-                Understand the Practices
+              <p className="font-serif text-xs uppercase tracking-[0.25em] text-brand-gold">
+                Journeys
+              </p>
+              <h2 className="mt-3 font-serif text-3xl font-medium text-brand-deep-green sm:text-4xl">
+                Curated paths into Ubud
               </h2>
               <p className="mx-auto mt-4 max-w-2xl text-lg leading-relaxed text-brand-charcoal-light">
-                Evergreen guides to the practices that define life in Ubud.
+                A handful of carefully shaped multi-day threads — temples, teachers,
+                rituals, and rest — to walk through the conscious-community scene
+                without drowning in choice.
               </p>
             </div>
 
             <Suspense fallback={<ToursSkeleton />}>
-              <FeaturedExperiences />
+              <FeaturedJourneys />
             </Suspense>
 
-            <div className="mt-10 text-center">
-              <Link
-                href="/experiences"
-                className="font-semibold text-brand-deep-green underline underline-offset-4 transition-colors hover:text-brand-gold"
-              >
-                View all guides
-              </Link>
+            <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
+              <Button asChild size="lg">
+                <Link href="/experiences">Explore all journeys</Link>
+              </Button>
+              <Button asChild variant="outline" size="lg">
+                <Link href="/experiences/3-day-ubud-reset">Start the 3-Day Reset</Link>
+              </Button>
             </div>
           </div>
         </section>
