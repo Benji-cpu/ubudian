@@ -8,13 +8,6 @@ import { Loader2, Camera, Check } from "lucide-react";
 import { getActivityTrail } from "@/lib/feedback/activity-trail";
 import type { FeedbackContext } from "@/lib/feedback/capture-feedback-context";
 
-const FEEDBACK_TYPES = [
-  { value: "bug" as const, label: "Bug" },
-  { value: "suggestion" as const, label: "Suggestion" },
-  { value: "general" as const, label: "General" },
-];
-
-type FeedbackType = (typeof FEEDBACK_TYPES)[number]["value"];
 type FormState = "idle" | "success" | "error";
 
 const DRAFT_KEY = "ubudian_feedback_draft";
@@ -23,10 +16,15 @@ interface FeedbackFormProps {
   onSuccess: () => void;
   context: FeedbackContext | null;
   screenshotBlob: Blob | null;
+  screenshotPending: boolean;
 }
 
-export function FeedbackForm({ onSuccess, context, screenshotBlob }: FeedbackFormProps) {
-  const [type, setType] = useState<FeedbackType>("general");
+export function FeedbackForm({
+  onSuccess,
+  context,
+  screenshotBlob,
+  screenshotPending,
+}: FeedbackFormProps) {
   const [message, setMessage] = useState(() => {
     if (typeof window === "undefined") return "";
     return sessionStorage.getItem(DRAFT_KEY) ?? "";
@@ -36,16 +34,16 @@ export function FeedbackForm({ onSuccess, context, screenshotBlob }: FeedbackFor
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
-    const t = setTimeout(() => textareaRef.current?.focus(), 200);
+    const t = setTimeout(() => textareaRef.current?.focus(), 50);
     return () => clearTimeout(t);
   }, []);
 
-  // Auto-dismiss after success
+  // Auto-dismiss after success (brief flash)
   useEffect(() => {
     if (state === "success") {
       const t = setTimeout(() => {
         onSuccess();
-      }, 1200);
+      }, 500);
       return () => clearTimeout(t);
     }
   }, [state, onSuccess]);
@@ -68,11 +66,7 @@ export function FeedbackForm({ onSuccess, context, screenshotBlob }: FeedbackFor
     if (e) e.preventDefault();
     if (!message.trim() || message.trim().length < 10) return;
 
-    // Optimistic UX: snapshot the payload, clear the draft, flash success,
-    // close. The actual screenshot upload + feedback POST happens in the
-    // background. If anything fails we restore the draft to sessionStorage.
     const payload = {
-      type,
       message: message.trim(),
       page_url: context?.pageUrl ?? null,
       page_title: context?.pageTitle ?? null,
@@ -109,7 +103,6 @@ export function FeedbackForm({ onSuccess, context, screenshotBlob }: FeedbackFor
         });
         if (!res.ok) throw new Error("Failed to submit");
       } catch {
-        // Background failure — restore draft so the user can retry.
         sessionStorage.setItem(DRAFT_KEY, payload.message);
       }
     })();
@@ -117,9 +110,9 @@ export function FeedbackForm({ onSuccess, context, screenshotBlob }: FeedbackFor
 
   if (state === "success") {
     return (
-      <div className="flex flex-col items-center gap-2 py-8">
-        <Check className="h-8 w-8 text-[var(--brand-deep-green)]" />
-        <p className="font-medium">Thanks for your feedback!</p>
+      <div className="flex flex-col items-center gap-2 py-6">
+        <Check className="h-7 w-7 text-[var(--brand-deep-green)]" />
+        <p className="text-sm font-medium">Thanks!</p>
       </div>
     );
   }
@@ -127,55 +120,34 @@ export function FeedbackForm({ onSuccess, context, screenshotBlob }: FeedbackFor
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <Label className="mb-2 block">Type</Label>
-        <div className="flex gap-2" role="radiogroup" aria-label="Feedback type">
-          {FEEDBACK_TYPES.map((opt) => {
-            const isActive = type === opt.value;
-            return (
-              <button
-                key={opt.value}
-                type="button"
-                role="radio"
-                aria-checked={isActive}
-                onClick={() => setType(opt.value)}
-                className={
-                  "flex-1 rounded-md border px-3 py-2 text-sm transition " +
-                  (isActive
-                    ? "border-[var(--brand-deep-green)] bg-[var(--brand-deep-green)] text-white"
-                    : "border-input bg-background hover:bg-muted")
-                }
-              >
-                {opt.label}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      <div>
-        <Label htmlFor="feedback-message">Message</Label>
+        <Label htmlFor="feedback-message" className="sr-only">Message</Label>
         <Textarea
           ref={textareaRef}
           id="feedback-message"
           value={message}
           onChange={(e) => persistDraft(e.target.value.slice(0, 2000))}
           onKeyDown={(e) => {
-            if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+            if (e.key === "Enter" && !e.shiftKey) {
               e.preventDefault();
               if (message.trim().length >= 10) handleSubmit();
             }
           }}
-          placeholder="Tell us what you think... (min 10 characters; ⌘/Ctrl+Enter to send)"
-          className="mt-1 min-h-[100px]"
+          placeholder="Tell us what you think… (min 10 characters; Enter to send, Shift+Enter for a new line)"
+          className="mt-1 min-h-[110px]"
         />
         <div className="mt-1 flex items-center justify-between text-xs text-muted-foreground">
           <span>{message.length}/2000</span>
-          {screenshotBlob && (
+          {screenshotBlob ? (
             <span className="inline-flex items-center gap-1">
               <Camera className="h-3 w-3" />
               Screenshot attached
             </span>
-          )}
+          ) : screenshotPending ? (
+            <span className="inline-flex items-center gap-1 opacity-70">
+              <Loader2 className="h-3 w-3 animate-spin" />
+              Capturing screenshot…
+            </span>
+          ) : null}
         </div>
       </div>
 
@@ -208,7 +180,7 @@ export function FeedbackForm({ onSuccess, context, screenshotBlob }: FeedbackFor
             Retry
           </>
         ) : (
-          "Send Feedback"
+          "Send"
         )}
       </Button>
     </form>
