@@ -301,6 +301,12 @@ export interface JourneyTestimonial {
   updated_at: string;
 }
 
+export interface SavedJourney {
+  profile_id: string;
+  journey_id: string;
+  created_at: string;
+}
+
 /**
  * A `JourneyDay` enriched with its ordered slots and (optionally) the resolved
  * atom candidates per slot — the shape the public journey detail page consumes.
