@@ -41,6 +41,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { JourneyAtomsAdmin } from "@/components/admin/journey-atoms-admin";
+import { JourneyTestimonialsAdmin } from "@/components/admin/journey-testimonials-admin";
+import { JourneyDaysAdmin } from "@/components/admin/journey-days-admin";
 import { Loader2, Trash2 } from "lucide-react";
 import type { Journey, JourneyTier } from "@/types";
 
@@ -177,6 +181,15 @@ export function JourneyForm({ initialData }: JourneyFormProps) {
 
   return (
     <Form {...form}>
+      <Tabs defaultValue="identity" className="space-y-6">
+        <TabsList className="w-full justify-start overflow-x-auto">
+          <TabsTrigger value="identity">Identity</TabsTrigger>
+          {isEditMode && <TabsTrigger value="days">Days</TabsTrigger>}
+          {isEditMode && <TabsTrigger value="atoms">Atoms</TabsTrigger>}
+          {isEditMode && <TabsTrigger value="testimonials">Testimonials</TabsTrigger>}
+        </TabsList>
+
+        <TabsContent value="identity">
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
         {form.formState.errors.root && (
           <div className="rounded-md border border-destructive bg-destructive/10 p-3 text-sm text-destructive">
@@ -527,6 +540,32 @@ export function JourneyForm({ initialData }: JourneyFormProps) {
           )}
         </div>
       </form>
+        </TabsContent>
+
+        {isEditMode && (
+          <TabsContent value="days">
+            <JourneyDaysAdmin
+              journeyId={initialData.id}
+              journeyLengthDays={initialData.length_days}
+            />
+          </TabsContent>
+        )}
+
+        {isEditMode && (
+          <TabsContent value="atoms">
+            <JourneyAtomsAdmin />
+          </TabsContent>
+        )}
+
+        {isEditMode && (
+          <TabsContent value="testimonials">
+            <JourneyTestimonialsAdmin
+              journeyId={initialData.id}
+              journeyLengthDays={initialData.length_days}
+            />
+          </TabsContent>
+        )}
+      </Tabs>
     </Form>
   );
 }
