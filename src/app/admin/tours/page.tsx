@@ -7,7 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Plus, MapPin, Compass, Sparkles } from "lucide-react";
+import { Plus, MapPin, Compass, Sparkles, Users, Building } from "lucide-react";
 import { ToursTabs } from "@/components/admin/tours/tours-tabs";
 import type { Tour, Experience } from "@/types";
 
@@ -41,6 +41,18 @@ export default async function AdminToursPage() {
               <Link href="/admin/journeys">
                 <Sparkles className="mr-2 h-4 w-4" />
                 Ubud Retreats
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href="/admin/practitioners">
+                <Users className="mr-2 h-4 w-4" />
+                Practitioners
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href="/admin/partners">
+                <Building className="mr-2 h-4 w-4" />
+                Partners
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
