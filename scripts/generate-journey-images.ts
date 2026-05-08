@@ -39,8 +39,12 @@ interface Spec {
   id: string;                 // slug-style identifier for logs
   prompt: string;             // the *subject* — STYLE_LOCK is appended
   aspect: Aspect;
-  // Where to write the resulting URL
-  target: { table: "journeys" | "journey_days" | "journey_atoms"; column: string; whereId: string };
+  // Where to write the resulting URL — `null` means standalone (just upload,
+  // log the URL, don't write anywhere). Used for the listing hero where the
+  // page references the storage path directly.
+  target:
+    | { table: "journeys" | "journey_days" | "journey_atoms" | "practitioners"; column: string; whereId: string }
+    | null;
 }
 
 // ---------------------------------------------------------------------------
@@ -180,6 +184,40 @@ const SPECS: Spec[] = [
     aspect: "1:1",
     target: { table: "journey_atoms", column: "image_url", whereId: "00000000-0000-0000-0000-00000000a304" },
   },
+
+  // -- Practitioner portraits (symbolic — no faces; objects + lineage cues, 1:1)
+  {
+    id: "practitioner:krishna",
+    prompt: "A shamanic frame drum resting on a folded woven blanket, candlelight beside it, breath visible in cool air, no people, intimate ceremonial still life",
+    aspect: "1:1",
+    target: { table: "practitioners", column: "photo_url", whereId: "00000000-0000-0000-0000-0000000c00a1" },
+  },
+  {
+    id: "practitioner:nina",
+    prompt: "Soft hands in golden light gently resting on a folded white linen sheet, an arrangement of small singing bowls in the background, no faces, intimate therapeutic space",
+    aspect: "1:1",
+    target: { table: "practitioners", column: "photo_url", whereId: "00000000-0000-0000-0000-0000000c00a2" },
+  },
+  {
+    id: "practitioner:ketut-arsana",
+    prompt: "A traditional Balinese healing still life — copper bowl of warm coconut oil, woven offerings of frangipani petals, pestle and mortar with herbs, no people, sacred and aged",
+    aspect: "1:1",
+    target: { table: "practitioners", column: "photo_url", whereId: "00000000-0000-0000-0000-0000000c00a3" },
+  },
+  {
+    id: "practitioner:made-nawa",
+    prompt: "A Traditional Chinese Medicine still life — copper acupuncture needles, ginger root, dried herbs in a small ceramic dish, calligraphy brush, intimate quiet light",
+    aspect: "1:1",
+    target: { table: "practitioners", column: "photo_url", whereId: "00000000-0000-0000-0000-0000000c00a4" },
+  },
+
+  // -- Listing-page hero (16:9, standalone — page references the path directly)
+  {
+    id: "listing-hero",
+    prompt: "A wide atmospheric Ubud panorama at dawn — terraced rice fields stepping down through mist into a deep green valley, a stone path winding between palms, no people, painterly cinematic, golden light breaking",
+    aspect: "16:9",
+    target: null,
+  },
 ];
 
 // ---------------------------------------------------------------------------
@@ -215,7 +253,7 @@ async function uploadAndPublic(buffer: Buffer, slotId: string): Promise<string> 
   return data.publicUrl;
 }
 
-async function currentValue(target: Spec["target"]): Promise<string | null> {
+async function currentValue(target: NonNullable<Spec["target"]>): Promise<string | null> {
   const { data } = await supabase
     .from(target.table)
     .select(target.column)
@@ -225,7 +263,7 @@ async function currentValue(target: Spec["target"]): Promise<string | null> {
   return ((data as Record<string, string | null> | null)?.[target.column] ?? null);
 }
 
-async function writeUrl(target: Spec["target"], url: string): Promise<void> {
+async function writeUrl(target: NonNullable<Spec["target"]>, url: string): Promise<void> {
   const { error } = await supabase
     .from(target.table)
     .update({ [target.column]: url })
@@ -242,7 +280,7 @@ async function main() {
   for (const spec of SPECS) {
     if (argOnly && spec.id !== argOnly) continue;
 
-    if (!argForce) {
+    if (!argForce && spec.target) {
       const existing = await currentValue(spec.target);
       if (existing) {
         console.log(`SKIP  ${spec.id} — already populated`);
@@ -254,7 +292,9 @@ async function main() {
     try {
       const buf = await generate(spec.prompt, spec.aspect);
       const url = await uploadAndPublic(buf, spec.id);
-      await writeUrl(spec.target, url);
+      if (spec.target) {
+        await writeUrl(spec.target, url);
+      }
       console.log(` OK\n      ${url}`);
     } catch (err) {
       console.log(` FAIL\n      ${err instanceof Error ? err.message : err}`);
