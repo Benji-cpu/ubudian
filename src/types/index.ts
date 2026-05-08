@@ -125,6 +125,7 @@ export interface Event {
   is_placeholder: boolean;
   is_core: boolean;
   archetype_tags: ArchetypeId[];
+  intent_tags: GuideIntent[];
   // Ingestion fields
   source_id: string | null;
   source_event_id: string | null;
