@@ -9,6 +9,7 @@ const settingsSchema = z.object({
   stories_enabled: z.boolean(),
   tours_enabled: z.boolean(),
   newsletter_archive_enabled: z.boolean(),
+  guides_enabled: z.boolean(),
 });
 
 export async function PATCH(request: Request) {

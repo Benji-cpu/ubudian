@@ -30,6 +30,11 @@ const SECTIONS: { key: SectionKey; label: string; description: string }[] = [
     label: "Newsletter archive",
     description: "Public access to /newsletter and past editions. Signup stays on everywhere regardless.",
   },
+  {
+    key: "guides_enabled",
+    label: "Guides",
+    description: "Public access to /guides — practical Survival Guide content and intent-based playbooks.",
+  },
 ];
 
 export function SettingsForm({ initial }: { initial: SiteSettings }) {
@@ -41,7 +46,8 @@ export function SettingsForm({ initial }: { initial: SiteSettings }) {
     values.blog_enabled !== initial.blog_enabled ||
     values.stories_enabled !== initial.stories_enabled ||
     values.tours_enabled !== initial.tours_enabled ||
-    values.newsletter_archive_enabled !== initial.newsletter_archive_enabled;
+    values.newsletter_archive_enabled !== initial.newsletter_archive_enabled ||
+    values.guides_enabled !== initial.guides_enabled;
 
   async function handleSave() {
     setSaving(true);

@@ -52,6 +52,50 @@ export interface Story {
   updated_at: string;
 }
 
+export type GuideTier = "practical" | "intent";
+export type GuideStatus = "draft" | "published" | "archived";
+export type GuideIntent =
+  | "romance"
+  | "community"
+  | "spirit"
+  | "living"
+  | "local_culture";
+export type GuideShortcodeKind =
+  | "event"
+  | "practitioner"
+  | "place"
+  | "partner"
+  | "story"
+  | "retreat";
+
+export interface Guide {
+  id: string;
+  slug: string;
+  tier: GuideTier;
+  title: string;
+  subtitle: string | null;
+  hero_quote: string | null;
+  intro_md: string | null;
+  body_md: string;
+  intent_tags: GuideIntent[];
+  archetype_tags: ArchetypeId[];
+  status: GuideStatus;
+  is_members_only: boolean;
+  is_editors_pick: boolean;
+  editors_pick_position: number | null;
+  reading_time_min: number | null;
+  hero_image_url: string | null;
+  card_image_url: string | null;
+  linked_retreat_id: string | null;
+  related_guide_slugs: string[];
+  field_tested_by: string | null;
+  last_updated_at: string | null;
+  published_at: string | null;
+  created_at: string;
+  updated_at: string;
+  sort_order: number;
+}
+
 export interface Event {
   id: string;
   title: string;
