@@ -238,6 +238,10 @@ export interface JourneyAtom {
   theme_tags: string[];
   archetype_tags: ArchetypeId[];
   image_url: string | null;
+  /** Plain-text caption shown under atom images (e.g. "Photo: @hujanlocale", "Representative · visit Hujan Locale"). */
+  image_credit: string | null;
+  /** Optional link target for the credit caption — usually the venue's site or IG. */
+  image_credit_url: string | null;
   affiliate_url: string | null;
   event_id: string | null;
   practitioner_id: string | null;
