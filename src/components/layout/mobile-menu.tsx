@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -29,6 +29,36 @@ export function MobileMenu({
 }) {
   const [open, setOpen] = useState(false);
   const router = useRouter();
+  // Whether we own a synthetic history entry for the open sheet, so we
+  // can pop it back off when the user closes via the X / a link.
+  const pushedEntry = useRef(false);
+
+  // When the sheet opens, push a synthetic history state so the OS Back
+  // gesture pops *that* entry (closing the sheet) instead of navigating
+  // away from the page.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (open && !pushedEntry.current) {
+      window.history.pushState({ ubudianMenu: true }, "");
+      pushedEntry.current = true;
+    }
+
+    function onPop() {
+      if (open) setOpen(false);
+      pushedEntry.current = false;
+    }
+
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, [open]);
+
+  function closeFromUI() {
+    setOpen(false);
+    if (pushedEntry.current && typeof window !== "undefined") {
+      pushedEntry.current = false;
+      window.history.back();
+    }
+  }
 
   const visibleLinks = NAV_LINKS.filter((link) => {
     const flag = HREF_TO_FLAG[link.href];
@@ -38,12 +68,21 @@ export function MobileMenu({
   async function handleSignOut() {
     const supabase = createClient();
     await supabase.auth.signOut();
-    setOpen(false);
+    closeFromUI();
     router.refresh();
   }
 
   return (
-    <Sheet open={open} onOpenChange={setOpen}>
+    <Sheet
+      open={open}
+      onOpenChange={(next) => {
+        if (next) {
+          setOpen(true);
+        } else {
+          closeFromUI();
+        }
+      }}
+    >
       <SheetTrigger asChild>
         <Button
           variant="ghost"
@@ -82,7 +121,7 @@ export function MobileMenu({
             <Link
               key={link.href}
               href={link.href}
-              onClick={() => setOpen(false)}
+              onClick={closeFromUI}
               className="font-serif text-xl text-brand-off-white/90 transition-colors hover:text-brand-gold"
             >
               {link.label}
@@ -91,7 +130,7 @@ export function MobileMenu({
           {profile && (
             <Link
               href="/dashboard"
-              onClick={() => setOpen(false)}
+              onClick={closeFromUI}
               className="flex items-center gap-2 font-serif text-xl text-brand-gold transition-colors hover:text-brand-off-white"
             >
               <LayoutDashboard className="h-4 w-4" />
@@ -101,7 +140,7 @@ export function MobileMenu({
           {profile?.role === "admin" && (
             <Link
               href="/admin"
-              onClick={() => setOpen(false)}
+              onClick={closeFromUI}
               className="flex items-center gap-2 font-serif text-xl text-brand-gold transition-colors hover:text-brand-off-white"
             >
               <Shield className="h-4 w-4" />
@@ -137,7 +176,7 @@ export function MobileMenu({
             <div className="flex justify-center">
               <Link
                 href="/login"
-                onClick={() => setOpen(false)}
+                onClick={closeFromUI}
               >
                 <Button className="bg-brand-gold text-brand-deep-green hover:bg-brand-gold/90">
                   Sign In
