@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { queryWithRetry } from "@/lib/supabase/retry";
 import { StoryCard } from "@/components/stories/story-card";
 import { ThemeFilter } from "@/components/stories/theme-filter";
+import { CrossSectionRibbon } from "@/components/journeys/cross-section-ribbon";
 import { getSiteSettings } from "@/lib/site-settings";
 import type { Story } from "@/types";
 
@@ -63,6 +64,11 @@ export default async function StoriesPage({ searchParams }: StoriesPageProps) {
           </p>
         </div>
       </section>
+
+      <CrossSectionRibbon
+        pitch="Want a curated retreat where you'll actually meet some of these humans?"
+        cta="See the retreats"
+      />
 
       {/* Filters + Grid */}
       <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">

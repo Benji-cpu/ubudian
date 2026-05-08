@@ -15,11 +15,12 @@ import { EventSearch } from "@/components/events/event-search";
 import { CategoryGuideLink } from "@/components/events/category-guide-link";
 import { MapView } from "@/components/events/map-view";
 import { RefreshOnFocus } from "@/components/events/refresh-on-focus";
+import { CrossSectionRibbon } from "@/components/journeys/cross-section-ribbon";
 import { nowInBali } from "@/lib/events/bali-time";
 import type { ArchetypeId, Event, Experience, QuizResultRecord } from "@/types";
 
 export const metadata: Metadata = {
-  title: "Events in Ubud | The Ubudian",
+  title: "Events in Ubud",
   description:
     "Tantra workshops, sound journeys, breathwork, ecstatic dance, medicine song circles, and sacred ceremonies happening in Ubud this week.",
 };
@@ -203,6 +204,11 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
           </Button>
         </div>
       </section>
+
+      <CrossSectionRibbon
+        pitch="Don't want to plan it day-by-day? We've curated multi-day retreats."
+        cta="See the curated retreats"
+      />
 
       {/* Controls */}
       <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">

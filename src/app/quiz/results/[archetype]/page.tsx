@@ -9,6 +9,7 @@ import { EventCard } from "@/components/events/event-card";
 import { TourCard } from "@/components/tours/tour-card";
 import { StoryCard } from "@/components/stories/story-card";
 import { ExperienceCard } from "@/components/experiences/experience-card";
+import { RecommendedRetreatCta } from "@/components/journeys/recommended-retreat-cta";
 import { Button } from "@/components/ui/button";
 import { SITE_URL } from "@/lib/constants";
 import type { ArchetypeId, Event, Tour, Story, Experience } from "@/types";
@@ -28,7 +29,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!archetype) return {};
 
   return {
-    title: `${archetype.name} — Ubud Spirit | The Ubudian`,
+    title: `${archetype.name} — Ubud Spirit`,
     description: archetype.tagline + ". " + archetype.description.slice(0, 150) + "...",
     openGraph: {
       title: `I'm ${archetype.name}! Discover Your Ubud Spirit`,
@@ -148,6 +149,12 @@ export default async function ArchetypeResultPage({ params }: PageProps) {
             </Link>
           </Button>
         </div>
+      </div>
+
+      {/* Recommended retreat — full-bleed band */}
+      <RecommendedRetreatCta primary={archetype.id} />
+
+      <div className="mx-auto max-w-3xl px-4 pt-12">
 
         {/* Take the quiz CTA */}
         <div className="mt-8 rounded-xl border border-brand-gold/30 bg-brand-gold/5 p-6 text-center">

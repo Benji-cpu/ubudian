@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { TourCard } from "@/components/tours/tour-card";
 import { NewsletterSignup } from "@/components/layout/newsletter-signup";
+import { CrossSectionRibbon } from "@/components/journeys/cross-section-ribbon";
 import { getSiteSettings } from "@/lib/site-settings";
 import type { Tour } from "@/types";
 
@@ -48,6 +49,11 @@ export default async function ToursPage() {
           </p>
         </div>
       </section>
+
+      <CrossSectionRibbon
+        pitch="Tours are day-shaped. Looking for something multi-day?"
+        cta="See the curated retreats"
+      />
 
       {/* Tours Grid */}
       <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
