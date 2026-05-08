@@ -253,6 +253,50 @@ export async function parseEventFromText(text: string): Promise<ParsedEvent[]> {
 }
 
 /**
+ * Parse an event flyer image (already loaded into memory) using Gemini
+ * Vision. Used when the image arrives via direct upload (e.g. user
+ * pasting a flyer into the submit-event form) so we don't need to round
+ * trip through external storage.
+ */
+export async function parseEventFromImageBuffer(
+  imageBuffer: Buffer,
+  mimeType: string,
+  additionalText?: string
+): Promise<ParsedEvent[]> {
+  const ai = getGenAI();
+  const model = ai.getGenerativeModel({
+    model: "gemini-2.5-flash-lite",
+    generationConfig: {
+      responseMimeType: "application/json",
+      responseSchema: parsedEventSchema,
+    },
+  });
+
+  const base64 = imageBuffer.toString("base64");
+  const parts: Parameters<typeof model.generateContent>[0] = [
+    PARSE_EVENT_IMAGE_PROMPT,
+    { inlineData: { mimeType, data: base64 } },
+  ];
+  if (additionalText) {
+    (parts as unknown[]).push(`\nAdditional context from message text:\n${additionalText}`);
+  }
+
+  const result = await withLLMRetry(
+    () => model.generateContent(parts),
+    "parseEventFromImageBuffer"
+  );
+
+  const response = result.response.text();
+  try {
+    const parsed = JSON.parse(response);
+    const events = parsed.events || [parsed];
+    return events as ParsedEvent[];
+  } catch {
+    throw new LLMApiError(`Failed to parse image-buffer event response: ${response}`, false);
+  }
+}
+
+/**
  * Parse an event flyer image using Gemini Vision.
  * Fetches the image from URL and sends it to Gemini for analysis.
  */

@@ -29,6 +29,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { DatePicker } from "@/components/admin/date-picker";
 import { TimePicker } from "@/components/admin/time-picker";
 import { Loader2, CheckCircle2 } from "lucide-react";
+import { AiDumpBlock, type AiDumpResult } from "./ai-dump-block";
 
 const submissionSchema = z.object({
   title: z.string().min(1, "Event title is required").max(200),
@@ -86,6 +87,39 @@ export function EventSubmissionForm() {
 
   const isRecurring = form.watch("is_recurring");
 
+  function applyAiDraft(draft: AiDumpResult) {
+    function set<K extends keyof SubmissionFormValues>(
+      field: K,
+      value: SubmissionFormValues[K]
+    ) {
+      form.setValue(field, value, { shouldDirty: true, shouldValidate: false });
+    }
+    if (draft.title) set("title", draft.title);
+    if (draft.description) set("description", draft.description);
+    if (draft.short_description) set("short_description", draft.short_description);
+    if (draft.category && EVENT_CATEGORIES.includes(draft.category as (typeof EVENT_CATEGORIES)[number])) {
+      set("category", draft.category);
+    }
+    if (draft.start_date) {
+      const d = new Date(draft.start_date);
+      if (!isNaN(d.getTime())) set("start_date", d);
+    }
+    if (draft.end_date) {
+      const d = new Date(draft.end_date);
+      if (!isNaN(d.getTime())) set("end_date", d);
+    }
+    if (draft.start_time) set("start_time", draft.start_time);
+    if (draft.end_time) set("end_time", draft.end_time);
+    if (draft.venue_name) set("venue_name", draft.venue_name);
+    if (draft.venue_address) set("venue_address", draft.venue_address);
+    if (draft.price_info) set("price_info", draft.price_info);
+    if (draft.external_ticket_url) set("external_ticket_url", draft.external_ticket_url);
+    if (draft.organizer_name) set("organizer_name", draft.organizer_name);
+    if (draft.organizer_contact) set("organizer_contact", draft.organizer_contact);
+    if (draft.organizer_instagram) set("organizer_instagram", draft.organizer_instagram);
+    if (typeof draft.is_recurring === "boolean") set("is_recurring", draft.is_recurring);
+  }
+
   async function onSubmit(data: SubmissionFormValues) {
     setStatus("loading");
 
@@ -134,6 +168,8 @@ export function EventSubmissionForm() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <AiDumpBlock onParsed={applyAiDraft} />
+
         {status === "error" && (
           <div className="rounded-md border border-destructive bg-destructive/10 p-3 text-sm text-destructive">
             {errorMessage}
