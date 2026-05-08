@@ -2,6 +2,9 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowLeft, ArrowUpRight, Clock } from "lucide-react";
 import { GuideMarkdown } from "@/components/guides/guide-markdown";
+import { GuideToc } from "@/components/guides/guide-toc";
+import { GuideOutOfDateLink } from "@/components/guides/guide-out-of-date-link";
+import { extractToc } from "@/lib/guides/toc";
 import type { Guide } from "@/types";
 import type { ResolvedRefs } from "@/lib/guides/shortcodes";
 
@@ -23,6 +26,7 @@ function formatLastUpdated(iso: string | null): string | null {
 
 export function PracticalGuide({ guide, resolved }: PracticalGuideProps) {
   const updatedAt = formatLastUpdated(guide.last_updated_at) ?? formatLastUpdated(guide.updated_at);
+  const toc = extractToc(guide.body_md);
 
   return (
     <article className="bg-white">
@@ -84,6 +88,8 @@ export function PracticalGuide({ guide, resolved }: PracticalGuideProps) {
         </div>
       </header>
 
+      <GuideToc entries={toc} />
+
       {/* Body */}
       <section className="mx-auto max-w-3xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
         {guide.intro_md && (
@@ -112,13 +118,16 @@ export function PracticalGuide({ guide, resolved }: PracticalGuideProps) {
               updatedAt && <>Last updated {updatedAt}.</>
             )}
           </div>
-          <Link
-            href="/guides"
-            className="inline-flex items-center gap-1.5 text-xs uppercase tracking-[0.16em] text-brand-deep-green transition-colors hover:text-primary"
-          >
-            More guides
-            <ArrowUpRight className="h-3.5 w-3.5" />
-          </Link>
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
+            <GuideOutOfDateLink guideTitle={guide.title} />
+            <Link
+              href="/guides"
+              className="inline-flex items-center gap-1.5 text-xs uppercase tracking-[0.16em] text-brand-deep-green transition-colors hover:text-primary"
+            >
+              More guides
+              <ArrowUpRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
         </div>
       </footer>
     </article>

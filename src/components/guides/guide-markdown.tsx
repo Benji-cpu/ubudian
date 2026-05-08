@@ -1,6 +1,7 @@
 import ReactMarkdown, { type Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Fragment } from "react";
+import { slugify } from "@/lib/utils";
 import {
   parseShortcodes,
   type ParsedNode,
@@ -41,6 +42,8 @@ export function GuideMarkdown({
         <Fragment key={i}>
           {seg.kind === "card" ? (
             <ShortcodeCard node={seg.node} resolved={resolved} />
+          ) : seg.kind === "pullquote" ? (
+            <PullQuote text={seg.text} variant={variant} />
           ) : (
             <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
               {seg.markdown}
@@ -50,6 +53,47 @@ export function GuideMarkdown({
       ))}
     </div>
   );
+}
+
+function PullQuote({
+  text,
+  variant,
+}: {
+  text: string;
+  variant: "practical" | "intent";
+}) {
+  if (variant === "practical") {
+    return (
+      <blockquote className="my-10 border-l-2 border-brand-gold/50 pl-6 font-serif text-xl leading-snug text-brand-deep-green sm:text-2xl">
+        {text}
+      </blockquote>
+    );
+  }
+  return (
+    <blockquote className="my-14 border-y border-brand-gold/30 px-2 py-10 text-center font-serif text-2xl font-medium leading-snug text-brand-deep-green sm:text-3xl md:text-4xl">
+      <span aria-hidden className="block pb-3 text-3xl text-brand-gold/70 sm:text-4xl">
+        “
+      </span>
+      {text}
+    </blockquote>
+  );
+}
+
+function headingId(children: React.ReactNode): string | undefined {
+  // Mirrors extractToc's slugify of the H2 plain text.
+  const text = childrenToText(children).trim();
+  if (!text) return undefined;
+  return slugify(text);
+}
+
+function childrenToText(node: React.ReactNode): string {
+  if (typeof node === "string") return node;
+  if (typeof node === "number") return String(node);
+  if (Array.isArray(node)) return node.map(childrenToText).join("");
+  if (node && typeof node === "object" && "props" in node) {
+    return childrenToText((node as { props: { children: React.ReactNode } }).props.children);
+  }
+  return "";
 }
 
 function inlineLinkRenderer(resolved: ResolvedRefs) {
@@ -84,7 +128,10 @@ function intentComponents(resolved: ResolvedRefs): Components {
   return {
     a: inlineLinkRenderer(resolved),
     h2: ({ children }) => (
-      <h2 className="mt-16 mb-6 font-serif text-3xl font-medium leading-tight text-brand-deep-green sm:text-4xl">
+      <h2
+        id={headingId(children)}
+        className="scroll-mt-32 mt-16 mb-6 font-serif text-3xl font-medium leading-tight text-brand-deep-green sm:text-4xl"
+      >
         {children}
       </h2>
     ),
@@ -137,7 +184,10 @@ function practicalComponents(resolved: ResolvedRefs): Components {
   return {
     a: inlineLinkRenderer(resolved),
     h2: ({ children }) => (
-      <h2 className="mt-14 mb-5 border-t border-brand-gold/25 pt-10 font-serif text-2xl font-medium tracking-tight text-brand-deep-green sm:text-3xl">
+      <h2
+        id={headingId(children)}
+        className="scroll-mt-32 mt-14 mb-5 border-t border-brand-gold/25 pt-10 font-serif text-2xl font-medium tracking-tight text-brand-deep-green sm:text-3xl"
+      >
         {children}
       </h2>
     ),
@@ -184,20 +234,40 @@ function practicalComponents(resolved: ResolvedRefs): Components {
 
 type Segment =
   | { kind: "markdown"; markdown: string }
-  | { kind: "card"; node: Extract<ParsedNode, { type: "shortcode" }> };
+  | { kind: "card"; node: Extract<ParsedNode, { type: "shortcode" }> }
+  | { kind: "pullquote"; text: string };
+
+const PULLQUOTE_RE = /\{\{pullquote\}\}([\s\S]*?)\{\{\/pullquote\}\}/g;
 
 function splitIntoSegments(body: string): Segment[] {
-  const nodes = parseShortcodes(body);
   const segments: Segment[] = [];
-  let buffer = "";
+  let cursor = 0;
+  for (const match of body.matchAll(PULLQUOTE_RE)) {
+    const start = match.index ?? 0;
+    if (start > cursor) {
+      pushChunk(segments, body.slice(cursor, start));
+    }
+    segments.push({ kind: "pullquote", text: match[1].trim() });
+    cursor = start + match[0].length;
+  }
+  if (cursor < body.length) {
+    pushChunk(segments, body.slice(cursor));
+  }
+  if (segments.length === 0) {
+    pushChunk(segments, body);
+  }
+  return segments;
+}
 
+function pushChunk(segments: Segment[], chunk: string) {
+  const nodes = parseShortcodes(chunk);
+  let buffer = "";
   const flush = () => {
     if (buffer.length > 0) {
       segments.push({ kind: "markdown", markdown: buffer });
       buffer = "";
     }
   };
-
   for (const node of nodes) {
     if (node.type === "text") {
       buffer += node.value;
@@ -211,6 +281,4 @@ function splitIntoSegments(body: string): Segment[] {
     buffer += `[${node.slug}](__sc__:${node.kind}:${node.slug})`;
   }
   flush();
-
-  return segments;
 }
