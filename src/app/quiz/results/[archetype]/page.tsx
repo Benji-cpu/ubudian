@@ -5,6 +5,8 @@ import { createClient } from "@/lib/supabase/server";
 import { ARCHETYPES, ARCHETYPE_IDS } from "@/lib/quiz-data";
 import { getEventsForArchetype, getToursForArchetype, getStoriesForArchetype, getExperiencesForArchetype } from "@/lib/quiz-helpers";
 import { getGuidesForArchetype } from "@/lib/guides/match-archetype";
+import { getStarterPack } from "@/lib/guides/starter-packs";
+import { getGuidesByRelatedSlugs } from "@/lib/guides/queries";
 import { getSiteSettings } from "@/lib/site-settings";
 import { QuizArchetypeCard } from "@/components/quiz/quiz-archetype-card";
 import { EventCard } from "@/components/events/event-card";
@@ -123,6 +125,13 @@ export default async function ArchetypeResultPage({ params }: PageProps) {
   const matchedGuides = settings.guides_enabled
     ? getGuidesForArchetype(guides, archetype.id, 3)
     : [];
+
+  // Starter pack — sequenced reading order keyed by archetype.
+  const starterPack = settings.guides_enabled ? getStarterPack(archetype.id) : null;
+  const starterGuides: Guide[] = starterPack
+    ? await getGuidesByRelatedSlugs(starterPack.slugs)
+    : [];
+
   const otherArchetypes = ARCHETYPE_IDS.filter((id) => id !== archetype.id);
 
   return (
@@ -168,6 +177,38 @@ export default async function ArchetypeResultPage({ params }: PageProps) {
           </Button>
         </div>
       </div>
+
+      {/* Starter-pack panel — ordered reading sequence */}
+      {starterPack && starterGuides.length > 0 && (
+        <section className="border-y border-brand-gold/15 bg-brand-cream/40 py-14">
+          <div className="mx-auto max-w-5xl px-4 sm:px-6">
+            <div className="mb-8 max-w-2xl">
+              <p className="text-[11px] uppercase tracking-[0.22em] text-brand-gold">
+                Start here, in this order
+              </p>
+              <h2 className="mt-3 font-serif text-2xl font-medium text-brand-deep-green sm:text-3xl">
+                A reading sequence for The {archetype.name}
+              </h2>
+              <p className="mt-4 text-base leading-relaxed text-brand-charcoal-light">
+                {starterPack.intro}
+              </p>
+            </div>
+            <ol className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+              {starterGuides.map((g, i) => (
+                <li key={g.id} className="flex flex-col">
+                  <span className="mb-3 inline-flex h-7 w-7 items-center justify-center rounded-full border border-brand-gold/50 font-serif text-sm text-brand-deep-green">
+                    {i + 1}
+                  </span>
+                  <GuideCard
+                    guide={g}
+                    variant={g.tier === "intent" ? "intent-medium" : "practical"}
+                  />
+                </li>
+              ))}
+            </ol>
+          </div>
+        </section>
+      )}
 
       {/* Recommended retreat — full-bleed band */}
       <RecommendedRetreatCta primary={archetype.id} />
