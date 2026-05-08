@@ -224,3 +224,14 @@ html.snap-homepage section {
 .retreat-reveal {
   opacity: 1;
 }
+
+/*
+ * Leaflet stacking-context containment.
+ * Why: Leaflet's internal panes (200–700) and controls (1000) use high
+ * z-indexes that, without a stacking context on the container, render above
+ * our fixed nav (z-50). `isolation: isolate` scopes those z-indexes to the
+ * map. Applies to all Leaflet maps (journey-map, events map-view, event-map).
+ */
+.leaflet-container {
+  isolation: isolate;
+}
