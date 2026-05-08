@@ -13,6 +13,7 @@ import { JourneyJsonLd } from "@/components/journeys/journey-json-ld";
 import { JourneyTestimonials } from "@/components/journeys/journey-testimonials";
 import { JourneyFaq } from "@/components/journeys/journey-faq";
 import { WhatsIncludedIcons } from "@/components/journeys/whats-included-icons";
+import { DifferentiatorStrip } from "@/components/journeys/differentiator-strip";
 import { JourneyGuides } from "@/components/journeys/journey-guides";
 import { JourneyDayTabs } from "@/components/journeys/journey-day-tabs";
 import { JourneyMap } from "@/components/journeys/journey-map";
@@ -295,6 +296,13 @@ export default async function JourneyPage({ params }: JourneyPageProps) {
           </h2>
           <WhatsIncludedIcons variant="card" />
         </section>
+      </div>
+
+      {/* Differentiator — typographic moment between summary and the day-by-day */}
+      <DifferentiatorStrip />
+
+      <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+
 
         {/* What's included — narrative (kept where author has written it) */}
         {journey.whats_included && (

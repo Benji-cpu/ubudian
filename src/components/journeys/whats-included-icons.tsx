@@ -1,10 +1,11 @@
 import {
-  BedDouble,
-  UtensilsCrossed,
-  Compass,
-  Leaf,
-  Users,
-  Sparkles,
+  DoorOpen,
+  Utensils,
+  HandHeart,
+  Moon,
+  UsersRound,
+  Sparkle,
+  type LucideIcon,
 } from "lucide-react";
 
 interface WhatsIncludedIconsProps {
@@ -12,44 +13,41 @@ interface WhatsIncludedIconsProps {
 }
 
 /**
- * Six tiles describing what every Ubud Retreat actually holds. Renders below
- * the hero summary on detail pages and above the cards on the listing.
- *
- * `card` variant — boxed, on its own background. Used on listing.
- * `inline` variant — flush, no background. Used on detail page below the
- * narrative summary, before the day-by-day.
+ * Six tiles describing what an Ubud Retreat actually delivers — phrased as
+ * relational access, not amenities. The villa, the meals, the schedule are
+ * implied; the value being sold is the introductions.
  */
 export function WhatsIncludedIcons({ variant = "card" }: WhatsIncludedIconsProps) {
-  const items: { icon: React.ComponentType<{ className?: string }>; label: string; sub: string }[] = [
+  const items: { icon: LucideIcon; label: string; sub: string }[] = [
     {
-      icon: BedDouble,
-      label: "A villa, sorted",
-      sub: "Quiet, light-filled, walking distance to your morning anchors.",
+      icon: DoorOpen,
+      label: "One door, each day",
+      sub: "Each anchor is a person, a place, or a circle you wouldn't find on your own.",
     },
     {
-      icon: UtensilsCrossed,
-      label: "Curated meals",
-      sub: "Welcome dinner and farewell pinned. The rest, hand-picked.",
+      icon: HandHeart,
+      label: "Practitioners we trust",
+      sub: "Healers, teachers, ceremony-holders we've worked with for years — not a directory.",
     },
     {
-      icon: Compass,
-      label: "One good anchor a day",
-      sub: "A ceremony, a class, a temple. Not three. Mostly.",
+      icon: Utensils,
+      label: "Tables you'd never find",
+      sub: "A welcome dinner, a long-stayer's home, a kitchen the scene actually eats at.",
     },
     {
-      icon: Leaf,
-      label: "Real rest days",
-      sub: "Built in. The rest is the practice, not a gap.",
+      icon: Moon,
+      label: "Real rest, not filler",
+      sub: "Days with nothing planned. The integration is the practice.",
     },
     {
-      icon: Users,
-      label: "A soft cohort",
-      sub: "Others walking the same arc — opt in to find them.",
+      icon: UsersRound,
+      label: "Four to eight, hand-picked",
+      sub: "A small cohort matched for fit. You arrive among strangers. You don't leave that way.",
     },
     {
-      icon: Sparkles,
-      label: "A closing reflection",
-      sub: "One voice note or written line, before you fly.",
+      icon: Sparkle,
+      label: "A field, after",
+      sub: "Phone numbers in your pocket, faces you'll see again. The week ends; the access doesn't.",
     },
   ];
 
@@ -60,15 +58,15 @@ export function WhatsIncludedIcons({ variant = "card" }: WhatsIncludedIconsProps
 
   return (
     <div className={wrapper}>
-      <ul className="grid gap-x-8 gap-y-6 sm:grid-cols-2 lg:grid-cols-3">
+      <ul className="grid gap-x-8 gap-y-7 sm:grid-cols-2 lg:grid-cols-3">
         {items.map(({ icon: Icon, label, sub }) => (
-          <li key={label} className="flex items-start gap-3">
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-deep-green/10 text-brand-deep-green">
-              <Icon className="h-5 w-5" />
+          <li key={label} className="group flex items-start gap-4">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-brand-gold/30 bg-brand-cream text-brand-deep-green transition-colors duration-300 group-hover:border-brand-gold group-hover:bg-brand-gold/10">
+              <Icon className="h-5 w-5" strokeWidth={1.25} />
             </span>
             <div className="min-w-0">
-              <p className="text-sm font-semibold text-brand-deep-green">{label}</p>
-              <p className="mt-0.5 text-sm text-muted-foreground">{sub}</p>
+              <p className="font-serif text-base font-medium text-brand-deep-green">{label}</p>
+              <p className="mt-1 text-sm leading-relaxed text-foreground/70">{sub}</p>
             </div>
           </li>
         ))}

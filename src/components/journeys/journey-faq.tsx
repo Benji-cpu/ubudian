@@ -11,9 +11,9 @@ interface JourneyFaqProps {
 }
 
 /**
- * Per-journey FAQ. Six questions a real visitor genuinely has after reading
- * the day-by-day. Answers are mostly the same across journeys but a few
- * details (length, what's pinned vs flexible) shift per journey.
+ * Per-journey FAQ. Six questions someone considering a paid retreat genuinely
+ * wants answered — about price, about who they'll meet, about coming alone,
+ * and about how the application gate works.
  */
 export function JourneyFaq({ journey }: JourneyFaqProps) {
   const faqs = buildFaqs(journey);
@@ -22,10 +22,10 @@ export function JourneyFaq({ journey }: JourneyFaqProps) {
     <section className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
       <div className="mb-6">
         <span className="text-xs uppercase tracking-[0.2em] text-brand-gold">
-          Before you book your flights
+          Before you apply
         </span>
         <h2 className="mt-2 font-serif text-2xl font-medium text-brand-deep-green sm:text-3xl">
-          Practical questions, honestly answered
+          Honest questions, honestly answered
         </h2>
       </div>
       <Accordion type="single" collapsible className="w-full">
@@ -46,30 +46,31 @@ export function JourneyFaq({ journey }: JourneyFaqProps) {
 
 function buildFaqs(journey: Journey): { q: string; a: string }[] {
   const days = journey.length_days;
+  const isShort = days <= 3;
   return [
     {
-      q: "Is this a guided retreat or a self-led guide?",
-      a: `For now, this is the guide — the recipe a knowledgeable friend would hand you. You move through the ${days} days at your own pace, on your own dates, using our pinned villas, restaurants, and practitioners alongside the live events from across Ubud. Insider members get a dashboard, daily nudges, and the soft-cohort layer that quietly connects you to others walking the same arc. A small handful of fully-bundled, fully-held cohorts run two or three times a year — capped, hand-curated, all-in price.`,
+      q: "Why is it priced where it is?",
+      a: `You're not paying for a curriculum. You're paying for the people. ${isShort ? "$1,400–1,800 per person" : "$2,400–3,400 per person"} covers the villa, the meals, the transfers, and — the part that matters — the introductions: practitioners we've worked with for years, gatherings that don't take strangers, tables you wouldn't be invited to alone. Comparable Ubud retreats sell the same villa-and-classes for more. We're priced where the conscious-community scene actually lives, not where wellness tourism does.`,
     },
     {
-      q: "Where do I stay?",
-      a: `Quiet, light-filled villas in Penestanan or Nyuh Kuning — neighbourhoods walking distance from the morning anchors and the welcome dinner restaurant. You book the villa yourself for now (we're choosy about partners and only list places we'd send our friends). For the cohort retreats, the villa is part of the bundle.`,
+      q: "Will I actually meet the community, or just attend a program?",
+      a: `That's the whole point of the format. Each day's anchor is a person, place, or circle. A healer comes to the villa for a private session, then stays for tea. A cacao circle in someone's living room — you're a guest, not a customer. A long-stayer hosts dinner and you meet five Ubudians who actually live here. By day five most cohorts have a small WhatsApp thread that keeps going long after the week ends. You leave with phone numbers, not just photographs.`,
     },
     {
-      q: "How much does this cost?",
-      a: `The retreat itself — the guide, the curation — is free to read and follow. The real cost is the things you'd be doing anyway: ${days <= 3 ? "$200–600 across three days for accommodation and meals; $30–80 for an anchor ceremony or a closing massage." : "$80–200/night for the villa across the week; $200–500 total for the anchor ceremonies, dance, dinners, and a closing massage."} Fully-bundled cohorts (when they run) are $500–1500 per person all-in.`,
+      q: "What if I'm coming alone?",
+      a: `Most people do. The cohort caps at four to eight, hand-picked for fit — we read every application. You arrive among strangers; the design of the week (shared meals, small rituals, real rest) means you don't stay strangers. If "alone" means "shy about group dynamics," say that on the application — we work with it.`,
     },
     {
-      q: "Can I do this on my own dates?",
-      a: `Yes — that's the point of the Living Guide format. The day-by-day is a flexible recipe. The system pulls real upcoming events from the calendar and matches them to whatever week you arrive. If a key ceremony only runs on Thursdays, you'll see Thursday's options. Insider self-paced (later this season) tracks state — you start whenever, mark days as done, and the soft cohort surfaces other people doing the same week.`,
+      q: "Is this a yoga retreat?",
+      a: `No. Yoga is on every corner in Ubud, and if you want a yoga-heavy week, the studios in town do that better than we ever could. This is a different shape: ${isShort ? "three days" : "a week"} of relational access into the conscious community — ceremony, breathwork, sound, embodiment, and the long meals where the actual conversations happen. If a class fits a day, fine. The class isn't the point.`,
     },
     {
-      q: "What if I want to do just one day?",
-      a: `Pull the thread. Each day's anchor is a real bookable experience in Ubud — a ceremony, a class, a temple morning. You don't need to commit to the whole retreat to use the single recommendation. The journey works as a cohesive arc; it also works as an à-la-carte pick.`,
+      q: "Solo or with a partner?",
+      a: `Both work. Most cohorts run a mix — solo travellers in private rooms, couples in shared rooms. Pricing differs slightly (single occupancy vs shared villa room). If you're applying as a couple, mention the relational work you're after; some weeks are explicitly for couples, others are mixed.`,
     },
     {
-      q: "How do I meet the others on this retreat?",
-      a: `Soft cohort opens with the Insider tier later this season — anyone walking the same retreat in Ubud the same week can opt into a small WhatsApp group plus a "who's on Day N right now" view (anonymous until both parties opt in). Self-selection does the work — you end up with people who chose the same arc you did.`,
+      q: "How does the application work?",
+      a: `Tell us a bit about who you are and what's drawing you to this particular week. We read every one. Within three days we'll either send you the payment link to hold a place, suggest a different week, or — if the fit isn't there — say so plainly. The application is what protects the cohort dynamic; it's not a sales filter.`,
     },
   ];
 }

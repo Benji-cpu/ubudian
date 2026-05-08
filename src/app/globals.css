@@ -203,3 +203,24 @@ html.snap-homepage {
 html.snap-homepage section {
   scroll-snap-align: start;
 }
+
+/* Retreats — slow ambient Ken Burns drift on hero imagery */
+@keyframes ambient-drift {
+  0%   { transform: scale(1.0)  translate(0%, 0%); }
+  100% { transform: scale(1.08) translate(-1.5%, -1%); }
+}
+
+/* Retreats — staggered reveal on scroll-in (paired with .retreat-reveal) */
+@keyframes retreat-reveal-up {
+  from { opacity: 0; transform: translateY(1.25rem); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/*
+ * Retreats — passthrough wrapper. Content is always visible. Motion polish
+ * lives on specific elements (WordReveal for hero + differentiator) where
+ * it can be scoped tightly without breaking SSR or fullPage screenshots.
+ */
+.retreat-reveal {
+  opacity: 1;
+}
