@@ -26,6 +26,7 @@ export const ADMIN_NAV_LINKS: AdminNavItem[] = [
   { type: "link", label: "Sources", href: "/admin/sources", icon: "Zap" },
   { type: "divider" },
   { type: "link", label: "Content", href: "/admin/content", icon: "FileText" },
+  { type: "link", label: "Guides", href: "/admin/guides", icon: "BookOpen" },
   { type: "link", label: "Tours", href: "/admin/tours", icon: "MapPin" },
   { type: "link", label: "Commerce", href: "/admin/commerce", icon: "CreditCard" },
   { type: "link", label: "Community", href: "/admin/community", icon: "Users" },
