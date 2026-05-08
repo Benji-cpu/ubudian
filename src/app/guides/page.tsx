@@ -39,9 +39,12 @@ export default async function GuidesPage({ searchParams }: GuidesPageProps) {
         : Promise.resolve([] as Guide[]),
     ]);
 
-  // Don't show editor's picks again in the playbooks rail.
-  const editorsPickIds = new Set(editorsPicks.map((g) => g.id));
-  const intentGuides = intentGuidesRaw.filter((g) => !editorsPickIds.has(g.id));
+  // Only dedupe the picks that actually render (top 3) — picks 4+ fall through
+  // to the playbooks rail so the section doesn't look empty when intent
+  // guides are densely flagged.
+  const displayedPicks = editorsPicks.slice(0, 3);
+  const displayedPickIds = new Set(displayedPicks.map((g) => g.id));
+  const intentGuides = intentGuidesRaw.filter((g) => !displayedPickIds.has(g.id));
 
   const intentConfig = activeIntent ? getIntentConfig(activeIntent) : null;
 
