@@ -85,9 +85,9 @@ export function PracticalGuide({ guide, resolved }: PracticalGuideProps) {
       </header>
 
       {/* Body */}
-      <section className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
+      <section className="mx-auto max-w-3xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
         {guide.intro_md && (
-          <div className="mb-12 border-l-2 border-brand-gold/40 pl-6">
+          <div className="mb-14 border-l-2 border-brand-gold/40 pl-6">
             <p className="font-serif text-xl leading-relaxed text-brand-deep-green sm:text-2xl">
               {guide.intro_md}
             </p>

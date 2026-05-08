@@ -1,11 +1,10 @@
-import ReactMarkdown from "react-markdown";
+import ReactMarkdown, { type Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Fragment } from "react";
 import {
   parseShortcodes,
   type ParsedNode,
   type ResolvedRefs,
-  lookupResolved,
 } from "@/lib/guides/shortcodes";
 import { ShortcodeCard, ShortcodeInlineLink } from "@/components/guides/shortcode-card";
 
@@ -21,66 +20,29 @@ interface GuideMarkdownProps {
  * Strategy:
  * - Card-modifier shortcodes (`{{event:slug|card}}`) are block-level — they split the
  *   body into segments, with cards rendered between markdown chunks.
- * - Inline shortcodes (no modifier) are pre-replaced with markdown links
- *   `[Title](href)` so they flow naturally inside ReactMarkdown — the custom <a>
- *   handler styles them.
+ * - Inline shortcodes (no modifier) are pre-replaced with a sentinel-href markdown
+ *   link `[slug](__sc__:kind:slug)` so they flow naturally inside ReactMarkdown — the
+ *   custom <a> handler detects the sentinel and styles them.
  * - Unresolved entities fall back to styled italic text — never broken links.
  */
-export function GuideMarkdown({ body, resolved, variant = "intent" }: GuideMarkdownProps) {
-  const proseClass =
-    variant === "intent"
-      ? "prose prose-lg max-w-none prose-headings:font-serif prose-headings:text-brand-deep-green prose-headings:font-medium prose-h2:mt-14 prose-h2:mb-6 prose-h2:text-3xl prose-h3:mt-10 prose-h3:text-xl prose-p:text-brand-charcoal-light prose-p:leading-[1.85] prose-p:text-[1.05rem] prose-blockquote:not-italic prose-blockquote:border-l-0 prose-blockquote:px-0 prose-blockquote:py-2 prose-blockquote:font-serif prose-blockquote:text-2xl prose-blockquote:text-brand-deep-green sm:prose-blockquote:text-3xl prose-blockquote:leading-snug prose-blockquote:font-medium prose-blockquote:text-center prose-blockquote:my-12 prose-strong:text-brand-deep-green prose-em:italic prose-em:text-brand-charcoal-light prose-img:rounded-sm prose-img:my-10 prose-li:text-brand-charcoal-light prose-li:leading-relaxed"
-      : "prose prose-base max-w-none prose-headings:font-serif prose-headings:text-brand-deep-green prose-headings:font-medium prose-h2:mt-12 prose-h2:mb-4 prose-h2:text-2xl prose-h3:mt-8 prose-h3:text-lg prose-p:text-brand-charcoal prose-p:leading-relaxed prose-blockquote:border-l-2 prose-blockquote:border-brand-gold/40 prose-blockquote:py-1 prose-blockquote:pl-5 prose-blockquote:italic prose-blockquote:text-brand-charcoal-light prose-strong:text-brand-deep-green prose-img:rounded-sm prose-li:text-brand-charcoal";
+export function GuideMarkdown({
+  body,
+  resolved,
+  variant = "intent",
+}: GuideMarkdownProps) {
+  const segments = splitIntoSegments(body);
 
-  const segments = splitIntoSegments(body, resolved);
+  const components: Components =
+    variant === "intent" ? intentComponents(resolved) : practicalComponents(resolved);
 
   return (
-    <div className={proseClass}>
+    <div className="font-sans text-brand-charcoal-light">
       {segments.map((seg, i) => (
         <Fragment key={i}>
           {seg.kind === "card" ? (
             <ShortcodeCard node={seg.node} resolved={resolved} />
           ) : (
-            <ReactMarkdown
-              remarkPlugins={[remarkGfm]}
-              components={{
-                a: ({ href, children }) => {
-                  // Sentinel-prefixed hrefs are inline shortcodes — render via the styled link.
-                  if (typeof href === "string" && href.startsWith("__sc__:")) {
-                    const [, kind, slug] = href.split(":");
-                    return (
-                      <ShortcodeInlineLink
-                        node={{
-                          type: "shortcode",
-                          kind: kind as never,
-                          slug,
-                          modifier: null,
-                        }}
-                        resolved={resolved}
-                      />
-                    );
-                  }
-                  const isExternal =
-                    typeof href === "string" &&
-                    /^https?:\/\//.test(href);
-                  return (
-                    <a
-                      href={href}
-                      target={isExternal ? "_blank" : undefined}
-                      rel={isExternal ? "noopener noreferrer" : undefined}
-                      className="text-brand-deep-green underline decoration-brand-gold/60 underline-offset-[5px] transition-colors hover:text-primary hover:decoration-brand-gold"
-                    >
-                      {children}
-                    </a>
-                  );
-                },
-                hr: () => (
-                  <div className="my-12 flex justify-center">
-                    <span className="h-px w-12 bg-brand-gold/40" aria-hidden />
-                  </div>
-                ),
-              }}
-            >
+            <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
               {seg.markdown}
             </ReactMarkdown>
           )}
@@ -90,11 +52,141 @@ export function GuideMarkdown({ body, resolved, variant = "intent" }: GuideMarkd
   );
 }
 
+function inlineLinkRenderer(resolved: ResolvedRefs) {
+  return function A({
+    href,
+    children,
+  }: React.ComponentProps<"a">) {
+    if (typeof href === "string" && href.startsWith("__sc__:")) {
+      const [, kind, slug] = href.split(":");
+      return (
+        <ShortcodeInlineLink
+          node={{ type: "shortcode", kind: kind as never, slug, modifier: null }}
+          resolved={resolved}
+        />
+      );
+    }
+    const isExternal = typeof href === "string" && /^https?:\/\//.test(href);
+    return (
+      <a
+        href={href}
+        target={isExternal ? "_blank" : undefined}
+        rel={isExternal ? "noopener noreferrer" : undefined}
+        className="text-brand-deep-green underline decoration-brand-gold/60 underline-offset-[5px] transition-colors hover:text-primary hover:decoration-brand-gold"
+      >
+        {children}
+      </a>
+    );
+  };
+}
+
+function intentComponents(resolved: ResolvedRefs): Components {
+  return {
+    a: inlineLinkRenderer(resolved),
+    h2: ({ children }) => (
+      <h2 className="mt-16 mb-6 font-serif text-3xl font-medium leading-tight text-brand-deep-green sm:text-4xl">
+        {children}
+      </h2>
+    ),
+    h3: ({ children }) => (
+      <h3 className="mt-12 mb-4 font-serif text-xl font-medium text-brand-deep-green sm:text-2xl">
+        {children}
+      </h3>
+    ),
+    h4: ({ children }) => (
+      <h4 className="mt-10 mb-3 font-serif text-lg font-medium text-brand-deep-green">
+        {children}
+      </h4>
+    ),
+    p: ({ children }) => (
+      <p className="my-6 text-[1.05rem] leading-[1.85] text-brand-charcoal-light">
+        {children}
+      </p>
+    ),
+    ul: ({ children }) => (
+      <ul className="my-6 list-disc space-y-2 pl-6 text-brand-charcoal-light">
+        {children}
+      </ul>
+    ),
+    ol: ({ children }) => (
+      <ol className="my-6 list-decimal space-y-2 pl-6 text-brand-charcoal-light">
+        {children}
+      </ol>
+    ),
+    li: ({ children }) => <li className="leading-relaxed">{children}</li>,
+    blockquote: ({ children }) => (
+      <blockquote className="my-12 border-y border-brand-gold/30 px-2 py-8 text-center font-serif text-2xl font-medium leading-snug text-brand-deep-green sm:text-3xl">
+        {children}
+      </blockquote>
+    ),
+    strong: ({ children }) => (
+      <strong className="font-semibold text-brand-deep-green">{children}</strong>
+    ),
+    em: ({ children }) => (
+      <em className="italic text-brand-charcoal-light">{children}</em>
+    ),
+    hr: () => (
+      <div className="my-14 flex justify-center" aria-hidden>
+        <span className="h-px w-12 bg-brand-gold/40" />
+      </div>
+    ),
+  };
+}
+
+function practicalComponents(resolved: ResolvedRefs): Components {
+  return {
+    a: inlineLinkRenderer(resolved),
+    h2: ({ children }) => (
+      <h2 className="mt-14 mb-5 border-t border-brand-gold/25 pt-10 font-serif text-2xl font-medium tracking-tight text-brand-deep-green sm:text-3xl">
+        {children}
+      </h2>
+    ),
+    h3: ({ children }) => (
+      <h3 className="mt-10 mb-3 font-serif text-lg font-semibold text-brand-deep-green sm:text-xl">
+        {children}
+      </h3>
+    ),
+    h4: ({ children }) => (
+      <h4 className="mt-8 mb-2 font-serif text-base font-semibold text-brand-deep-green">
+        {children}
+      </h4>
+    ),
+    p: ({ children }) => (
+      <p className="my-5 leading-[1.75] text-brand-charcoal">{children}</p>
+    ),
+    ul: ({ children }) => (
+      <ul className="my-5 list-disc space-y-2 pl-6 text-brand-charcoal">
+        {children}
+      </ul>
+    ),
+    ol: ({ children }) => (
+      <ol className="my-5 list-decimal space-y-2 pl-6 text-brand-charcoal">
+        {children}
+      </ol>
+    ),
+    li: ({ children }) => <li className="leading-relaxed">{children}</li>,
+    blockquote: ({ children }) => (
+      <blockquote className="my-6 border-l-2 border-brand-gold/40 py-1 pl-5 italic text-brand-charcoal-light">
+        {children}
+      </blockquote>
+    ),
+    strong: ({ children }) => (
+      <strong className="font-semibold text-brand-deep-green">{children}</strong>
+    ),
+    em: ({ children }) => <em className="italic">{children}</em>,
+    hr: () => (
+      <div className="my-10 flex justify-center" aria-hidden>
+        <span className="h-px w-10 bg-brand-gold/40" />
+      </div>
+    ),
+  };
+}
+
 type Segment =
   | { kind: "markdown"; markdown: string }
   | { kind: "card"; node: Extract<ParsedNode, { type: "shortcode" }> };
 
-function splitIntoSegments(body: string, _resolved: ResolvedRefs): Segment[] {
+function splitIntoSegments(body: string): Segment[] {
   const nodes = parseShortcodes(body);
   const segments: Segment[] = [];
   let buffer = "";
@@ -116,7 +208,6 @@ function splitIntoSegments(body: string, _resolved: ResolvedRefs): Segment[] {
       segments.push({ kind: "card", node });
       continue;
     }
-    // Inline shortcode → encode as a markdown link with a sentinel href.
     buffer += `[${node.slug}](__sc__:${node.kind}:${node.slug})`;
   }
   flush();

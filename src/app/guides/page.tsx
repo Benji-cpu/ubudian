@@ -25,7 +25,7 @@ export default async function GuidesPage({ searchParams }: GuidesPageProps) {
   const activeIntent: GuideIntent | null =
     rawIntent && isGuideIntent(rawIntent) ? rawIntent : null;
 
-  const [editorsPicks, intentGuides, practicalGuides, filteredGuides] =
+  const [editorsPicks, intentGuidesRaw, practicalGuides, filteredGuides] =
     await Promise.all([
       activeIntent ? Promise.resolve([] as Guide[]) : getEditorsPicks(5),
       activeIntent
@@ -38,6 +38,10 @@ export default async function GuidesPage({ searchParams }: GuidesPageProps) {
         ? getPublishedGuides({ intent: activeIntent, limit: 24 })
         : Promise.resolve([] as Guide[]),
     ]);
+
+  // Don't show editor's picks again in the playbooks rail.
+  const editorsPickIds = new Set(editorsPicks.map((g) => g.id));
+  const intentGuides = intentGuidesRaw.filter((g) => !editorsPickIds.has(g.id));
 
   const intentConfig = activeIntent ? getIntentConfig(activeIntent) : null;
 

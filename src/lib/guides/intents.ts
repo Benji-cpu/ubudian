@@ -8,40 +8,43 @@ export interface IntentConfig {
   archetypeAffinity: ArchetypeId[];
 }
 
+const STORAGE_BASE =
+  "https://vzooblnkztbjgfbdfzxl.supabase.co/storage/v1/object/public/images/guides";
+
 export const GUIDE_INTENTS: IntentConfig[] = [
   {
     id: "romance",
     label: "Romance & Intimacy",
     blurb: "The Eat-Pray-Love fantasy, honestly. What it actually takes.",
-    imageUrl: "/images/guides/intents/romance.jpg",
+    imageUrl: `${STORAGE_BASE}/intents/romance.jpg`,
     archetypeAffinity: ["connector", "epicurean"],
   },
   {
     id: "community",
     label: "Community & Belonging",
     blurb: "The rooms where Ubud actually meets itself.",
-    imageUrl: "/images/guides/intents/community.jpg",
+    imageUrl: `${STORAGE_BASE}/intents/community.jpg`,
     archetypeAffinity: ["connector", "seeker"],
   },
   {
     id: "spirit",
     label: "Spirit & Practice",
     blurb: "Separating the real teachers from the costume.",
-    imageUrl: "/images/guides/intents/spirit.jpg",
+    imageUrl: `${STORAGE_BASE}/intents/spirit.jpg`,
     archetypeAffinity: ["seeker"],
   },
   {
     id: "living",
     label: "Living Beautifully",
     blurb: "The long-stay arithmetic. Spaciousness without spend.",
-    imageUrl: "/images/guides/intents/living.jpg",
+    imageUrl: `${STORAGE_BASE}/intents/living.jpg`,
     archetypeAffinity: ["epicurean", "creative"],
   },
   {
     id: "local_culture",
     label: "Local Culture, Honestly",
     blurb: "Beyond the cliché, into the relationships.",
-    imageUrl: "/images/guides/intents/local-culture.jpg",
+    imageUrl: `${STORAGE_BASE}/intents/local-culture.jpg`,
     archetypeAffinity: ["explorer", "seeker"],
   },
 ];
