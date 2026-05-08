@@ -69,6 +69,12 @@ export function parsePriceFromText(
   return { min: Math.min(...numbers), max: Math.max(...numbers) };
 }
 
+/** True only when the price is unambiguously free (zero or "free" / "gratis"). */
+export function isFreeEvent(priceInfo: string | null): boolean {
+  const parsed = parsePriceFromText(priceInfo);
+  return parsed !== null && parsed.min === 0 && parsed.max === 0;
+}
+
 /**
  * Check if a price_info string matches a given price bracket.
  * If price_info is unparseable, returns true (show in all brackets).

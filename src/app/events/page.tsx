@@ -5,7 +5,6 @@ import { createClient } from "@/lib/supabase/server";
 import { queryWithRetry } from "@/lib/supabase/retry";
 import { getCurrentProfile } from "@/lib/auth";
 import { ARCHETYPES } from "@/lib/quiz-data";
-import { Button } from "@/components/ui/button";
 import { AgendaFeed } from "@/components/events/agenda-feed";
 import { PriceFilteredEvents } from "@/components/events/price-filtered-events";
 import { ViewSwitcher } from "@/components/events/view-switcher";
@@ -14,6 +13,7 @@ import { EventFilters } from "@/components/events/event-filters";
 import { EventSearch } from "@/components/events/event-search";
 import { CategoryGuideLink } from "@/components/events/category-guide-link";
 import { MapView } from "@/components/events/map-view";
+import { EventsHero } from "@/components/events/events-hero";
 import { RefreshOnFocus } from "@/components/events/refresh-on-focus";
 import { CrossSectionRibbon } from "@/components/journeys/cross-section-ribbon";
 import { nowInBali } from "@/lib/events/bali-time";
@@ -49,7 +49,6 @@ interface EventsPageProps {
     price?: string;
     archetype?: string;
     free?: string;
-    hasImage?: string;
   }>;
 }
 
@@ -120,6 +119,9 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
         .order(sortByNewest ? "created_at" : "start_date", {
           ascending: !sortByNewest,
         });
+      if (!sortByNewest) {
+        query = query.order("start_time", { ascending: true, nullsFirst: false });
+      }
 
       const today = nowInBali().dateStr;
 
@@ -185,25 +187,21 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
   const isFeedView = view === "feed";
   const isMapView = view === "map";
 
+  // The hero stands on its own with the gradient + painterly radials.
+  // We can re-enable a curated photo backdrop once the AI image backfill
+  // produces text-free, on-brand imagery — too many ingested cover URLs
+  // are event flyers with embedded text that clashes with the headline.
+
   return (
     <div>
       <RefreshOnFocus />
-      {/* Hero */}
-      <section className="bg-brand-cream px-4 py-12 sm:py-16">
-        <div className="mx-auto max-w-3xl text-center">
-          <div className="mx-auto mb-6 h-px w-12 bg-brand-gold/40" />
-          <h1 className="font-serif text-4xl font-medium tracking-tight text-brand-deep-green sm:text-5xl">
-            What&apos;s Happening in Ubud
-          </h1>
-          <p className="mt-4 text-lg text-muted-foreground">
-            Tantra workshops, sound journeys, breathwork sessions, sacred
-            circles, and community gatherings — updated daily from across Ubud.
-          </p>
-          <Button asChild variant="outline" className="mt-6">
-            <Link href="/events/submit">Submit an Event</Link>
-          </Button>
-        </div>
-      </section>
+
+      <EventsHero
+        backdropImageUrl={null}
+        backdropAlt=""
+        backdropCaption={null}
+        totalCount={allEvents.length}
+      />
 
       <CrossSectionRibbon
         pitch="Don't want to plan it day-by-day? We've curated multi-day retreats."
@@ -211,26 +209,27 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
       />
 
       {/* Controls */}
-      <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-          <div className="flex items-center gap-2">
-            <Suspense>
-              <ViewSwitcher />
-            </Suspense>
+      <section
+        id="events"
+        className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8"
+      >
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <Suspense>
+            <EventSearch />
+          </Suspense>
+          <div className="flex items-center gap-2 sm:flex-shrink-0">
             {!isFeedView && !isMapView && (
               <Suspense>
                 <EventSortSelect />
               </Suspense>
             )}
-          </div>
-          <div className="w-full sm:max-w-xs">
             <Suspense>
-              <EventSearch />
+              <ViewSwitcher />
             </Suspense>
           </div>
         </div>
 
-        <div className="mt-4">
+        <div className="mt-5">
           <Suspense>
             <EventFilters />
           </Suspense>

@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { formatEventTime, isRecentlyAddedEvent } from "@/lib/utils";
 import { CATEGORY_EMOJI } from "@/lib/constants";
 import { formatEventDateLine } from "@/lib/events/format";
+import { isFreeEvent } from "@/lib/price-parser";
 import { EventCardPlaceholder } from "./event-card-placeholder";
 import { EventCardExternalLinks } from "./event-card-external-links";
 import { MapPin, Clock, Calendar, User } from "lucide-react";
@@ -17,82 +18,106 @@ interface EventGridCardProps {
 export function EventGridCard({ event, saveButton }: EventGridCardProps) {
   const dateLine = formatEventDateLine(event);
   const emoji = CATEGORY_EMOJI[event.category] || CATEGORY_EMOJI["Other"];
+  const isFree = isFreeEvent(event.price_info);
 
   return (
-    <Link href={`/events/${event.slug}`} className="group block">
-      <article className="overflow-hidden rounded-lg border border-brand-gold/10 bg-card transition-shadow hover:shadow-lg">
+    <Link
+      href={`/events/${event.slug}`}
+      className="group relative block focus-visible:outline-none"
+    >
+      <article className="relative overflow-hidden rounded-2xl border border-brand-deep-green/10 bg-white transition-all duration-300 ease-out hover:-translate-y-0.5 hover:border-brand-gold/40 hover:shadow-[0_18px_40px_-20px_rgba(44,74,62,0.4)] motion-reduce:hover:translate-y-0">
         {/* Image */}
-        <div className="relative aspect-[4/3] overflow-hidden">
+        <div className="relative aspect-[16/10] overflow-hidden">
           {event.cover_image_url ? (
             <Image
               src={event.cover_image_url}
               alt=""
               fill
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-              className="object-cover transition-transform duration-300 group-hover:scale-105"
+              className="object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-[1.06] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
             />
           ) : (
             <EventCardPlaceholder
               category={event.category}
-              className="h-full w-full text-4xl"
+              className="h-full w-full"
             />
           )}
 
+          {/* Soft top-down gradient for legibility of overlay chips */}
+          <div
+            aria-hidden
+            className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/30 opacity-80"
+          />
+
           {/* Save button overlay (top-right) */}
           {saveButton && (
-            <div className="absolute right-2 top-2 rounded-full bg-background/80 backdrop-blur-sm">
+            <div className="absolute right-2.5 top-2.5 rounded-full bg-white/85 p-0.5 shadow-md backdrop-blur-sm">
               {saveButton}
             </div>
           )}
 
-          {/* Category badge overlay (bottom-left) */}
-          <div className="absolute bottom-2 left-2 flex items-center gap-1.5">
-            <Badge className="bg-black/60 text-white backdrop-blur-sm hover:bg-black/60">
-              {emoji} {event.category}
+          {/* Free ribbon (top-left) */}
+          {isFree && (
+            <div className="absolute left-3 top-3 rounded-full bg-brand-gold px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-brand-deep-green shadow-md">
+              Free
+            </div>
+          )}
+
+          {/* Category + new badges (bottom-left) */}
+          <div className="absolute bottom-2.5 left-2.5 flex items-center gap-1.5">
+            <Badge className="rounded-full border-transparent bg-black/55 px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.14em] text-brand-cream backdrop-blur-md hover:bg-black/55">
+              {emoji && <span className="mr-1 not-italic">{emoji}</span>}
+              {event.category}
             </Badge>
             {isRecentlyAddedEvent(event.created_at, event.start_date) && (
-              <span className="rounded bg-brand-gold px-1.5 py-0.5 text-xs font-medium text-white">
+              <span className="rounded-full bg-brand-cream/95 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.16em] text-brand-deep-green">
                 New
               </span>
             )}
           </div>
+
+          {/* Hairline gold accent that grows on hover */}
+          <span
+            aria-hidden
+            className="absolute bottom-0 left-0 h-[2px] w-0 bg-brand-gold/80 transition-all duration-500 ease-out group-hover:w-full"
+          />
         </div>
 
         {/* Content */}
-        <div className="p-4">
-          <h3 className="font-serif text-lg font-medium leading-snug text-foreground line-clamp-2 group-hover:text-primary">
+        <div className="p-5">
+          <h3 className="font-serif text-xl font-medium leading-snug tracking-tight text-brand-deep-green line-clamp-2 transition-colors group-hover:text-brand-deep-green">
             {event.title}
           </h3>
 
-          <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
-            <span className="flex items-center gap-1">
-              <Calendar className="h-3 w-3" />
+          <div className="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-brand-charcoal/65">
+            <span className="flex items-center gap-1 font-medium text-brand-charcoal/80">
+              <Calendar className="h-3 w-3 text-brand-deep-green/70" />
               {dateLine}
             </span>
             {(event.start_time || event.end_time) && (
               <span className="flex items-center gap-1">
-                <Clock className="h-3 w-3" />
+                <Clock className="h-3 w-3 text-brand-deep-green/60" />
                 {formatEventTime(event.start_time, event.end_time)}
               </span>
             )}
             {event.venue_name && (
               <span className="flex items-center gap-1">
-                <MapPin className="h-3 w-3" />
+                <MapPin className="h-3 w-3 text-brand-deep-green/60" />
                 <span className="line-clamp-1">{event.venue_name}</span>
               </span>
             )}
           </div>
 
           {event.short_description && (
-            <p className="mt-2 text-sm text-muted-foreground line-clamp-2">
+            <p className="mt-2.5 text-sm leading-relaxed text-brand-charcoal/70 line-clamp-2">
               {event.short_description}
             </p>
           )}
 
-          <div className="mt-3 flex items-center justify-between">
+          <div className="mt-3.5 flex items-center justify-between border-t border-brand-deep-green/8 pt-3">
             <div className="flex items-center gap-2">
-              {event.price_info && (
-                <span className="text-sm font-medium text-brand-terracotta">
+              {event.price_info && !isFree && (
+                <span className="text-sm font-semibold tracking-tight text-brand-terracotta">
                   {event.price_info}
                 </span>
               )}
@@ -102,9 +127,9 @@ export function EventGridCard({ event, saveButton }: EventGridCardProps) {
               />
             </div>
             {event.organizer_name && (
-              <span className="flex items-center gap-1 text-xs text-muted-foreground">
+              <span className="flex items-center gap-1 text-[11px] text-brand-charcoal/50">
                 <User className="h-3 w-3" />
-                {event.organizer_name}
+                <span className="line-clamp-1">{event.organizer_name}</span>
               </span>
             )}
           </div>

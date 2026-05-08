@@ -77,9 +77,14 @@ type TimeBucket =
   | "Next Week"
   | "Later";
 
-export function groupEventsByTimeBucket<T extends { start_date: string; is_recurring: boolean; recurrence_rule: string | null }>(
-  events: T[]
-): { bucket: TimeBucket; events: T[] }[] {
+export function groupEventsByTimeBucket<
+  T extends {
+    start_date: string
+    start_time?: string | null
+    is_recurring: boolean
+    recurrence_rule: string | null
+  },
+>(events: T[]): { bucket: TimeBucket; events: T[] }[] {
   const now = new Date()
   const nextWeekStart = startOfWeek(addWeeks(now, 1), { weekStartsOn: 1 })
   const nextWeekEnd = endOfWeek(addWeeks(now, 1), { weekStartsOn: 1 })
@@ -117,7 +122,25 @@ export function groupEventsByTimeBucket<T extends { start_date: string; is_recur
     bucketMap.get(bucket)!.push(event)
   }
 
+  for (const list of bucketMap.values()) {
+    list.sort((a, b) => {
+      if (a.start_date !== b.start_date) {
+        return a.start_date.localeCompare(b.start_date)
+      }
+      const at = timeToMinutes(a.start_time)
+      const bt = timeToMinutes(b.start_time)
+      return at - bt
+    })
+  }
+
   return bucketOrder
     .filter((b) => bucketMap.get(b)!.length > 0)
     .map((b) => ({ bucket: b, events: bucketMap.get(b)! }))
+}
+
+function timeToMinutes(t?: string | null): number {
+  if (!t) return Number.MAX_SAFE_INTEGER
+  const [h, m] = t.split(":").map(Number)
+  if (Number.isNaN(h) || Number.isNaN(m)) return Number.MAX_SAFE_INTEGER
+  return h * 60 + m
 }

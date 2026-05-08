@@ -25,7 +25,6 @@ export function PriceFilteredEvents({
   const searchParams = useSearchParams();
   const priceBracket = searchParams.get("price") as PriceBracket | null;
   const freeOnly = searchParams.get("free") === "true";
-  const hasImageOnly = searchParams.get("hasImage") === "true";
 
   const filtered = useMemo(() => {
     let out = events;
@@ -35,11 +34,8 @@ export function PriceFilteredEvents({
     if (freeOnly) {
       out = out.filter((e) => matchesPriceBracket(e.price_info, "free"));
     }
-    if (hasImageOnly) {
-      out = out.filter((e) => !!e.cover_image_url);
-    }
     return out;
-  }, [events, priceBracket, freeOnly, hasImageOnly]);
+  }, [events, priceBracket, freeOnly]);
 
   if (view === "calendar") return <EventCalendar events={filtered} />;
   if (view === "week") return <EventWeekView events={filtered} />;

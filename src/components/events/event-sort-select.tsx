@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
+import { ArrowUpDown } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -10,7 +11,7 @@ import {
 } from "@/components/ui/select";
 
 const SORT_OPTIONS = [
-  { value: "date", label: "Date (soonest)" },
+  { value: "date", label: "Soonest first" },
   { value: "newest", label: "Recently added" },
 ] as const;
 
@@ -31,7 +32,12 @@ export function EventSortSelect() {
 
   return (
     <Select value={currentSort} onValueChange={setSort}>
-      <SelectTrigger size="sm" className="w-[160px]">
+      <SelectTrigger
+        size="default"
+        className="h-10 min-w-[170px] border-brand-deep-green/15 bg-white/60 text-brand-charcoal shadow-sm backdrop-blur-sm hover:border-brand-deep-green/30"
+        aria-label="Sort events"
+      >
+        <ArrowUpDown className="h-3.5 w-3.5 text-brand-deep-green/60" />
         <SelectValue />
       </SelectTrigger>
       <SelectContent>

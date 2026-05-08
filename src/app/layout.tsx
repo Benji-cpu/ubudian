@@ -7,6 +7,7 @@ import { Footer } from "@/components/layout/footer";
 import { Toaster } from "@/components/ui/sonner";
 import { FeedbackFab } from "@/components/feedback/feedback-fab";
 import { ActivityTrailInstaller } from "@/components/feedback/activity-trail-installer";
+import { AuthSync } from "@/components/auth/auth-sync";
 import { ThemeProvider } from "@/components/theme-provider";
 import { SITE_NAME, SITE_DESCRIPTION, SITE_URL } from "@/lib/constants";
 import "./globals.css";
@@ -53,6 +54,7 @@ export default function RootLayout({
           <Toaster />
           <FeedbackFab />
           <ActivityTrailInstaller />
+          <AuthSync />
         </ThemeProvider>
         <Analytics />
         <SpeedInsights />

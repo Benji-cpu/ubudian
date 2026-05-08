@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { formatEventTime, isRecentlyAddedEvent } from "@/lib/utils";
 import { CATEGORY_EMOJI } from "@/lib/constants";
 import { formatEventDateLine } from "@/lib/events/format";
+import { isFreeEvent } from "@/lib/price-parser";
 import { EventCardPlaceholder } from "./event-card-placeholder";
 import { EventCardExternalLinks } from "./event-card-external-links";
 import { MapPin, Clock, Calendar, User } from "lucide-react";
@@ -17,19 +18,20 @@ interface EventCardProps {
 export function EventCard({ event, saveButton }: EventCardProps) {
   const dateLine = formatEventDateLine(event);
   const emoji = CATEGORY_EMOJI[event.category] || CATEGORY_EMOJI["Other"];
+  const isFree = isFreeEvent(event.price_info);
 
   return (
     <Link href={`/events/${event.slug}`} className="group block">
-      <article className="flex gap-4 rounded-sm border border-brand-gold/10 bg-card p-4 transition-shadow hover:shadow-md">
+      <article className="relative flex gap-4 overflow-hidden rounded-xl border border-brand-deep-green/10 bg-white p-4 transition-all duration-300 ease-out hover:-translate-y-0.5 hover:border-brand-gold/40 hover:shadow-[0_14px_30px_-18px_rgba(44,74,62,0.35)] motion-reduce:hover:translate-y-0">
         {/* Cover image */}
-        <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded sm:h-[100px] sm:w-[140px]">
+        <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-lg sm:h-[108px] sm:w-[156px]">
           {event.cover_image_url ? (
             <Image
               src={event.cover_image_url}
-              alt={event.title}
+              alt=""
               fill
-              sizes="(max-width: 640px) 96px, 140px"
-              className="object-cover"
+              sizes="(max-width: 640px) 96px, 156px"
+              className="object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-[1.06] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
             />
           ) : (
             <EventCardPlaceholder
@@ -37,58 +39,69 @@ export function EventCard({ event, saveButton }: EventCardProps) {
               className="h-full w-full"
             />
           )}
+          {isFree && (
+            <div className="absolute left-1.5 top-1.5 rounded-full bg-brand-gold px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-[0.16em] text-brand-deep-green shadow-sm">
+              Free
+            </div>
+          )}
         </div>
 
         {/* Content */}
         <div className="min-w-0 flex-1">
-          <h3 className="font-serif text-lg font-medium leading-snug text-foreground line-clamp-1 group-hover:text-primary">
-            {event.title}
-          </h3>
+          <div className="flex items-start gap-2">
+            <h3 className="font-serif text-lg font-medium leading-snug tracking-tight text-brand-deep-green line-clamp-1 flex-1 transition-colors">
+              {event.title}
+            </h3>
+            {isRecentlyAddedEvent(event.created_at, event.start_date) && (
+              <span className="shrink-0 rounded-full bg-brand-gold/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.16em] text-brand-deep-green">
+                New
+              </span>
+            )}
+          </div>
 
-          <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
-            <Badge variant="outline" className="text-xs">
-              {emoji} {event.category}
+          <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-brand-charcoal/65">
+            <Badge
+              variant="outline"
+              className="rounded-full border-brand-deep-green/15 bg-transparent px-2 py-0.5 text-[10px] font-medium uppercase tracking-[0.14em] text-brand-deep-green/80"
+            >
+              {emoji && <span className="mr-1 not-italic">{emoji}</span>}
+              {event.category}
             </Badge>
             {event.is_core && (
               <span
                 title="Weekly community anchor"
-                className="rounded border border-brand-gold/60 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-brand-gold"
+                className="rounded-full border border-brand-gold/60 px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.16em] text-brand-gold"
               >
                 Core
               </span>
             )}
-            {isRecentlyAddedEvent(event.created_at, event.start_date) && (
-              <span className="rounded bg-brand-gold px-1.5 py-0.5 text-xs font-medium text-white">
-                New
-              </span>
-            )}
-            <span className="flex items-center gap-1">
-              <Calendar className="h-3 w-3" />
+            <span className="flex items-center gap-1 font-medium text-brand-charcoal/80">
+              <Calendar className="h-3 w-3 text-brand-deep-green/70" />
               {dateLine}
             </span>
             {(event.start_time || event.end_time) && (
               <span className="flex items-center gap-1">
-                <Clock className="h-3 w-3" />
+                <Clock className="h-3 w-3 text-brand-deep-green/60" />
                 {formatEventTime(event.start_time, event.end_time)}
               </span>
             )}
             {event.venue_name && (
               <span className="flex items-center gap-1">
-                <MapPin className="h-3 w-3" />
+                <MapPin className="h-3 w-3 text-brand-deep-green/60" />
                 {event.venue_name}
               </span>
             )}
           </div>
 
           {event.short_description && (
-            <p className="mt-1.5 text-sm text-muted-foreground line-clamp-1">
+            <p className="mt-2 text-sm leading-relaxed text-brand-charcoal/70 line-clamp-1">
               {event.short_description}
             </p>
           )}
 
-          <div className="mt-1.5 flex items-center gap-2">
-            {event.price_info && (
-              <span className="text-sm font-medium text-brand-terracotta">
+          <div className="mt-2 flex items-center gap-2">
+            {event.price_info && !isFree && (
+              <span className="text-sm font-semibold tracking-tight text-brand-terracotta">
                 {event.price_info}
               </span>
             )}
@@ -97,7 +110,7 @@ export function EventCard({ event, saveButton }: EventCardProps) {
               externalTicketUrl={event.external_ticket_url}
             />
             {event.organizer_name && (
-              <span className="ml-auto flex items-center gap-1 text-xs text-muted-foreground truncate">
+              <span className="ml-auto flex items-center gap-1 text-[11px] text-brand-charcoal/50 truncate">
                 <User className="h-3 w-3 shrink-0" />
                 <span className="truncate">{event.organizer_name}</span>
               </span>
@@ -109,6 +122,12 @@ export function EventCard({ event, saveButton }: EventCardProps) {
         {saveButton && (
           <div className="flex shrink-0 items-center">{saveButton}</div>
         )}
+
+        {/* Hairline gold accent that grows on hover */}
+        <span
+          aria-hidden
+          className="absolute bottom-0 left-0 h-[2px] w-0 bg-brand-gold/70 transition-all duration-500 ease-out group-hover:w-full"
+        />
       </article>
     </Link>
   );

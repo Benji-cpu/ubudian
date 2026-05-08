@@ -1,6 +1,13 @@
+"use client";
+
+import { useMemo } from "react";
 import { EventCard } from "./event-card";
 import { EventListEmptyState } from "./event-list-empty-state";
 import { SaveEventButton } from "@/components/dashboard/save-event-button";
+import {
+  PaginatedEvents,
+  EventRowSkeleton,
+} from "./paginated-events";
 import { groupEventsByTimeBucket } from "@/lib/utils";
 import type { Event } from "@/types";
 
@@ -10,40 +17,72 @@ interface EventListProps {
   savedEventIds?: string[];
 }
 
-export function EventList({ events, currentProfileId, savedEventIds }: EventListProps) {
-  if (events.length === 0) {
-    return <EventListEmptyState />;
-  }
+type BucketLabel = string;
 
-  const buckets = groupEventsByTimeBucket(events);
+/**
+ * Flatten the bucketed events into a single ordered list, but keep
+ * the bucket labels so we can interleave section headers between
+ * runs of items. This lets the paginator work on a single flat
+ * stream while preserving the grouped visual rhythm of the page.
+ */
+type ListRow =
+  | { kind: "header"; bucket: BucketLabel; id: string }
+  | { kind: "event"; event: Event; id: string };
+
+export function EventList({
+  events,
+  currentProfileId,
+  savedEventIds,
+}: EventListProps) {
   const savedSet = new Set(savedEventIds ?? []);
 
+  const rows: ListRow[] = useMemo(() => {
+    const buckets = groupEventsByTimeBucket(events);
+    const out: ListRow[] = [];
+    for (const { bucket, events: bucketEvents } of buckets) {
+      out.push({ kind: "header", bucket, id: `header-${bucket}` });
+      for (const event of bucketEvents) {
+        out.push({ kind: "event", event, id: event.id });
+      }
+    }
+    return out;
+  }, [events]);
+
   return (
-    <div className="space-y-8">
-      {buckets.map(({ bucket, events: bucketEvents }) => (
-        <section key={bucket}>
-          <h2 className="mb-3 font-serif text-xl font-medium text-brand-deep-green">
-            {bucket}
-          </h2>
-          <div className="grid gap-3 md:grid-cols-2">
-            {bucketEvents.map((event) => (
-              <EventCard
-                key={event.id}
-                event={event}
-                saveButton={
-                  currentProfileId ? (
-                    <SaveEventButton
-                      eventId={event.id}
-                      profileId={currentProfileId}
-                      initialSaved={savedSet.has(event.id)}
-                    />
-                  ) : undefined
-                }
-              />
-            ))}
+    <PaginatedEvents
+      items={rows}
+      pageSize={32}
+      containerClassName="space-y-3"
+      emptyState={<EventListEmptyState />}
+      renderSkeleton={() => <EventRowSkeleton />}
+      renderItem={(row) => {
+        if (row.kind === "header") {
+          return (
+            <h2
+              key={row.id}
+              className="mt-8 mb-1 first:mt-0 font-serif text-xl font-medium text-brand-deep-green"
+            >
+              {row.bucket}
+            </h2>
+          );
+        }
+        return (
+          <div key={row.id}>
+            <EventCard
+              event={row.event}
+              saveButton={
+                currentProfileId ? (
+                  <SaveEventButton
+                    eventId={row.event.id}
+                    profileId={currentProfileId}
+                    initialSaved={savedSet.has(row.event.id)}
+                  />
+                ) : undefined
+              }
+            />
           </div>
-        </section>
-      ))}
-    </div>
+        );
+      }}
+    />
   );
 }
