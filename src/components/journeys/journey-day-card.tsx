@@ -4,6 +4,7 @@ import { Sun, Sunrise, Moon, ExternalLink } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { MarkdownContent } from "@/components/blog/markdown-content";
 import { ShareDayButton } from "@/components/journeys/share-day-button";
+import { AtomLightbox } from "@/components/journeys/atom-lightbox";
 import type {
   JourneyAtom,
   JourneyAtomKind,
@@ -25,18 +26,18 @@ interface JourneyDayCardProps {
 
 const DAY_TYPE_LABEL: Record<JourneyDayType, string> = {
   arrival: "Arrival",
-  light: "Light day",
-  active: "Active day",
-  rest: "Rest day",
+  light: "Light",
+  active: "Active",
+  rest: "Rest",
   closing: "Closing",
 };
 
-const DAY_TYPE_TONE: Record<JourneyDayType, string> = {
-  arrival: "bg-brand-gold/15 text-brand-deep-green",
-  light: "bg-brand-deep-green/10 text-brand-deep-green",
-  active: "bg-brand-terracotta/15 text-brand-terracotta",
-  rest: "bg-brand-cream text-brand-deep-green/70 border border-brand-gold/30",
-  closing: "bg-brand-deep-green/15 text-brand-deep-green",
+const DAY_TYPE_INK: Record<JourneyDayType, string> = {
+  arrival: "text-brand-gold",
+  light: "text-brand-deep-green/65",
+  active: "text-brand-terracotta",
+  rest: "text-brand-deep-green/55",
+  closing: "text-brand-deep-green",
 };
 
 const WINDOW_ORDER: JourneyDayWindow[] = ["morning", "afternoon", "evening"];
@@ -75,19 +76,24 @@ export function JourneyDayCard({
     slotsByWindow.get(s.slot_window)?.push(s);
   }
 
-  // Collect atom images surfaced today for the photo strip — gives the day
-  // a visual register without forcing the reader to scan every slot.
-  const dayPhotos: { src: string; alt: string }[] = [];
+  // Collect atoms-with-images surfaced today. The first one becomes the
+  // day's lead hero (16:9 banner under the header). Up to three follow-ons
+  // sit below as a thumb strip. Both click into the AtomLightbox.
+  const heroAtoms: JourneyAtom[] = [];
+  const seenAtomIds = new Set<string>();
   for (const ws of slotsByWindow.values()) {
     for (const slot of ws) {
       const atoms = candidatesBySlot.get(slot.id) ?? [];
       for (const atom of atoms) {
-        if (atom.image_url && dayPhotos.length < 4) {
-          dayPhotos.push({ src: atom.image_url, alt: atom.title });
+        if (atom.image_url && !seenAtomIds.has(atom.id) && heroAtoms.length < 4) {
+          seenAtomIds.add(atom.id);
+          heroAtoms.push(atom);
         }
       }
     }
   }
+  const leadAtom = heroAtoms[0];
+  const supportingAtoms = heroAtoms.slice(1);
 
   return (
     <article
@@ -108,12 +114,13 @@ export function JourneyDayCard({
             <div className="absolute inset-0 -z-10 bg-gradient-to-r from-brand-cream/80 via-brand-cream/55 to-brand-cream/30" aria-hidden />
           </>
         )}
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex flex-wrap items-center gap-3">
-            <span className="rounded-full bg-brand-deep-green px-3 py-1 text-xs font-semibold uppercase tracking-wider text-brand-cream">
-              Day {day.day_number}
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div className="flex items-baseline gap-3">
+            <span className="font-serif text-xs uppercase tracking-[0.3em] text-brand-gold">
+              Day {String(day.day_number).padStart(2, "0")}
             </span>
-            <span className={`rounded-full px-3 py-1 text-xs font-medium ${DAY_TYPE_TONE[day.day_type]}`}>
+            <span className="text-brand-gold/40">·</span>
+            <span className={`font-serif text-sm italic ${DAY_TYPE_INK[day.day_type]}`}>
               {DAY_TYPE_LABEL[day.day_type]}
             </span>
           </div>
@@ -126,29 +133,57 @@ export function JourneyDayCard({
             />
           )}
         </div>
-        <h3 className="mt-3 font-serif text-xl font-medium text-brand-deep-green sm:text-2xl">
+        <h3 className="mt-4 font-serif text-2xl font-medium leading-tight text-brand-deep-green sm:text-[1.7rem]">
           {day.theme}
         </h3>
         {day.theme_subtitle && (
-          <p className="mt-1 text-sm italic text-muted-foreground">{day.theme_subtitle}</p>
+          <p className="mt-1.5 font-serif text-base italic text-foreground/65">{day.theme_subtitle}</p>
         )}
       </header>
 
-      {dayPhotos.length >= 2 && (
-        <div className="grid gap-1 border-b border-brand-gold/15 bg-brand-cream/10 sm:grid-cols-4">
-          {dayPhotos.map((p, i) => (
-            <div
-              key={`${p.src}-${i}`}
-              className="relative aspect-[5/4] overflow-hidden first:sm:col-span-2 first:sm:row-span-1 first:sm:aspect-[5/3]"
-            >
-              <Image
-                src={p.src}
-                alt={p.alt}
-                fill
-                sizes="(max-width: 640px) 50vw, 25vw"
-                className="object-cover"
-              />
+      {leadAtom && (
+        <AtomLightbox atom={leadAtom}>
+          <div className="group relative aspect-[16/10] w-full overflow-hidden border-b border-brand-gold/15 sm:aspect-[2/1]">
+            <Image
+              src={leadAtom.image_url as string}
+              alt={leadAtom.title}
+              fill
+              sizes="(max-width: 768px) 100vw, 768px"
+              className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/15 to-transparent" />
+            <div className="absolute inset-x-0 bottom-0 p-4 text-white sm:p-6">
+              <span className="text-[10px] uppercase tracking-[0.2em] text-brand-gold">
+                {ATOM_KIND_LABEL[leadAtom.kind]}
+              </span>
+              <p className="mt-1 font-serif text-xl font-medium leading-tight sm:text-2xl">
+                {leadAtom.title}
+              </p>
+              {leadAtom.short_description && (
+                <p className="mt-1 line-clamp-2 max-w-xl text-sm opacity-90">
+                  {leadAtom.short_description}
+                </p>
+              )}
             </div>
+          </div>
+        </AtomLightbox>
+      )}
+
+      {supportingAtoms.length > 0 && (
+        <div className="grid grid-cols-3 gap-1 border-b border-brand-gold/15 bg-brand-cream/10">
+          {supportingAtoms.map((atom) => (
+            <AtomLightbox key={atom.id} atom={atom}>
+              <div className="group relative aspect-[5/4] overflow-hidden">
+                <Image
+                  src={atom.image_url as string}
+                  alt={atom.title}
+                  fill
+                  sizes="(max-width: 640px) 33vw, 220px"
+                  className="object-cover transition-transform group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/35 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+              </div>
+            </AtomLightbox>
           ))}
         </div>
       )}
@@ -232,18 +267,26 @@ function SlotRow({
 
 function AtomLine({ atom, eventSlugs }: { atom: JourneyAtom; eventSlugs: Map<string, string> }) {
   const href = atomHref(atom, eventSlugs);
+  const useLightbox = !!atom.image_url;
+  const actionLabel =
+    atom.kind === "event_ref"
+      ? "Open event"
+      : atom.kind === "accommodation" || atom.kind === "restaurant"
+      ? "Visit"
+      : "Open";
   const inner = (
     <>
       {atom.image_url ? (
-        <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-sm border border-brand-gold/20 sm:h-16 sm:w-16">
+        <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-sm border border-brand-gold/25 sm:h-16 sm:w-16">
           <Image
             src={atom.image_url}
             alt=""
             fill
             sizes="64px"
-            className="object-cover transition-transform group-hover:scale-105"
+            className="object-cover transition-transform duration-700 ease-out group-hover:scale-110"
             aria-hidden
           />
+          <div className="pointer-events-none absolute inset-0 ring-0 ring-brand-gold/40 transition-all duration-500 group-hover:ring-1" />
         </div>
       ) : (
         <Badge variant="outline" className="shrink-0 text-[10px] uppercase tracking-wider">
@@ -270,7 +313,13 @@ function AtomLine({ atom, eventSlugs }: { atom: JourneyAtom; eventSlugs: Map<str
   );
   return (
     <li>
-      {href ? (
+      {useLightbox ? (
+        <AtomLightbox atom={atom} actionHref={href ?? undefined} actionLabel={actionLabel}>
+          <div className="group flex items-start gap-3 rounded-sm px-1 py-1 transition-colors hover:bg-brand-cream/40">
+            {inner}
+          </div>
+        </AtomLightbox>
+      ) : href ? (
         <Link
           href={href}
           target={href.startsWith("http") ? "_blank" : undefined}

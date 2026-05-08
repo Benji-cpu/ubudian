@@ -19,22 +19,36 @@ export function JourneyFaq({ journey }: JourneyFaqProps) {
   const faqs = buildFaqs(journey);
 
   return (
-    <section className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
-      <div className="mb-6">
-        <span className="text-xs uppercase tracking-[0.2em] text-brand-gold">
+    <section className="mx-auto max-w-3xl px-4 py-16 sm:px-6 sm:py-20">
+      <div className="mb-8">
+        <span className="text-xs uppercase tracking-[0.3em] text-brand-gold">
           Before you apply
         </span>
-        <h2 className="mt-2 font-serif text-2xl font-medium text-brand-deep-green sm:text-3xl">
+        <h2 className="mt-3 font-serif text-2xl font-medium text-brand-deep-green sm:text-3xl">
           Honest questions, honestly answered
         </h2>
       </div>
-      <Accordion type="single" collapsible className="w-full">
+      <Accordion type="single" collapsible className="w-full divide-y divide-brand-gold/20 border-t border-b border-brand-gold/20 [&_[data-slot=accordion-item]]:border-0 [&_[data-state=open]]:bg-brand-cream/35">
         {faqs.map((faq, i) => (
-          <AccordionItem key={i} value={`faq-${i}`}>
-            <AccordionTrigger className="text-left font-serif text-base font-medium text-brand-deep-green">
-              {faq.q}
+          <AccordionItem
+            key={i}
+            value={`faq-${i}`}
+            className="px-1 transition-colors data-[state=open]:border-l-2 data-[state=open]:border-l-brand-deep-green data-[state=open]:pl-4"
+          >
+            <AccordionTrigger className="py-5 text-left font-serif text-base font-medium leading-snug text-brand-deep-green hover:no-underline data-[state=open]:text-brand-deep-green sm:text-lg [&>svg]:hidden">
+              <span className="flex flex-1 items-baseline justify-between gap-4">
+                <span>{faq.q}</span>
+                <span
+                  aria-hidden="true"
+                  className="relative ml-4 flex h-4 w-4 shrink-0 self-center"
+                >
+                  {/* gold hairline cross — vertical hides when accordion is open */}
+                  <span className="absolute left-0 right-0 top-1/2 h-px -translate-y-1/2 bg-brand-gold" />
+                  <span className="absolute left-1/2 top-0 bottom-0 w-px -translate-x-1/2 bg-brand-gold transition-transform duration-300 [[data-state=open]_&]:scale-y-0" />
+                </span>
+              </span>
             </AccordionTrigger>
-            <AccordionContent className="text-base leading-relaxed text-foreground/85">
+            <AccordionContent className="pb-6 pr-4 text-base leading-relaxed text-foreground/80">
               {faq.a}
             </AccordionContent>
           </AccordionItem>

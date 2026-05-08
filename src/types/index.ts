@@ -226,6 +226,8 @@ export type PartnerKind =
   | "spa"
   | "other";
 
+export type CohortStatus = "open" | "almost_full" | "full" | "waitlist";
+
 export interface Journey {
   id: string;
   slug: string;
@@ -240,10 +242,22 @@ export interface Journey {
   whats_included: string | null;
   who_its_for: string | null;
   practical_info: string | null;
+  /** Editorial note from the curator — surfaced under the hero quote on the detail page. */
+  curator_note: string | null;
   is_published: boolean;
   sort_order: number;
   created_at: string;
   updated_at: string;
+  host_name: string | null;
+  host_role: string | null;
+  host_avatar_url: string | null;
+  cohort_size_min: number | null;
+  cohort_size_max: number | null;
+  villa_neighbourhood: string | null;
+  price_per_person_cents: number | null;
+  next_cohort_starts_at: string | null;
+  next_cohort_ends_at: string | null;
+  next_cohort_status: CohortStatus | null;
 }
 
 export interface JourneyDay {

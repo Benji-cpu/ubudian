@@ -14,12 +14,17 @@ import { JourneyTestimonials } from "@/components/journeys/journey-testimonials"
 import { JourneyFaq } from "@/components/journeys/journey-faq";
 import { WhatsIncludedIcons } from "@/components/journeys/whats-included-icons";
 import { DifferentiatorStrip } from "@/components/journeys/differentiator-strip";
+import { CohortFacts } from "@/components/journeys/cohort-facts";
 import { JourneyGuides } from "@/components/journeys/journey-guides";
 import { JourneyDayTabs } from "@/components/journeys/journey-day-tabs";
 import { JourneyMap } from "@/components/journeys/journey-map";
 import { SaveJourneyButton } from "@/components/journeys/save-journey-button";
 import { NewsletterSignup } from "@/components/layout/newsletter-signup";
 import { resolveDayCandidates } from "@/lib/journeys/slot-resolver";
+import {
+  rankJourneysByArchetype,
+  rankAtomsForUser,
+} from "@/lib/journeys/journey-personalization";
 import { getCurrentProfile } from "@/lib/auth";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -31,6 +36,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import type {
+  ArchetypeId,
   Journey,
   JourneyDay,
   JourneyDaySlot,
@@ -109,30 +115,45 @@ export default async function JourneyPage({ params }: JourneyPageProps) {
       initialSaved = Boolean(savedRow);
     }
 
-    const [daysRes, moreRes, testRes] = await Promise.all([
+    const [daysRes, moreRes, testRes, quizRes] = await Promise.all([
       supabase
         .from("journey_days")
         .select("*")
         .eq("journey_id", journey.id)
         .order("day_number", { ascending: true }),
+      // Fetch all candidate alternates; we rank in JS so logged-in users with a
+      // quiz result see archetype-matched threads first instead of admin sort.
       supabase
         .from("journeys")
         .select("*")
         .eq("is_published", true)
         .eq("tier", "living_guide")
         .neq("id", journey.id)
-        .order("sort_order", { ascending: true })
-        .limit(3),
+        .order("sort_order", { ascending: true }),
       supabase
         .from("journey_testimonials")
         .select("*")
         .eq("journey_id", journey.id)
         .eq("is_published", true)
         .order("sort_order", { ascending: true }),
+      profile
+        ? supabase
+            .from("quiz_results")
+            .select("primary_archetype, secondary_archetype")
+            .eq("profile_id", profile.id)
+            .order("created_at", { ascending: false })
+            .limit(1)
+            .maybeSingle()
+        : Promise.resolve({ data: null }),
     ]);
 
     days = (daysRes.data ?? []) as JourneyDay[];
-    moreJourneys = (moreRes.data ?? []) as Journey[];
+    const allMore = (moreRes.data ?? []) as Journey[];
+    const quiz = quizRes.data as { primary_archetype: ArchetypeId; secondary_archetype: ArchetypeId | null } | null;
+    moreJourneys = rankJourneysByArchetype(allMore, {
+      primary: quiz?.primary_archetype ?? null,
+      secondary: quiz?.secondary_archetype ?? null,
+    }).slice(0, 3);
     testimonials = (testRes.data ?? []) as JourneyTestimonial[];
 
     if (days.length > 0) {
@@ -148,6 +169,21 @@ export default async function JourneyPage({ params }: JourneyPageProps) {
         slotsByDay.set(d.id, allSlots.filter((s) => s.journey_day_id === d.id));
       }
       candidatesBySlot = await resolveDayCandidates(allSlots);
+
+      // If the user has a quiz result, re-rank the candidates inside each
+      // slot so archetype-aligned atoms surface first. Anon users see the
+      // slot-resolver's theme-tag-based order unchanged.
+      if (quiz?.primary_archetype) {
+        for (const [slotId, atoms] of candidatesBySlot.entries()) {
+          candidatesBySlot.set(
+            slotId,
+            rankAtomsForUser(atoms, {
+              primary: quiz.primary_archetype,
+              secondary: quiz.secondary_archetype ?? null,
+            }),
+          );
+        }
+      }
 
       // Fetch event slugs for any event_ref atoms (events route uses slug, not id)
       const eventIds = new Set<string>();
@@ -194,18 +230,21 @@ export default async function JourneyPage({ params }: JourneyPageProps) {
   return (
     <article>
       <JourneyJsonLd journey={journey} />
-      {/* Cover */}
+      {/* Cover — slow Ken Burns drift on supporting browsers, static elsewhere */}
       {journey.cover_image_url ? (
-        <div className="relative h-[420px] w-full sm:h-[520px]">
-          <Image
-            src={journey.cover_image_url}
-            alt={journey.title}
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/25 to-transparent" />
+        <div className="relative h-[440px] w-full overflow-hidden sm:h-[560px]">
+          <div className="absolute inset-0 motion-safe:animate-[ambient-drift_22s_ease-in-out_infinite_alternate]">
+            <Image
+              src={journey.cover_image_url}
+              alt={journey.title}
+              fill
+              priority
+              sizes="100vw"
+              className="object-cover"
+            />
+          </div>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-black/10" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/15 via-transparent to-transparent" />
           {profile && (
             <div className="absolute right-4 top-4 sm:right-6 sm:top-6">
               <SaveJourneyButton
@@ -277,17 +316,52 @@ export default async function JourneyPage({ params }: JourneyPageProps) {
           </div>
         )}
 
-        {/* Hero quote / summary */}
+        {/* Hero quote — typographic moment, not just a quote box */}
         {journey.hero_quote && (
-          <blockquote className="mt-6 border-l-2 border-brand-gold/50 pl-4 font-serif text-xl italic text-brand-deep-green">
-            {journey.hero_quote}
-          </blockquote>
+          <figure className="mt-10">
+            <span
+              aria-hidden="true"
+              className="block font-serif text-5xl leading-none text-brand-gold/45 sm:text-6xl"
+            >
+              &ldquo;
+            </span>
+            <blockquote className="mt-2 font-serif text-xl italic leading-snug text-brand-deep-green sm:text-2xl">
+              {journey.hero_quote}
+            </blockquote>
+            <div className="mt-5 h-px w-12 bg-brand-gold/40" />
+          </figure>
         )}
+
+        {/* Curator's note — Benji's voice, after the hero quote */}
+        {journey.curator_note && (
+          <aside className="mt-8 rounded-md border-l-2 border-brand-gold/60 bg-brand-cream/40 px-5 py-4">
+            <p className="text-[10px] uppercase tracking-[0.25em] text-brand-gold">
+              Curator&apos;s note
+            </p>
+            <p className="mt-2 font-serif text-base leading-relaxed text-brand-deep-green/90 sm:text-lg">
+              {journey.curator_note}
+            </p>
+          </aside>
+        )}
+
         {journey.summary && (
-          <div className="mt-6 text-lg leading-relaxed text-muted-foreground">
+          <div className="mt-8 text-lg leading-relaxed text-foreground/75">
             <MarkdownContent content={journey.summary} />
           </div>
         )}
+
+        {/* Last refreshed — quiet trust signal that this retreat is maintained */}
+        <p className="mt-6 text-[11px] uppercase tracking-wider text-muted-foreground/70">
+          Last refreshed{" "}
+          {new Date(journey.updated_at).toLocaleDateString("en-GB", {
+            day: "numeric",
+            month: "short",
+            year: "numeric",
+          })}
+        </p>
+
+        {/* Cohort facts — who, when, where, how many, what cost */}
+        <CohortFacts journey={journey} applyHref={`/experiences/${journey.slug}/apply`} />
 
         {/* What this retreat holds — icon row */}
         <section className="mt-12">
