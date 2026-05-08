@@ -32,7 +32,7 @@ export type ModerationResult =
   | { ok: true; notes?: string }
   | { ok: false; flag: ModerationFlag; reason: string };
 
-const MODEL = "gemini-2.0-flash";
+const MODEL = "gemini-2.5-flash-lite";
 
 const SYSTEM_PROMPT = `You are the content safety gate for The Ubudian, a community events platform for Ubud, Bali.
 

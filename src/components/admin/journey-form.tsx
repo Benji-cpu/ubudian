@@ -73,6 +73,7 @@ const journeySchema = z.object({
   whats_included: z.string().optional().or(z.literal("")),
   who_its_for: z.string().optional().or(z.literal("")),
   practical_info: z.string().optional().or(z.literal("")),
+  curator_note: z.string().max(800).optional().or(z.literal("")),
   archetype_tags: z.array(z.enum(["seeker", "explorer", "creative", "connector", "epicurean"])),
   is_published: z.boolean(),
   sort_order: z.string().optional().or(z.literal("")),
@@ -107,6 +108,7 @@ export function JourneyForm({ initialData }: JourneyFormProps) {
       whats_included: initialData?.whats_included ?? "",
       who_its_for: initialData?.who_its_for ?? "",
       practical_info: initialData?.practical_info ?? "",
+      curator_note: initialData?.curator_note ?? "",
       archetype_tags: initialData?.archetype_tags ?? [],
       is_published: initialData?.is_published ?? false,
       sort_order: initialData?.sort_order?.toString() ?? "0",
@@ -137,6 +139,7 @@ export function JourneyForm({ initialData }: JourneyFormProps) {
       whats_included: data.whats_included || null,
       who_its_for: data.who_its_for || null,
       practical_info: data.practical_info || null,
+      curator_note: data.curator_note || null,
       archetype_tags: data.archetype_tags,
       is_published: data.is_published,
       sort_order: data.sort_order ? Number(data.sort_order) : 0,
@@ -343,6 +346,27 @@ export function JourneyForm({ initialData }: JourneyFormProps) {
                       height={220}
                     />
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="curator_note"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Curator&apos;s note</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      rows={3}
+                      placeholder="Two or three sentences on why this retreat — in your voice. Surfaces under the hero quote on the detail page."
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    Optional. Authorial — not generic marketing. Appears as a signed editorial aside.
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
