@@ -182,13 +182,27 @@ export function GuideForm({ initialData }: GuideFormProps) {
     }
 
     let error;
+    let savedId: string | null = isEditMode ? initialData!.id : null;
     if (isEditMode) {
       ({ error } = await supabase
         .from("guides")
         .update(payload)
         .eq("id", initialData.id));
     } else {
-      ({ error } = await supabase.from("guides").insert(payload));
+      const { data: inserted, error: insertError } = await supabase
+        .from("guides")
+        .insert(payload)
+        .select("id")
+        .single();
+      error = insertError;
+      savedId = (inserted?.id as string | undefined) ?? null;
+    }
+
+    // Sync the body's shortcode references into guide_entity_references.
+    // This is best-effort: a sync failure does not invalidate the save.
+    if (!error && savedId) {
+      const { syncGuideReferences } = await import("@/lib/guides/sync-references");
+      await syncGuideReferences(supabase, savedId, data.body_md);
     }
 
     setSaving(false);
