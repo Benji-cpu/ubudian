@@ -30,7 +30,7 @@ npm run test:e2e   # Playwright E2E tests
 
 - **Platform**: Vercel (Hobby plan)
 - **Project**: `ubudian-v1`
-- **Production URL**: https://ubudian-v1.vercel.app
+- **Production URL**: https://theubudian.life (canonical apex; old `ubudian-v1.vercel.app` and `www.theubudian.life` 308-redirect to it via `src/middleware.ts` host-canonicalization — webhooks and `/api/cron/*` are exempt). Always reference `theubudian.life` in copy, env vars (`NEXT_PUBLIC_SITE_URL`), screenshots, and docs.
 - **Cron jobs**:
   - `/api/cron/ingest-events` — Vercel Cron, daily at 6 AM UTC
   - `/api/cron/ingestion-health` — Vercel Cron, daily at 9 AM UTC
