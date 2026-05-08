@@ -13,9 +13,16 @@ import type { Event } from "@/types";
 interface EventGridCardProps {
   event: Event;
   saveButton?: React.ReactNode;
+  /** Tailwind aspect class applied to the cover image, e.g. `aspect-[4/5]`.
+      Lets the parent vary heights to create a staggered masonry feel. */
+  aspectClass?: string;
 }
 
-export function EventGridCard({ event, saveButton }: EventGridCardProps) {
+export function EventGridCard({
+  event,
+  saveButton,
+  aspectClass = "aspect-[16/10]",
+}: EventGridCardProps) {
   const dateLine = formatEventDateLine(event);
   const emoji = CATEGORY_EMOJI[event.category] || CATEGORY_EMOJI["Other"];
   const isFree = isFreeEvent(event.price_info);
@@ -27,7 +34,7 @@ export function EventGridCard({ event, saveButton }: EventGridCardProps) {
     >
       <article className="relative overflow-hidden rounded-2xl border border-brand-deep-green/10 bg-white transition-all duration-300 ease-out hover:-translate-y-0.5 hover:border-brand-gold/40 hover:shadow-[0_18px_40px_-20px_rgba(44,74,62,0.4)] motion-reduce:hover:translate-y-0">
         {/* Image */}
-        <div className="relative aspect-[16/10] overflow-hidden">
+        <div className={`relative ${aspectClass} overflow-hidden`}>
           {event.cover_image_url ? (
             <Image
               src={event.cover_image_url}
