@@ -17,6 +17,7 @@ const HREF_TO_FLAG: Record<string, keyof SiteSettings> = {
   "/stories": "stories_enabled",
   "/tours": "tours_enabled",
   "/newsletter": "newsletter_archive_enabled",
+  "/guides": "guides_enabled",
 };
 
 export function MobileMenu({

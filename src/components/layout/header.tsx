@@ -45,6 +45,14 @@ export async function Header() {
           >
             Quiz
           </Link>
+          {settings.guides_enabled && (
+            <Link
+              href="/guides"
+              className="text-xs font-semibold uppercase tracking-widest text-brand-off-white transition-colors duration-300 hover:text-brand-gold"
+            >
+              Guides
+            </Link>
+          )}
           <Link
             href="/events"
             className="text-xs font-semibold uppercase tracking-widest text-brand-off-white transition-colors duration-300 hover:text-brand-gold"
