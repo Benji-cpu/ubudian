@@ -49,6 +49,7 @@ interface EventsPageProps {
     price?: string;
     archetype?: string;
     free?: string;
+    intents?: string;
   }>;
 }
 
@@ -174,6 +175,17 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
 
       if (params.archetype) {
         query = query.contains("archetype_tags", [params.archetype]);
+      }
+
+      if (params.intents) {
+        // Comma-separated intent ids — match events that carry at least one.
+        const intents = params.intents
+          .split(",")
+          .map((s) => s.trim())
+          .filter(Boolean);
+        if (intents.length > 0) {
+          query = query.overlaps("intent_tags", intents);
+        }
       }
 
       return query;

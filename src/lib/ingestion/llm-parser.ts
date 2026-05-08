@@ -106,6 +106,11 @@ const parsedEventItemSchema = {
     cover_image_url: { type: SchemaType.STRING as const, description: "Cover image URL", nullable: true },
     quality_score: { type: SchemaType.NUMBER as const, description: "Content quality score 0.0-1.0 based on: field completeness (title, description, date, venue, time, price), description clarity, and overall publish-readiness" },
     content_flags: { type: SchemaType.ARRAY as const, items: { type: SchemaType.STRING as const }, description: "Content flags: 'spam', 'inappropriate', 'misleading', 'off_topic', 'low_quality'. Empty array if content is clean." },
+    intent_tags: {
+      type: SchemaType.ARRAY as const,
+      items: { type: SchemaType.STRING as const, enum: ["romance", "community", "spirit", "living", "local_culture"] },
+      description: "Which guide intent(s) this event serves. 'romance' = tantra/intimacy/dating; 'community' = circles, groups, gatherings; 'spirit' = ceremony, sound, devotional practice; 'living' = lifestyle, food, slow-living; 'local_culture' = Balinese arts, traditions, language. Pick 0-2 best matches; leave empty if none clearly fit.",
+    },
   },
   required: ["title", "description", "category", "start_date", "quality_score", "content_flags"] ,
 };

@@ -30,6 +30,8 @@ export interface ParsedEvent {
   // Quality assessment (set by LLM)
   quality_score?: number;
   content_flags?: string[];
+  // Guide intent tagging (set by LLM)
+  intent_tags?: string[];
   // Source tracking (set by adapter)
   source_url?: string | null;
   source_event_id?: string | null;

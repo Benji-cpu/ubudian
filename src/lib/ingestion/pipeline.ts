@@ -813,6 +813,7 @@ export async function createEventFromParsed(
           ingested_at: new Date().toISOString(),
           quality_score: qualityScore || null,
           content_flags: mergedFlags,
+          intent_tags: parsed.intent_tags ?? [],
           ai_approved_at: aiApprovedAt,
           moderation_reason: moderationReason,
           latitude,

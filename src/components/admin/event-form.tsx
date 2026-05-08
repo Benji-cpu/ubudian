@@ -76,6 +76,7 @@ const eventSchema = z.object({
   organizer_contact: z.string().optional().or(z.literal("")),
   organizer_instagram: z.string().optional().or(z.literal("")),
   archetype_tags: z.array(z.enum(["seeker", "explorer", "creative", "connector", "epicurean"])),
+  intent_tags: z.array(z.enum(["romance", "community", "spirit", "living", "local_culture"])),
 });
 
 type EventFormValues = z.infer<typeof eventSchema>;
@@ -120,6 +121,7 @@ export function EventForm({ initialData }: EventFormProps) {
       organizer_contact: initialData?.organizer_contact ?? "",
       organizer_instagram: initialData?.organizer_instagram ?? "",
       archetype_tags: initialData?.archetype_tags ?? [],
+      intent_tags: initialData?.intent_tags ?? [],
     },
   });
 
@@ -160,6 +162,7 @@ export function EventForm({ initialData }: EventFormProps) {
       organizer_contact: data.organizer_contact || null,
       organizer_instagram: data.organizer_instagram || null,
       archetype_tags: data.archetype_tags,
+      intent_tags: data.intent_tags,
     };
 
     let error;
@@ -528,7 +531,28 @@ export function EventForm({ initialData }: EventFormProps) {
                   <FormControl>
                     <TagInput options={ARCHETYPE_IDS} value={field.value} onChange={field.onChange} />
                   </FormControl>
-                  <FormDescription>Tag for personalized recommendations</FormDescription>
+                  <FormDescription>Quiz personalisation</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="intent_tags"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Intent Tags</FormLabel>
+                  <FormControl>
+                    <TagInput
+                      options={["romance", "community", "spirit", "living", "local_culture"]}
+                      value={field.value}
+                      onChange={field.onChange}
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    What guide intent does this event serve? Used by the &ldquo;live events for [intent]&rdquo; CTAs in guides.
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
