@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Sun, Sunrise, Moon, ExternalLink } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { MarkdownContent } from "@/components/blog/markdown-content";
+import { ShareDayButton } from "@/components/journeys/share-day-button";
 import type {
   JourneyAtom,
   JourneyAtomKind,
@@ -17,6 +18,9 @@ interface JourneyDayCardProps {
   slots: JourneyDaySlot[];
   candidatesBySlot: Map<string, JourneyAtom[]>;
   eventSlugs: Map<string, string>;
+  /** When provided, enables per-day share/deep-link UX. */
+  journeyTitle?: string;
+  journeyUrl?: string;
 }
 
 const DAY_TYPE_LABEL: Record<JourneyDayType, string> = {
@@ -57,15 +61,39 @@ const ATOM_KIND_LABEL: Record<JourneyAtomKind, string> = {
   reflection: "Reflection",
 };
 
-export function JourneyDayCard({ day, slots, candidatesBySlot, eventSlugs }: JourneyDayCardProps) {
+export function JourneyDayCard({
+  day,
+  slots,
+  candidatesBySlot,
+  eventSlugs,
+  journeyTitle,
+  journeyUrl,
+}: JourneyDayCardProps) {
   const slotsByWindow = new Map<JourneyDayWindow, JourneyDaySlot[]>();
   for (const w of WINDOW_ORDER) slotsByWindow.set(w, []);
   for (const s of slots) {
     slotsByWindow.get(s.slot_window)?.push(s);
   }
 
+  // Collect atom images surfaced today for the photo strip — gives the day
+  // a visual register without forcing the reader to scan every slot.
+  const dayPhotos: { src: string; alt: string }[] = [];
+  for (const ws of slotsByWindow.values()) {
+    for (const slot of ws) {
+      const atoms = candidatesBySlot.get(slot.id) ?? [];
+      for (const atom of atoms) {
+        if (atom.image_url && dayPhotos.length < 4) {
+          dayPhotos.push({ src: atom.image_url, alt: atom.title });
+        }
+      }
+    }
+  }
+
   return (
-    <article className="overflow-hidden rounded-md border border-brand-gold/20 bg-card">
+    <article
+      id={`day-${day.day_number}`}
+      className="scroll-mt-24 overflow-hidden rounded-md border border-brand-gold/20 bg-card"
+    >
       <header className="relative overflow-hidden border-b border-brand-gold/15 bg-brand-cream/30 px-5 py-6 sm:px-6 sm:py-8">
         {day.background_image_url && (
           <>
@@ -80,13 +108,23 @@ export function JourneyDayCard({ day, slots, candidatesBySlot, eventSlugs }: Jou
             <div className="absolute inset-0 -z-10 bg-gradient-to-r from-brand-cream/80 via-brand-cream/55 to-brand-cream/30" aria-hidden />
           </>
         )}
-        <div className="flex items-center gap-3">
-          <span className="rounded-full bg-brand-deep-green px-3 py-1 text-xs font-semibold uppercase tracking-wider text-brand-cream">
-            Day {day.day_number}
-          </span>
-          <span className={`rounded-full px-3 py-1 text-xs font-medium ${DAY_TYPE_TONE[day.day_type]}`}>
-            {DAY_TYPE_LABEL[day.day_type]}
-          </span>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="rounded-full bg-brand-deep-green px-3 py-1 text-xs font-semibold uppercase tracking-wider text-brand-cream">
+              Day {day.day_number}
+            </span>
+            <span className={`rounded-full px-3 py-1 text-xs font-medium ${DAY_TYPE_TONE[day.day_type]}`}>
+              {DAY_TYPE_LABEL[day.day_type]}
+            </span>
+          </div>
+          {journeyTitle && journeyUrl && (
+            <ShareDayButton
+              journeyTitle={journeyTitle}
+              journeyUrl={journeyUrl}
+              dayNumber={day.day_number}
+              dayTheme={day.theme}
+            />
+          )}
         </div>
         <h3 className="mt-3 font-serif text-xl font-medium text-brand-deep-green sm:text-2xl">
           {day.theme}
@@ -95,6 +133,25 @@ export function JourneyDayCard({ day, slots, candidatesBySlot, eventSlugs }: Jou
           <p className="mt-1 text-sm italic text-muted-foreground">{day.theme_subtitle}</p>
         )}
       </header>
+
+      {dayPhotos.length >= 2 && (
+        <div className="grid gap-1 border-b border-brand-gold/15 bg-brand-cream/10 sm:grid-cols-4">
+          {dayPhotos.map((p, i) => (
+            <div
+              key={`${p.src}-${i}`}
+              className="relative aspect-[5/4] overflow-hidden first:sm:col-span-2 first:sm:row-span-1 first:sm:aspect-[5/3]"
+            >
+              <Image
+                src={p.src}
+                alt={p.alt}
+                fill
+                sizes="(max-width: 640px) 50vw, 25vw"
+                className="object-cover"
+              />
+            </div>
+          ))}
+        </div>
+      )}
 
       <div className="px-5 py-5 sm:px-6">
         {day.intention && (
@@ -178,13 +235,13 @@ function AtomLine({ atom, eventSlugs }: { atom: JourneyAtom; eventSlugs: Map<str
   const inner = (
     <>
       {atom.image_url ? (
-        <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-sm border border-brand-gold/20">
+        <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-sm border border-brand-gold/20 sm:h-16 sm:w-16">
           <Image
             src={atom.image_url}
             alt=""
             fill
-            sizes="48px"
-            className="object-cover"
+            sizes="64px"
+            className="object-cover transition-transform group-hover:scale-105"
             aria-hidden
           />
         </div>
@@ -193,7 +250,7 @@ function AtomLine({ atom, eventSlugs }: { atom: JourneyAtom; eventSlugs: Map<str
           {ATOM_KIND_LABEL[atom.kind]}
         </Badge>
       )}
-      <div className="min-w-0">
+      <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
           {atom.image_url && (
             <span className="text-[10px] uppercase tracking-wider text-brand-gold">
@@ -201,7 +258,7 @@ function AtomLine({ atom, eventSlugs }: { atom: JourneyAtom; eventSlugs: Map<str
             </span>
           )}
         </div>
-        <p className="truncate text-sm font-medium text-foreground">{atom.title}</p>
+        <p className="text-sm font-medium text-foreground">{atom.title}</p>
         {atom.short_description && (
           <p className="text-xs text-muted-foreground line-clamp-2">{atom.short_description}</p>
         )}
@@ -218,12 +275,28 @@ function AtomLine({ atom, eventSlugs }: { atom: JourneyAtom; eventSlugs: Map<str
           href={href}
           target={href.startsWith("http") ? "_blank" : undefined}
           rel={href.startsWith("http") ? "noopener noreferrer" : undefined}
-          className="flex items-start gap-2 rounded-sm px-1 py-1 hover:bg-brand-cream/40"
+          className="group flex items-start gap-3 rounded-sm px-1 py-1 hover:bg-brand-cream/40"
         >
           {inner}
         </Link>
       ) : (
-        <div className="flex items-start gap-2 px-1 py-1">{inner}</div>
+        <div className="group flex items-start gap-3 px-1 py-1">{inner}</div>
+      )}
+      {atom.image_url && atom.image_credit && (
+        <p className="ml-[3.75rem] mt-0.5 text-[10px] text-muted-foreground/80 sm:ml-[4.25rem]">
+          {atom.image_credit_url ? (
+            <a
+              href={atom.image_credit_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline-offset-2 hover:underline"
+            >
+              {atom.image_credit} &rarr;
+            </a>
+          ) : (
+            atom.image_credit
+          )}
+        </p>
       )}
     </li>
   );

@@ -13,8 +13,13 @@ import { JourneyJsonLd } from "@/components/journeys/journey-json-ld";
 import { JourneyTestimonials } from "@/components/journeys/journey-testimonials";
 import { JourneyFaq } from "@/components/journeys/journey-faq";
 import { WhatsIncludedIcons } from "@/components/journeys/whats-included-icons";
+import { JourneyGuides } from "@/components/journeys/journey-guides";
+import { JourneyDayTabs } from "@/components/journeys/journey-day-tabs";
+import { JourneyMap } from "@/components/journeys/journey-map";
+import { SaveJourneyButton } from "@/components/journeys/save-journey-button";
 import { NewsletterSignup } from "@/components/layout/newsletter-signup";
 import { resolveDayCandidates } from "@/lib/journeys/slot-resolver";
+import { getCurrentProfile } from "@/lib/auth";
 import { Badge } from "@/components/ui/badge";
 import {
   Breadcrumb,
@@ -76,6 +81,8 @@ export default async function JourneyPage({ params }: JourneyPageProps) {
   const eventSlugs = new Map<string, string>();
   let moreJourneys: Journey[] = [];
   let testimonials: JourneyTestimonial[] = [];
+  let initialSaved = false;
+  const profile = await getCurrentProfile();
 
   try {
     const { slug } = await params;
@@ -90,6 +97,16 @@ export default async function JourneyPage({ params }: JourneyPageProps) {
 
     if (!journeyRow) notFound();
     journey = journeyRow as Journey;
+
+    if (profile) {
+      const { data: savedRow } = await supabase
+        .from("saved_journeys")
+        .select("journey_id")
+        .eq("profile_id", profile.id)
+        .eq("journey_id", journey.id)
+        .maybeSingle();
+      initialSaved = Boolean(savedRow);
+    }
 
     const [daysRes, moreRes, testRes] = await Promise.all([
       supabase
@@ -152,6 +169,27 @@ export default async function JourneyPage({ params }: JourneyPageProps) {
 
   const journeyUrl = `${SITE_URL}/experiences/${journey.slug}`;
 
+  // Roll up signals from atoms across every slot — drives the practitioner
+  // rail, the map, and (later) personalisation. Done once, used many times.
+  const practitionerIds = new Set<string>();
+  const mappableAtoms: JourneyAtom[] = [];
+  const seenAtomIds = new Set<string>();
+  for (const cs of candidatesBySlot.values()) {
+    for (const atom of cs) {
+      if (seenAtomIds.has(atom.id)) continue;
+      seenAtomIds.add(atom.id);
+      if (atom.practitioner_id) practitionerIds.add(atom.practitioner_id);
+      if (
+        typeof atom.latitude === "number" &&
+        typeof atom.longitude === "number" &&
+        Number.isFinite(atom.latitude) &&
+        Number.isFinite(atom.longitude)
+      ) {
+        mappableAtoms.push(atom);
+      }
+    }
+  }
+
   return (
     <article>
       <JourneyJsonLd journey={journey} />
@@ -167,6 +205,15 @@ export default async function JourneyPage({ params }: JourneyPageProps) {
             className="object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/25 to-transparent" />
+          {profile && (
+            <div className="absolute right-4 top-4 sm:right-6 sm:top-6">
+              <SaveJourneyButton
+                journeyId={journey.id}
+                profileId={profile.id}
+                initialSaved={initialSaved}
+              />
+            </div>
+          )}
           <div className="absolute inset-x-0 bottom-0 p-6 sm:p-10">
             <div className="mx-auto max-w-3xl text-white">
               <div className="flex items-center gap-3 text-xs uppercase tracking-[0.2em] opacity-90">
@@ -193,6 +240,9 @@ export default async function JourneyPage({ params }: JourneyPageProps) {
           <ImageIcon className="h-12 w-12 text-muted-foreground/40" />
         </div>
       )}
+
+      {/* Practitioners rail */}
+      <JourneyGuides practitionerIds={Array.from(practitionerIds)} />
 
       {/* Breadcrumbs */}
       <nav className="mx-auto max-w-3xl px-4 pt-6 sm:px-6">
@@ -258,28 +308,36 @@ export default async function JourneyPage({ params }: JourneyPageProps) {
 
       {/* Days */}
       {days.length > 0 && (
-        <section className="border-t bg-brand-cream/30 px-4 py-12 sm:px-6">
-          <div className="mx-auto max-w-3xl">
-            <h2 className="font-serif text-2xl font-medium text-brand-deep-green">
-              The {journey.length_days} days
-            </h2>
-            <p className="mt-2 text-sm text-muted-foreground">
-              The retreat is light by design — most days hold one good thing,
-              with rest, food, and unplanned encounters around it.
-            </p>
-            <div className="mt-8 space-y-6">
-              {days.map((d) => (
-                <JourneyDayCard
-                  key={d.id}
-                  day={d}
-                  slots={slotsByDay.get(d.id) ?? []}
-                  candidatesBySlot={candidatesBySlot}
-                  eventSlugs={eventSlugs}
-                />
-              ))}
+        <>
+          <JourneyDayTabs
+            days={days.map((d) => ({ day_number: d.day_number, theme: d.theme }))}
+          />
+          <section className="border-t bg-brand-cream/30 px-4 py-12 sm:px-6">
+            <div className="mx-auto max-w-3xl">
+              <h2 className="font-serif text-2xl font-medium text-brand-deep-green">
+                The {journey.length_days} days
+              </h2>
+              <p className="mt-2 text-sm text-muted-foreground">
+                The retreat is light by design — most days hold one good thing,
+                with rest, food, and unplanned encounters around it.
+              </p>
+              <div className="mt-8 space-y-6">
+                {days.map((d) => (
+                  <JourneyDayCard
+                    key={d.id}
+                    day={d}
+                    slots={slotsByDay.get(d.id) ?? []}
+                    candidatesBySlot={candidatesBySlot}
+                    eventSlugs={eventSlugs}
+                    journeyTitle={journey.title}
+                    journeyUrl={journeyUrl}
+                  />
+                ))}
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
+          <JourneyMap atoms={mappableAtoms} />
+        </>
       )}
 
       {/* Testimonials */}
