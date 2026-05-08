@@ -15,6 +15,7 @@ import { getCurrentUser, getCurrentProfile } from "@/lib/auth";
 import { isInsider } from "@/lib/stripe/subscription";
 import { MembersOnlyPaywall } from "@/components/membership/members-only-paywall";
 import { getSiteSettings } from "@/lib/site-settings";
+import { MentionedInGuides } from "@/components/cross-links/mentioned-in-guides";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -272,6 +273,7 @@ export default async function StoryPage({ params }: StoryPageProps) {
           </div>
         </section>
       )}
+      <MentionedInGuides refKind="story" refSlug={story.slug} />
     </article>
   );
 }

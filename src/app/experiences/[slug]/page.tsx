@@ -19,6 +19,7 @@ import { JourneyGuides } from "@/components/journeys/journey-guides";
 import { JourneyDayTabs } from "@/components/journeys/journey-day-tabs";
 import { JourneyMap } from "@/components/journeys/journey-map";
 import { SaveJourneyButton } from "@/components/journeys/save-journey-button";
+import { MentionedInGuides } from "@/components/cross-links/mentioned-in-guides";
 import { NewsletterSignup } from "@/components/layout/newsletter-signup";
 import { resolveDayCandidates } from "@/lib/journeys/slot-resolver";
 import {
@@ -488,6 +489,8 @@ export default async function JourneyPage({ params }: JourneyPageProps) {
           </div>
         </section>
       )}
+
+      <MentionedInGuides refKind="retreat" refSlug={journey.slug} tone="deep" />
 
       {/* Quiz CTA */}
       <section className="bg-brand-pale-green px-4 py-14">

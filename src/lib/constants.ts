@@ -93,6 +93,7 @@ export const DASHBOARD_NAV_LINKS = [
   { label: "My Spirit", href: "/dashboard/archetype" },
   { label: "My Agenda", href: "/dashboard/events" },
   { label: "My Retreats", href: "/dashboard/retreats" },
+  { label: "My Guides", href: "/dashboard/guides" },
   { label: "Membership", href: "/dashboard/membership" },
   { label: "Settings", href: "/dashboard/settings" },
 ] as const;

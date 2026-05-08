@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-react";
 import { GuideMarkdown } from "@/components/guides/guide-markdown";
 import { MentionedInGuide } from "@/components/guides/mentioned-in-guide";
 import { GuideCard } from "@/components/guides/guide-card";
+import { SaveGuideButton } from "@/components/guides/save-guide-button";
 import { GUIDE_INTENTS, getIntentConfig } from "@/lib/guides/intents";
 import { eventLinkForIntent } from "@/lib/guides/intent-to-event-categories";
 import type { Guide, Journey } from "@/types";
@@ -14,6 +15,8 @@ interface IntentGuideProps {
   resolved: ResolvedRefs;
   linkedRetreat: Journey | null;
   relatedGuides: Guide[];
+  profileId: string | null;
+  initialSaved: boolean;
 }
 
 export function IntentGuide({
@@ -21,6 +24,8 @@ export function IntentGuide({
   resolved,
   linkedRetreat,
   relatedGuides,
+  profileId,
+  initialSaved,
 }: IntentGuideProps) {
   const primaryIntent = guide.intent_tags[0] ?? null;
   const intentConfig = primaryIntent ? getIntentConfig(primaryIntent) : null;
@@ -50,13 +55,23 @@ export function IntentGuide({
         />
 
         <div className="relative mx-auto flex min-h-[78svh] max-w-5xl flex-col justify-end px-4 pb-20 pt-32 sm:px-6 sm:pb-28 sm:pt-40 lg:px-8">
-          <Link
-            href="/guides"
-            className="self-start inline-flex items-center gap-1.5 text-xs uppercase tracking-[0.18em] text-brand-cream/80 transition-colors hover:text-brand-cream"
-          >
-            <ArrowLeft className="h-3.5 w-3.5" />
-            The Guides
-          </Link>
+          <div className="flex items-center justify-between gap-3">
+            <Link
+              href="/guides"
+              className="self-start inline-flex items-center gap-1.5 text-xs uppercase tracking-[0.18em] text-brand-cream/80 transition-colors hover:text-brand-cream"
+            >
+              <ArrowLeft className="h-3.5 w-3.5" />
+              The Guides
+            </Link>
+            {profileId && (
+              <SaveGuideButton
+                guideId={guide.id}
+                profileId={profileId}
+                initialSaved={initialSaved}
+                variant="icon"
+              />
+            )}
+          </div>
 
           {allIntentLabels.length > 0 && (
             <p className="mt-10 text-[11px] uppercase tracking-[0.28em] text-brand-gold">

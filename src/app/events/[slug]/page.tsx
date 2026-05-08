@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { MapPin, ExternalLink, User } from "lucide-react";
 import { isSafeUrl } from "@/lib/url-validation";
 import { getCurrentProfile } from "@/lib/auth";
+import { MentionedInGuides } from "@/components/cross-links/mentioned-in-guides";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -260,6 +261,7 @@ export default async function EventPage({ params }: EventPageProps) {
           </section>
         )}
       </article>
+      <MentionedInGuides refKind="event" refSlug={e.slug} />
     </>
   );
 }

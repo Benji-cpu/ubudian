@@ -5,7 +5,7 @@ import { SITE_URL } from "@/lib/constants";
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const supabase = createAdminClient();
 
-  const [blogRes, storiesRes, eventsRes, toursRes, newsletterRes] =
+  const [blogRes, storiesRes, eventsRes, toursRes, newsletterRes, guidesRes] =
     await Promise.all([
       supabase
         .from("blog_posts")
@@ -27,11 +27,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         .from("newsletter_editions")
         .select("slug, updated_at")
         .eq("status", "published"),
+      supabase
+        .from("guides")
+        .select("slug, updated_at")
+        .eq("status", "published"),
     ]);
 
   const staticPages: MetadataRoute.Sitemap = [
     { url: SITE_URL, changeFrequency: "daily", priority: 1.0 },
     { url: `${SITE_URL}/events`, changeFrequency: "daily", priority: 0.9 },
+    { url: `${SITE_URL}/guides`, changeFrequency: "weekly", priority: 0.8 },
     { url: `${SITE_URL}/stories`, changeFrequency: "weekly", priority: 0.8 },
     { url: `${SITE_URL}/tours`, changeFrequency: "weekly", priority: 0.8 },
     { url: `${SITE_URL}/blog`, changeFrequency: "weekly", priority: 0.7 },
@@ -77,6 +82,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })
   );
 
+  const guidePages: MetadataRoute.Sitemap = (guidesRes.data ?? []).map((g) => ({
+    url: `${SITE_URL}/guides/${g.slug}`,
+    lastModified: g.updated_at,
+    changeFrequency: "monthly",
+    priority: 0.7,
+  }));
+
   return [
     ...staticPages,
     ...blogPages,
@@ -84,5 +96,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...eventPages,
     ...tourPages,
     ...newsletterPages,
+    ...guidePages,
   ];
 }

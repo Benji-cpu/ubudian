@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowUpRight, Clock } from "lucide-react";
 import { GuideMarkdown } from "@/components/guides/guide-markdown";
 import { GuideToc } from "@/components/guides/guide-toc";
 import { GuideOutOfDateLink } from "@/components/guides/guide-out-of-date-link";
+import { SaveGuideButton } from "@/components/guides/save-guide-button";
 import { extractToc } from "@/lib/guides/toc";
 import type { Guide } from "@/types";
 import type { ResolvedRefs } from "@/lib/guides/shortcodes";
@@ -11,6 +12,8 @@ import type { ResolvedRefs } from "@/lib/guides/shortcodes";
 interface PracticalGuideProps {
   guide: Guide;
   resolved: ResolvedRefs;
+  profileId: string | null;
+  initialSaved: boolean;
 }
 
 function formatLastUpdated(iso: string | null): string | null {
@@ -24,7 +27,7 @@ function formatLastUpdated(iso: string | null): string | null {
   });
 }
 
-export function PracticalGuide({ guide, resolved }: PracticalGuideProps) {
+export function PracticalGuide({ guide, resolved, profileId, initialSaved }: PracticalGuideProps) {
   const updatedAt = formatLastUpdated(guide.last_updated_at) ?? formatLastUpdated(guide.updated_at);
   const toc = extractToc(guide.body_md);
 
@@ -119,6 +122,14 @@ export function PracticalGuide({ guide, resolved }: PracticalGuideProps) {
             )}
           </div>
           <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
+            {profileId && (
+              <SaveGuideButton
+                guideId={guide.id}
+                profileId={profileId}
+                initialSaved={initialSaved}
+                variant="ghost"
+              />
+            )}
             <GuideOutOfDateLink guideTitle={guide.title} />
             <Link
               href="/guides"
