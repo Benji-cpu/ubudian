@@ -46,14 +46,15 @@ export function EventsHero({
         </div>
       )}
 
-      {/* Brand gradient overlay — calibrated so dark photos still legible
-          but lighter / colourful photos breathe through. */}
+      {/* Brand gradient overlay — top edge sits flush with the navbar
+          (solid brand-deep-green) and only deepens further down so dark
+          photos stay legible without a hard color seam at the join. */}
       <div
         aria-hidden
         className={
           hasImage
-            ? "absolute inset-0 bg-gradient-to-b from-black/55 via-brand-deep-green/55 to-black/80"
-            : "absolute inset-0 bg-gradient-to-br from-brand-deep-green via-brand-deep-green to-[#1c302a]"
+            ? "absolute inset-0 bg-gradient-to-b from-brand-deep-green via-brand-deep-green/55 to-black/80"
+            : "absolute inset-0 bg-gradient-to-b from-brand-deep-green via-brand-deep-green to-[#1c302a]"
         }
       />
 
