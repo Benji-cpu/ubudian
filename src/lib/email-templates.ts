@@ -1,4 +1,4 @@
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://theubudian.com";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://theubudian.life";
 
 const COLORS = {
   deepGreen: "#2C4A3E",

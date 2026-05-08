@@ -388,7 +388,7 @@ async function sendHealthAlert(issues: string[]): Promise<void> {
           ${issues.map((i) => `<li>${i}</li>`).join("")}
         </ul>
         <p>
-          <a href="${process.env.NEXT_PUBLIC_SITE_URL || "https://theubudian.com"}/admin/ingestion">
+          <a href="${process.env.NEXT_PUBLIC_SITE_URL || "https://theubudian.life"}/admin/ingestion">
             View Ingestion Dashboard
           </a>
         </p>
