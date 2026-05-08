@@ -4,15 +4,18 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { ARCHETYPES, ARCHETYPE_IDS } from "@/lib/quiz-data";
 import { getEventsForArchetype, getToursForArchetype, getStoriesForArchetype, getExperiencesForArchetype } from "@/lib/quiz-helpers";
+import { getGuidesForArchetype } from "@/lib/guides/match-archetype";
+import { getSiteSettings } from "@/lib/site-settings";
 import { QuizArchetypeCard } from "@/components/quiz/quiz-archetype-card";
 import { EventCard } from "@/components/events/event-card";
 import { TourCard } from "@/components/tours/tour-card";
 import { StoryCard } from "@/components/stories/story-card";
 import { ExperienceCard } from "@/components/experiences/experience-card";
+import { GuideCard } from "@/components/guides/guide-card";
 import { RecommendedRetreatCta } from "@/components/journeys/recommended-retreat-cta";
 import { Button } from "@/components/ui/button";
 import { SITE_URL } from "@/lib/constants";
-import type { ArchetypeId, Event, Tour, Story, Experience } from "@/types";
+import type { ArchetypeId, Event, Tour, Story, Experience, Guide } from "@/types";
 import type { Metadata } from "next";
 
 interface PageProps {
@@ -61,12 +64,15 @@ export default async function ArchetypeResultPage({ params }: PageProps) {
   let tours: Tour[] = [];
   let stories: Story[] = [];
   let experiences: Experience[] = [];
+  let guides: Guide[] = [];
+
+  const settings = await getSiteSettings();
 
   try {
     const supabase = await createClient();
     const today = new Date().toISOString().split("T")[0];
 
-    const [eventsRes, toursRes, storiesRes, experiencesRes] = await Promise.all([
+    const [eventsRes, toursRes, storiesRes, experiencesRes, guidesRes] = await Promise.all([
       supabase
         .from("events")
         .select("*")
@@ -91,12 +97,21 @@ export default async function ArchetypeResultPage({ params }: PageProps) {
         .eq("is_active", true)
         .order("sort_order", { ascending: true })
         .limit(12),
+      settings.guides_enabled
+        ? supabase
+            .from("guides")
+            .select("*")
+            .eq("status", "published")
+            .order("sort_order", { ascending: true })
+            .limit(24)
+        : Promise.resolve({ data: [] as Guide[] }),
     ]);
 
     events = (eventsRes.data ?? []) as Event[];
     tours = (toursRes.data ?? []) as Tour[];
     stories = (storiesRes.data ?? []) as Story[];
     experiences = (experiencesRes.data ?? []) as Experience[];
+    guides = (guidesRes.data ?? []) as Guide[];
   } catch {
     // Supabase unreachable — render with empty recommendations
   }
@@ -105,6 +120,9 @@ export default async function ArchetypeResultPage({ params }: PageProps) {
   const matchedEvents = getEventsForArchetype(events, archetype.id);
   const matchedTours = getToursForArchetype(tours, archetype.id);
   const matchedStories = getStoriesForArchetype(stories, archetype.id);
+  const matchedGuides = settings.guides_enabled
+    ? getGuidesForArchetype(guides, archetype.id, 3)
+    : [];
   const otherArchetypes = ARCHETYPE_IDS.filter((id) => id !== archetype.id);
 
   return (
@@ -165,6 +183,34 @@ export default async function ArchetypeResultPage({ params }: PageProps) {
             <Link href="/quiz">Take the Quiz</Link>
           </Button>
         </div>
+
+        {/* Recommended guides */}
+        {matchedGuides.length > 0 && (
+          <div className="mt-12">
+            <h2 className="font-serif text-2xl font-medium text-brand-deep-green">
+              Guides for {archetype.name}
+            </h2>
+            <p className="mt-2 text-brand-charcoal-light">
+              Free, opinionated reading — start here.
+            </p>
+            <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {matchedGuides.map((guide) => (
+                <GuideCard
+                  key={guide.id}
+                  guide={guide}
+                  variant={guide.tier === "intent" ? "intent-medium" : "practical"}
+                />
+              ))}
+            </div>
+            <div className="mt-6">
+              <Button asChild variant="outline" size="lg" className="w-full sm:w-auto">
+                <Link href={`/guides?archetype=${archetype.id}`}>
+                  Browse all guides for {archetype.name} &rarr;
+                </Link>
+              </Button>
+            </div>
+          </div>
+        )}
 
         {/* Recommended experiences */}
         {matchedExperiences.length > 0 && (
