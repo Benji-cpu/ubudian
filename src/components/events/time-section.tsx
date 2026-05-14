@@ -15,7 +15,7 @@ export function TimeSection({ label, subtitle, events, renderSaveButton }: TimeS
     <section className="mx-auto max-w-7xl">
       <div className="mb-4 flex items-end justify-between px-4 sm:px-0">
         <div>
-          <h3 className="font-serif text-xl font-medium text-brand-deep-green sm:text-2xl">
+          <h3 className="font-serif text-xl font-medium text-brand-deep-green sm:text-2xl dark:text-brand-gold">
             {label}
           </h3>
           {subtitle && (

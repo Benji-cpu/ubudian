@@ -62,7 +62,7 @@ export function ViewSwitcher() {
 
   return (
     <div
-      className="flex h-10 items-center gap-0.5 rounded-md border border-brand-deep-green/15 bg-white/60 p-0.5 shadow-sm backdrop-blur-sm"
+      className="flex h-10 items-center gap-0.5 rounded-md border border-brand-deep-green/15 bg-card/60 p-0.5 shadow-sm backdrop-blur-sm dark:border-brand-deep-green/25 dark:bg-card/40"
       role="tablist"
       aria-label="Choose how to view events"
     >
@@ -79,11 +79,11 @@ export function ViewSwitcher() {
                 aria-selected={isActive}
                 aria-label={`${label} view — ${description}`}
                 className={cn(
-                  "h-9 gap-1.5 rounded-[5px] px-2.5 text-brand-charcoal/70 transition-all duration-200",
-                  "hover:bg-brand-deep-green/5 hover:text-brand-deep-green",
+                  "h-9 gap-1.5 rounded-[5px] px-2.5 text-muted-foreground transition-all duration-200",
+                  "hover:bg-brand-deep-green/5 hover:text-brand-deep-green dark:hover:bg-brand-gold/10 dark:hover:text-brand-gold",
                   "focus-visible:ring-2 focus-visible:ring-brand-gold/40",
                   isActive &&
-                    "bg-brand-deep-green text-brand-cream shadow-sm hover:bg-brand-deep-green hover:text-brand-cream"
+                    "bg-brand-deep-green text-brand-cream shadow-sm hover:bg-brand-deep-green hover:text-brand-cream dark:bg-brand-gold dark:text-brand-deep-green dark:hover:bg-brand-gold dark:hover:text-brand-deep-green"
                 )}
               >
                 <Icon className="h-4 w-4" />

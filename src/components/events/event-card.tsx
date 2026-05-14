@@ -22,7 +22,7 @@ export function EventCard({ event, saveButton }: EventCardProps) {
 
   return (
     <Link href={`/events/${event.slug}`} className="group block">
-      <article className="relative flex gap-4 overflow-hidden rounded-xl border border-brand-deep-green/10 bg-white p-4 transition-all duration-300 ease-out hover:-translate-y-0.5 hover:border-brand-gold/40 hover:shadow-[0_14px_30px_-18px_rgba(44,74,62,0.35)] motion-reduce:hover:translate-y-0">
+      <article className="relative flex gap-4 overflow-hidden rounded-xl border border-brand-deep-green/10 bg-card p-4 transition-all duration-300 ease-out hover:-translate-y-0.5 hover:border-brand-gold/40 hover:shadow-[0_14px_30px_-18px_rgba(44,74,62,0.35)] motion-reduce:hover:translate-y-0 dark:border-brand-deep-green/20 dark:hover:shadow-[0_14px_30px_-18px_rgba(201,168,76,0.25)]">
         {/* Cover image */}
         <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-lg sm:h-[108px] sm:w-[156px]">
           {event.cover_image_url ? (
@@ -59,7 +59,7 @@ export function EventCard({ event, saveButton }: EventCardProps) {
             )}
           </div>
 
-          <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-brand-charcoal/65">
+          <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
             <Badge
               variant="outline"
               className="rounded-full border-brand-deep-green/15 bg-transparent px-2 py-0.5 text-[10px] font-medium uppercase tracking-[0.14em] text-brand-deep-green/80"
@@ -75,7 +75,7 @@ export function EventCard({ event, saveButton }: EventCardProps) {
                 Core
               </span>
             )}
-            <span className="flex items-center gap-1 font-medium text-brand-charcoal/80">
+            <span className="flex items-center gap-1 font-medium text-foreground/85">
               <Calendar className="h-3 w-3 text-brand-deep-green/70" />
               {dateLine}
             </span>
@@ -94,7 +94,7 @@ export function EventCard({ event, saveButton }: EventCardProps) {
           </div>
 
           {event.short_description && (
-            <p className="mt-2 text-sm leading-relaxed text-brand-charcoal/70 line-clamp-1">
+            <p className="mt-2 text-sm leading-relaxed text-foreground/75 line-clamp-1">
               {event.short_description}
             </p>
           )}
@@ -110,7 +110,7 @@ export function EventCard({ event, saveButton }: EventCardProps) {
               externalTicketUrl={event.external_ticket_url}
             />
             {event.organizer_name && (
-              <span className="ml-auto flex items-center gap-1 text-[11px] text-brand-charcoal/50 truncate">
+              <span className="ml-auto flex items-center gap-1 text-[11px] text-muted-foreground/80 truncate">
                 <User className="h-3 w-3 shrink-0" />
                 <span className="truncate">{event.organizer_name}</span>
               </span>

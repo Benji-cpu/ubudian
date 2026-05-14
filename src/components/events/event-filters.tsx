@@ -257,8 +257,8 @@ export function EventFilters() {
               onClick={() => toggleDateFilter(df)}
               aria-pressed={isActive}
               className={cn(
-                "h-9 rounded-full border-brand-deep-green/15 bg-white/60 px-4 text-xs font-medium tracking-wide text-brand-charcoal/70 shadow-sm backdrop-blur-sm transition-all duration-200",
-                "hover:border-brand-deep-green/30 hover:bg-white hover:text-brand-deep-green",
+                "h-9 rounded-full border-brand-deep-green/15 bg-card/60 px-4 text-xs font-medium tracking-wide text-muted-foreground shadow-sm backdrop-blur-sm transition-all duration-200 dark:border-brand-deep-green/25 dark:bg-card/30",
+                "hover:border-brand-deep-green/30 hover:bg-card hover:text-brand-deep-green dark:hover:bg-card/60 dark:hover:text-brand-gold",
                 isActive &&
                   "border-brand-deep-green bg-brand-deep-green text-brand-cream shadow-md hover:bg-brand-deep-green hover:text-brand-cream"
               )}
@@ -291,10 +291,10 @@ export function EventFilters() {
               variant="outline"
               size="sm"
               className={cn(
-                "h-9 rounded-full border-brand-deep-green/15 bg-white/60 px-4 text-xs font-medium tracking-wide text-brand-charcoal/80 shadow-sm backdrop-blur-sm transition-all duration-200",
-                "hover:border-brand-deep-green/30 hover:bg-white hover:text-brand-deep-green",
+                "h-9 rounded-full border-brand-deep-green/15 bg-card/60 px-4 text-xs font-medium tracking-wide text-foreground/80 shadow-sm backdrop-blur-sm transition-all duration-200 dark:border-brand-deep-green/25 dark:bg-card/30",
+                "hover:border-brand-deep-green/30 hover:bg-card hover:text-brand-deep-green dark:hover:bg-card/60 dark:hover:text-brand-gold",
                 drawerFilterCount > 0 &&
-                  "border-brand-deep-green/40 text-brand-deep-green"
+                  "border-brand-deep-green/40 text-brand-deep-green dark:text-brand-gold dark:border-brand-gold/40"
               )}
             >
               <SlidersHorizontal className="mr-1.5 h-3.5 w-3.5" />
@@ -314,7 +314,7 @@ export function EventFilters() {
               <SheetTitle className="font-serif text-2xl text-brand-deep-green">
                 Refine
               </SheetTitle>
-              <SheetDescription className="text-brand-charcoal/70">
+              <SheetDescription className="text-muted-foreground">
                 Narrow events by time, price, venue, or what&apos;s on right
                 now.
               </SheetDescription>
@@ -436,17 +436,17 @@ export function EventFilters() {
                       isUserTyping.current = true;
                       setVenueInput(e.target.value);
                     }}
-                    className="h-10 border-brand-deep-green/15 bg-white/80 pl-9 text-sm"
+                    className="h-10 border-brand-deep-green/15 bg-card/80 pl-9 text-sm dark:border-brand-deep-green/25 dark:bg-card/50"
                   />
                 </div>
               </div>
             </div>
 
-            <SheetFooter className="border-t border-brand-deep-green/10 bg-white/60 backdrop-blur-sm">
+            <SheetFooter className="border-t border-brand-deep-green/10 bg-card/60 backdrop-blur-sm dark:border-brand-deep-green/20 dark:bg-card/30">
               <Button
                 variant="ghost"
                 onClick={clearAll}
-                className="text-brand-charcoal/70 hover:text-brand-deep-green"
+                className="text-muted-foreground hover:text-brand-deep-green dark:hover:text-brand-gold"
               >
                 Clear all
               </Button>
@@ -474,7 +474,7 @@ export function EventFilters() {
               "shrink-0 cursor-pointer select-none rounded-full px-3.5 py-1.5 text-xs font-medium tracking-wide transition-all",
               !activeCategory
                 ? "border-transparent bg-brand-deep-green text-brand-cream hover:bg-brand-deep-green/90"
-                : "border-brand-deep-green/15 bg-transparent text-brand-charcoal/70 hover:border-brand-deep-green/40 hover:text-brand-deep-green"
+                : "border-brand-deep-green/15 bg-transparent text-muted-foreground hover:border-brand-deep-green/40 hover:text-brand-deep-green dark:hover:text-brand-gold dark:hover:border-brand-gold/40"
             )}
             onClick={() => setCategory(null)}
           >
@@ -491,7 +491,7 @@ export function EventFilters() {
                   "shrink-0 cursor-pointer select-none whitespace-nowrap rounded-full px-3.5 py-1.5 text-xs font-medium tracking-wide transition-all",
                   isActive
                     ? "border-transparent bg-brand-deep-green text-brand-cream hover:bg-brand-deep-green/90"
-                    : "border-brand-deep-green/15 bg-transparent text-brand-charcoal/70 hover:border-brand-deep-green/40 hover:text-brand-deep-green"
+                    : "border-brand-deep-green/15 bg-transparent text-muted-foreground hover:border-brand-deep-green/40 hover:text-brand-deep-green dark:hover:text-brand-gold dark:hover:border-brand-gold/40"
                 )}
                 onClick={() => setCategory(isActive ? null : cat)}
               >
@@ -504,7 +504,7 @@ export function EventFilters() {
         <Button
           variant="ghost"
           size="sm"
-          className="mt-1 h-auto px-2 py-0.5 text-xs font-medium text-brand-charcoal/60 hover:text-brand-deep-green"
+          className="mt-1 h-auto px-2 py-0.5 text-xs font-medium text-muted-foreground hover:text-brand-deep-green dark:hover:text-brand-gold"
           onClick={() => setCategoryExpanded(!categoryExpanded)}
         >
           {categoryExpanded ? (
@@ -544,7 +544,7 @@ export function EventFilters() {
           <button
             type="button"
             onClick={clearAll}
-            className="ml-auto text-xs font-medium text-brand-charcoal/60 underline-offset-4 transition hover:text-brand-deep-green hover:underline"
+            className="ml-auto text-xs font-medium text-muted-foreground underline-offset-4 transition hover:text-brand-deep-green hover:underline dark:hover:text-brand-gold"
           >
             Clear all
           </button>

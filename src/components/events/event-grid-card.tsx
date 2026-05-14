@@ -32,7 +32,7 @@ export function EventGridCard({
       href={`/events/${event.slug}`}
       className="group relative block focus-visible:outline-none"
     >
-      <article className="relative overflow-hidden rounded-2xl border border-brand-deep-green/10 bg-white transition-all duration-300 ease-out hover:-translate-y-0.5 hover:border-brand-gold/40 hover:shadow-[0_18px_40px_-20px_rgba(44,74,62,0.4)] motion-reduce:hover:translate-y-0">
+      <article className="relative overflow-hidden rounded-2xl border border-brand-deep-green/10 bg-card transition-all duration-300 ease-out hover:-translate-y-0.5 hover:border-brand-gold/40 hover:shadow-[0_18px_40px_-20px_rgba(44,74,62,0.4)] motion-reduce:hover:translate-y-0 dark:border-brand-deep-green/20 dark:hover:shadow-[0_18px_40px_-20px_rgba(201,168,76,0.25)]">
         {/* Image */}
         <div className={`relative ${aspectClass} overflow-hidden`}>
           {event.cover_image_url ? (
@@ -96,8 +96,8 @@ export function EventGridCard({
             {event.title}
           </h3>
 
-          <div className="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-brand-charcoal/65">
-            <span className="flex items-center gap-1 font-medium text-brand-charcoal/80">
+          <div className="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+            <span className="flex items-center gap-1 font-medium text-foreground/85">
               <Calendar className="h-3 w-3 text-brand-deep-green/70" />
               {dateLine}
             </span>
@@ -116,12 +116,12 @@ export function EventGridCard({
           </div>
 
           {event.short_description && (
-            <p className="mt-2.5 text-sm leading-relaxed text-brand-charcoal/70 line-clamp-2">
+            <p className="mt-2.5 text-sm leading-relaxed text-foreground/75 line-clamp-2">
               {event.short_description}
             </p>
           )}
 
-          <div className="mt-3.5 flex items-center justify-between border-t border-brand-deep-green/8 pt-3">
+          <div className="mt-3.5 flex items-center justify-between border-t border-brand-deep-green/10 pt-3 dark:border-brand-deep-green/15">
             <div className="flex items-center gap-2">
               {event.price_info && !isFree && (
                 <span className="text-sm font-semibold tracking-tight text-brand-terracotta">
@@ -134,7 +134,7 @@ export function EventGridCard({
               />
             </div>
             {event.organizer_name && (
-              <span className="flex items-center gap-1 text-[11px] text-brand-charcoal/50">
+              <span className="flex items-center gap-1 text-[11px] text-muted-foreground/80">
                 <User className="h-3 w-3" />
                 <span className="line-clamp-1">{event.organizer_name}</span>
               </span>
