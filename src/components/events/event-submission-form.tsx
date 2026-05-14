@@ -92,7 +92,9 @@ export function EventSubmissionForm() {
       field: K,
       value: SubmissionFormValues[K]
     ) {
-      form.setValue(field, value, { shouldDirty: true, shouldValidate: false });
+      // react-hook-form's typed Path inference is too strict for this dynamic K/V relationship
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      form.setValue(field, value as any, { shouldDirty: true, shouldValidate: false });
     }
     if (draft.title) set("title", draft.title);
     if (draft.description) set("description", draft.description);

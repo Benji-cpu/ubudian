@@ -26,9 +26,9 @@ export async function MentionedInGuides({
       .eq("ref_slug", refSlug)
       .order("position", { ascending: true });
 
-    guides = ((data ?? []) as Array<{ guides: Guide | null }>)
+    guides = ((data ?? []) as unknown as Array<{ guides: Guide | null }>)
       .map((row) => row.guides)
-      .filter((g): g is Guide => Boolean(g) && g.status === "published")
+      .filter((g): g is Guide => Boolean(g) && g!.status === "published")
       .slice(0, 3);
   } catch {
     return null;

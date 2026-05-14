@@ -273,7 +273,7 @@ export default async function StoryPage({ params }: StoryPageProps) {
           </div>
         </section>
       )}
-      <MentionedInGuides refKind="story" refSlug={story.slug} />
+      <MentionedInGuides refKind="story" refSlug={s.slug} />
     </article>
   );
 }

@@ -167,7 +167,8 @@ export async function classifyMessage(text: string): Promise<ClassificationResul
     model: "gemini-2.5-flash-lite",
     generationConfig: {
       responseMimeType: "application/json",
-      responseSchema: classificationSchema,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      responseSchema: classificationSchema as any,
     },
   });
 
@@ -204,7 +205,8 @@ export async function classifyAndParseMessage(text: string): Promise<ClassifyAnd
     model: "gemini-2.5-flash-lite",
     generationConfig: {
       responseMimeType: "application/json",
-      responseSchema: classifyAndParseSchema,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      responseSchema: classifyAndParseSchema as any,
     },
   });
 
@@ -235,7 +237,8 @@ export async function parseEventFromText(text: string): Promise<ParsedEvent[]> {
     model: "gemini-2.5-flash-lite",
     generationConfig: {
       responseMimeType: "application/json",
-      responseSchema: parsedEventSchema,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      responseSchema: parsedEventSchema as any,
     },
   });
 
@@ -273,7 +276,8 @@ export async function parseEventFromImageBuffer(
     model: "gemini-2.5-flash-lite",
     generationConfig: {
       responseMimeType: "application/json",
-      responseSchema: parsedEventSchema,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      responseSchema: parsedEventSchema as any,
     },
   });
 
@@ -314,7 +318,8 @@ export async function parseEventFromImage(
     model: "gemini-2.5-flash-lite",
     generationConfig: {
       responseMimeType: "application/json",
-      responseSchema: parsedEventSchema,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      responseSchema: parsedEventSchema as any,
     },
   });
 
@@ -386,7 +391,8 @@ export async function compareEventsSemantically(
     model: "gemini-2.5-flash-lite",
     generationConfig: {
       responseMimeType: "application/json",
-      responseSchema: semanticDedupSchema,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      responseSchema: semanticDedupSchema as any,
     },
   });
 
