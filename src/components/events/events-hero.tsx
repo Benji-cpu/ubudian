@@ -115,14 +115,14 @@ export function EventsHero({
         <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
           <Button
             asChild
-            className="rounded-full bg-brand-cream px-7 py-6 text-sm font-semibold tracking-wide text-brand-deep-green shadow-lg transition hover:bg-white hover:shadow-xl"
+            className="rounded-full bg-brand-cream px-7 py-6 text-sm font-semibold tracking-wide text-brand-deep-green shadow-lg transition hover:bg-brand-off-white hover:shadow-xl dark:hover:bg-brand-cream/90"
           >
             <Link href="#events">Browse the agenda</Link>
           </Button>
           <Button
             asChild
             variant="outline"
-            className="rounded-full border-brand-cream/30 bg-white/5 px-7 py-6 text-sm font-semibold tracking-wide text-brand-cream backdrop-blur-sm transition hover:border-brand-cream/60 hover:bg-white/10 hover:text-brand-cream"
+            className="rounded-full border-brand-cream/30 bg-brand-cream/5 px-7 py-6 text-sm font-semibold tracking-wide text-brand-cream backdrop-blur-sm transition hover:border-brand-cream/60 hover:bg-brand-cream/10 hover:text-brand-cream"
           >
             <Link href="/events/submit">Submit an event</Link>
           </Button>

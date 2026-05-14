@@ -274,8 +274,8 @@ export function EventFilters() {
           onClick={toggleFreeOnly}
           aria-pressed={activeFreeOnly}
           className={cn(
-            "h-9 rounded-full border-brand-deep-green/15 bg-white/60 px-4 text-xs font-medium tracking-wide text-brand-charcoal/70 shadow-sm backdrop-blur-sm transition-all duration-200",
-            "hover:border-brand-deep-green/30 hover:bg-white hover:text-brand-deep-green",
+            "h-9 rounded-full border-brand-deep-green/15 bg-card/60 px-4 text-xs font-medium tracking-wide text-muted-foreground shadow-sm backdrop-blur-sm transition-all duration-200 dark:border-brand-deep-green/25 dark:bg-card/30",
+            "hover:border-brand-deep-green/30 hover:bg-card hover:text-brand-deep-green dark:hover:bg-card/60 dark:hover:text-brand-gold",
             activeFreeOnly &&
               "border-brand-gold bg-brand-gold text-brand-deep-green shadow-md hover:bg-brand-gold hover:text-brand-deep-green"
           )}

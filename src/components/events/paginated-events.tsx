@@ -96,10 +96,10 @@ export function PaginatedEvents<T extends { id: string }>({
               onClick={() =>
                 setVisibleCount((c) => Math.min(c + pageSize, items.length))
               }
-              className="rounded-full border-brand-deep-green/20 bg-white/60 px-6 text-xs font-medium tracking-wide text-brand-deep-green shadow-sm hover:bg-white"
+              className="rounded-full border-brand-deep-green/20 bg-card/60 px-6 text-xs font-medium tracking-wide text-brand-deep-green shadow-sm hover:bg-card dark:border-brand-deep-green/30 dark:bg-card/40 dark:hover:bg-card/70 dark:text-brand-gold"
             >
               Show more events
-              <span className="ml-2 text-brand-charcoal/50">
+              <span className="ml-2 text-muted-foreground">
                 · {items.length - visibleCount} remaining
               </span>
             </Button>
@@ -110,7 +110,7 @@ export function PaginatedEvents<T extends { id: string }>({
       {!hasMore && items.length > pageSize && (
         <div className="mt-10 flex flex-col items-center gap-3">
           <div className="h-px w-12 bg-brand-gold/40" />
-          <p className="text-xs uppercase tracking-[0.18em] text-brand-charcoal/50">
+          <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
             That&apos;s all for now
           </p>
         </div>
@@ -122,7 +122,7 @@ export function PaginatedEvents<T extends { id: string }>({
 /** Card-shaped skeleton matching EventGridCard dimensions. */
 export function EventCardSkeleton() {
   return (
-    <div className="overflow-hidden rounded-2xl border border-brand-deep-green/10 bg-white/40">
+    <div className="overflow-hidden rounded-2xl border border-brand-deep-green/10 bg-card/40 dark:border-brand-deep-green/20">
       <div className="aspect-[16/10] w-full animate-pulse bg-brand-deep-green/5" />
       <div className="space-y-3 p-4">
         <div className="h-4 w-3/4 animate-pulse rounded bg-brand-deep-green/10" />
@@ -136,7 +136,7 @@ export function EventCardSkeleton() {
 /** Row-shaped skeleton matching EventCard list dimensions. */
 export function EventRowSkeleton() {
   return (
-    <div className="flex gap-4 overflow-hidden rounded-xl border border-brand-deep-green/10 bg-white/40 p-3">
+    <div className="flex gap-4 overflow-hidden rounded-xl border border-brand-deep-green/10 bg-card/40 p-3 dark:border-brand-deep-green/20">
       <div className="aspect-square h-24 w-24 shrink-0 animate-pulse rounded-lg bg-brand-deep-green/5" />
       <div className="flex-1 space-y-2 py-1">
         <div className="h-4 w-3/4 animate-pulse rounded bg-brand-deep-green/10" />

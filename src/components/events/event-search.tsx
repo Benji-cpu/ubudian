@@ -50,8 +50,8 @@ export function EventSearch() {
         }}
         aria-label="Search events"
         className={cn(
-          "h-10 border-brand-deep-green/15 bg-white/60 pl-10 pr-9 text-brand-charcoal shadow-sm backdrop-blur-sm",
-          "placeholder:text-brand-charcoal/50",
+          "h-10 border-brand-deep-green/15 bg-card/60 pl-10 pr-9 text-foreground shadow-sm backdrop-blur-sm dark:border-brand-deep-green/25 dark:bg-card/30",
+          "placeholder:text-muted-foreground",
           "focus-visible:border-brand-deep-green/40 focus-visible:ring-brand-gold/30"
         )}
       />

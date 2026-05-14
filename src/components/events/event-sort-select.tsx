@@ -34,7 +34,7 @@ export function EventSortSelect() {
     <Select value={currentSort} onValueChange={setSort}>
       <SelectTrigger
         size="default"
-        className="h-10 min-w-[170px] border-brand-deep-green/15 bg-white/60 text-brand-charcoal shadow-sm backdrop-blur-sm hover:border-brand-deep-green/30"
+        className="h-10 min-w-[170px] border-brand-deep-green/15 bg-card/60 text-foreground shadow-sm backdrop-blur-sm hover:border-brand-deep-green/30 dark:border-brand-deep-green/25 dark:bg-card/30"
         aria-label="Sort events"
       >
         <ArrowUpDown className="h-3.5 w-3.5 text-brand-deep-green/60" />

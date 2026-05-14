@@ -58,7 +58,7 @@ export function EventGridCard({
 
           {/* Save button overlay (top-right) */}
           {saveButton && (
-            <div className="absolute right-2.5 top-2.5 rounded-full bg-white/85 p-0.5 shadow-md backdrop-blur-sm">
+            <div className="absolute right-2.5 top-2.5 rounded-full bg-white/85 p-0.5 shadow-md backdrop-blur-sm dark:bg-card/85">
               {saveButton}
             </div>
           )}

@@ -252,7 +252,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
 
         {params.archetype && ARCHETYPE_NAMES[params.archetype] && (
           <div className="mt-4 flex items-center justify-between rounded-lg border border-brand-gold/20 bg-brand-gold/5 px-4 py-3">
-            <p className="text-sm text-brand-charcoal">
+            <p className="text-sm text-foreground">
               Showing events matched to your archetype:{" "}
               <span className="font-semibold text-brand-deep-green">
                 {ARCHETYPE_NAMES[params.archetype]}
