@@ -14,6 +14,7 @@ import { generateFingerprint } from "./fingerprint";
 import { normalizeVenue } from "./venue-normalizer";
 import { eventSimilarityScore, normalizeForComparison, titlesMatch } from "./similarity";
 import { compareEventsSemantically } from "./llm-parser";
+import { parseRecurrenceRule } from "@/lib/recurrence";
 import type { DedupMatchType } from "@/types";
 
 export interface DedupCandidate {
@@ -116,6 +117,62 @@ export async function findDuplicates(input: DedupInput, precomputed?: DedupPreco
       });
     }
     return candidates; // Fingerprint match is very reliable
+  }
+
+  // Layer 2.5: Recurring-event cross-date match
+  // For events flagged as recurring, scan the full table (NOT date-bounded)
+  // for an existing approved/pending row with matching normalised title and
+  // venue at the same recurrence frequency. This catches the case where two
+  // ingest passes assign different seed dates to the same weekly event
+  // (Songs of the Dragonfly Apr 20 vs May 03, etc.) — the ±1-day fuzzy
+  // window in Layer 3 would never compare them.
+  if (input.is_recurring) {
+    const inputRule = parseRecurrenceRule(input.recurrence_rule ?? null);
+    const normalisedInputTitle = normalizeForComparison(input.title);
+    const venueKey = normalizedVenue ? normalizeForComparison(normalizedVenue) : null;
+
+    let recurringQuery = supabase
+      .from("events")
+      .select("id, title, venue_name, recurrence_rule, is_recurring, start_date, status")
+      .eq("is_recurring", true)
+      .in("status", ["approved", "pending"])
+      .limit(50);
+
+    if (venueKey) {
+      recurringQuery = recurringQuery.ilike("venue_name", `%${input.venue_name ?? ""}%`);
+    }
+
+    const { data: recurringMatches } = await recurringQuery;
+
+    for (const existing of recurringMatches ?? []) {
+      if (!titlesMatch(input.title, existing.title, 0.85)) continue;
+      const existingRule = parseRecurrenceRule(existing.recurrence_rule);
+      // If both have a frequency, require it to match. If either is missing
+      // a rule entirely, still consider it a match — same-titled recurring
+      // rows at the same venue are almost certainly the same event.
+      if (inputRule && existingRule && inputRule.frequency !== existingRule.frequency) continue;
+
+      const existingNorm = normalizeForComparison(existing.title);
+      const titleConfidence = existingNorm === normalisedInputTitle ? 0.95 : 0.88;
+
+      candidates.push({
+        eventId: existing.id,
+        matchType: "fuzzy_title",
+        confidence: titleConfidence,
+        metadata: {
+          recurring_cross_date: true,
+          inputTitle: normalisedInputTitle,
+          existingTitle: existingNorm,
+          inputSeed: input.start_date,
+          existingSeed: existing.start_date,
+        },
+      });
+    }
+
+    if (candidates.length > 0) {
+      candidates.sort((a, b) => b.confidence - a.confidence);
+      if (candidates[0].confidence >= 0.9) return candidates;
+    }
   }
 
   // Layer 3: Fuzzy title match within same date range

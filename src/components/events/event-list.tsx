@@ -8,7 +8,7 @@ import {
   PaginatedEvents,
   EventRowSkeleton,
 } from "./paginated-events";
-import { groupEventsByTimeBucket } from "@/lib/utils";
+import { bucketEventsByTime, type EventBucket } from "@/lib/events/buckets";
 import type { Event } from "@/types";
 
 interface EventListProps {
@@ -19,15 +19,29 @@ interface EventListProps {
 
 type BucketLabel = string;
 
-/**
- * Flatten the bucketed events into a single ordered list, but keep
- * the bucket labels so we can interleave section headers between
- * runs of items. This lets the paginator work on a single flat
- * stream while preserving the grouped visual rhythm of the page.
- */
 type ListRow =
   | { kind: "header"; bucket: BucketLabel; id: string }
   | { kind: "event"; event: Event; id: string };
+
+const BUCKET_ORDER: EventBucket[] = [
+  "happening_now",
+  "today",
+  "tomorrow",
+  "in_progress",
+  "weekend",
+  "next_week",
+  "later",
+];
+
+const BUCKET_LABEL: Record<EventBucket, string> = {
+  happening_now: "Happening now",
+  today: "Today",
+  tomorrow: "Tomorrow",
+  in_progress: "Running this week",
+  weekend: "This weekend",
+  next_week: "Next week",
+  later: "Later this month and beyond",
+};
 
 export function EventList({
   events,
@@ -37,12 +51,15 @@ export function EventList({
   const savedSet = new Set(savedEventIds ?? []);
 
   const rows: ListRow[] = useMemo(() => {
-    const buckets = groupEventsByTimeBucket(events);
+    const buckets = bucketEventsByTime(events);
     const out: ListRow[] = [];
-    for (const { bucket, events: bucketEvents } of buckets) {
-      out.push({ kind: "header", bucket, id: `header-${bucket}` });
+    for (const key of BUCKET_ORDER) {
+      const bucketEvents = buckets[key];
+      if (bucketEvents.length === 0) continue;
+      const label = BUCKET_LABEL[key];
+      out.push({ kind: "header", bucket: label, id: `header-${key}` });
       for (const event of bucketEvents) {
-        out.push({ kind: "event", event, id: event.id });
+        out.push({ kind: "event", event, id: `${event.id}-${key}` });
       }
     }
     return out;

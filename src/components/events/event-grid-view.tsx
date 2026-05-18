@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { EventGridCard } from "./event-grid-card";
 import { EventListEmptyState } from "./event-list-empty-state";
 import { SaveEventButton } from "@/components/dashboard/save-event-button";
@@ -7,6 +8,7 @@ import {
   PaginatedEvents,
   EventCardSkeleton,
 } from "./paginated-events";
+import { rolledForward } from "@/lib/events/buckets";
 import type { Event } from "@/types";
 
 interface EventGridViewProps {
@@ -39,10 +41,19 @@ export function EventGridView({
   savedEventIds,
 }: EventGridViewProps) {
   const savedSet = new Set(savedEventIds ?? []);
+  const rolled = useMemo(() => {
+    const r = rolledForward(events);
+    return [...r].sort((a, b) => {
+      if (a.start_date !== b.start_date) return a.start_date.localeCompare(b.start_date);
+      const at = a.start_time ?? "99:99:99";
+      const bt = b.start_time ?? "99:99:99";
+      return at.localeCompare(bt);
+    });
+  }, [events]);
 
   return (
     <PaginatedEvents
-      items={events}
+      items={rolled}
       pageSize={24}
       // CSS columns creates a true masonry: cards keep their natural
       // height and pack into balanced columns. `break-inside-avoid` on

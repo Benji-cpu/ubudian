@@ -76,7 +76,7 @@ Quality Assessment:
   - "spam": Promotional content disguised as events, MLM, crypto schemes
   - "inappropriate": NSFW, hate speech, offensive content
   - "misleading": Fake events, clickbait, scam-like content
-  - "off_topic": Not related to Ubud/Bali community events
+  - "off_topic": Not a fit for The Ubudian's conscious-community / dance / tantra / ceremony / breathwork audience. Flag MANDATORILY when title or description matches any of: ATV, white-water rafting, zipline, jet ski, banana boat, bar crawl, pub crawl, nightlife, cocktail night, drinks special, monkey forest tickets, jungle tour, safari, sightseeing tour, day-trip booking, scooter rental, basic yoga class, beginner yoga class. Also flag when an event is clearly a generic tourist activity sold by a tour operator rather than a community gathering. Cute community workshops (kids art, family paint party, puppy painting) are NOT off_topic — keep them.
   - "low_quality": Extremely vague, unreadable, or gibberish content
 
 Respond with ONLY valid JSON (no markdown, no code blocks). For a single event:
@@ -150,7 +150,7 @@ Quality Assessment:
   - "spam": Promotional content disguised as events, MLM, crypto schemes
   - "inappropriate": NSFW, hate speech, offensive content
   - "misleading": Fake events, clickbait, scam-like content
-  - "off_topic": Not related to Ubud/Bali community events
+  - "off_topic": Not a fit for The Ubudian's conscious-community / dance / tantra / ceremony / breathwork audience. Flag MANDATORILY when title or description matches any of: ATV, white-water rafting, zipline, jet ski, banana boat, bar crawl, pub crawl, nightlife, cocktail night, drinks special, monkey forest tickets, jungle tour, safari, sightseeing tour, day-trip booking, scooter rental, basic yoga class, beginner yoga class. Also flag when an event is clearly a generic tourist activity sold by a tour operator rather than a community gathering. Cute community workshops (kids art, family paint party, puppy painting) are NOT off_topic — keep them.
   - "low_quality": Extremely vague, unreadable, or gibberish content
 
 Respond with ONLY valid JSON (no markdown, no code blocks):
@@ -229,7 +229,7 @@ Quality Assessment (for each event):
   - "spam": Promotional content disguised as events, MLM, crypto schemes
   - "inappropriate": NSFW, hate speech, offensive content
   - "misleading": Fake events, clickbait, scam-like content
-  - "off_topic": Not related to Ubud/Bali community events
+  - "off_topic": Not a fit for The Ubudian's conscious-community / dance / tantra / ceremony / breathwork audience. Flag MANDATORILY when title or description matches any of: ATV, white-water rafting, zipline, jet ski, banana boat, bar crawl, pub crawl, nightlife, cocktail night, drinks special, monkey forest tickets, jungle tour, safari, sightseeing tour, day-trip booking, scooter rental, basic yoga class, beginner yoga class. Also flag when an event is clearly a generic tourist activity sold by a tour operator rather than a community gathering. Cute community workshops (kids art, family paint party, puppy painting) are NOT off_topic — keep them.
   - "low_quality": Extremely vague, unreadable, or gibberish content
 
 Respond with valid JSON matching the schema.`;

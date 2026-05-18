@@ -56,7 +56,7 @@ export interface RawMessage {
  */
 export interface ProcessResult {
   messageId: string;
-  status: "created" | "duplicate" | "not_event" | "failed";
+  status: "created" | "duplicate" | "not_event" | "failed" | "rejected";
   eventId?: string;
   error?: string;
   eventsCreatedCount?: number;

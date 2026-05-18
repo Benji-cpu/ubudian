@@ -755,9 +755,28 @@ export async function createEventFromParsed(
     slug = `${slug}-${Date.now().toString(36)}`;
   }
 
-  // AI moderation gate. Hard red flags → rejected; everything else publishes.
+  // AI moderation gate. Hard red flags → rejected; off_topic → skipped entirely
+  // (the LLM parser's off_topic flag and any moderation flag in that family).
+  // Everything else lands as PENDING — admin queue is the single approval gate
+  // per CLAUDE.md "Ingested events always start as pending".
   const qualityScore = parsed.quality_score ?? 0;
   const contentFlags = parsed.content_flags ?? [];
+
+  if (contentFlags.includes("off_topic")) {
+    await supabase
+      .from("raw_ingestion_messages")
+      .update({
+        parsed_event_data: {
+          ...((typeof parsed === "object" ? parsed : {}) as Record<string, unknown>),
+          _icp_skipped: true,
+          _icp_reason: "parser flagged off_topic",
+        },
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", messageId);
+    return { messageId, status: "rejected" };
+  }
+
   const moderation = await moderateEvent({
     title: parsed.title,
     description: parsed.description || parsed.title,
@@ -768,9 +787,27 @@ export async function createEventFromParsed(
     source_id: sourceId,
   });
 
-  const eventStatus: "approved" | "rejected" = moderation.ok ? "approved" : "rejected";
+  if (!moderation.ok && moderation.flag === "off_topic") {
+    await supabase
+      .from("raw_ingestion_messages")
+      .update({
+        parsed_event_data: {
+          ...((typeof parsed === "object" ? parsed : {}) as Record<string, unknown>),
+          _icp_skipped: true,
+          _icp_reason: `moderator flagged off_topic: ${moderation.reason}`,
+        },
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", messageId);
+    return { messageId, status: "rejected" };
+  }
+
+  // Hard red flags (spam / inappropriate / misleading) still produce a row
+  // marked 'rejected' for audit, but never auto-approve. Everything that passes
+  // moderation lands as 'pending' for admin review.
+  const eventStatus: "pending" | "rejected" = moderation.ok ? "pending" : "rejected";
   const moderationReason = moderation.ok ? null : moderation.reason;
-  const aiApprovedAt = moderation.ok ? new Date().toISOString() : null;
+  const aiApprovedAt: string | null = null; // never AI-approved on ingestion
   const mergedFlags = moderation.ok
     ? contentFlags
     : Array.from(new Set([...contentFlags, moderation.flag]));
@@ -879,7 +916,7 @@ export async function createEventFromParsed(
       category,
       venue: normalizedVenue || parsed.venue_name || null,
       source_name: (sourceConfig._sourceName as string) || null,
-      auto_approved: eventStatus === "approved",
+      auto_approved: false,
     },
     sourceId,
   });
@@ -895,6 +932,6 @@ export async function createEventFromParsed(
     messageId,
     status: "created",
     eventId: newEvent.id,
-    eventsAutoApproved: eventStatus === "approved" ? 1 : 0,
+    eventsAutoApproved: 0,
   };
 }

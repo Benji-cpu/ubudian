@@ -895,10 +895,12 @@ describe("createEventFromParsed", () => {
   });
 
   // ============================================
-  // Auto-approve tests
+  // Ingestion → pending tests
+  // (Ingested events always land as 'pending' for admin review per CLAUDE.md;
+  // auto-approve was removed in the 2026-05 /events overhaul.)
   // ============================================
 
-  it("auto-approves clean events regardless of source config", async () => {
+  it("marks clean events as pending regardless of source config", async () => {
     const mockInsert = vi.fn().mockReturnValue(chain({ id: "evt-1" }));
     const mockUpdate = vi.fn().mockReturnValue({
       eq: vi.fn().mockResolvedValue({ error: null }),
@@ -931,13 +933,13 @@ describe("createEventFromParsed", () => {
       _autoApproveThreshold: 0.85,
     });
     expect(result.status).toBe("created");
-    expect(result.eventsAutoApproved).toBe(1);
+    expect(result.eventsAutoApproved).toBe(0);
     expect(mockInsert).toHaveBeenCalledWith(
-      expect.objectContaining({ status: "approved" })
+      expect.objectContaining({ status: "pending" })
     );
   });
 
-  it("auto-approves even when no source config is provided", async () => {
+  it("marks events as pending even when no source config is provided", async () => {
     const mockInsert = vi.fn().mockReturnValue(chain({ id: "evt-1" }));
     const mockUpdate = vi.fn().mockReturnValue({
       eq: vi.fn().mockResolvedValue({ error: null }),
@@ -967,13 +969,13 @@ describe("createEventFromParsed", () => {
 
     const result = await createEventFromParsed("msg-1", parsed, "src-1", true);
     expect(result.status).toBe("created");
-    expect(result.eventsAutoApproved).toBe(1);
+    expect(result.eventsAutoApproved).toBe(0);
     expect(mockInsert).toHaveBeenCalledWith(
-      expect.objectContaining({ status: "approved" })
+      expect.objectContaining({ status: "pending" })
     );
   });
 
-  it("auto-approves even when quality_score is low", async () => {
+  it("marks events as pending even when quality_score is low", async () => {
     const mockInsert = vi.fn().mockReturnValue(chain({ id: "evt-1" }));
     const mockUpdate = vi.fn().mockReturnValue({
       eq: vi.fn().mockResolvedValue({ error: null }),
@@ -1003,9 +1005,9 @@ describe("createEventFromParsed", () => {
 
     const result = await createEventFromParsed("msg-1", parsed, "src-1", true);
     expect(result.status).toBe("created");
-    expect(result.eventsAutoApproved).toBe(1);
+    expect(result.eventsAutoApproved).toBe(0);
     expect(mockInsert).toHaveBeenCalledWith(
-      expect.objectContaining({ status: "approved" })
+      expect.objectContaining({ status: "pending" })
     );
   });
 

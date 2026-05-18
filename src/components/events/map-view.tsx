@@ -30,6 +30,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CATEGORY_EMOJI } from "@/lib/constants";
 import { formatEventTime } from "@/lib/utils";
+import { rolledForward } from "@/lib/events/buckets";
 import type { Event } from "@/types";
 
 import "leaflet/dist/leaflet.css";
@@ -53,16 +54,17 @@ export function MapView({ events }: MapViewProps) {
   const [selected, setSelected] = useState<Event | null>(null);
   const [mounted, setMounted] = useState(false);
 
+  const rolled = useMemo(() => rolledForward(events), [events]);
   const mappable = useMemo(
     () =>
-      events.filter(
+      rolled.filter(
         (e) =>
           typeof e.latitude === "number" &&
           typeof e.longitude === "number" &&
           Number.isFinite(e.latitude) &&
           Number.isFinite(e.longitude)
       ),
-    [events]
+    [rolled]
   );
 
   useEffect(() => {

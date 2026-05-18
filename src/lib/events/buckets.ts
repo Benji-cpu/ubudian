@@ -24,7 +24,7 @@ import {
   parseTimeToMinutes,
   type BaliNow,
 } from "./bali-time";
-import { parseRecurrenceRule } from "@/lib/recurrence";
+import { parseRecurrenceRule, daysOfWeekArray } from "@/lib/recurrence";
 
 export type EventBucket =
   | "happening_now"
@@ -38,6 +38,18 @@ export type EventBucket =
 export type BucketedEvents = Record<EventBucket, Event[]>;
 
 const DAY_MS = 24 * 60 * 60 * 1000;
+
+/**
+ * Roll every recurring event's `start_date` (and `end_date` if a span)
+ * forward to its next occurrence on or after today. Non-recurring events
+ * pass through. Use for flat views (Grid, Map, sheet panels) that don't
+ * bucket but still need to display the next-instance date instead of
+ * the seed date.
+ */
+export function rolledForward(events: Event[], now: Date = new Date()): Event[] {
+  const todayStr = nowInBali(now).dateStr;
+  return events.map((event) => nextOccurrence(event, todayStr));
+}
 
 export function bucketEventsByTime(events: Event[], now: Date = new Date()): BucketedEvents {
   const buckets: BucketedEvents = {
@@ -164,6 +176,23 @@ function nextOccurrence(event: Event, today: string): Event {
   // Already upcoming — leave alone.
   if (event.start_date >= today) return event;
 
+  // Multi-day weekly (Mon/Wed/Fri etc.): pick the soonest matching weekday
+  // on or after today, without stepping a whole 7-day stride that would
+  // skip closer occurrences.
+  if (rule.frequency === "weekly" && Array.isArray(rule.day_of_week)) {
+    const days = daysOfWeekArray(rule);
+    if (days.length > 0) {
+      let probe = today;
+      for (let i = 0; i < 14; i++) {
+        if (days.includes(dayOfWeekFromDateStr(probe))) {
+          const newEnd = spanDays > 0 ? addDays(probe, spanDays) : event.end_date;
+          return { ...event, start_date: probe, end_date: newEnd };
+        }
+        probe = addDays(probe, 1);
+      }
+    }
+  }
+
   // Roll forward by the rule's step until start >= today.
   // Safety cap at 400 iterations (over a year for weekly).
   let start = event.start_date;
@@ -174,6 +203,12 @@ function nextOccurrence(event: Event, today: string): Event {
 
   const newEnd = spanDays > 0 ? addDays(start, spanDays) : event.end_date;
   return { ...event, start_date: start, end_date: newEnd };
+}
+
+/** Day-of-week (0=Sun..6=Sat) for a YYYY-MM-DD string in UTC. */
+function dayOfWeekFromDateStr(dateStr: string): number {
+  const [y, m, d] = dateStr.split("-").map(Number);
+  return new Date(Date.UTC(y, m - 1, d)).getUTCDay();
 }
 
 function advanceByRule(

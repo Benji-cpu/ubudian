@@ -8,8 +8,22 @@ import {
 
 export interface RecurrenceRule {
   frequency: "daily" | "weekly" | "biweekly" | "monthly";
-  day_of_week?: number; // 0=Sun, 1=Mon, ..., 6=Sat
+  /**
+   * 0=Sun, 1=Mon, ..., 6=Sat. A single number is a single weekday; an
+   * array represents multi-day weeklies (e.g. Mon/Wed/Fri = [1,3,5]).
+   * Arrays are only meaningful for `weekly` frequency.
+   */
+  day_of_week?: number | number[];
   day_of_month?: number;
+}
+
+/** Normalise day_of_week into an array of unique weekdays for iteration. */
+export function daysOfWeekArray(rule: RecurrenceRule): number[] {
+  if (rule.day_of_week === undefined) return [];
+  if (Array.isArray(rule.day_of_week)) {
+    return Array.from(new Set(rule.day_of_week)).sort((a, b) => a - b);
+  }
+  return [rule.day_of_week];
 }
 
 export function parseRecurrenceRule(rule: string | null): RecurrenceRule | null {
@@ -50,8 +64,14 @@ function parseRruleString(s: string): RecurrenceRule | null {
   else if (freq === "MONTHLY") frequency = "monthly";
   else return null;
   const byday = parts.BYDAY?.toUpperCase();
-  const day_of_week = byday ? DAY_INDEX_BY_RRULE[byday] : undefined;
-  return day_of_week !== undefined ? { frequency, day_of_week } : { frequency };
+  if (!byday) return { frequency };
+  const days = byday
+    .split(",")
+    .map((d) => DAY_INDEX_BY_RRULE[d.trim()])
+    .filter((d): d is number => typeof d === "number");
+  if (days.length === 0) return { frequency };
+  if (days.length === 1) return { frequency, day_of_week: days[0] };
+  return { frequency, day_of_week: days };
 }
 
 const DAY_NAMES = [
@@ -60,16 +80,18 @@ const DAY_NAMES = [
 
 function parseNaturalLanguage(s: string): RecurrenceRule | null {
   const lower = s.toLowerCase();
+  const hits: number[] = [];
   for (let i = 0; i < DAY_NAMES.length; i++) {
-    if (!lower.includes(DAY_NAMES[i])) continue;
-    if (
+    if (lower.includes(DAY_NAMES[i])) hits.push(i);
+  }
+  if (hits.length > 0) {
+    const biweekly =
       lower.startsWith("alternat") ||
       lower.includes("biweek") ||
-      lower.includes("every other")
-    ) {
-      return { frequency: "biweekly", day_of_week: i };
-    }
-    return { frequency: "weekly", day_of_week: i };
+      lower.includes("every other");
+    const frequency: RecurrenceRule["frequency"] = biweekly ? "biweekly" : "weekly";
+    if (hits.length === 1) return { frequency, day_of_week: hits[0] };
+    return { frequency, day_of_week: hits };
   }
   if (lower === "monthly" || lower.startsWith("every month")) return { frequency: "monthly" };
   if (lower === "daily" || lower.startsWith("every day")) return { frequency: "daily" };
@@ -84,14 +106,36 @@ export function expandRecurrence(
   const rule = parseRecurrenceRule(event.recurrence_rule);
   if (!rule) return [new Date(event.start_date)];
 
-  const dates: Date[] = [];
-  let current = startOfDay(new Date(event.start_date));
+  const seed = startOfDay(new Date(event.start_date));
   const end = startOfDay(rangeEnd);
+  const start = startOfDay(rangeStart);
+
+  // Multi-day weekly (e.g. Mon/Wed/Fri): walk each candidate day in
+  // the range and emit if the weekday matches.
+  if (rule.frequency === "weekly" && Array.isArray(rule.day_of_week)) {
+    const days = daysOfWeekArray(rule);
+    const dates: Date[] = [];
+    let cursor = seed;
+    const safeStart = cursor < start ? start : cursor;
+    let probe = startOfDay(safeStart);
+    let count = 0;
+    while (isBefore(probe, end) && count < 365) {
+      if (!isBefore(probe, seed) && days.includes(probe.getDay())) {
+        if (!isBefore(probe, start)) dates.push(new Date(probe));
+      }
+      probe = addDays(probe, 1);
+      count++;
+    }
+    return dates;
+  }
+
+  const dates: Date[] = [];
+  let current = seed;
   const maxOccurrences = 365;
   let count = 0;
 
   while (isBefore(current, end) && count < maxOccurrences) {
-    if (!isBefore(current, startOfDay(rangeStart))) {
+    if (!isBefore(current, start)) {
       dates.push(new Date(current));
     }
 
@@ -120,18 +164,27 @@ export function formatRecurrenceRule(rule: string | null): string {
   if (!parsed) return "";
 
   const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  const dayNamesShort = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+  const formatDays = (days: number[]) => {
+    if (days.length === 1) return dayNames[days[0]];
+    if (days.length === 2) return `${dayNamesShort[days[0]]} & ${dayNamesShort[days[1]]}`;
+    return days.map((d) => dayNamesShort[d]).join(", ");
+  };
 
   switch (parsed.frequency) {
     case "daily":
       return "Every day";
-    case "weekly":
-      return parsed.day_of_week !== undefined
-        ? `Every ${dayNames[parsed.day_of_week]}`
-        : "Every week";
-    case "biweekly":
-      return parsed.day_of_week !== undefined
-        ? `Every other ${dayNames[parsed.day_of_week]}`
-        : "Every 2 weeks";
+    case "weekly": {
+      const days = daysOfWeekArray(parsed);
+      if (days.length === 0) return "Every week";
+      return `Every ${formatDays(days)}`;
+    }
+    case "biweekly": {
+      const days = daysOfWeekArray(parsed);
+      if (days.length === 0) return "Every 2 weeks";
+      return `Every other ${formatDays(days)}`;
+    }
     case "monthly":
       return parsed.day_of_month
         ? `Monthly on the ${parsed.day_of_month}${getOrdinalSuffix(parsed.day_of_month)}`

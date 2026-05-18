@@ -11,6 +11,13 @@ import { registerAdapter } from "../source-adapter";
 const EVENTBRITE_BASE = "https://www.eventbriteapi.com/v3";
 const UBUD_LOCATION = "Ubud, Bali, Indonesia";
 
+// Conscious-community keyword bias. Eventbrite + AllEvents + Meetup all query
+// by radius only, which dumps tourist-trap content (bar crawls, ATV, monkey
+// forest) onto the agenda. This biases each source toward the audience The
+// Ubudian actually serves. The downstream LLM ICP filter is the final gate.
+const ICP_QUERY_BIAS =
+  "ecstatic dance OR contact improv OR tantra OR ceremony OR breathwork OR sound journey OR cacao OR conscious OR yoga OR meditation OR retreat OR kirtan OR circle";
+
 const eventbriteAdapter: SourceAdapter = {
   sourceSlug: "eventbrite",
 
@@ -24,16 +31,15 @@ const eventbriteAdapter: SourceAdapter = {
     }
 
     const radius = (config.radius_km as string) || "20km";
-    const query = (config.query as string) || "";
+    const query = (config.query as string) || ICP_QUERY_BIAS;
 
     const params = new URLSearchParams({
       "location.address": UBUD_LOCATION,
       "location.within": radius,
       expand: "venue,organizer,ticket_availability",
       sort_by: "date",
+      q: query,
     });
-
-    if (query) params.set("q", query);
 
     const res = await fetch(`${EVENTBRITE_BASE}/events/search/?${params}`, {
       headers: { Authorization: `Bearer ${apiKey}` },

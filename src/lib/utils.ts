@@ -5,14 +5,6 @@ import {
   isSameDay,
   isSameMonth,
   isSameYear,
-  isToday,
-  isTomorrow,
-  isThisWeek,
-  addWeeks,
-  startOfWeek,
-  endOfWeek,
-  isAfter,
-  isBefore,
 } from "date-fns"
 
 export function cn(...inputs: ClassValue[]) {
@@ -70,77 +62,3 @@ export function formatEventTime(startTime?: string | null, endTime?: string | nu
   return `${formatTime(startTime)} – ${formatTime(endTime)}`
 }
 
-type TimeBucket =
-  | "Today"
-  | "Tomorrow"
-  | "This Week"
-  | "Next Week"
-  | "Later";
-
-export function groupEventsByTimeBucket<
-  T extends {
-    start_date: string
-    start_time?: string | null
-    is_recurring: boolean
-    recurrence_rule: string | null
-  },
->(events: T[]): { bucket: TimeBucket; events: T[] }[] {
-  const now = new Date()
-  const nextWeekStart = startOfWeek(addWeeks(now, 1), { weekStartsOn: 1 })
-  const nextWeekEnd = endOfWeek(addWeeks(now, 1), { weekStartsOn: 1 })
-
-  const bucketOrder: TimeBucket[] = [
-    "Today",
-    "Tomorrow",
-    "This Week",
-    "Next Week",
-    "Later",
-  ]
-  const bucketMap = new Map<TimeBucket, T[]>(
-    bucketOrder.map((b) => [b, []])
-  )
-
-  for (const event of events) {
-    const eventDate = new Date(event.start_date)
-
-    let bucket: TimeBucket
-    if (isToday(eventDate)) {
-      bucket = "Today"
-    } else if (isTomorrow(eventDate)) {
-      bucket = "Tomorrow"
-    } else if (isThisWeek(eventDate, { weekStartsOn: 1 })) {
-      bucket = "This Week"
-    } else if (
-      !isBefore(eventDate, nextWeekStart) &&
-      !isAfter(eventDate, nextWeekEnd)
-    ) {
-      bucket = "Next Week"
-    } else {
-      bucket = "Later"
-    }
-
-    bucketMap.get(bucket)!.push(event)
-  }
-
-  for (const list of bucketMap.values()) {
-    list.sort((a, b) => {
-      if (a.start_date !== b.start_date) {
-        return a.start_date.localeCompare(b.start_date)
-      }
-      const at = timeToMinutes(a.start_time)
-      const bt = timeToMinutes(b.start_time)
-      return at - bt
-    })
-  }
-
-  return bucketOrder
-    .filter((b) => bucketMap.get(b)!.length > 0)
-    .map((b) => ({ bucket: b, events: bucketMap.get(b)! }))
-}
-
-function timeToMinutes(t?: string | null): number {
-  if (!t) return Number.MAX_SAFE_INTEGER
-  const [h, m] = t.split(":").map(Number)
-  if (Number.isNaN(h) || Number.isNaN(m)) return Number.MAX_SAFE_INTEGER
-  return h * 60 + m
-}

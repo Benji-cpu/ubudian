@@ -31,7 +31,10 @@ export async function generateFingerprint(fields: {
     const venueKey = fields.venue_name
       ? normalizeForComparison(fields.venue_name)
       : "novenue";
-    const ruleKey = `recurring:${rule.frequency}:${rule.day_of_week ?? rule.day_of_month ?? "x"}`;
+    const dowKey = Array.isArray(rule.day_of_week)
+      ? [...rule.day_of_week].sort((a, b) => a - b).join(",")
+      : rule.day_of_week ?? rule.day_of_month ?? "x";
+    const ruleKey = `recurring:${rule.frequency}:${dowKey}`;
     dateOrRuleKey = `${ruleKey}|${venueKey}`;
   } else {
     dateOrRuleKey = fields.start_date;
