@@ -1,0 +1,84 @@
+{
+  "version": 1,
+  "_doc": "Compounding source list. The daily curator agent reads this each run and may append to discovered_pending. Promote venues from discovered_pending into priority_a/b only after they've shown up in at least 3 daily logs with quality events. Edit this file directly to add or retire sources.",
+  "priority_a": [
+    {
+      "name": "Yoga Barn — events calendar",
+      "url": "https://theyogabarn.com/events",
+      "type": "website",
+      "themes": ["dance", "ceremony", "sound"],
+      "note": "Filter their events page for ecstatic dance, cacao, sound — skip pure yoga classes."
+    },
+    {
+      "name": "Paradiso Ubud — events",
+      "url": "https://paradisoubud.com/events",
+      "type": "wordpress",
+      "themes": ["dance"],
+      "note": "Skip the cinema schedule — only the ecstatic dance / live music slots."
+    },
+    {
+      "name": "Sanctuary Ubud",
+      "url": "https://thesanctuaryubud.com",
+      "type": "website",
+      "themes": ["tantra"],
+      "note": "Tantra intensives and embodied workshops. Their site sometimes hides dates inside booking flows — follow through if needed."
+    },
+    {
+      "name": "Blossom Space Ubud",
+      "url": "https://blossomubud.com",
+      "type": "website",
+      "themes": ["tantra", "dance"],
+      "note": "Tantra, conscious sexuality, embodied dance. New venue, growing programme."
+    },
+    {
+      "name": "Pyramids of Chi",
+      "url": "https://pyramidsofchi.com/events",
+      "type": "website",
+      "themes": ["sound", "ceremony"],
+      "note": "Sound healing — gong, bowl, breath journeys. Own ticketing system."
+    },
+    {
+      "name": "Dragonfly Village Ubud",
+      "url": "https://www.instagram.com/dragonflyvillageubud/",
+      "type": "instagram",
+      "themes": ["dance", "ceremony", "sound"],
+      "note": "Newer venue, IG-first publishing. High signal-to-noise for our themes."
+    }
+  ],
+  "priority_b": [
+    {
+      "name": "Lu.ma — Ubud discovery",
+      "url": "https://lu.ma/discover?q=ubud",
+      "type": "luma",
+      "themes": ["dance", "tantra", "ceremony"],
+      "note": "Growing fast among digital-nomad-adjacent organisers in Ubud. Filter by date window today → +60 days."
+    },
+    {
+      "name": "Eventbrite — Ubud dance/tantra search",
+      "url": "https://www.eventbrite.com/d/indonesia--ubud/dance/",
+      "type": "eventbrite",
+      "themes": ["dance"],
+      "note": "Public listings — no API key required for read. Also search 'tantra', 'ecstatic'."
+    },
+    {
+      "name": "Megatix — Bali (existing DB source)",
+      "url": "supabase",
+      "type": "internal",
+      "themes": ["dance", "tantra", "ceremony"],
+      "note": "Query the events table for source.slug='megatix' AND created_at > NOW() - INTERVAL '36 hours' to surface new entries the existing adapter pulled. Re-tag if they fit our themes but were mis-categorised."
+    }
+  ],
+  "instagram_handles": [
+    "yogabarnbali",
+    "paradisoubud",
+    "blossom.ubud",
+    "thesanctuaryubud",
+    "dragonflyvillageubud",
+    "barastudio.ubud",
+    "happypuppyubud",
+    "pyramidsofchi"
+  ],
+  "discovered_pending": [],
+  "rejected_permanent": [],
+  "facilitators_pending": []
+}
