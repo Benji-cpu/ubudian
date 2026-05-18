@@ -78,7 +78,37 @@
     "happypuppyubud",
     "pyramidsofchi"
   ],
-  "discovered_pending": [],
+  "discovered_pending": [
+    {
+      "name": "Alchemy Yoga & Meditation Center (AYMC)",
+      "url": "https://www.alchemyyogacenter.com/ubud-events",
+      "first_seen": "2026-05-19",
+      "themes": ["dance", "ceremony", "sound"],
+      "note": "Hosts weekly RISE Ecstatic Dance (Tue 7-9pm) and Full Moon Bhakti celebrations. Sayan rice-field setting. Strong community anchor. Candidate for priority_a after 3 logs."
+    }
+  ],
   "rejected_permanent": [],
-  "facilitators_pending": []
+  "facilitators_pending": [
+    {
+      "name": "Raio (Rob Weber)",
+      "instagram": null,
+      "first_seen": "2026-05-19",
+      "events_seen": ["Full Moon Cacao Ceremony — The Yoga Barn"],
+      "note": "Medicine man, sound healer, musician. Runs monthly full moon ceremonies at Yoga Barn. Well-known in Ubud scene. BaliSpirit Festival presenter."
+    },
+    {
+      "name": "Jada Jane Boh",
+      "instagram": "@jadajaneboh",
+      "first_seen": "2026-05-19",
+      "events_seen": ["Moving Waves 5Rhythms — Paradiso Ubud"],
+      "note": "5Rhythms certified facilitator. Runs Moving Waves at Paradiso. Schedule unconfirmed for 2026 — verify before ingesting."
+    },
+    {
+      "name": "Emmalee Bevan",
+      "instagram": "@dragonflyvillageubud",
+      "first_seen": "2026-05-19",
+      "events_seen": ["Dance of the Dragonfly — Dragonfly Village"],
+      "note": "Co-leads somatic dance ritual at Dragonfly Village with Ritual Beats. Resident facilitator, weekly Wednesdays."
+    }
+  ]
 }
