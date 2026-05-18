@@ -54,6 +54,8 @@ async function handleStripeEvent(event: Stripe.Event) {
         await handleBookingCheckoutCompleted(supabase, session);
       } else if (type === "subscription") {
         await handleSubscriptionCheckoutCompleted(supabase, session);
+      } else if (type === "sponsorship") {
+        await handleSponsorshipCheckoutCompleted(supabase, session);
       }
       break;
     }
@@ -126,20 +128,28 @@ async function handleStripeEvent(event: Stripe.Event) {
     case "customer.subscription.created":
     case "customer.subscription.updated": {
       const subscription = event.data.object as Stripe.Subscription;
-      await upsertSubscription(supabase, subscription);
+      if (subscription.metadata?.type === "sponsorship") {
+        await upsertSponsorSubscription(supabase, subscription);
+      } else {
+        await upsertSubscription(supabase, subscription);
+      }
       break;
     }
 
     case "customer.subscription.deleted": {
       const subscription = event.data.object as Stripe.Subscription;
-      await supabase
-        .from("subscriptions")
-        .update({
-          status: "canceled",
-          cancel_at_period_end: false,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("stripe_subscription_id", subscription.id);
+      if (subscription.metadata?.type === "sponsorship") {
+        await markSponsorSubscriptionEnded(supabase, subscription);
+      } else {
+        await supabase
+          .from("subscriptions")
+          .update({
+            status: "canceled",
+            cancel_at_period_end: false,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("stripe_subscription_id", subscription.id);
+      }
       break;
     }
 
@@ -198,6 +208,16 @@ async function handleStripeEvent(event: Stripe.Event) {
         await supabase
           .from("subscriptions")
           .update({ status: "past_due", updated_at: new Date().toISOString() })
+          .eq("stripe_subscription_id", subscriptionId);
+
+        // If this subscription belongs to a sponsor, pause public visibility.
+        await supabase
+          .from("sponsors")
+          .update({
+            status: "paused",
+            stripe_subscription_status: "past_due",
+            updated_at: new Date().toISOString(),
+          })
           .eq("stripe_subscription_id", subscriptionId);
       }
       break;
@@ -296,6 +316,73 @@ async function handleSubscriptionCheckoutCompleted(
       .update({ stripe_customer_id: session.customer as string })
       .eq("id", profileId);
   }
+}
+
+async function handleSponsorshipCheckoutCompleted(
+  supabase: ReturnType<typeof createAdminClient>,
+  session: Stripe.Checkout.Session
+) {
+  const sponsorId = session.metadata?.sponsor_id;
+  if (!sponsorId) return;
+
+  // Sponsor row stamping happens redundantly in upsertSponsorSubscription too;
+  // we do it here as well so the dashboard shows a customer id immediately
+  // (in case the customer.subscription.created event lags).
+  if (session.customer) {
+    await supabase
+      .from("sponsors")
+      .update({
+        stripe_customer_id: session.customer as string,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", sponsorId);
+  }
+}
+
+async function upsertSponsorSubscription(
+  supabase: ReturnType<typeof createAdminClient>,
+  subscription: Stripe.Subscription
+) {
+  const sponsorId = subscription.metadata?.sponsor_id;
+  if (!sponsorId) return;
+
+  const item = subscription.items.data[0];
+  const priceId = item?.price?.id ?? null;
+
+  // Stripe subscription statuses we treat as "active enough to render publicly":
+  //   active, trialing. Anything else (past_due, unpaid, canceled, incomplete*)
+  //   pauses the sponsor's public visibility but leaves the row in place.
+  const isPubliclyVisible =
+    subscription.status === "active" || subscription.status === "trialing";
+
+  await supabase
+    .from("sponsors")
+    .update({
+      stripe_customer_id: subscription.customer as string,
+      stripe_subscription_id: subscription.id,
+      stripe_price_id: priceId,
+      stripe_subscription_status: subscription.status,
+      status: isPubliclyVisible ? "active" : "paused",
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", sponsorId);
+}
+
+async function markSponsorSubscriptionEnded(
+  supabase: ReturnType<typeof createAdminClient>,
+  subscription: Stripe.Subscription
+) {
+  const sponsorId = subscription.metadata?.sponsor_id;
+  if (!sponsorId) return;
+
+  await supabase
+    .from("sponsors")
+    .update({
+      stripe_subscription_status: "canceled",
+      status: "ended",
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", sponsorId);
 }
 
 async function upsertSubscription(

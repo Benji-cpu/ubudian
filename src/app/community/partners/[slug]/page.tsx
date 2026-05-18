@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ExternalLink, Instagram, Mail, MessageCircle } from "lucide-react";
 import { getSponsorBySlug } from "@/lib/sponsors/sponsor-service";
+import { recordSponsorshipEvent } from "@/lib/sponsors/analytics";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -40,6 +41,7 @@ export default async function CommunityPartnerPage({ params }: PageProps) {
   const { slug } = await params;
   const sponsor = await getSponsorBySlug(slug);
   if (!sponsor) notFound();
+  recordSponsorshipEvent({ sponsorId: sponsor.id, eventType: "profile_view" });
 
   const instagramUrl = sponsor.instagram_handle
     ? `https://instagram.com/${sponsor.instagram_handle.replace("@", "")}`

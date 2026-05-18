@@ -51,15 +51,36 @@ if [ ! -f "$INBOX" ]; then
   sleep 60
   git pull --ff-only origin main
 fi
+```
+
+### Self-heal — inbox still missing after 60s
+
+GH cron has been observed drifting 30+ minutes during peak load (see digest 2026-05-19, where `approver-fetch.yml` ran at 20:15 UTC instead of 19:42 UTC and the trigger committed a BLOCKED stub at 19:53). Use the seeded `GITHUB_PAT` to dispatch the workflow yourself, poll up to 5 min, then retry. **Do not** echo the PAT in any output, file, or commit message.
+
+```bash
+if [ ! -f "$INBOX" ]; then
+  export GH_TOKEN="$GITHUB_PAT"
+  echo "Dispatching approver-fetch workflow…"
+  gh workflow run approver-fetch.yml --repo Benji-cpu/ubudian --ref main
+
+  for i in $(seq 1 30); do
+    sleep 10
+    LATEST=$(gh run list --workflow=approver-fetch.yml --repo Benji-cpu/ubudian --limit 1 --json status,conclusion --jq '.[0]')
+    STATUS=$(echo "$LATEST" | jq -r '.status')
+    if [ "$STATUS" = "completed" ]; then break; fi
+  done
+
+  git pull --ff-only origin main
+fi
 
 if [ ! -f "$INBOX" ]; then
   cat > "curator/approvals/${TODAY}.md" <<EOF
 # Event approvals — ${TODAY}
 
-**Status: BLOCKED — inbox missing.** GH workflow \`approver-fetch\` did not produce \`curator/approvals/inbox/${TODAY}.json\` before this agent ran. Check https://github.com/Benji-cpu/ubudian/actions/workflows/approver-fetch.yml — likely CRON_SECRET drift or Vercel route 5xx.
+**Status: BLOCKED — inbox missing (self-heal failed).** GH workflow \`approver-fetch\` did not produce \`curator/approvals/inbox/${TODAY}.json\` before this agent ran, and dispatching it via \`gh workflow run\` did not produce one either within 5 minutes. Check https://github.com/Benji-cpu/ubudian/actions/workflows/approver-fetch.yml — likely \`CRON_SECRET\` drift between Vercel + GH repo secrets, expired \`GITHUB_PAT\`, or the Vercel route 5xx'ing.
 EOF
   git add "curator/approvals/${TODAY}.md"
-  git commit -m "approver: ${TODAY} — inbox missing"
+  git commit -m "approver: ${TODAY} — inbox missing (self-heal failed)"
   git push origin main
   exit 0
 fi
@@ -76,7 +97,9 @@ If `QUEUE_SIZE` is 0, write a one-line audit log ("Queue empty — no decisions 
 
 ## Step 3 — Decide each row
 
-For every event in `.events[]`, classify into ONE of four buckets. The JSON carries `sibling_approved[]` — same-normalised-title rows already approved — to make dedup cheap.
+For every event in `.events[]`, classify into ONE of five buckets. The JSON carries `sibling_approved[]` — same-normalised-title rows already approved — to make dedup cheap.
+
+You can also issue a **repair** decision in ADDITION to an approve/archive — e.g. if a row is otherwise approvable but `start_time` is NULL while the description clearly says "starts at 7 PM", emit a `repair` patching `start_time: "19:00"` and an `approve` for the same id in the same payload. The apply route lands them in order.
 
 ### `approve`
 - ICP fit: dance / tantra / contact improv / ceremony / sound / breathwork / cacao / circle / conscious-community workshop / retreat. Cute community gatherings (kids art, family paint, puppy painting) — keep; they're community-coloured.
@@ -104,6 +127,12 @@ Set `dup_of` to the canonical sibling id in the decision.
 - You genuinely can't tell. Unfamiliar facilitator + sparse source, borderline tantric vs NSFW, medical claims you can't verify, novel category, etc.
 - The row stays `pending` (the apply route is a no-op for escalate).
 
+### `repair`
+- The row has a fixable field-level issue: `start_time IS NULL` but the description carries a clear time ("starts at 7 PM", "doors 6:30pm", "6-8pm"); a venue typo you can normalise from `raw_text_snippet`; an obviously bad `external_ticket_url` (bare-domain → prepend `https://`); a placeholder description that an earlier message in the parsed data resolves.
+- Issue `{ id, action: "repair", patch: { <fields to update> }, reason: "…" }`. Allowed patch fields: `start_time, end_time, start_date, end_date, venue_name, venue_address, description, short_description, external_ticket_url, organizer_name, organizer_instagram`. Anything else is silently dropped by the route.
+- If after repair the row is approvable, ALSO emit an `approve` decision for the same id in the same payload — the route applies decisions in array order, so `repair` then `approve` lands correctly.
+- Only repair when the fix is unambiguous (a quote from the description). If you'd have to guess, escalate instead.
+
 **Confidence floor:** below ~70% confident, escalate. Escalation is the safety net, not a coward's bucket — use it.
 
 ## Step 4 — Write the decisions JSON
@@ -117,7 +146,9 @@ Set `dup_of` to the canonical sibling id in the decision.
     { "id": "<uuid>", "action": "approve", "reason": "Drop-in ecstatic-dance class at Paradiso, clean copy" },
     { "id": "<uuid>", "action": "archive_off_topic", "reason": "ATV adventure tour" },
     { "id": "<uuid>", "action": "archive_dup", "dup_of": "<sibling-id>", "reason": "Same Bachata weekly already approved" },
-    { "id": "<uuid>", "action": "escalate", "reason": "Single Instagram source, can't verify the facilitator" }
+    { "id": "<uuid>", "action": "escalate", "reason": "Single Instagram source, can't verify the facilitator" },
+    { "id": "<uuid>", "action": "repair", "patch": { "start_time": "19:00", "external_ticket_url": "https://example.com/tix" }, "reason": "Description says 'doors 7pm'; URL was bare-domain" },
+    { "id": "<uuid>", "action": "approve", "reason": "After repair: complete + ICP fit" }
   ]
 }
 ```

@@ -253,7 +253,7 @@ describe("runIngestion", () => {
         title: "Sunset Yoga",
         description: "Yoga at sunset",
         category: "Yoga & Meditation",
-        start_date: "2026-03-20",
+        start_date: "2030-06-15",
         venue_name: "Yoga Barn",
       }],
     });
@@ -301,7 +301,7 @@ describe("processRawMessage", () => {
         title: "Sunset Yoga",
         description: "Yoga session",
         category: "Yoga & Meditation",
-        start_date: "2026-03-20",
+        start_date: "2030-06-15",
       }],
     });
     mockFindDuplicates.mockResolvedValue([]);
@@ -362,7 +362,7 @@ describe("processRawMessage", () => {
         title: "Flyer Event",
         description: "From image",
         category: "Art & Culture",
-        start_date: "2026-04-01",
+        start_date: "2030-06-15",
       },
     ]);
     mockFindDuplicates.mockResolvedValue([]);
@@ -412,7 +412,7 @@ describe("processRawMessage", () => {
         title: "Flyer Event",
         description: "From image",
         category: "Art & Culture",
-        start_date: "2026-04-01",
+        start_date: "2030-06-15",
         cover_image_url: "https://llm-provided-url.com/image.jpg",
       },
     ]);
@@ -466,7 +466,7 @@ describe("processRawMessage", () => {
         title: "Text Fallback Event",
         description: "Parsed from text",
         category: "Circle & Community",
-        start_date: "2026-04-15",
+        start_date: "2030-06-15",
       }],
     });
     mockFindDuplicates.mockResolvedValue([]);
@@ -521,7 +521,7 @@ describe("processRawMessage", () => {
           title: "Second Image Event",
           description: "From second image",
           category: "Music & Performance",
-          start_date: "2026-05-01",
+          start_date: "2030-06-15",
         },
       ]);
     mockFindDuplicates.mockResolvedValue([]);
@@ -552,7 +552,7 @@ describe("processRawMessage", () => {
           title: "Pre-parsed Event",
           description: "Already structured",
           category: "Other",
-          start_date: "2026-04-01",
+          start_date: "2030-06-15",
         },
       ],
     };
@@ -568,7 +568,7 @@ describe("processRawMessage", () => {
         title: "Direct Parse",
         description: "Skipped classification",
         category: "Other",
-        start_date: "2026-04-01",
+        start_date: "2030-06-15",
       },
     ]);
     mockFindDuplicates.mockResolvedValue([]);
@@ -641,7 +641,7 @@ describe("createEventFromParsed", () => {
         title: "Sunset Yoga",
         description: "x",
         category: "Yoga & Meditation",
-        start_date: "2026-03-20",
+        start_date: "2030-06-15",
         venue_name: "Yoga Barn",
         source_url: "https://example.com/event",
         // cover_image_url is missing → enrichment should fire
@@ -659,7 +659,7 @@ describe("createEventFromParsed", () => {
         title: "Sunset Yoga",
         description: "x",
         category: "Yoga & Meditation",
-        start_date: "2026-03-20",
+        start_date: "2030-06-15",
       };
       await createEventFromParsed("msg-1", parsed, "src-1", true);
       expect(mockEnrichFromUrls).not.toHaveBeenCalled();
@@ -671,7 +671,7 @@ describe("createEventFromParsed", () => {
         description: "x",
         short_description: "Brief",
         category: "Yoga & Meditation",
-        start_date: "2026-03-20",
+        start_date: "2030-06-15",
         venue_name: "Yoga Barn",
         venue_address: "Jl. Hanoman 44",
         organizer_name: "Saraswati",
@@ -690,7 +690,7 @@ describe("createEventFromParsed", () => {
         title: "Sunset Yoga",
         description: "x",
         category: "Yoga & Meditation",
-        start_date: "2026-03-20",
+        start_date: "2030-06-15",
         source_url: "https://example.com/event",
       };
       const result = await createEventFromParsed("msg-1", parsed, "src-1", true);
@@ -703,7 +703,7 @@ describe("createEventFromParsed", () => {
       title: "Sunset Yoga",
       description: "Evening yoga session",
       category: "Yoga & Meditation",
-      start_date: "2026-03-20",
+      start_date: "2030-06-15",
       venue_name: "Yoga Barn",
     };
 
@@ -717,7 +717,7 @@ describe("createEventFromParsed", () => {
       title: "",
       description: "No title",
       category: "Other",
-      start_date: "2026-03-20",
+      start_date: "2030-06-15",
     };
 
     const result = await createEventFromParsed("msg-1", parsed, "src-1", true);
@@ -766,7 +766,7 @@ describe("createEventFromParsed", () => {
       title: "Test Event",
       description: "Testing",
       category: "Invalid Category XYZ",
-      start_date: "2026-03-20",
+      start_date: "2030-06-15",
     };
 
     await createEventFromParsed("msg-1", parsed, "src-1", true);
@@ -789,7 +789,7 @@ describe("createEventFromParsed", () => {
       title: "Duplicate Event",
       description: "Already exists",
       category: "Other",
-      start_date: "2026-03-20",
+      start_date: "2030-06-15",
     };
 
     const result = await createEventFromParsed("msg-1", parsed, "src-1", true);
@@ -810,7 +810,7 @@ describe("createEventFromParsed", () => {
       title: "Maybe Duplicate",
       description: "Possibly exists",
       category: "Other",
-      start_date: "2026-03-20",
+      start_date: "2030-06-15",
     };
 
     const result = await createEventFromParsed("msg-1", parsed, "src-1", true);
@@ -849,7 +849,7 @@ describe("createEventFromParsed", () => {
       title: "Slug Collision Event",
       description: "Test",
       category: "Other",
-      start_date: "2026-03-20",
+      start_date: "2030-06-15",
     };
 
     await createEventFromParsed("msg-1", parsed, "src-1", true);
@@ -886,7 +886,7 @@ describe("createEventFromParsed", () => {
       title: "Insert Fail Event",
       description: "Will fail",
       category: "Other",
-      start_date: "2026-03-20",
+      start_date: "2030-06-15",
     };
 
     const result = await createEventFromParsed("msg-1", parsed, "src-1", true);
@@ -923,7 +923,7 @@ describe("createEventFromParsed", () => {
       title: "Great Event",
       description: "Fully detailed event",
       category: "Yoga & Meditation",
-      start_date: "2026-03-20",
+      start_date: "2030-06-15",
       quality_score: 0.95,
       content_flags: [],
     };
@@ -962,7 +962,7 @@ describe("createEventFromParsed", () => {
       title: "Great Event",
       description: "Fully detailed event",
       category: "Yoga & Meditation",
-      start_date: "2026-03-20",
+      start_date: "2030-06-15",
       quality_score: 0.92,
       content_flags: [],
     };
@@ -998,7 +998,7 @@ describe("createEventFromParsed", () => {
       title: "Vague Event",
       description: "Something happening",
       category: "Other",
-      start_date: "2026-03-20",
+      start_date: "2030-06-15",
       quality_score: 0.2,
       content_flags: ["low_quality"],
     };
@@ -1040,7 +1040,7 @@ describe("createEventFromParsed", () => {
       title: "Test Event",
       description: "Testing quality storage",
       category: "Other",
-      start_date: "2026-03-20",
+      start_date: "2030-06-15",
       quality_score: 0.78,
       content_flags: ["low_quality"],
     };

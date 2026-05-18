@@ -32,12 +32,17 @@ export default async function AdminSponsorsPage() {
             page.
           </p>
         </div>
-        <Button asChild>
-          <Link href="/admin/sponsors/new">
-            <Plus className="mr-2 h-4 w-4" />
-            New Partner
-          </Link>
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button asChild variant="outline">
+            <Link href="/admin/sponsors/leads">Leads</Link>
+          </Button>
+          <Button asChild>
+            <Link href="/admin/sponsors/new">
+              <Plus className="mr-2 h-4 w-4" />
+              New Partner
+            </Link>
+          </Button>
+        </div>
       </div>
 
       <div className="mt-8 overflow-hidden rounded-md border">

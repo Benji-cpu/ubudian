@@ -409,8 +409,44 @@ export interface Sponsor {
   monthly_amount_cents: number | null;
   starts_on: string | null;
   ends_on: string | null;
+  claimed_by_profile_id: string | null;
+  stripe_customer_id: string | null;
+  stripe_subscription_id: string | null;
+  stripe_price_id: string | null;
+  stripe_subscription_status: string | null;
   created_at: string;
   updated_at: string;
+}
+
+export type SponsorLeadStatus = "new" | "contacted" | "converted" | "dismissed";
+export type SponsorLeadTierInterest = "patron" | "partner" | "anchor" | "unsure";
+
+export interface SponsorLead {
+  id: string;
+  business_name: string;
+  contact_name: string | null;
+  contact_email: string;
+  contact_whatsapp: string | null;
+  website_url: string | null;
+  tier_interest: SponsorLeadTierInterest | null;
+  message: string | null;
+  status: SponsorLeadStatus;
+  admin_notes: string | null;
+  sponsor_id: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export type SponsorshipEventType = "event_impression" | "profile_view" | "partner_click";
+
+export interface SponsorshipEvent {
+  id: string;
+  sponsor_id: string;
+  event_type: SponsorshipEventType;
+  context_entity_type: string | null;
+  context_entity_id: string | null;
+  dedupe_key: string | null;
+  created_at: string;
 }
 
 export interface Sponsorship {

@@ -16,6 +16,7 @@ import { isSafeUrl } from "@/lib/url-validation";
 import { getCurrentProfile } from "@/lib/auth";
 import { MentionedInGuides } from "@/components/cross-links/mentioned-in-guides";
 import { getActiveSponsorshipFor } from "@/lib/sponsors/sponsor-service";
+import { recordSponsorshipEvent } from "@/lib/sponsors/analytics";
 import { PartnerCredit } from "@/components/sponsors/partner-credit";
 import {
   Breadcrumb,
@@ -114,6 +115,14 @@ export default async function EventPage({ params }: EventPageProps) {
     related = (relatedEvents ?? []) as Event[];
 
     sponsorship = await getActiveSponsorshipFor("event", e.id);
+    if (sponsorship) {
+      recordSponsorshipEvent({
+        sponsorId: sponsorship.sponsor.id,
+        eventType: "event_impression",
+        contextEntityType: "event",
+        contextEntityId: e.id,
+      });
+    }
   } catch {
     notFound();
   }

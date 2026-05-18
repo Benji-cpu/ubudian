@@ -39,6 +39,64 @@ const ENRICH_ON_DUPLICATE_FIELDS = [
 type EnrichFieldName = (typeof ENRICH_ON_DUPLICATE_FIELDS)[number];
 
 /**
+ * In-flight ICP keyword filter for the title + description. Mirrors the
+ * LLM prompt's `off_topic` rule (llm-prompts.ts) so pre-parsed adapters
+ * (Megatix, Tickettailor, Eventbrite, …) that skip the LLM still get the
+ * same hard-reject treatment.
+ *
+ * Returns the matched phrase if the event should be rejected; null otherwise.
+ * Conservative — only matches phrases that are unambiguously off-brand.
+ * The daily Claude approver routine is the editorial gate for borderline
+ * cases.
+ */
+const OFF_TOPIC_KEYWORDS: RegExp[] = [
+  /\batv\b/i,
+  /\bwhite[- ]water rafting\b/i,
+  /\brafting\b.*(trip|tour|day)/i,
+  /\bzipline\b/i,
+  /\bjet[- ]?ski\b/i,
+  /\bbanana boat\b/i,
+  /\bbar crawl\b/i,
+  /\bpub crawl\b/i,
+  /\bnightlife\b/i,
+  /\bcocktail (night|masterclass|class)\b/i,
+  /\bdrinks special\b/i,
+  /\bmonkey forest (ticket|entry|tour)/i,
+  /\bjungle (tour|trek)\b/i,
+  /\bsafari\b/i,
+  /\bsightseeing\b/i,
+  /\bday[- ]?trip booking\b/i,
+  /\bscooter rental\b/i,
+  /\bhotel package\b/i,
+  /\bbasic yoga\b/i,
+  /\bbeginner yoga\b/i,
+];
+
+function matchOffTopicKeywords(
+  title: string | null | undefined,
+  description: string | null | undefined
+): string | null {
+  const haystack = `${title ?? ""} ${description ?? ""}`;
+  for (const pat of OFF_TOPIC_KEYWORDS) {
+    const m = haystack.match(pat);
+    if (m) return m[0].toLowerCase();
+  }
+  return null;
+}
+
+/**
+ * Bali "today" as YYYY-MM-DD. Used by the past-date drop at insert time.
+ */
+function baliTodayStr(): string {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Makassar",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date());
+}
+
+/**
  * When dedup matches a raw message to an existing event, backfill the
  * existing event with any fields the incoming `parsed` has that the existing
  * event lacks. Best-effort: never throws.
@@ -754,24 +812,48 @@ export async function createEventFromParsed(
     slug = `${slug}-${Date.now().toString(36)}`;
   }
 
-  // In-flight filtering is cheap and parser-driven only — no Gemini call.
-  // The parser's `off_topic` content_flag drops obvious junk before insert
-  // (bar crawls, ATV, monkey forest etc., per llm-prompts.ts ICP rules).
-  // Everything else lands as PENDING. Editorial judgement (ICP fit, dedup,
-  // brand voice, completeness) is the job of the daily Claude approver
-  // routine — `.claude/agents/daily-event-approver.md` — which runs on
-  // Benji's Max plan with full Sonnet/Opus context, not in-flight Gemini.
+  // In-flight ICP filter — runs on every path, including pre-parsed
+  // adapters (Megatix, Tickettailor, Eventbrite, etc.) that don't invoke
+  // the LLM and therefore can't emit `off_topic` themselves. Same keyword
+  // family as the LLM prompt (llm-prompts.ts) so both paths converge.
+  // Editorial judgement (ICP fit, dedup, brand voice, completeness) is
+  // still the job of the daily Claude approver — this is just the
+  // free / fast pre-filter for obvious tourist-trap content.
   const qualityScore = parsed.quality_score ?? 0;
   const contentFlags = parsed.content_flags ?? [];
 
-  if (contentFlags.includes("off_topic")) {
+  const icpReject = matchOffTopicKeywords(parsed.title, parsed.description);
+
+  if (contentFlags.includes("off_topic") || icpReject) {
     await supabase
       .from("raw_ingestion_messages")
       .update({
         parsed_event_data: {
           ...((typeof parsed === "object" ? parsed : {}) as Record<string, unknown>),
           _icp_skipped: true,
-          _icp_reason: "parser flagged off_topic",
+          _icp_reason: icpReject
+            ? `in-flight keyword filter: ${icpReject}`
+            : "parser flagged off_topic",
+        },
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", messageId);
+    return { messageId, status: "rejected" };
+  }
+
+  // Past-date filter — drop single-day non-recurring events whose start_date
+  // is already past in Bali time. Multi-day events (end_date set, end >= today)
+  // and recurring events pass through because they still have future instances.
+  const today = baliTodayStr();
+  const isSingleDay = !parsed.end_date || parsed.end_date === parsed.start_date;
+  if (!parsed.is_recurring && isSingleDay && parsed.start_date < today) {
+    await supabase
+      .from("raw_ingestion_messages")
+      .update({
+        parsed_event_data: {
+          ...((typeof parsed === "object" ? parsed : {}) as Record<string, unknown>),
+          _past_skipped: true,
+          _past_reason: `single-day event already past (start=${parsed.start_date}, today=${today})`,
         },
         updated_at: new Date().toISOString(),
       })

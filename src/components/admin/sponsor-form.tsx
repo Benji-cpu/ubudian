@@ -83,11 +83,19 @@ const sponsorSchema = z.object({
 
 type SponsorFormValues = z.infer<typeof sponsorSchema>;
 
-interface SponsorFormProps {
-  initialData?: Sponsor;
+interface SponsorFormPreset {
+  name?: string;
+  contact_email?: string;
+  tier?: SponsorTier;
+  from_lead_id?: string;
 }
 
-export function SponsorForm({ initialData }: SponsorFormProps) {
+interface SponsorFormProps {
+  initialData?: Sponsor;
+  preset?: SponsorFormPreset;
+}
+
+export function SponsorForm({ initialData, preset }: SponsorFormProps) {
   const router = useRouter();
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -98,17 +106,17 @@ export function SponsorForm({ initialData }: SponsorFormProps) {
   const form = useForm<SponsorFormValues>({
     resolver: zodResolver(sponsorSchema),
     defaultValues: {
-      name: initialData?.name ?? "",
-      slug: initialData?.slug ?? "",
+      name: initialData?.name ?? preset?.name ?? "",
+      slug: initialData?.slug ?? (preset?.name ? slugify(preset.name) : ""),
       tagline: initialData?.tagline ?? "",
       description: initialData?.description ?? "",
       logo_url: initialData?.logo_url ?? "",
       hero_image_url: initialData?.hero_image_url ?? "",
       website_url: initialData?.website_url ?? "",
       instagram_handle: initialData?.instagram_handle ?? "",
-      contact_email: initialData?.contact_email ?? "",
+      contact_email: initialData?.contact_email ?? preset?.contact_email ?? "",
       contact_whatsapp: initialData?.contact_whatsapp ?? "",
-      tier: initialData?.tier ?? "patron",
+      tier: initialData?.tier ?? preset?.tier ?? "patron",
       status: initialData?.status ?? "active",
       category_sponsor: initialData?.category_sponsor ?? "",
       monthly_amount_cents: initialData?.monthly_amount_cents?.toString() ?? "",
@@ -155,10 +163,30 @@ export function SponsorForm({ initialData }: SponsorFormProps) {
     };
 
     let error;
+    let createdSponsorId: string | null = null;
     if (isEditMode) {
       ({ error } = await supabase.from("sponsors").update(payload).eq("id", initialData.id));
     } else {
-      ({ error } = await supabase.from("sponsors").insert(payload));
+      const { data: created, error: insertErr } = await supabase
+        .from("sponsors")
+        .insert(payload)
+        .select("id")
+        .single();
+      error = insertErr;
+      createdSponsorId = (created as { id: string } | null)?.id ?? null;
+    }
+
+    // If this new sponsor came from a lead inquiry, mark the lead as converted
+    // and link it to the sponsor row so the audit trail survives.
+    if (!error && !isEditMode && preset?.from_lead_id && createdSponsorId) {
+      await supabase
+        .from("sponsor_leads")
+        .update({
+          status: "converted",
+          sponsor_id: createdSponsorId,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", preset.from_lead_id);
     }
 
     setSaving(false);

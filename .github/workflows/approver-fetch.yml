@@ -2,15 +2,19 @@ name: approver-fetch
 
 # First leg of the git-as-bus pattern for the daily event approver.
 #
-# Runs at 19:42 UTC (≈03:42 WITA), 10 minutes before the Claude trigger
+# Runs at 19:32 UTC (≈03:32 WITA), 20 minutes before the Claude trigger
 # (trig_015VbLdAh4G8Wpz1hscSvRtC) fires at 19:52 UTC. Curls the Vercel
 # /api/cron/approver-data route from a GH runner (Anthropic sandbox can't
 # reach theubudian.life) and commits the JSON payload to main. The trigger
 # then reads it and produces the decisions.
+#
+# The 20-minute slack absorbs GH cron drift (incident 2026-05-19: ran 33min
+# late). Trigger also self-heals — if inbox still missing at 19:53, it
+# dispatches this workflow itself via GITHUB_PAT and waits up to 5min.
 
 on:
   schedule:
-    - cron: "42 19 * * *"
+    - cron: "32 19 * * *"
   workflow_dispatch: {}
 
 permissions:

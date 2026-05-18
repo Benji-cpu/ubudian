@@ -1,6 +1,26 @@
 import { SponsorForm } from "@/components/admin/sponsor-form";
+import type { SponsorTier } from "@/types";
 
-export default function NewSponsorPage() {
+interface PageProps {
+  searchParams: Promise<{
+    name?: string;
+    email?: string;
+    tier?: string;
+    from_lead?: string;
+  }>;
+}
+
+const TIERS: SponsorTier[] = ["patron", "partner", "anchor"];
+
+export default async function NewSponsorPage({ searchParams }: PageProps) {
+  const sp = await searchParams;
+  const preset = {
+    name: sp.name ?? "",
+    contact_email: sp.email ?? "",
+    tier: TIERS.includes(sp.tier as SponsorTier) ? (sp.tier as SponsorTier) : undefined,
+    from_lead_id: sp.from_lead,
+  };
+
   return (
     <div>
       <div className="mb-8">
@@ -11,7 +31,7 @@ export default function NewSponsorPage() {
           can be attached to events, editions, journeys, and stories.
         </p>
       </div>
-      <SponsorForm />
+      <SponsorForm preset={preset} />
     </div>
   );
 }
