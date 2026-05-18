@@ -1,0 +1,65 @@
+name: approver-fetch
+
+# First leg of the git-as-bus pattern for the daily event approver.
+#
+# Runs at 19:42 UTC (≈03:42 WITA), 10 minutes before the Claude trigger
+# (trig_015VbLdAh4G8Wpz1hscSvRtC) fires at 19:52 UTC. Curls the Vercel
+# /api/cron/approver-data route from a GH runner (Anthropic sandbox can't
+# reach theubudian.life) and commits the JSON payload to main. The trigger
+# then reads it and produces the decisions.
+
+on:
+  schedule:
+    - cron: "42 19 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: approver-fetch
+  cancel-in-progress: false
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+          fetch-depth: 1
+
+      - name: Compute Bali date
+        id: date
+        run: echo "today=$(TZ=Asia/Makassar date +%F)" >> "$GITHUB_OUTPUT"
+
+      - name: Fetch pending queue
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          TODAY: ${{ steps.date.outputs.today }}
+        run: |
+          set -euo pipefail
+          mkdir -p curator/approvals/inbox
+          curl -fsS \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            "https://theubudian.life/api/cron/approver-data" \
+            -o "curator/approvals/inbox/${TODAY}.json"
+          jq -e '.date' "curator/approvals/inbox/${TODAY}.json" > /dev/null
+          QUEUE=$(jq '.queue_size // 0' "curator/approvals/inbox/${TODAY}.json")
+          echo "::notice::Pending queue size for ${TODAY}: ${QUEUE}"
+
+      - name: Commit JSON to main
+        env:
+          TODAY: ${{ steps.date.outputs.today }}
+        run: |
+          set -euo pipefail
+          git config user.name  "ubudian-bot"
+          git config user.email "ubudian-bot@users.noreply.github.com"
+          git add "curator/approvals/inbox/${TODAY}.json"
+          if git diff --cached --quiet; then
+            echo "No change in payload — nothing to commit."
+            exit 0
+          fi
+          git commit -m "approver inbox: ${TODAY} (auto)"
+          git push origin HEAD:main

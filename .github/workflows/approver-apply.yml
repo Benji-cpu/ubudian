@@ -1,0 +1,81 @@
+name: approver-apply
+
+# Second leg of the git-as-bus pattern for the daily event approver.
+#
+# Triggered whenever the daily-event-approver trigger commits a new
+# decisions payload to main. Reads the JSON, POSTs it to the Vercel
+# /api/cron/approver-apply route, which applies status UPDATEs to the
+# events table.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'curator/approvals/decisions/**'
+  workflow_dispatch:
+    inputs:
+      date:
+        description: 'Decisions date (YYYY-MM-DD). Defaults to today (Bali time).'
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: approver-apply
+  cancel-in-progress: false
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Find decisions payload to apply
+        id: payload
+        run: |
+          set -euo pipefail
+          if [ -n "${{ github.event.inputs.date }}" ]; then
+            DATE="${{ github.event.inputs.date }}"
+          else
+            DATE=$(ls -t curator/approvals/decisions/*.json 2>/dev/null | head -1 | sed -E 's|.*/([0-9]{4}-[0-9]{2}-[0-9]{2})\.json|\1|')
+          fi
+
+          if [ -z "$DATE" ] || [ ! -f "curator/approvals/decisions/${DATE}.json" ]; then
+            echo "No decisions payload found — exiting cleanly."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "date=$DATE" >> "$GITHUB_OUTPUT"
+          echo "path=curator/approvals/decisions/${DATE}.json" >> "$GITHUB_OUTPUT"
+          echo "Applying $DATE"
+
+      - name: POST to approver-apply route
+        if: steps.payload.outputs.skip != 'true'
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          DATE: ${{ steps.payload.outputs.date }}
+          PAYLOAD_PATH: ${{ steps.payload.outputs.path }}
+        run: |
+          set -euo pipefail
+
+          BODY=$(jq -c --arg date "$DATE" '{ date: $date, decisions: .decisions }' "$PAYLOAD_PATH")
+
+          RESPONSE=$(curl -fsS -X POST \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            -H "Content-Type: application/json" \
+            -d "$BODY" \
+            "https://theubudian.life/api/cron/approver-apply")
+
+          echo "$RESPONSE" | jq .
+
+          APPROVED=$(echo "$RESPONSE" | jq -r '.approved // 0')
+          OFFTOPIC=$(echo "$RESPONSE" | jq -r '.archived_off_topic // 0')
+          DUPED=$(echo "$RESPONSE" | jq -r '.archived_dup // 0')
+          ESCALATED=$(echo "$RESPONSE" | jq -r '.escalated // 0')
+          echo "::notice::Approver applied: approved=$APPROVED off_topic=$OFFTOPIC dup=$DUPED escalated=$ESCALATED ($DATE)"
