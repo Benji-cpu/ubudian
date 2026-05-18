@@ -19,7 +19,6 @@ import { validateAndNormalizeDate } from "./date-validator";
 import { logHealthEvent } from "./health-utils";
 import { logActivity } from "./activity-log";
 import { enrichFromUrls, applyEnrichment } from "./url-enricher";
-import { moderateEvent } from "@/lib/events/moderation";
 import { geocodeVenue } from "@/lib/geocoding";
 import type { IngestionRunResult, ParsedEvent, ProcessResult, RawMessage } from "./types";
 
@@ -755,10 +754,13 @@ export async function createEventFromParsed(
     slug = `${slug}-${Date.now().toString(36)}`;
   }
 
-  // AI moderation gate. Hard red flags → rejected; off_topic → skipped entirely
-  // (the LLM parser's off_topic flag and any moderation flag in that family).
-  // Everything else lands as PENDING — admin queue is the single approval gate
-  // per CLAUDE.md "Ingested events always start as pending".
+  // In-flight filtering is cheap and parser-driven only — no Gemini call.
+  // The parser's `off_topic` content_flag drops obvious junk before insert
+  // (bar crawls, ATV, monkey forest etc., per llm-prompts.ts ICP rules).
+  // Everything else lands as PENDING. Editorial judgement (ICP fit, dedup,
+  // brand voice, completeness) is the job of the daily Claude approver
+  // routine — `.claude/agents/daily-event-approver.md` — which runs on
+  // Benji's Max plan with full Sonnet/Opus context, not in-flight Gemini.
   const qualityScore = parsed.quality_score ?? 0;
   const contentFlags = parsed.content_flags ?? [];
 
@@ -777,40 +779,11 @@ export async function createEventFromParsed(
     return { messageId, status: "rejected" };
   }
 
-  const moderation = await moderateEvent({
-    title: parsed.title,
-    description: parsed.description || parsed.title,
-    organizer_name: parsed.organizer_name || null,
-    venue_name: parsed.venue_name || null,
-    source_url: parsed.source_url || null,
-    origin: "ingestion",
-    source_id: sourceId,
-  });
-
-  if (!moderation.ok && moderation.flag === "off_topic") {
-    await supabase
-      .from("raw_ingestion_messages")
-      .update({
-        parsed_event_data: {
-          ...((typeof parsed === "object" ? parsed : {}) as Record<string, unknown>),
-          _icp_skipped: true,
-          _icp_reason: `moderator flagged off_topic: ${moderation.reason}`,
-        },
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", messageId);
-    return { messageId, status: "rejected" };
-  }
-
-  // Hard red flags (spam / inappropriate / misleading) still produce a row
-  // marked 'rejected' for audit, but never auto-approve. Everything that passes
-  // moderation lands as 'pending' for admin review.
-  const eventStatus: "pending" | "rejected" = moderation.ok ? "pending" : "rejected";
-  const moderationReason = moderation.ok ? null : moderation.reason;
-  const aiApprovedAt: string | null = null; // never AI-approved on ingestion
-  const mergedFlags = moderation.ok
-    ? contentFlags
-    : Array.from(new Set([...contentFlags, moderation.flag]));
+  // Always pending — the daily Claude approver routine is the editorial gate.
+  const eventStatus: "pending" = "pending";
+  const moderationReason: string | null = null;
+  const aiApprovedAt: string | null = null;
+  const mergedFlags = contentFlags;
 
   // Insert the event
   const { data: newEvent, error: insertError } = await queryWithRetry(

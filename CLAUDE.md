@@ -32,9 +32,11 @@ npm run test:e2e   # Playwright E2E tests
 - **Project**: `ubudian-v1`
 - **Production URL**: https://theubudian.life (canonical apex; old `ubudian-v1.vercel.app` and `www.theubudian.life` 308-redirect to it via `src/middleware.ts` host-canonicalization — webhooks and `/api/cron/*` are exempt). Always reference `theubudian.life` in copy, env vars (`NEXT_PUBLIC_SITE_URL`), screenshots, and docs.
 - **Cron jobs**:
-  - `/api/cron/ingest-events` — Vercel Cron, daily at 6 AM UTC
+  - `/api/cron/ingest-events` — Vercel Cron, daily at 6 AM UTC. Lands events as `pending`.
   - `/api/cron/ingestion-health` — Vercel Cron, daily at 9 AM UTC
-  - `/api/cron/daily-maintenance` — called by Claude Code remote agent at `17 19 * * *` UTC (≈03:17 Bali). Agent prompt at `.claude/agents/nightly-routine.md`. Trigger registered via claude.ai (https://claude.ai/code/scheduled).
+  - `/api/cron/daily-maintenance` — Claude remote trigger `trig_01CnuNJSs8m8wdVyeVrDHrKq` at `17 19 * * *` UTC (≈03:17 WITA). Agent: `.claude/agents/nightly-routine.md`.
+  - **Daily curator** — Claude trigger `trig_01637DsCbz5qGn6r5RTP4hhi` at `47 19 * * *` UTC (≈03:47 WITA). Agent: `.claude/agents/daily-curator.md`. Discovers + ingests dance/tantra events into `pending`.
+  - **Daily event approver** — Claude trigger `trig_015VbLdAh4G8Wpz1hscSvRtC` at `52 19 * * *` UTC (≈03:52 WITA). Agent: `.claude/agents/daily-event-approver.md`. Walks the `pending` queue with Claude Sonnet judgement, approves / archives / escalates. Replaces the in-flight Gemini moderation gate. Commits `curator/approvals/YYYY-MM-DD.md` to main.
 - **Images**: `unoptimized: true` (no Next.js Image Optimization)
 - **Remote image hosts**: Unsplash, `*.supabase.co`, `api.telegram.org`
 

@@ -12,7 +12,7 @@ You do **not** call the Vercel cron route directly. Anthropic's sandbox egress a
 
 1. **You** (this agent) walk a curated source list, apply a taste filter, and commit `curator/inbox/${TODAY}.json` + `curator/log/${TODAY}.md` to `main`. You may also append new venues/facilitators to `curator/sources.json`.
 2. **GitHub Actions** workflow `.github/workflows/curator-ingest.yml` triggers on any push to `curator/inbox/**` and POSTs the JSON to `https://theubudian.life/api/cron/curator-ingest` with `Authorization: Bearer ${CRON_SECRET}`.
-3. **The route** (`src/app/api/cron/curator-ingest/route.ts`) reads the JSON and pipes each event through the existing `createEventFromParsed()` pipeline — inheriting dedup, venue normalisation, fingerprinting, geocoding, moderation. Events land with `status='pending'` so the admin queue still owns final approval.
+3. **The route** (`src/app/api/cron/curator-ingest/route.ts`) reads the JSON and pipes each event through the existing `createEventFromParsed()` pipeline — inheriting dedup, venue normalisation, fingerprinting, geocoding, and the parser-driven ICP filter. Events land with `status='pending'` and the **daily event approver** trigger (`.claude/agents/daily-event-approver.md`, fires at 52 19 UTC) is the editorial gate that decides what surfaces.
 
 GitHub is the message bus. You only need `github.com` egress (allowlisted). You also have the Supabase MCP for read queries against the existing DB — use it to check for already-ingested events and to surface fresh Megatix rows tagged for your themes.
 

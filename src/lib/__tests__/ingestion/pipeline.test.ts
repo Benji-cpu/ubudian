@@ -1011,93 +1011,11 @@ describe("createEventFromParsed", () => {
     );
   });
 
-  it("rejects when the AI moderation gate flags spam", async () => {
-    mockModerateEvent.mockResolvedValueOnce({
-      ok: false,
-      flag: "spam",
-      reason: "Crypto promotion, not a community event.",
-    });
-
-    const mockInsert = vi.fn().mockReturnValue(chain({ id: "evt-1" }));
-    const mockUpdate = vi.fn().mockReturnValue({
-      eq: vi.fn().mockResolvedValue({ error: null }),
-    });
-
-    mockFrom.mockImplementation((table: string) => {
-      if (table === "events") {
-        return { select: () => chain(null), insert: mockInsert };
-      }
-      if (table === "raw_ingestion_messages") {
-        return { update: mockUpdate };
-      }
-      if (table === "dedup_matches") {
-        return { upsert: vi.fn().mockResolvedValue({ error: null }) };
-      }
-      return { select: () => chain(null), update: mockUpdate };
-    });
-
-    const parsed: ParsedEvent = {
-      title: "Suspicious Event",
-      description: "Come join our crypto event",
-      category: "Other",
-      start_date: "2026-03-20",
-      quality_score: 0.9,
-      content_flags: [],
-    };
-
-    const result = await createEventFromParsed("msg-1", parsed, "src-1", true);
-    expect(result.status).toBe("created");
-    expect(result.eventsAutoApproved).toBe(0);
-    expect(mockInsert).toHaveBeenCalledWith(
-      expect.objectContaining({
-        status: "rejected",
-        moderation_reason: "Crypto promotion, not a community event.",
-        content_flags: expect.arrayContaining(["spam"]),
-      })
-    );
-  });
-
-  it("rejects when the AI moderation gate flags inappropriate", async () => {
-    mockModerateEvent.mockResolvedValueOnce({
-      ok: false,
-      flag: "inappropriate",
-      reason: "Contains hate speech.",
-    });
-
-    const mockInsert = vi.fn().mockReturnValue(chain({ id: "evt-1" }));
-    const mockUpdate = vi.fn().mockReturnValue({
-      eq: vi.fn().mockResolvedValue({ error: null }),
-    });
-
-    mockFrom.mockImplementation((table: string) => {
-      if (table === "events") {
-        return { select: () => chain(null), insert: mockInsert };
-      }
-      if (table === "raw_ingestion_messages") {
-        return { update: mockUpdate };
-      }
-      if (table === "dedup_matches") {
-        return { upsert: vi.fn().mockResolvedValue({ error: null }) };
-      }
-      return { select: () => chain(null), update: mockUpdate };
-    });
-
-    const parsed: ParsedEvent = {
-      title: "Inappropriate Event",
-      description: "...",
-      category: "Other",
-      start_date: "2026-03-20",
-      quality_score: 0.9,
-      content_flags: [],
-    };
-
-    const result = await createEventFromParsed("msg-1", parsed, "src-1", true);
-    expect(result.status).toBe("created");
-    expect(result.eventsAutoApproved).toBe(0);
-    expect(mockInsert).toHaveBeenCalledWith(
-      expect.objectContaining({ status: "rejected" })
-    );
-  });
+  // Moderation-gate tests removed: the ingestion path no longer calls
+  // moderateEvent. Spam / inappropriate / off-brand judgement is now the
+  // job of the daily-event-approver routine (Claude trigger, runs on the
+  // pending queue). The user-submission path still uses moderateEvent and
+  // is covered by its own tests.
 
   it("stores quality_score and content_flags on the event", async () => {
     const mockInsert = vi.fn().mockReturnValue(chain({ id: "evt-1" }));
