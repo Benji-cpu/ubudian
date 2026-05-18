@@ -253,6 +253,33 @@ RemoteTrigger { action: "update", trigger_id: "trig_01CnuNJSs8m8wdVyeVrDHrKq",
 
 Sister triggers (same family, different repos): MysTech `trig_01TKZ5AcWYUjmXPffoRd1qaz` (19:22 UTC), WordZoo `trig_01Dnx4XZjFoduw1SEfio9vPy` (19:32 UTC), The Programme `trig_01QaE3psDNRrhF51N6UFSey6` (19:07 UTC), CC Mastery `trig_01FRSrj9oJguHBmUhnhhmBbJ` (20:17 UTC).
 
+## Daily Curator Trigger
+
+Separate trigger from `daily-maintenance` — runs an AI curator that discovers and ingests dance + tantra + ceremony events daily. See `.claude/agents/daily-curator.md` for the agent spec and `curator/playbook.md` for the vibe filter rules. Same git-as-bus architecture as `daily-maintenance`: agent writes `curator/inbox/YYYY-MM-DD.json` to main → GH Actions workflow `.github/workflows/curator-ingest.yml` POSTs to `/api/cron/curator-ingest` → route runs each event through `createEventFromParsed()` and forces `status='pending'`.
+
+| Field | Value |
+|-------|-------|
+| Trigger ID | `trig_01637DsCbz5qGn6r5RTP4hhi` |
+| Name | `Ubudian — daily curator (dance + tantra)` |
+| Cron | `47 19 * * *` UTC (≈03:47 Bali, 30 min after `daily-maintenance`) |
+| Environment | `env_013bqn65fNb8N1mWyLSMV78w` (Default — anthropic_cloud) |
+| Model | `claude-sonnet-4-6` |
+| Repo | `https://github.com/Benji-cpu/ubudian` |
+| Agent file | `.claude/agents/daily-curator.md` |
+| State | `curator/sources.json`, `curator/playbook.md`, `curator/log/`, `curator/inbox/` |
+| Vercel route | `/api/cron/curator-ingest` (POST, `CRON_SECRET` Bearer auth) |
+| Source row | `event_sources.slug = 'curator'` with `_preParsed=true`, `_skipClassification=true` |
+
+Common operations:
+
+```text
+RemoteTrigger { action: "run",    trigger_id: "trig_01637DsCbz5qGn6r5RTP4hhi" }   # fire ad-hoc
+RemoteTrigger { action: "get",    trigger_id: "trig_01637DsCbz5qGn6r5RTP4hhi" }
+RemoteTrigger { action: "update", trigger_id: "trig_01637DsCbz5qGn6r5RTP4hhi", body: { enabled: false } }  # pause
+```
+
+Run history at https://claude.ai/code/scheduled/trig_01637DsCbz5qGn6r5RTP4hhi.
+
 ## Claude Autonomy & DB Workflow
 
 Claude is pre-authorized to apply migrations and mutate production Supabase directly via MCP. The safety net is discipline around *how* changes are made, not permission prompts.
