@@ -93,6 +93,66 @@ export async function getActiveSponsorshipFor(
 }
 
 /**
+ * Set of event IDs currently boosted via an active Partner- or Anchor-tier
+ * sponsorship. Patron-tier sponsorships do not boost — those are directory-only.
+ * The caller decides what to do with the set (sort priority, badge, etc.).
+ *
+ * Returned as a Set for O(1) membership checks in ranking + bucket comparators.
+ */
+export const getActiveBoostedEventIds = cache(async (): Promise<Set<string>> => {
+  const supabase = await createClient();
+  const nowIso = new Date().toISOString();
+
+  const { data, error } = await supabase
+    .from("sponsorships")
+    .select("entity_id, sponsor:sponsors!inner(tier, status)")
+    .eq("entity_type", "event")
+    .lte("starts_at", nowIso)
+    .or(`ends_at.is.null,ends_at.gt.${nowIso}`)
+    .eq("sponsor.status", "active")
+    .in("sponsor.tier", ["partner", "anchor"]);
+
+  if (error) {
+    console.error("[sponsor-service] getActiveBoostedEventIds error:", error);
+    return new Set();
+  }
+
+  const rows = (data ?? []) as { entity_id: string }[];
+  return new Set(rows.map((r) => r.entity_id));
+});
+
+/**
+ * Map of `partners.id → sponsor slug` for anchor-tier sponsors. Used to mark
+ * journey atoms whose underlying partner is also a community partner — we
+ * match by slug since `partners` and `sponsors` are independent tables today
+ * (the two are linked by sharing a slug). Empty map if there are no overlaps.
+ */
+export const getAnchorPartnerSlugsByPartnerId = cache(async (): Promise<Map<string, string>> => {
+  const supabase = await createClient();
+
+  const [partnersRes, sponsorsRes] = await Promise.all([
+    supabase.from("partners").select("id, slug").eq("is_active", true),
+    supabase.from("sponsors").select("slug, tier, status").eq("status", "active").eq("tier", "anchor"),
+  ]);
+
+  if (partnersRes.error) {
+    console.error("[sponsor-service] anchor partners: partners query error:", partnersRes.error);
+    return new Map();
+  }
+  if (sponsorsRes.error) {
+    console.error("[sponsor-service] anchor partners: sponsors query error:", sponsorsRes.error);
+    return new Map();
+  }
+
+  const anchorSlugs = new Set(((sponsorsRes.data ?? []) as { slug: string }[]).map((s) => s.slug));
+  const out = new Map<string, string>();
+  for (const p of ((partnersRes.data ?? []) as { id: string; slug: string }[])) {
+    if (anchorSlugs.has(p.slug)) out.set(p.id, p.slug);
+  }
+  return out;
+});
+
+/**
  * Anchor-tier sponsor that owns the given event category (e.g. "Dance & Movement").
  * One active sponsor per category is enforced by a unique partial index in SQL.
  */

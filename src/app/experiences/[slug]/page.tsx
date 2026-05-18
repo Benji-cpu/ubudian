@@ -27,6 +27,7 @@ import {
   rankAtomsForUser,
 } from "@/lib/journeys/journey-personalization";
 import { getCurrentProfile } from "@/lib/auth";
+import { getAnchorPartnerSlugsByPartnerId } from "@/lib/sponsors/sponsor-service";
 import { Badge } from "@/components/ui/badge";
 import {
   Breadcrumb,
@@ -90,6 +91,7 @@ export default async function JourneyPage({ params }: JourneyPageProps) {
   let moreJourneys: Journey[] = [];
   let testimonials: JourneyTestimonial[] = [];
   let initialSaved = false;
+  let anchorPartnerSlugs: Map<string, string> = new Map();
   const profile = await getCurrentProfile();
 
   try {
@@ -201,6 +203,8 @@ export default async function JourneyPage({ params }: JourneyPageProps) {
         }
       }
     }
+
+    anchorPartnerSlugs = await getAnchorPartnerSlugsByPartnerId();
   } catch {
     notFound();
   }
@@ -414,6 +418,7 @@ export default async function JourneyPage({ params }: JourneyPageProps) {
                     eventSlugs={eventSlugs}
                     journeyTitle={journey.title}
                     journeyUrl={journeyUrl}
+                    anchorPartnerSlugs={anchorPartnerSlugs}
                   />
                 ))}
               </div>

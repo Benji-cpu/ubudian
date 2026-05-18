@@ -51,7 +51,11 @@ export function rolledForward(events: Event[], now: Date = new Date()): Event[] 
   return events.map((event) => nextOccurrence(event, todayStr));
 }
 
-export function bucketEventsByTime(events: Event[], now: Date = new Date()): BucketedEvents {
+export function bucketEventsByTime(
+  events: Event[],
+  now: Date = new Date(),
+  boostedEventIds?: Set<string>
+): BucketedEvents {
   const buckets: BucketedEvents = {
     happening_now: [],
     today: [],
@@ -73,8 +77,17 @@ export function bucketEventsByTime(events: Event[], now: Date = new Date()): Buc
     if (bucket) buckets[bucket].push(effective);
   }
 
+  const compare = boostedEventIds && boostedEventIds.size > 0
+    ? (a: Event, b: Event) => {
+        const aBoost = boostedEventIds.has(a.id) ? 1 : 0;
+        const bBoost = boostedEventIds.has(b.id) ? 1 : 0;
+        if (aBoost !== bBoost) return bBoost - aBoost;
+        return compareEvents(a, b);
+      }
+    : compareEvents;
+
   for (const key of Object.keys(buckets) as EventBucket[]) {
-    buckets[key].sort(compareEvents);
+    buckets[key].sort(compare);
   }
 
   return buckets;
@@ -142,17 +155,30 @@ export const compareEventsByStart = compareEvents;
 /**
  * Stable sort over rolled-forward events. `mode === 'newest'` keys on
  * `created_at` descending; everything else falls back to start-date ASC.
- * Mutates a new array; does not touch the input.
+ * If `boostedEventIds` is provided, those events sort to the front of their
+ * tie group (date- or recency-equal) so the community-partner boost shows up
+ * in flat views (grid, list) too. Mutates a new array; does not touch the input.
  */
 export function sortRolledEvents(
   events: Event[],
-  mode: "date" | "newest" = "date"
+  mode: "date" | "newest" = "date",
+  boostedEventIds?: Set<string>
 ): Event[] {
   const out = [...events];
-  if (mode === "newest") {
-    out.sort((a, b) => b.created_at.localeCompare(a.created_at));
+  const base =
+    mode === "newest"
+      ? (a: Event, b: Event) => b.created_at.localeCompare(a.created_at)
+      : compareEvents;
+
+  if (boostedEventIds && boostedEventIds.size > 0) {
+    out.sort((a, b) => {
+      const aBoost = boostedEventIds.has(a.id) ? 1 : 0;
+      const bBoost = boostedEventIds.has(b.id) ? 1 : 0;
+      if (aBoost !== bBoost) return bBoost - aBoost;
+      return base(a, b);
+    });
   } else {
-    out.sort(compareEvents);
+    out.sort(base);
   }
   return out;
 }

@@ -12,6 +12,8 @@ interface AgendaFeedProps {
   savedEventIds: string[];
   viewerArchetypes?: ArchetypeId[] | null;
   archetypeLabel?: string | null;
+  /** Event IDs with an active Partner+ sponsorship — boost in ranking + buckets. */
+  boostedEventIds?: Set<string>;
 }
 
 const BUCKET_ORDER: { key: EventBucket; label: string; subtitle?: string }[] = [
@@ -30,6 +32,7 @@ export function AgendaFeed({
   savedEventIds,
   viewerArchetypes,
   archetypeLabel,
+  boostedEventIds,
 }: AgendaFeedProps) {
   const now = new Date();
   const savedSet = new Set(savedEventIds);
@@ -60,6 +63,7 @@ export function AgendaFeed({
   const ranked = rankEvents(events, {
     now,
     viewerArchetypes: viewerArchetypes ?? undefined,
+    boostedEventIds,
   });
 
   // Hero: top-ranked event that has not yet finished.
@@ -79,7 +83,7 @@ export function AgendaFeed({
 
   // Bucket the remainder (everything except the hero) into time sections.
   const remainder = events.filter((e) => e.id !== hero?.id);
-  const buckets = bucketEventsByTime(remainder, now);
+  const buckets = bucketEventsByTime(remainder, now, boostedEventIds);
 
   return (
     <div className="space-y-12">

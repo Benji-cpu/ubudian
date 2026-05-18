@@ -19,7 +19,9 @@ import { RefreshOnFocus } from "@/components/events/refresh-on-focus";
 import { CrossSectionRibbon } from "@/components/journeys/cross-section-ribbon";
 import { nowInBali } from "@/lib/events/bali-time";
 import { filterEventsInRange } from "@/lib/events/filter-range";
-import type { ArchetypeId, Event, Experience, QuizResultRecord } from "@/types";
+import { getActiveBoostedEventIds, getCategorySponsor } from "@/lib/sponsors/sponsor-service";
+import { PartnerCredit } from "@/components/sponsors/partner-credit";
+import type { ArchetypeId, Event, Experience, QuizResultRecord, Sponsor } from "@/types";
 
 const VIEWS_USING_OWN_VIEWPORT = new Set(["calendar", "week"]);
 // The feed view renders its own HeroEvent + ForYou rail + happening-now
@@ -70,6 +72,8 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
   let savedEventIds: string[] = [];
   let viewerArchetypes: ArchetypeId[] | null = null;
   let archetypeLabel: string | null = null;
+  let boostedEventIds: Set<string> = new Set();
+  let categorySponsor: Sponsor | null = null;
 
   try {
     const supabase = await createClient();
@@ -200,6 +204,13 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
     }, "events-list");
     if (error) console.error("Events query error:", error);
     allEvents = (events ?? []) as Event[];
+
+    // Community-partner data — boost-sort eligible event IDs and (when filtered
+    // by category) the anchor sponsor that owns that category.
+    boostedEventIds = await getActiveBoostedEventIds();
+    if (params.category) {
+      categorySponsor = await getCategorySponsor(params.category);
+    }
   } catch {
     // Supabase unreachable — render with empty state
   }
@@ -215,7 +226,13 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
   const useOwnViewport = VIEWS_USING_OWN_VIEWPORT.has(view);
   const viewEvents = useOwnViewport
     ? allEvents
-    : filterEventsInRange(allEvents, params.from ?? null, params.to ?? null);
+    : filterEventsInRange(
+        allEvents,
+        params.from ?? null,
+        params.to ?? null,
+        undefined,
+        boostedEventIds
+      );
 
   // The hero stands on its own with the gradient + painterly radials.
   // We can re-enable a curated photo backdrop once the AI image backfill
@@ -234,7 +251,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
       />
 
       {VIEWS_WITH_FEATURED_STRIP.has(view) && (
-        <FeaturedStrip events={allEvents} />
+        <FeaturedStrip events={allEvents} boostedEventIds={boostedEventIds} />
       )}
 
       <CrossSectionRibbon
@@ -267,6 +284,13 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
           <Suspense>
             <EventFilters />
           </Suspense>
+          {params.category && categorySponsor && (
+            <PartnerCredit
+              sponsor={categorySponsor}
+              verb={`${params.category}, brought to you by`}
+              className="mt-4"
+            />
+          )}
           {params.category && categoryGuide && (
             <CategoryGuideLink category={params.category} guide={categoryGuide} />
           )}
@@ -300,6 +324,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
               savedEventIds={savedEventIds}
               viewerArchetypes={viewerArchetypes}
               archetypeLabel={archetypeLabel}
+              boostedEventIds={boostedEventIds}
             />
           </Suspense>
         ) : isMapView ? (

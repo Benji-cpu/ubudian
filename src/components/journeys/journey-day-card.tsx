@@ -22,6 +22,12 @@ interface JourneyDayCardProps {
   /** When provided, enables per-day share/deep-link UX. */
   journeyTitle?: string;
   journeyUrl?: string;
+  /**
+   * Map of partner_id → sponsor slug for partners that are also active
+   * Anchor-tier community partners. Atoms with a matching partner_id render
+   * their title with a subtle gold underline that links to the partner profile.
+   */
+  anchorPartnerSlugs?: Map<string, string>;
 }
 
 const DAY_TYPE_LABEL: Record<JourneyDayType, string> = {
@@ -69,6 +75,7 @@ export function JourneyDayCard({
   eventSlugs,
   journeyTitle,
   journeyUrl,
+  anchorPartnerSlugs,
 }: JourneyDayCardProps) {
   const slotsByWindow = new Map<JourneyDayWindow, JourneyDaySlot[]>();
   for (const w of WINDOW_ORDER) slotsByWindow.set(w, []);
@@ -219,6 +226,7 @@ export function JourneyDayCard({
                       slot={slot}
                       candidates={candidatesBySlot.get(slot.id) ?? []}
                       eventSlugs={eventSlugs}
+                      anchorPartnerSlugs={anchorPartnerSlugs}
                     />
                   ))}
                 </ul>
@@ -235,10 +243,12 @@ function SlotRow({
   slot,
   candidates,
   eventSlugs,
+  anchorPartnerSlugs,
 }: {
   slot: JourneyDaySlot;
   candidates: JourneyAtom[];
   eventSlugs: Map<string, string>;
+  anchorPartnerSlugs?: Map<string, string>;
 }) {
   return (
     <li className="rounded border border-brand-gold/15 bg-brand-cream/15 p-3">
@@ -257,7 +267,12 @@ function SlotRow({
       {candidates.length > 0 && (
         <ul className="mt-2 space-y-2">
           {candidates.map((atom) => (
-            <AtomLine key={atom.id} atom={atom} eventSlugs={eventSlugs} />
+            <AtomLine
+              key={atom.id}
+              atom={atom}
+              eventSlugs={eventSlugs}
+              anchorPartnerSlugs={anchorPartnerSlugs}
+            />
           ))}
         </ul>
       )}
@@ -265,7 +280,15 @@ function SlotRow({
   );
 }
 
-function AtomLine({ atom, eventSlugs }: { atom: JourneyAtom; eventSlugs: Map<string, string> }) {
+function AtomLine({
+  atom,
+  eventSlugs,
+  anchorPartnerSlugs,
+}: {
+  atom: JourneyAtom;
+  eventSlugs: Map<string, string>;
+  anchorPartnerSlugs?: Map<string, string>;
+}) {
   const href = atomHref(atom, eventSlugs);
   const useLightbox = !!atom.image_url;
   const actionLabel =
@@ -274,6 +297,9 @@ function AtomLine({ atom, eventSlugs }: { atom: JourneyAtom; eventSlugs: Map<str
       : atom.kind === "accommodation" || atom.kind === "restaurant"
       ? "Visit"
       : "Open";
+  const anchorPartnerSlug = atom.partner_id
+    ? anchorPartnerSlugs?.get(atom.partner_id) ?? null
+    : null;
   const inner = (
     <>
       {atom.image_url ? (
@@ -301,9 +327,22 @@ function AtomLine({ atom, eventSlugs }: { atom: JourneyAtom; eventSlugs: Map<str
             </span>
           )}
         </div>
-        <p className="text-sm font-medium text-foreground">{atom.title}</p>
+        <p className="text-sm font-medium text-foreground">
+          {anchorPartnerSlug ? (
+            <span className="underline decoration-brand-gold/50 underline-offset-4 decoration-1">
+              {atom.title}
+            </span>
+          ) : (
+            atom.title
+          )}
+        </p>
         {atom.short_description && (
           <p className="text-xs text-muted-foreground line-clamp-2">{atom.short_description}</p>
+        )}
+        {anchorPartnerSlug && (
+          <p className="mt-0.5 text-[10px] uppercase tracking-wider text-brand-gold/80">
+            Community partner
+          </p>
         )}
       </div>
       {href?.startsWith("http") && (

@@ -176,6 +176,28 @@ describe("rankEvents", () => {
     expect(ranked[0].event.id).toBe("today");
   });
 
+  it("sponsorBoost outranks core + festival on the same day", () => {
+    const today = "2026-04-21";
+    const festival = makeEvent({ id: "festival", start_date: today, quality_score: 0.95 });
+    festival.end_date = "2026-04-22"; // festival kickoff
+    const weekly = makeEvent({ id: "weekly-core", start_date: today });
+    weekly.is_core = true;
+    const sponsored = makeEvent({ id: "sponsored", start_date: today, quality_score: 0.5 });
+
+    const ranked = rankEvents([festival, weekly, sponsored], {
+      now: new Date(`${today}T12:00:00`),
+      boostedEventIds: new Set(["sponsored"]),
+    });
+    expect(ranked[0].event.id).toBe("sponsored");
+    expect(ranked[0].components.sponsorBoost).toBeGreaterThan(0);
+  });
+
+  it("non-boosted events get zero sponsorBoost", () => {
+    const event = makeEvent({ id: "a", start_date: "2026-04-22", quality_score: 0.5 });
+    const s = scoreEvent(event, { now, boostedEventIds: new Set(["other-id"]) });
+    expect(s.components.sponsorBoost).toBe(0);
+  });
+
   it("scoreEvent produces consistent component breakdowns", () => {
     const event = makeEvent({
       id: "x",

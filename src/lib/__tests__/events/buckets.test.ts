@@ -269,4 +269,32 @@ describe("bucketEventsByTime", () => {
       expect(buckets.tomorrow[0].start_date).toBe("2026-04-21");
     });
   });
+
+  describe("sponsorship boost", () => {
+    it("sorts boosted events to the front of their bucket", () => {
+      const today = "2026-04-20";
+      const now = baliClock(today, 10);
+      const a = makeEvent({ id: "a", start_date: today, start_time: "09:00:00" });
+      const b = makeEvent({ id: "b", start_date: today, start_time: "11:00:00" });
+      const c = makeEvent({ id: "c", start_date: today, start_time: "14:00:00" });
+
+      const withoutBoost = bucketEventsByTime([a, b, c], now);
+      expect(withoutBoost.today.map((e) => e.id)).toEqual(["b", "c"]);
+
+      const withBoost = bucketEventsByTime([a, b, c], now, new Set(["c"]));
+      // 'a' has already ended (start_time 09:00, clock 10:00); 'b' and 'c'
+      // both surface in `today`, and the boosted one wins regardless of time.
+      expect(withBoost.today.map((e) => e.id)).toEqual(["c", "b"]);
+    });
+
+    it("leaves natural order intact when no boosted ids overlap the result", () => {
+      const today = "2026-04-20";
+      const now = baliClock(today, 10);
+      const b = makeEvent({ id: "b", start_date: today, start_time: "11:00:00" });
+      const c = makeEvent({ id: "c", start_date: today, start_time: "14:00:00" });
+
+      const buckets = bucketEventsByTime([b, c], now, new Set(["unrelated"]));
+      expect(buckets.today.map((e) => e.id)).toEqual(["b", "c"]);
+    });
+  });
 });

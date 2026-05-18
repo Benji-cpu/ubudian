@@ -7,6 +7,8 @@ interface FeaturedStripProps {
   events: Event[];
   /** Compute relative to this clock — defaults to real `now`. */
   now?: Date;
+  /** Event IDs with an active Partner+ sponsorship — sort to the front of each bucket. */
+  boostedEventIds?: Set<string>;
 }
 
 const EVENING_CUTOFF_MINUTES = 17 * 60; // 17:00 Bali
@@ -22,9 +24,9 @@ const MAX_CARDS = 8;
  * there are evening events; otherwise "What's on next". Renders nothing
  * if fewer than three candidates land — a sparse rail looks abandoned.
  */
-export function FeaturedStrip({ events, now = new Date() }: FeaturedStripProps) {
+export function FeaturedStrip({ events, now = new Date(), boostedEventIds }: FeaturedStripProps) {
   const bali = nowInBali(now);
-  const buckets = bucketEventsByTime(events, now);
+  const buckets = bucketEventsByTime(events, now, boostedEventIds);
 
   // Build the candidate list in priority order. Dedupe by id so a recurring
   // event that lives in both today + in_progress doesn't appear twice.

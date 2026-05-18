@@ -2,6 +2,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { isAdmin } from "@/lib/auth";
 import { createPost } from "@/lib/beehiiv";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
+import { SITE_URL } from "@/lib/constants";
 import { NextResponse } from "next/server";
 
 function escapeHtml(str: string): string {
@@ -101,6 +102,29 @@ export async function POST(request: Request) {
         `<h3>Sponsored by ${escapeHtml(edition.sponsor_name as string)}</h3>${escapeHtml((edition.sponsor_text as string) || "")}${
           edition.sponsor_url ? `<p><a href="${escapeHtml(edition.sponsor_url as string)}">Learn more</a></p>` : ""
         }`
+      );
+    }
+
+    // Community Partners footer — soft list of all Patron+ active sponsors,
+    // links to each partner profile. Editorial, never "Sponsored by".
+    const { data: footerSponsors } = await supabase
+      .from("sponsors")
+      .select("name, slug, tier")
+      .eq("status", "active")
+      .order("name", { ascending: true });
+
+    const partners = ((footerSponsors ?? []) as { name: string; slug: string; tier: string }[])
+      .filter((s) => s.tier === "partner" || s.tier === "anchor" || s.tier === "patron");
+
+    if (partners.length > 0) {
+      const links = partners
+        .map(
+          (s) =>
+            `<a href="${escapeHtml(SITE_URL)}/community/partners/${escapeHtml(s.slug)}">${escapeHtml(s.name)}</a>`
+        )
+        .join(" · ");
+      sections.push(
+        `<p><em>The Ubudian is sustained by these community partners: ${links}.</em></p>`
       );
     }
 
