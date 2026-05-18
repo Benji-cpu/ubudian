@@ -1,0 +1,27 @@
+{
+  "date": "2026-05-18",
+  "decisions": [
+    {
+      "id": "08ee02fb-47ad-4fdb-a702-07c5801dc828",
+      "action": "archive_off_topic",
+      "reason": "Dry-run test fixture — `[TEST]` title prefix, slug carries `dry-run-v2-2026-05-18`, fake venue 'Test Venue Penestanan', raw_text_snippet labels it a test row."
+    },
+    {
+      "id": "711b1733-2516-4ea9-932e-773ae846c5e8",
+      "action": "archive_dup",
+      "dup_of": "ac664db4-b8e4-437d-83d1-645ba0443912",
+      "reason": "Same 5Rhythms class at Paradiso Ubud is already live as a weekly recurring series (Tuesdays from 2026-05-12). This single-day row from 2026-05-05 is both a duplicate and already past."
+    },
+    {
+      "id": "6117497b-e867-4aeb-8baa-53e253a07336",
+      "action": "archive_off_topic",
+      "reason": "Tourist-coded adventure package — ATV + Ayung River rafting day-trip sold by Travolks Bali via megatix.co.id. Pure adrenaline tour, not a community gathering."
+    },
+    {
+      "id": "56adfd2d-399a-4f44-b549-a778a83f5efd",
+      "action": "archive_dup",
+      "dup_of": "f65bfccc-f346-4336-b318-f5cd573caa72",
+      "reason": "Same CBC — Contact Beyond Contact session at Moksa already approved (2026-04-27 sibling). This 2026-04-20 instance is an earlier duplicate of the same series and is in the past."
+    }
+  ]
+}
