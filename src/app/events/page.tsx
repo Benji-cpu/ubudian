@@ -234,35 +234,28 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
         boostedEventIds
       );
 
-  // The hero stands on its own with the gradient + painterly radials.
-  // We can re-enable a curated photo backdrop once the AI image backfill
-  // produces text-free, on-brand imagery — too many ingested cover URLs
-  // are event flyers with embedded text that clashes with the headline.
+  // The events hero is the home-style portal — full height, gradient
+  // blending into the fixed nav. We `-mt-14` here so it sits flush under
+  // the header (matching `src/app/page.tsx:91`).
 
   return (
-    <div>
+    <div className="-mt-14">
       <RefreshOnFocus />
 
-      <EventsHero
-        backdropImageUrl={null}
-        backdropAlt=""
-        backdropCaption={null}
-        totalCount={viewEvents.length}
-      />
+      <EventsHero totalCount={viewEvents.length} />
 
       {VIEWS_WITH_FEATURED_STRIP.has(view) && (
         <FeaturedStrip events={allEvents} boostedEventIds={boostedEventIds} />
       )}
 
-      <CrossSectionRibbon
-        pitch="Don't want to plan it day-by-day? We've curated multi-day retreats."
-        cta="See the curated retreats"
-      />
-
-      {/* Controls */}
+      {/* Controls — clear hierarchy:
+            1. Search (the strongest affordance — what most users want first)
+            2. Date / "What's on now" chips (the second strongest)
+            3. Categories (quieter, scrollable on mobile)
+            Sort + View tuck right of search as quiet utilities. */}
       <section
         id="events"
-        className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8"
+        className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8"
       >
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
           <Suspense>
@@ -280,7 +273,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
           </div>
         </div>
 
-        <div className="mt-5">
+        <div className="mt-6">
           <Suspense>
             <EventFilters />
           </Suspense>
@@ -340,6 +333,11 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
           </Suspense>
         )}
       </section>
+
+      <CrossSectionRibbon
+        pitch="Don't want to plan it day-by-day? We've curated multi-day retreats."
+        cta="See the curated retreats"
+      />
     </div>
   );
 }

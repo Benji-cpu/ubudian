@@ -32,6 +32,7 @@ function makeEvent(partial: Partial<Event> & { id: string; start_date: string })
     is_placeholder: false,
     is_core: false,
     archetype_tags: [],
+    intent_tags: [],
     source_id: null,
     source_event_id: null,
     source_url: null,

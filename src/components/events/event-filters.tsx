@@ -28,13 +28,7 @@ import { EVENT_CATEGORIES, CATEGORY_EMOJI } from "@/lib/constants";
 import { PRICE_BRACKETS } from "@/lib/price-parser";
 import { nowInBaliDate } from "@/lib/events/bali-time";
 import { cn } from "@/lib/utils";
-import {
-  ChevronDown,
-  ChevronUp,
-  MapPin,
-  SlidersHorizontal,
-  X,
-} from "lucide-react";
+import { MapPin, SlidersHorizontal, X } from "lucide-react";
 
 type DateFilter = { key: string; label: string; from: string; to: string };
 
@@ -104,7 +98,6 @@ export function EventFilters() {
   // (modulo the few-second seam at Bali midnight — acceptable for a filter
   // chip list).
   const dateFilters = useMemo(() => buildDateFilters(), []);
-  const [categoryExpanded, setCategoryExpanded] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [venueInput, setVenueInput] = useState(activeVenue || "");
   const isUserTyping = useRef(false);
@@ -248,9 +241,15 @@ export function EventFilters() {
   const quickDates = dateFilters.filter((df) => df.key !== "month");
 
   return (
-    <div className="space-y-4">
-      {/* Row 1: Quick filters + All filters trigger */}
+    <div className="space-y-3">
+      {/* Row 1: When chips (Today/Tomorrow/Weekend/Week), then a soft divider,
+          then secondary modifiers (Happening now / Free / All filters). The
+          eyebrow on the left tells the user this row is about WHEN — the
+          category row below answers WHAT KIND. Clear axes = less haphazard. */}
       <div className="flex flex-wrap items-center gap-2">
+        <span className="mr-1 hidden text-[11px] font-semibold uppercase tracking-[0.14em] text-brand-deep-green/55 sm:inline dark:text-brand-gold/55">
+          When
+        </span>
         {quickDates.map((df) => {
           const isActive = activeFrom === df.from && activeTo === df.to;
           return (
@@ -271,6 +270,11 @@ export function EventFilters() {
             </Button>
           );
         })}
+
+        <span
+          aria-hidden
+          className="mx-1 hidden h-5 w-px bg-brand-deep-green/15 sm:block"
+        />
 
         <Button
           variant="outline"
@@ -315,8 +319,6 @@ export function EventFilters() {
         >
           Free
         </Button>
-
-        <span className="ml-1 hidden h-5 w-px bg-brand-deep-green/15 sm:block" />
 
         <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
           <SheetTrigger asChild>
@@ -468,14 +470,15 @@ export function EventFilters() {
         </Sheet>
       </div>
 
-      {/* Row 2: Categories */}
-      <div className="relative">
-        <div
-          className={cn(
-            "flex flex-wrap gap-2 transition-all",
-            !categoryExpanded && "max-h-[36px] overflow-hidden"
-          )}
-        >
+      {/* Row 2: Categories — single horizontal strip, scrolls on mobile.
+          Eventbrite-style: keeps the secondary axis (what kind of event)
+          visually distinct from the primary axis (when) and prevents the
+          chaotic 3-row wrap that earlier versions had. */}
+      <div className="-mx-4 px-4 sm:mx-0 sm:px-0">
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <span className="shrink-0 text-[11px] font-semibold uppercase tracking-[0.14em] text-brand-deep-green/55 dark:text-brand-gold/55">
+            Kind
+          </span>
           <Badge
             variant={!activeCategory ? "default" : "outline"}
             className={cn(
@@ -509,22 +512,6 @@ export function EventFilters() {
             );
           })}
         </div>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="mt-1 h-auto px-2 py-0.5 text-xs font-medium text-muted-foreground hover:text-brand-deep-green dark:hover:text-brand-gold"
-          onClick={() => setCategoryExpanded(!categoryExpanded)}
-        >
-          {categoryExpanded ? (
-            <>
-              Show less <ChevronUp className="ml-1 h-3 w-3" />
-            </>
-          ) : (
-            <>
-              All categories <ChevronDown className="ml-1 h-3 w-3" />
-            </>
-          )}
-        </Button>
       </div>
 
       {/* Row 3: Active filter strip — sticky under the global header so the

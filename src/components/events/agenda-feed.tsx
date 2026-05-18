@@ -69,17 +69,33 @@ export function AgendaFeed({
   // Hero: top-ranked event that has not yet finished.
   const hero = ranked[0]?.event;
 
-  // For You rail: prefer archetype-matched events. Fallback to top-ranked
-  // minus the hero. Cap at 8 so the rail stays snappy on mobile.
-  const forYouCandidates = viewerArchetypes?.length
+  // For You rail — only when we have honest signal from the viewer.
+  // Signed-out users see no rail (the page doesn't claim to know them);
+  // signed-in users get the rail iff they've taken the quiz OR saved at
+  // least one event. Picking from archetype overlap when we have it,
+  // otherwise weighted by category overlap with what they've saved.
+  const hasArchetype = (viewerArchetypes?.length ?? 0) > 0;
+  const hasSaves = savedEventIds.length > 0;
+  const hasSignal = !!currentProfileId && (hasArchetype || hasSaves);
+
+  const savedCategories = new Set<string>();
+  if (hasSaves) {
+    for (const e of events) {
+      if (savedSet.has(e.id)) savedCategories.add(e.category);
+    }
+  }
+
+  const forYouCandidates: Event[] = hasSignal
     ? ranked
-        .filter((r) => r.components.personalization > 0 && r.event.id !== hero?.id)
+        .filter((r) => r.event.id !== hero?.id && !savedSet.has(r.event.id))
+        .filter((r) => {
+          if (hasArchetype && r.components.personalization > 0) return true;
+          if (hasSaves && savedCategories.has(r.event.category)) return true;
+          return false;
+        })
         .slice(0, 8)
         .map((r) => r.event)
-    : ranked
-        .filter((r) => r.event.id !== hero?.id)
-        .slice(0, 8)
-        .map((r) => r.event);
+    : [];
 
   // Bucket the remainder (everything except the hero) into time sections.
   const remainder = events.filter((e) => e.id !== hero?.id);
@@ -89,10 +105,11 @@ export function AgendaFeed({
     <div className="space-y-12">
       {hero && <HeroEvent event={hero} saveButton={renderSave(hero)} />}
 
-      {forYouCandidates.length > 0 && (
+      {hasSignal && forYouCandidates.length > 0 && (
         <ForYouRail
           events={forYouCandidates}
           archetypeLabel={archetypeLabel ?? null}
+          savedCount={savedEventIds.length}
         />
       )}
 
