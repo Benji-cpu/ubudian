@@ -90,38 +90,39 @@ export async function GET(request: Request) {
 
   const rows = pending ?? [];
 
-  // For each pending row, fetch approved siblings sharing the normalised title
-  // (case + punctuation insensitive). Cheap heuristic but matches the agent
-  // playbook's dedup rule.
-  const enriched = [] as Array<Record<string, unknown>>;
-  for (const row of rows) {
-    const normTitle = normaliseTitle(row.title);
-    let siblings: Array<{
-      id: string;
-      title: string;
-      venue_name: string | null;
-      recurrence_rule: string | null;
-      start_date: string | null;
-    }> = [];
+  // Pre-fetch every approved row once and index by normalised title.
+  // Punctuation (em-dashes etc.) breaks Postgres ilike prefix matching,
+  // so we normalise both sides client-side. The approved set is bounded
+  // (typically < 500 active rows) so this is cheap.
+  type ApprovedRow = {
+    id: string;
+    title: string | null;
+    venue_name: string | null;
+    recurrence_rule: string | null;
+    start_date: string | null;
+  };
 
-    if (normTitle) {
-      // Tight prefix-match: same first 30 chars of normalised title, status=approved.
-      // We re-filter client-side for exact normalised equality.
-      const prefix = normTitle.slice(0, 30);
-      const { data: maybeSiblings } = await supabase
-        .from("events")
-        .select("id, title, venue_name, recurrence_rule, start_date")
-        .eq("status", "approved")
-        .ilike("title", `${prefix.replace(/[%_]/g, "")}%`)
-        .limit(20);
+  const { data: approved } = await supabase
+    .from("events")
+    .select("id, title, venue_name, recurrence_rule, start_date")
+    .eq("status", "approved")
+    .limit(1000)
+    .returns<ApprovedRow[]>();
 
-      siblings = (maybeSiblings ?? []).filter(
-        (sib) => normaliseTitle(sib.title) === normTitle
-      );
-    }
-
-    enriched.push({ ...row, sibling_approved: siblings });
+  const approvedByNormTitle = new Map<string, ApprovedRow[]>();
+  for (const sib of approved ?? []) {
+    const key = normaliseTitle(sib.title);
+    if (!key) continue;
+    const bucket = approvedByNormTitle.get(key);
+    if (bucket) bucket.push(sib);
+    else approvedByNormTitle.set(key, [sib]);
   }
+
+  const enriched = rows.map((row) => {
+    const normTitle = normaliseTitle(row.title);
+    const siblings = normTitle ? approvedByNormTitle.get(normTitle) ?? [] : [];
+    return { ...row, sibling_approved: siblings };
+  });
 
   return NextResponse.json({
     date: baliDateStr(),
