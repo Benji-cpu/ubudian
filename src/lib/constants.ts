@@ -13,6 +13,7 @@ export const NAV_LINKS = [
   { label: "Tours", href: "/tours" },
   { label: "Newsletter", href: "/newsletter" },
   { label: "Membership", href: "/membership" },
+  { label: "Community Partners", href: "/community/partners" },
   { label: "About", href: "/about" },
 ] as const;
 
@@ -29,6 +30,7 @@ export const ADMIN_NAV_LINKS: AdminNavItem[] = [
   { type: "link", label: "Guides", href: "/admin/guides", icon: "BookOpen" },
   { type: "link", label: "Tours", href: "/admin/tours", icon: "MapPin" },
   { type: "link", label: "Commerce", href: "/admin/commerce", icon: "CreditCard" },
+  { type: "link", label: "Partners", href: "/admin/sponsors", icon: "HandHeart" },
   { type: "link", label: "Community", href: "/admin/community", icon: "Users" },
   { type: "divider" },
   { type: "link", label: "Site Settings", href: "/admin/settings", icon: "Settings" },

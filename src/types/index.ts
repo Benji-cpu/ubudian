@@ -383,6 +383,50 @@ export interface JourneyWithDays extends Journey {
   days: JourneyDayWithSlots[];
 }
 
+// ============================================
+// COMMUNITY PARTNERS (sponsorship)
+// ============================================
+
+export type SponsorTier = "patron" | "partner" | "anchor";
+export type SponsorStatus = "active" | "paused" | "ended";
+export type SponsorshipEntityType = "event" | "newsletter_edition" | "journey" | "story";
+
+export interface Sponsor {
+  id: string;
+  slug: string;
+  name: string;
+  tagline: string | null;
+  description: string | null;
+  logo_url: string | null;
+  hero_image_url: string | null;
+  website_url: string | null;
+  instagram_handle: string | null;
+  contact_email: string | null;
+  contact_whatsapp: string | null;
+  tier: SponsorTier;
+  status: SponsorStatus;
+  category_sponsor: string | null;
+  monthly_amount_cents: number | null;
+  starts_on: string | null;
+  ends_on: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Sponsorship {
+  id: string;
+  sponsor_id: string;
+  entity_type: SponsorshipEntityType;
+  entity_id: string;
+  starts_at: string;
+  ends_at: string | null;
+  created_at: string;
+}
+
+export interface SponsorshipWithSponsor extends Sponsorship {
+  sponsor: Sponsor;
+}
+
 export interface NewsletterEdition {
   id: string;
   subject: string;

@@ -13,6 +13,7 @@ import { RichTextEditor } from "@/components/admin/rich-text-editor";
 import { ImageUploader } from "@/components/admin/image-uploader";
 import { RefetchImageButton } from "@/components/admin/refetch-image-button";
 import { TagInput } from "@/components/admin/tag-input";
+import { SponsorshipAttach } from "@/components/admin/sponsorship-attach";
 import { ARCHETYPE_IDS } from "@/lib/quiz-data";
 import { DatePicker } from "@/components/admin/date-picker";
 import { TimePicker } from "@/components/admin/time-picker";
@@ -711,6 +712,10 @@ export function EventForm({ initialData }: EventFormProps) {
                 )}
               />
             </div>
+
+            {isEditMode && (
+              <SponsorshipAttach entityType="event" entityId={initialData.id} />
+            )}
           </div>
         </div>
 

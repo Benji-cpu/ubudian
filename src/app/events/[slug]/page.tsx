@@ -15,6 +15,8 @@ import { MapPin, ExternalLink, User } from "lucide-react";
 import { isSafeUrl } from "@/lib/url-validation";
 import { getCurrentProfile } from "@/lib/auth";
 import { MentionedInGuides } from "@/components/cross-links/mentioned-in-guides";
+import { getActiveSponsorshipFor } from "@/lib/sponsors/sponsor-service";
+import { PartnerCredit } from "@/components/sponsors/partner-credit";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -67,6 +69,7 @@ export default async function EventPage({ params }: EventPageProps) {
   let related: Event[] = [];
   let currentProfileId: string | null = null;
   let initiallySaved = false;
+  let sponsorship: Awaited<ReturnType<typeof getActiveSponsorshipFor>> = null;
 
   try {
     const { slug } = await params;
@@ -109,6 +112,8 @@ export default async function EventPage({ params }: EventPageProps) {
 
     if (relatedError) console.error("Related events query error:", relatedError);
     related = (relatedEvents ?? []) as Event[];
+
+    sponsorship = await getActiveSponsorshipFor("event", e.id);
   } catch {
     notFound();
   }
@@ -200,6 +205,10 @@ export default async function EventPage({ params }: EventPageProps) {
                 </div>
               </div>
             </div>
+          )}
+
+          {sponsorship && (
+            <PartnerCredit sponsor={sponsorship.sponsor} className="mt-4" />
           )}
 
           <div className="mt-5">

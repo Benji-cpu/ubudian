@@ -48,6 +48,33 @@ export async function POST(request: Request) {
     const content = (edition.content_json ?? {}) as Record<string, string>;
     const sections: string[] = [];
 
+    // Partner credit (top of email) — preferred path uses sponsorships table.
+    const nowIso = new Date().toISOString();
+    const { data: sponsorshipRow } = await supabase
+      .from("sponsorships")
+      .select("sponsor:sponsors!inner(name, website_url, tagline, status)")
+      .eq("entity_type", "newsletter_edition")
+      .eq("entity_id", editionId)
+      .lte("starts_at", nowIso)
+      .or(`ends_at.is.null,ends_at.gt.${nowIso}`)
+      .eq("sponsor.status", "active")
+      .order("starts_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    const partner = (sponsorshipRow as { sponsor?: { name: string; website_url: string | null; tagline: string | null } } | null)?.sponsor;
+    if (partner) {
+      const linkOpen = partner.website_url
+        ? `<a href="${escapeHtml(partner.website_url)}">`
+        : "";
+      const linkClose = partner.website_url ? "</a>" : "";
+      sections.push(
+        `<p><em>This edition held by ${linkOpen}${escapeHtml(partner.name)}${linkClose}.${
+          partner.tagline ? ` ${escapeHtml(partner.tagline)}` : ""
+        }</em></p>`
+      );
+    }
+
     if (content.featured_story_excerpt) {
       sections.push(`<h2>Featured Story</h2>${escapeHtml(content.featured_story_excerpt)}`);
     }
@@ -67,7 +94,9 @@ export async function POST(request: Request) {
       sections.push(`<h2>Tour Spotlight</h2>${escapeHtml(content.tour_spotlight_text)}`);
     }
 
-    if (edition.sponsor_name) {
+    // Legacy sponsor fallback (bottom of email) — used only when no community
+    // partner is attached via the sponsorships table.
+    if (!partner && edition.sponsor_name) {
       sections.push(
         `<h3>Sponsored by ${escapeHtml(edition.sponsor_name as string)}</h3>${escapeHtml((edition.sponsor_text as string) || "")}${
           edition.sponsor_url ? `<p><a href="${escapeHtml(edition.sponsor_url as string)}">Learn more</a></p>` : ""

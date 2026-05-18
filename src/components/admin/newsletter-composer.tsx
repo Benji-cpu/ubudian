@@ -9,6 +9,7 @@ import { createClient } from "@/lib/supabase/client";
 import { slugify } from "@/lib/utils";
 import { RichTextEditor } from "@/components/admin/rich-text-editor";
 import { ImageUploader } from "@/components/admin/image-uploader";
+import { SponsorshipAttach } from "@/components/admin/sponsorship-attach";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -372,8 +373,20 @@ export function NewsletterComposer({ initialData }: NewsletterComposerProps) {
 
           {/* Sidebar */}
           <div className="space-y-6">
+            {isEditMode && (
+              <SponsorshipAttach
+                entityType="newsletter_edition"
+                entityId={initialData.id}
+                label="Community Partner"
+                description="Picks the partner who holds this edition. When set, the email renders 'This edition held by [partner]' at the top instead of the legacy sponsor fields below."
+              />
+            )}
+
             <div className="space-y-4 rounded-md border p-4">
-              <h3 className="text-sm font-medium">Sponsor</h3>
+              <h3 className="text-sm font-medium">Sponsor (legacy fields)</h3>
+              <p className="text-xs text-muted-foreground">
+                Only used when no community partner is attached above.
+              </p>
               <FormField
                 control={form.control}
                 name="sponsor_name"

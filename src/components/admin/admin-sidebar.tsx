@@ -14,6 +14,7 @@ import {
   MapPin,
   Zap,
   CreditCard,
+  HandHeart,
   Menu,
   Settings,
   BookOpen,
@@ -35,6 +36,7 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   MapPin,
   Zap,
   CreditCard,
+  HandHeart,
   Settings,
   BookOpen,
 };
