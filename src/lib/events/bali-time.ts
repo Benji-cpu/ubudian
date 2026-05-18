@@ -59,6 +59,41 @@ export function nowInBali(now: Date = new Date()): BaliNow {
   };
 }
 
+/**
+ * Return a `Date` object whose UTC components match Bali's current local
+ * Y/M/D/H/M. Useful when handing the value to date-fns (`addDays`,
+ * `nextFriday`, `endOfWeek`, …) which read components via the host TZ —
+ * combined with UTC-based readers it lets us reason about Bali wall time
+ * without dragging a tz-aware library through every call site.
+ */
+export function nowInBaliDate(now: Date = new Date()): Date {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: BALI_TZ,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  }).formatToParts(now);
+
+  const get = (type: string) => parts.find((p) => p.type === type)?.value ?? "0";
+  const hourRaw = get("hour");
+  const hour = hourRaw === "24" ? "00" : hourRaw;
+
+  return new Date(
+    Date.UTC(
+      Number(get("year")),
+      Number(get("month")) - 1,
+      Number(get("day")),
+      Number(hour),
+      Number(get("minute")),
+      Number(get("second"))
+    )
+  );
+}
+
 /** Parse HH:MM[:SS] into minutes since midnight, or null if malformed. */
 export function parseTimeToMinutes(value: string | null): number | null {
   if (!value) return null;

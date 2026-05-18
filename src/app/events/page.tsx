@@ -14,10 +14,17 @@ import { EventSearch } from "@/components/events/event-search";
 import { CategoryGuideLink } from "@/components/events/category-guide-link";
 import { MapView } from "@/components/events/map-view";
 import { EventsHero } from "@/components/events/events-hero";
+import { FeaturedStrip } from "@/components/events/featured-strip";
 import { RefreshOnFocus } from "@/components/events/refresh-on-focus";
 import { CrossSectionRibbon } from "@/components/journeys/cross-section-ribbon";
 import { nowInBali } from "@/lib/events/bali-time";
+import { filterEventsInRange } from "@/lib/events/filter-range";
 import type { ArchetypeId, Event, Experience, QuizResultRecord } from "@/types";
+
+const VIEWS_USING_OWN_VIEWPORT = new Set(["calendar", "week"]);
+// The feed view renders its own HeroEvent + ForYou rail + happening-now
+// section, so the FeaturedStrip would just duplicate signal there.
+const VIEWS_WITH_FEATURED_STRIP = new Set(["list", "grid", "map"]);
 
 export const metadata: Metadata = {
   title: "Events in Ubud",
@@ -113,15 +120,14 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
 
     const { data: events, error } = await queryWithRetry(() => {
       const sortByNewest = params.sort === "newest";
-      let query = supabase
-        .from("events")
-        .select("*")
-        .eq("status", "approved")
-        .order(sortByNewest ? "created_at" : "start_date", {
-          ascending: !sortByNewest,
-        });
-      if (!sortByNewest) {
-        query = query.order("start_time", { ascending: true, nullsFirst: false });
+      let query = supabase.from("events").select("*").eq("status", "approved");
+      // For "newest" we can sort DB-side on created_at — recurring rolling
+      // doesn't move the row's authored timestamp. For "date" (default) we
+      // sort client-side after roll-forward; the DB's `start_date` column is
+      // the seed date, which is misleading once we re-anchor to the next
+      // occurrence.
+      if (sortByNewest) {
+        query = query.order("created_at", { ascending: false });
       }
 
       const today = nowInBali().dateStr;
@@ -145,12 +151,14 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
         query = query.eq("category", params.category);
       }
 
-      if (params.from && params.happening !== "true") {
-        query = query.gte("start_date", params.from);
-      }
-      if (params.to && params.happening !== "true") {
-        query = query.lte("start_date", params.to);
-      }
+      // NOTE: `params.from` / `params.to` are intentionally NOT applied at the
+      // DB layer. Recurring events store their seed `start_date`, so a DB-side
+      // BETWEEN would strip every recurring class whose original date sits
+      // outside the window — including weekly events whose next occurrence
+      // lands squarely inside it. The range is applied in `filterEventsInRange`
+      // below, after roll-forward, for views that share the page-level events
+      // array (feed, list, grid, map). Calendar and Week views manage their
+      // own viewport via `expandRecurrence`.
 
       if (params.q) {
         const q = `%${params.q}%`;
@@ -199,6 +207,16 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
   const isFeedView = view === "feed";
   const isMapView = view === "map";
 
+  // Calendar and Week views walk their own date viewport and run
+  // `expandRecurrence` themselves — they need the raw seed-date events. For
+  // every other view, we roll recurring events forward to the next occurrence
+  // inside the active `from`/`to` window (or to today, if no window is set)
+  // before handing the array down.
+  const useOwnViewport = VIEWS_USING_OWN_VIEWPORT.has(view);
+  const viewEvents = useOwnViewport
+    ? allEvents
+    : filterEventsInRange(allEvents, params.from ?? null, params.to ?? null);
+
   // The hero stands on its own with the gradient + painterly radials.
   // We can re-enable a curated photo backdrop once the AI image backfill
   // produces text-free, on-brand imagery — too many ingested cover URLs
@@ -212,8 +230,12 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
         backdropImageUrl={null}
         backdropAlt=""
         backdropCaption={null}
-        totalCount={allEvents.length}
+        totalCount={viewEvents.length}
       />
+
+      {VIEWS_WITH_FEATURED_STRIP.has(view) && (
+        <FeaturedStrip events={allEvents} />
+      )}
 
       <CrossSectionRibbon
         pitch="Don't want to plan it day-by-day? We've curated multi-day retreats."
@@ -273,7 +295,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
         {isFeedView ? (
           <Suspense>
             <AgendaFeed
-              events={allEvents}
+              events={viewEvents}
               currentProfileId={currentProfileId}
               savedEventIds={savedEventIds}
               viewerArchetypes={viewerArchetypes}
@@ -281,11 +303,11 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
             />
           </Suspense>
         ) : isMapView ? (
-          <MapView events={allEvents} />
+          <MapView events={viewEvents} />
         ) : (
           <Suspense>
             <PriceFilteredEvents
-              events={allEvents}
+              events={useOwnViewport ? allEvents : viewEvents}
               view={view}
               currentProfileId={currentProfileId}
               savedEventIds={savedEventIds}

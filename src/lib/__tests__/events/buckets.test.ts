@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { bucketEventsByTime } from "@/lib/events/buckets";
+import { filterEventsInRange } from "@/lib/events/filter-range";
 import { nowInBali } from "@/lib/events/bali-time";
 import type { Event } from "@/types";
 
@@ -238,6 +239,34 @@ describe("bucketEventsByTime", () => {
       const event = makeEvent({ id: "morning", start_date: "2026-04-21", start_time: "08:00" });
       const buckets = bucketEventsByTime([event], nearMidnightBali);
       expect(buckets.today.map((e) => e.id)).toEqual(["morning"]);
+    });
+
+    // Regression for the 2026-05-18 bug: clicking "Tomorrow" with a recurring
+    // weekly Tuesday class whose seed date sits in the past must still land
+    // the class in the `tomorrow` bucket after `filterEventsInRange` rolls
+    // it forward. Before the fix the seed date got stripped at the DB layer
+    // (BETWEEN from AND to on seed start_date) and the bucket ran over an
+    // empty list.
+    it("places a rolled Tuesday recurring into 'tomorrow' after range filter", () => {
+      // Today: Mon Apr 20 Bali; tomorrow: Tue Apr 21.
+      const mon = baliClock("2026-04-20", 10);
+      const event = makeEvent({
+        id: "tues-weekly",
+        start_date: "2026-03-31", // a prior Tuesday
+        start_time: "18:00",
+      });
+      event.is_recurring = true;
+      event.recurrence_rule = '{"frequency":"weekly","day_of_week":2}';
+
+      const filtered = filterEventsInRange(
+        [event],
+        "2026-04-21",
+        "2026-04-21",
+        mon
+      );
+      const buckets = bucketEventsByTime(filtered, mon);
+      expect(buckets.tomorrow.map((e) => e.id)).toEqual(["tues-weekly"]);
+      expect(buckets.tomorrow[0].start_date).toBe("2026-04-21");
     });
   });
 });

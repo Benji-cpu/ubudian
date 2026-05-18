@@ -131,6 +131,32 @@ function compareEvents(a: Event, b: Event): number {
   return at - bt;
 }
 
+/**
+ * Public sort comparator keyed on `start_date` then `start_time`. After
+ * `rolledForward` or `filterEventsInRange`, the events carry their next
+ * occurrence's date — so client-side views that consume those outputs can
+ * sort with this comparator and get the right order.
+ */
+export const compareEventsByStart = compareEvents;
+
+/**
+ * Stable sort over rolled-forward events. `mode === 'newest'` keys on
+ * `created_at` descending; everything else falls back to start-date ASC.
+ * Mutates a new array; does not touch the input.
+ */
+export function sortRolledEvents(
+  events: Event[],
+  mode: "date" | "newest" = "date"
+): Event[] {
+  const out = [...events];
+  if (mode === "newest") {
+    out.sort((a, b) => b.created_at.localeCompare(a.created_at));
+  } else {
+    out.sort(compareEvents);
+  }
+  return out;
+}
+
 /** Add N days to a YYYY-MM-DD string, returning a YYYY-MM-DD string. */
 function addDays(dateStr: string, days: number): string {
   const [y, m, d] = dateStr.split("-").map(Number);

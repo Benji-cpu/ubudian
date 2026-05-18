@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   format,
@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/sheet";
 import { EVENT_CATEGORIES, CATEGORY_EMOJI } from "@/lib/constants";
 import { PRICE_BRACKETS } from "@/lib/price-parser";
+import { nowInBaliDate } from "@/lib/events/bali-time";
 import { cn } from "@/lib/utils";
 import {
   ChevronDown,
@@ -38,7 +39,10 @@ import {
 type DateFilter = { key: string; label: string; from: string; to: string };
 
 function buildDateFilters(): DateFilter[] {
-  const today = new Date();
+  // Anchor every chip to Bali wall time. The events DB is authored in Bali,
+  // so "Today" / "Tomorrow" must match the Bali calendar — not the user's
+  // browser or the Vercel UTC clock.
+  const today = nowInBaliDate();
   const tomorrow = addDays(today, 1);
   return [
     {
@@ -95,15 +99,15 @@ export function EventFilters() {
   const activeHappening = searchParams.get("happening") === "true";
   const activeFreeOnly = searchParams.get("free") === "true";
 
-  const [dateFilters, setDateFilters] = useState<DateFilter[]>([]);
+  // Computed synchronously: buildDateFilters reads Bali wall time via
+  // `nowInBaliDate`, which is deterministic on both server and client renders
+  // (modulo the few-second seam at Bali midnight — acceptable for a filter
+  // chip list).
+  const dateFilters = useMemo(() => buildDateFilters(), []);
   const [categoryExpanded, setCategoryExpanded] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [venueInput, setVenueInput] = useState(activeVenue || "");
   const isUserTyping = useRef(false);
-
-  useEffect(() => {
-    setDateFilters(buildDateFilters());
-  }, []);
 
   // Debounced venue search
   useEffect(() => {
@@ -166,12 +170,12 @@ export function EventFilters() {
     setParams({ free: activeFreeOnly ? null : "true" });
   }
 
-  // Number of filters living in the All-filters drawer
+  // Number of filters living in the All-filters drawer. Happening-now lives
+  // as a top-level pill now, so it doesn't count.
   const drawerFilterCount =
     (activeTime ? 1 : 0) +
     (activePrice ? 1 : 0) +
-    (activeVenue ? 1 : 0) +
-    (activeHappening ? 1 : 0);
+    (activeVenue ? 1 : 0);
 
   // Active filter pills (for the strip at the bottom)
   const activePills: { label: string; onClear: () => void }[] = [];
@@ -271,6 +275,35 @@ export function EventFilters() {
         <Button
           variant="outline"
           size="sm"
+          onClick={toggleHappeningNow}
+          aria-pressed={activeHappening}
+          className={cn(
+            "h-9 rounded-full border-brand-deep-green/15 bg-card/60 px-4 text-xs font-medium tracking-wide text-muted-foreground shadow-sm backdrop-blur-sm transition-all duration-200 dark:border-brand-deep-green/25 dark:bg-card/30",
+            "hover:border-brand-deep-green/30 hover:bg-card hover:text-brand-deep-green dark:hover:bg-card/60 dark:hover:text-brand-gold",
+            activeHappening &&
+              "border-brand-terracotta bg-brand-terracotta text-white shadow-md hover:bg-brand-terracotta hover:text-white"
+          )}
+        >
+          <span className="relative mr-2 flex h-2 w-2">
+            <span
+              className={cn(
+                "absolute inline-flex h-full w-full animate-ping rounded-full opacity-75",
+                activeHappening ? "bg-white/70" : "bg-brand-terracotta/50"
+              )}
+            />
+            <span
+              className={cn(
+                "relative inline-flex h-2 w-2 rounded-full",
+                activeHappening ? "bg-white" : "bg-brand-terracotta"
+              )}
+            />
+          </span>
+          Happening now
+        </Button>
+
+        <Button
+          variant="outline"
+          size="sm"
           onClick={toggleFreeOnly}
           aria-pressed={activeFreeOnly}
           className={cn(
@@ -315,36 +348,11 @@ export function EventFilters() {
                 Refine
               </SheetTitle>
               <SheetDescription className="text-muted-foreground">
-                Narrow events by time, price, venue, or what&apos;s on right
-                now.
+                Narrow by time of day, price, venue, or specific dates.
               </SheetDescription>
             </SheetHeader>
 
             <div className="space-y-7 px-4 py-6">
-              {/* Happening now */}
-              <div>
-                <h3 className="mb-2 text-xs font-semibold uppercase tracking-[0.12em] text-brand-deep-green/70">
-                  Right now
-                </h3>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={toggleHappeningNow}
-                  aria-pressed={activeHappening}
-                  className={cn(
-                    "h-9 rounded-full border-brand-deep-green/15 px-4 text-xs font-medium",
-                    activeHappening &&
-                      "border-brand-terracotta bg-brand-terracotta text-white hover:bg-brand-terracotta hover:text-white"
-                  )}
-                >
-                  <span className="relative mr-2 flex h-2 w-2">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-terracotta/60 opacity-75" />
-                    <span className="relative inline-flex h-2 w-2 rounded-full bg-brand-terracotta" />
-                  </span>
-                  Happening now
-                </Button>
-              </div>
-
               {/* Date range */}
               <div>
                 <h3 className="mb-2 text-xs font-semibold uppercase tracking-[0.12em] text-brand-deep-green/70">
@@ -519,9 +527,11 @@ export function EventFilters() {
         </Button>
       </div>
 
-      {/* Row 3: Active filter strip */}
+      {/* Row 3: Active filter strip — sticky under the global header so the
+          user can clear filters without scrolling back up after a long
+          results list. Header is h-14 (56px) fixed; offset matches. */}
       {activePills.length > 0 && (
-        <div className="flex flex-wrap items-center gap-2 border-t border-brand-deep-green/10 pt-3">
+        <div className="sticky top-14 z-30 -mx-4 flex flex-wrap items-center gap-2 border-y border-brand-deep-green/10 bg-brand-cream/85 px-4 py-2.5 backdrop-blur-md sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 dark:bg-background/85">
           <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-brand-deep-green/60">
             Active
           </span>
