@@ -7,6 +7,7 @@ import { ShareButtons } from "@/components/blog/share-buttons";
 import { EventJsonLd } from "@/components/events/event-json-ld";
 import { EventCard } from "@/components/events/event-card";
 import { EventHero } from "@/components/events/event-hero";
+import { rolledForward } from "@/lib/events/buckets";
 import { EventMap } from "@/components/events/event-map";
 import { FacilitatorCard } from "@/components/events/facilitator-card";
 import { SaveEventButton } from "@/components/dashboard/save-event-button";
@@ -129,9 +130,15 @@ export default async function EventPage({ params }: EventPageProps) {
 
   const eventUrl = `${SITE_URL}/events/${e.slug}`;
 
+  // Roll recurring events forward to their next occurrence so the hero
+  // matches what the agenda card showed when the user clicked through.
+  // Without this the detail page renders the seed date (e.g. April 26)
+  // while the card already displays the next-instance date (May 24).
+  const eRolled = rolledForward([e])[0] ?? e;
+
   const saveButton = currentProfileId ? (
     <SaveEventButton
-      eventId={e.id}
+      eventId={eRolled.id}
       profileId={currentProfileId}
       initialSaved={initiallySaved}
     />
@@ -139,11 +146,11 @@ export default async function EventPage({ params }: EventPageProps) {
 
   return (
     <>
-      <EventJsonLd event={e} />
+      <EventJsonLd event={eRolled} />
 
       <article className="pb-24 md:pb-0">
         {/* Editorial hero */}
-        <EventHero event={e} saveButton={saveButton} />
+        <EventHero event={eRolled} saveButton={saveButton} />
 
         {/* Breadcrumbs */}
         <nav className="mx-auto max-w-3xl px-4 pt-6 sm:px-6">
