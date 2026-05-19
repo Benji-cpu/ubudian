@@ -85,6 +85,27 @@
       "first_seen": "2026-05-19",
       "themes": ["dance", "ceremony", "sound"],
       "note": "Hosts weekly RISE Ecstatic Dance (Tue 7-9pm) and Full Moon Bhakti celebrations. Sayan rice-field setting. Strong community anchor. Candidate for priority_a after 3 logs."
+    },
+    {
+      "name": "Dragon Tea Temple",
+      "url": "https://linktr.ee/dragonteatemple",
+      "first_seen": "2026-05-20",
+      "themes": ["ceremony", "sound", "dance"],
+      "note": "Jl. Penestanan No.8, Sayan, Ubud. Candlelit ceremonial garden space. Runs monthly New Moon Kirtan & Sacred Tea (Bhakti Bliss Bali) and Full Moon Kirtan — format is kirtan + sacred tea + ecstatic dance by fire + cosmic sound healing. Exactly our universe. Instagram: @dragon.tea.temple. Candidate for priority_b after 2 more logs."
+    },
+    {
+      "name": "Azadi Retreat",
+      "url": "https://retreat.guru/centers/9803-1/azadi-retreat",
+      "first_seen": "2026-05-20",
+      "themes": ["dance", "sound"],
+      "note": "Banjar Laplapan, Pejeng Kawan, Ubud (Laplapan area). Sleeps 20+, rice-field setting, Mt Agung views. Hosts visiting international artists — first seen via YUJOY ecstatic dance June 8. Track for future visiting artists / special events."
+    },
+    {
+      "name": "Bara Studio @ Karma House",
+      "url": "https://www.anandasarita.com/events/essence-of-love",
+      "first_seen": "2026-05-20",
+      "themes": ["tantra"],
+      "note": "Penestanan, Ubud (above Karma House Chai and Tattoo). Weekly Saturday Tantra Essence couples workshop ('Essence of Love') in Ananda Sarita lineage. 500k IDR/couple. Strong recurring signal for Tantra & Intimacy category. Ticket Tailor: tickettailor.com/events/barastudio/1755020. Candidate for priority_b."
     }
   ],
   "rejected_permanent": [],
@@ -107,8 +128,36 @@
       "name": "Emmalee Bevan",
       "instagram": "@dragonflyvillageubud",
       "first_seen": "2026-05-19",
-      "events_seen": ["Dance of the Dragonfly — Dragonfly Village"],
-      "note": "Co-leads somatic dance ritual at Dragonfly Village with Ritual Beats. Resident facilitator, weekly Wednesdays."
+      "events_seen": ["Dance of the Dragonfly — Dragonfly Village", "Dance of the Dragonfly Expanded Launch — Dragonfly Village (Jul 23)"],
+      "note": "Co-leads somatic dance ritual at Dragonfly Village with Ritual Beats. Resident facilitator. Expanded format launches July 23 with sauna/fire circle."
+    },
+    {
+      "name": "Bhakti Bliss Bali (Jeremy Sol)",
+      "instagram": "@bhaktiblissbali",
+      "first_seen": "2026-05-20",
+      "events_seen": ["New Moon Kirtan & Sacred Tea — Dragon Tea Temple (Jun 25)"],
+      "note": "Leads New Moon and Full Moon Kirtan at Dragon Tea Temple. Kirtan + ecstatic dance + sound healing format. Regular Ubud scene presence."
+    },
+    {
+      "name": "YUJOY",
+      "instagram": null,
+      "first_seen": "2026-05-20",
+      "events_seen": ["Ecstatic Dance with DJ YUJOY — Azadi Retreat (Jun 8)"],
+      "note": "International ecstatic dance DJ and musician. 20+ tracks. Multi-genre: electronic/folk/ethnic/hip-hop/soul/funk. Touring artist. Site: yujoy.io. Visiting artist not resident."
+    },
+    {
+      "name": "Katya Reihan + Sean Goldberg (DJ Goldie)",
+      "instagram": "@ecstantric_dance",
+      "first_seen": "2026-05-20",
+      "events_seen": ["ECSTANTRIC DANCE — Lodtunduh, Ubud (Sep 7)"],
+      "note": "Run ECSTANTRIC DANCE, a tantra flow + ecstatic dance fusion format. Experts in tantra, yoga, meditation. Based in Bali. Distinct offering — track for future editions."
+    },
+    {
+      "name": "Dharmaraj",
+      "instagram": null,
+      "first_seen": "2026-05-20",
+      "events_seen": ["Awakening the Heart — Swasti Eco Cottages (Aug 23-24)"],
+      "note": "Decades in tantric, Osho, and embodiment traditions. Runs 2-day retreats at Swasti Eco Cottages, Ubud. Linktr.ee profile: linktr.ee/Dharma.Raj. Contact: dharmarajawakens@gmail.com / WA +62-813-3725-3380."
     }
   ]
 }
