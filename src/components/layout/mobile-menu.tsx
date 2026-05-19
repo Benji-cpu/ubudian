@@ -60,6 +60,18 @@ export function MobileMenu({
     }
   }
 
+  // When closing because the user clicked a link, do not call history.back():
+  // the synchronous back navigation races with Next Link's router.push and
+  // cancels it, leaving the user on the current page. Collapse the synthetic
+  // entry in place so the destination ends up directly above the origin.
+  function closeFromLink() {
+    if (pushedEntry.current && typeof window !== "undefined") {
+      window.history.replaceState({}, "");
+      pushedEntry.current = false;
+    }
+    setOpen(false);
+  }
+
   const visibleLinks = NAV_LINKS.filter((link) => {
     const flag = HREF_TO_FLAG[link.href];
     return !flag || settings[flag];
@@ -121,7 +133,7 @@ export function MobileMenu({
             <Link
               key={link.href}
               href={link.href}
-              onClick={closeFromUI}
+              onClick={closeFromLink}
               className="font-serif text-xl text-brand-off-white/90 transition-colors hover:text-brand-gold"
             >
               {link.label}
@@ -130,7 +142,7 @@ export function MobileMenu({
           {profile && (
             <Link
               href="/dashboard"
-              onClick={closeFromUI}
+              onClick={closeFromLink}
               className="flex items-center gap-2 font-serif text-xl text-brand-gold transition-colors hover:text-brand-off-white"
             >
               <LayoutDashboard className="h-4 w-4" />
@@ -140,7 +152,7 @@ export function MobileMenu({
           {profile?.role === "admin" && (
             <Link
               href="/admin"
-              onClick={closeFromUI}
+              onClick={closeFromLink}
               className="flex items-center gap-2 font-serif text-xl text-brand-gold transition-colors hover:text-brand-off-white"
             >
               <Shield className="h-4 w-4" />
@@ -176,7 +188,7 @@ export function MobileMenu({
             <div className="flex justify-center">
               <Link
                 href="/login"
-                onClick={closeFromUI}
+                onClick={closeFromLink}
               >
                 <Button className="bg-brand-gold text-brand-deep-green hover:bg-brand-gold/90">
                   Sign In
