@@ -2,7 +2,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
-import { CATEGORY_EMOJI } from "@/lib/constants";
 import { EventCardPlaceholder } from "@/components/events/event-card-placeholder";
 import { Calendar, Heart } from "lucide-react";
 import type { Event } from "@/types";
@@ -32,8 +31,6 @@ export function PopularThisWeek({ events }: PopularThisWeekProps) {
 
       <div className="mt-4 flex gap-4 overflow-x-auto pb-2 scrollbar-thin">
         {events.map((event) => {
-          const emoji =
-            CATEGORY_EMOJI[event.category] || CATEGORY_EMOJI["Other"];
           return (
             <Link
               key={event.id}
@@ -58,7 +55,7 @@ export function PopularThisWeek({ events }: PopularThisWeekProps) {
                   )}
                   <div className="absolute bottom-2 left-2">
                     <Badge className="bg-black/60 text-white backdrop-blur-sm hover:bg-black/60 text-[10px]">
-                      {emoji} {event.category}
+                      {event.category}
                     </Badge>
                   </div>
                 </div>

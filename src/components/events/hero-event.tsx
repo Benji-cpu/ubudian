@@ -3,7 +3,6 @@ import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatEventTime } from "@/lib/utils";
-import { CATEGORY_EMOJI } from "@/lib/constants";
 import { formatEventDateLine } from "@/lib/events/format";
 import { EventCardPlaceholder } from "./event-card-placeholder";
 import { Calendar, Clock, MapPin, ArrowRight } from "lucide-react";
@@ -15,7 +14,6 @@ interface HeroEventProps {
 }
 
 export function HeroEvent({ event, saveButton }: HeroEventProps) {
-  const emoji = CATEGORY_EMOJI[event.category] || CATEGORY_EMOJI["Other"];
   const dateLine = formatEventDateLine(event, new Date(), "long");
 
   return (
@@ -44,7 +42,7 @@ export function HeroEvent({ event, saveButton }: HeroEventProps) {
                 Featured today
               </Badge>
               <Badge className="bg-black/60 text-white backdrop-blur-sm hover:bg-black/60">
-                {emoji} {event.category}
+                {event.category}
               </Badge>
             </div>
             {saveButton && (

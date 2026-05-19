@@ -24,11 +24,25 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { EVENT_CATEGORIES, CATEGORY_EMOJI } from "@/lib/constants";
+import { EVENT_CATEGORIES } from "@/lib/constants";
 import { PRICE_BRACKETS } from "@/lib/price-parser";
 import { nowInBaliDate } from "@/lib/events/bali-time";
 import { cn } from "@/lib/utils";
-import { MapPin, SlidersHorizontal, X } from "lucide-react";
+import { ChevronDown, MapPin, SlidersHorizontal, X } from "lucide-react";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+
+// Top-of-mind categories shown inline as chips. The rest live in the
+// Category popover + All filters sheet. Keeping the inline strip to three
+// is what makes the row read as "primary axis" rather than "endless list".
+const FEATURED_CATEGORIES = [
+  "Dance & Movement",
+  "Tantra & Intimacy",
+  "Ceremony & Sound",
+] as const;
 
 type DateFilter = { key: string; label: string; from: string; to: string };
 
@@ -217,7 +231,7 @@ export function EventFilters() {
   }
   if (activeCategory) {
     activePills.push({
-      label: `${CATEGORY_EMOJI[activeCategory] || ""} ${activeCategory}`.trim(),
+      label: activeCategory,
       onClear: () => setCategory(null),
     });
   }
@@ -240,87 +254,88 @@ export function EventFilters() {
   // Quick-pill filters: Today / Tomorrow / Weekend / Week + Free
   const quickDates = dateFilters.filter((df) => df.key !== "month");
 
+  const pillBase =
+    "h-9 rounded-full border-brand-deep-green/15 bg-card/60 px-4 text-xs font-medium tracking-wide text-muted-foreground shadow-sm backdrop-blur-sm transition-all duration-200 dark:border-brand-deep-green/25 dark:bg-card/30 hover:border-brand-deep-green/30 hover:bg-card hover:text-brand-deep-green dark:hover:bg-card/60 dark:hover:text-brand-gold";
+  const pillActiveDeepGreen =
+    "border-brand-deep-green bg-brand-deep-green text-brand-cream shadow-md hover:bg-brand-deep-green hover:text-brand-cream";
+
+  // The featured category chips show only when the active category sits
+  // inside the featured set OR no category is active. When the user picks a
+  // less-featured category, the active label replaces the third chip so the
+  // selection is always visible at-a-glance.
+  const visibleFeatured: string[] = [...FEATURED_CATEGORIES];
+  if (activeCategory && !FEATURED_CATEGORIES.includes(activeCategory as (typeof FEATURED_CATEGORIES)[number])) {
+    visibleFeatured[2] = activeCategory;
+  }
+
   return (
     <div className="space-y-3">
-      {/* Row 1: When chips (Today/Tomorrow/Weekend/Week), then a soft divider,
-          then secondary modifiers (Happening now / Free / All filters). The
-          eyebrow on the left tells the user this row is about WHEN — the
-          category row below answers WHAT KIND. Clear axes = less haphazard. */}
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="mr-1 hidden text-[11px] font-semibold uppercase tracking-[0.14em] text-brand-deep-green/55 sm:inline dark:text-brand-gold/55">
-          When
-        </span>
-        {quickDates.map((df) => {
-          const isActive = activeFrom === df.from && activeTo === df.to;
-          return (
-            <Button
-              key={df.key}
-              variant="outline"
-              size="sm"
-              onClick={() => toggleDateFilter(df)}
-              aria-pressed={isActive}
-              className={cn(
-                "h-9 rounded-full border-brand-deep-green/15 bg-card/60 px-4 text-xs font-medium tracking-wide text-muted-foreground shadow-sm backdrop-blur-sm transition-all duration-200 dark:border-brand-deep-green/25 dark:bg-card/30",
-                "hover:border-brand-deep-green/30 hover:bg-card hover:text-brand-deep-green dark:hover:bg-card/60 dark:hover:text-brand-gold",
-                isActive &&
-                  "border-brand-deep-green bg-brand-deep-green text-brand-cream shadow-md hover:bg-brand-deep-green hover:text-brand-cream"
-              )}
-            >
-              {df.label}
-            </Button>
-          );
-        })}
+      {/* Primary row — date pills push left, modifiers push right.
+          `justify-between` fills the full content width so the chip cluster
+          no longer huddles on the left edge with dead space beside it. */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-2">
+          {quickDates.map((df) => {
+            const isActive = activeFrom === df.from && activeTo === df.to;
+            return (
+              <Button
+                key={df.key}
+                variant="outline"
+                size="sm"
+                onClick={() => toggleDateFilter(df)}
+                aria-pressed={isActive}
+                className={cn(pillBase, isActive && pillActiveDeepGreen)}
+              >
+                {df.label}
+              </Button>
+            );
+          })}
+        </div>
 
-        <span
-          aria-hidden
-          className="mx-1 hidden h-5 w-px bg-brand-deep-green/15 sm:block"
-        />
+        <div className="flex flex-wrap items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={toggleHappeningNow}
+            aria-pressed={activeHappening}
+            className={cn(
+              pillBase,
+              activeHappening &&
+                "border-brand-terracotta bg-brand-terracotta text-white shadow-md hover:bg-brand-terracotta hover:text-white"
+            )}
+          >
+            <span className="relative mr-2 flex h-2 w-2">
+              <span
+                className={cn(
+                  "absolute inline-flex h-full w-full animate-ping rounded-full opacity-75",
+                  activeHappening ? "bg-white/70" : "bg-brand-terracotta/50"
+                )}
+              />
+              <span
+                className={cn(
+                  "relative inline-flex h-2 w-2 rounded-full",
+                  activeHappening ? "bg-white" : "bg-brand-terracotta"
+                )}
+              />
+            </span>
+            Happening now
+          </Button>
 
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={toggleHappeningNow}
-          aria-pressed={activeHappening}
-          className={cn(
-            "h-9 rounded-full border-brand-deep-green/15 bg-card/60 px-4 text-xs font-medium tracking-wide text-muted-foreground shadow-sm backdrop-blur-sm transition-all duration-200 dark:border-brand-deep-green/25 dark:bg-card/30",
-            "hover:border-brand-deep-green/30 hover:bg-card hover:text-brand-deep-green dark:hover:bg-card/60 dark:hover:text-brand-gold",
-            activeHappening &&
-              "border-brand-terracotta bg-brand-terracotta text-white shadow-md hover:bg-brand-terracotta hover:text-white"
-          )}
-        >
-          <span className="relative mr-2 flex h-2 w-2">
-            <span
-              className={cn(
-                "absolute inline-flex h-full w-full animate-ping rounded-full opacity-75",
-                activeHappening ? "bg-white/70" : "bg-brand-terracotta/50"
-              )}
-            />
-            <span
-              className={cn(
-                "relative inline-flex h-2 w-2 rounded-full",
-                activeHappening ? "bg-white" : "bg-brand-terracotta"
-              )}
-            />
-          </span>
-          Happening now
-        </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={toggleFreeOnly}
+            aria-pressed={activeFreeOnly}
+            className={cn(
+              pillBase,
+              activeFreeOnly &&
+                "border-brand-gold bg-brand-gold text-brand-deep-green shadow-md hover:bg-brand-gold hover:text-brand-deep-green"
+            )}
+          >
+            Free
+          </Button>
 
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={toggleFreeOnly}
-          aria-pressed={activeFreeOnly}
-          className={cn(
-            "h-9 rounded-full border-brand-deep-green/15 bg-card/60 px-4 text-xs font-medium tracking-wide text-muted-foreground shadow-sm backdrop-blur-sm transition-all duration-200 dark:border-brand-deep-green/25 dark:bg-card/30",
-            "hover:border-brand-deep-green/30 hover:bg-card hover:text-brand-deep-green dark:hover:bg-card/60 dark:hover:text-brand-gold",
-            activeFreeOnly &&
-              "border-brand-gold bg-brand-gold text-brand-deep-green shadow-md hover:bg-brand-gold hover:text-brand-deep-green"
-          )}
-        >
-          Free
-        </Button>
-
-        <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
+          <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
           <SheetTrigger asChild>
             <Button
               variant="outline"
@@ -350,11 +365,50 @@ export function EventFilters() {
                 Refine
               </SheetTitle>
               <SheetDescription className="text-muted-foreground">
-                Narrow by time of day, price, venue, or specific dates.
+                Categories, time of day, price, venue, specific dates.
               </SheetDescription>
             </SheetHeader>
 
             <div className="space-y-7 px-4 py-6">
+              {/* Category */}
+              <div>
+                <h3 className="mb-2 text-xs font-semibold uppercase tracking-[0.12em] text-brand-deep-green/70">
+                  Category
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  <Badge
+                    variant={!activeCategory ? "default" : "outline"}
+                    className={cn(
+                      "cursor-pointer select-none rounded-full px-3.5 py-1.5 text-xs font-medium tracking-wide transition-all",
+                      !activeCategory
+                        ? "border-transparent bg-brand-deep-green text-brand-cream hover:bg-brand-deep-green/90"
+                        : "border-brand-deep-green/15 bg-transparent text-muted-foreground hover:border-brand-deep-green/40 hover:text-brand-deep-green dark:hover:text-brand-gold dark:hover:border-brand-gold/40"
+                    )}
+                    onClick={() => setCategory(null)}
+                  >
+                    All
+                  </Badge>
+                  {EVENT_CATEGORIES.map((cat) => {
+                    const isActive = activeCategory === cat;
+                    return (
+                      <Badge
+                        key={cat}
+                        variant={isActive ? "default" : "outline"}
+                        className={cn(
+                          "cursor-pointer select-none whitespace-nowrap rounded-full px-3.5 py-1.5 text-xs font-medium tracking-wide transition-all",
+                          isActive
+                            ? "border-transparent bg-brand-deep-green text-brand-cream hover:bg-brand-deep-green/90"
+                            : "border-brand-deep-green/15 bg-transparent text-muted-foreground hover:border-brand-deep-green/40 hover:text-brand-deep-green dark:hover:text-brand-gold dark:hover:border-brand-gold/40"
+                        )}
+                        onClick={() => setCategory(isActive ? null : cat)}
+                      >
+                        {cat}
+                      </Badge>
+                    );
+                  })}
+                </div>
+              </div>
+
               {/* Date range */}
               <div>
                 <h3 className="mb-2 text-xs font-semibold uppercase tracking-[0.12em] text-brand-deep-green/70">
@@ -468,50 +522,98 @@ export function EventFilters() {
             </SheetFooter>
           </SheetContent>
         </Sheet>
+        </div>
       </div>
 
-      {/* Row 2: Categories — single horizontal strip, scrolls on mobile.
-          Eventbrite-style: keeps the secondary axis (what kind of event)
-          visually distinct from the primary axis (when) and prevents the
-          chaotic 3-row wrap that earlier versions had. */}
-      <div className="-mx-4 px-4 sm:mx-0 sm:px-0">
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          <span className="shrink-0 text-[11px] font-semibold uppercase tracking-[0.14em] text-brand-deep-green/55 dark:text-brand-gold/55">
-            Kind
-          </span>
-          <Badge
-            variant={!activeCategory ? "default" : "outline"}
-            className={cn(
-              "shrink-0 cursor-pointer select-none rounded-full px-3.5 py-1.5 text-xs font-medium tracking-wide transition-all",
-              !activeCategory
-                ? "border-transparent bg-brand-deep-green text-brand-cream hover:bg-brand-deep-green/90"
-                : "border-brand-deep-green/15 bg-transparent text-muted-foreground hover:border-brand-deep-green/40 hover:text-brand-deep-green dark:hover:text-brand-gold dark:hover:border-brand-gold/40"
-            )}
-            onClick={() => setCategory(null)}
+      {/* Row 2 — Categories. Three popular kinds inline + a popover for the
+          rest. No emoji decoration (brand register, not texting), no
+          horizontal scroll (cognitive load + bad mobile ergonomics). */}
+      <div className="flex flex-wrap items-center gap-2">
+        <Badge
+          variant={!activeCategory ? "default" : "outline"}
+          className={cn(
+            "cursor-pointer select-none rounded-full px-3.5 py-1.5 text-xs font-medium tracking-wide transition-all",
+            !activeCategory
+              ? "border-transparent bg-brand-deep-green text-brand-cream hover:bg-brand-deep-green/90"
+              : "border-brand-deep-green/15 bg-transparent text-muted-foreground hover:border-brand-deep-green/40 hover:text-brand-deep-green dark:hover:text-brand-gold dark:hover:border-brand-gold/40"
+          )}
+          onClick={() => setCategory(null)}
+        >
+          All
+        </Badge>
+        {visibleFeatured.map((cat) => {
+          const isActive = activeCategory === cat;
+          return (
+            <Badge
+              key={cat}
+              variant={isActive ? "default" : "outline"}
+              className={cn(
+                "cursor-pointer select-none whitespace-nowrap rounded-full px-3.5 py-1.5 text-xs font-medium tracking-wide transition-all",
+                isActive
+                  ? "border-transparent bg-brand-deep-green text-brand-cream hover:bg-brand-deep-green/90"
+                  : "border-brand-deep-green/15 bg-transparent text-muted-foreground hover:border-brand-deep-green/40 hover:text-brand-deep-green dark:hover:text-brand-gold dark:hover:border-brand-gold/40"
+              )}
+              onClick={() => setCategory(isActive ? null : cat)}
+            >
+              {cat}
+            </Badge>
+          );
+        })}
+
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              size="sm"
+              className={cn(
+                "h-8 rounded-full border-brand-deep-green/15 bg-card/60 px-3.5 text-xs font-medium tracking-wide text-muted-foreground transition-all dark:border-brand-deep-green/25 dark:bg-card/30",
+                "hover:border-brand-deep-green/30 hover:text-brand-deep-green dark:hover:text-brand-gold"
+              )}
+            >
+              More categories
+              <ChevronDown className="ml-1 h-3 w-3" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent
+            side="bottom"
+            align="start"
+            className="w-64 p-2"
           >
-            All
-          </Badge>
-          {EVENT_CATEGORIES.map((cat) => {
-            const emoji = CATEGORY_EMOJI[cat] || "";
-            const isActive = activeCategory === cat;
-            return (
-              <Badge
-                key={cat}
-                variant={isActive ? "default" : "outline"}
-                className={cn(
-                  "shrink-0 cursor-pointer select-none whitespace-nowrap rounded-full px-3.5 py-1.5 text-xs font-medium tracking-wide transition-all",
-                  isActive
-                    ? "border-transparent bg-brand-deep-green text-brand-cream hover:bg-brand-deep-green/90"
-                    : "border-brand-deep-green/15 bg-transparent text-muted-foreground hover:border-brand-deep-green/40 hover:text-brand-deep-green dark:hover:text-brand-gold dark:hover:border-brand-gold/40"
-                )}
-                onClick={() => setCategory(isActive ? null : cat)}
-              >
-                {emoji && <span className="mr-1 opacity-80">{emoji}</span>}
-                {cat}
-              </Badge>
-            );
-          })}
-        </div>
+            <p className="px-2 pb-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-brand-deep-green/60 dark:text-brand-gold/60">
+              Categories
+            </p>
+            <button
+              type="button"
+              onClick={() => setCategory(null)}
+              className={cn(
+                "block w-full rounded-md px-3 py-2 text-left text-sm transition-colors",
+                !activeCategory
+                  ? "bg-brand-deep-green text-brand-cream"
+                  : "text-foreground hover:bg-brand-deep-green/5 dark:hover:bg-brand-gold/10"
+              )}
+            >
+              All categories
+            </button>
+            {EVENT_CATEGORIES.map((cat) => {
+              const isActive = activeCategory === cat;
+              return (
+                <button
+                  key={cat}
+                  type="button"
+                  onClick={() => setCategory(isActive ? null : cat)}
+                  className={cn(
+                    "block w-full rounded-md px-3 py-2 text-left text-sm transition-colors",
+                    isActive
+                      ? "bg-brand-deep-green text-brand-cream"
+                      : "text-foreground hover:bg-brand-deep-green/5 dark:hover:bg-brand-gold/10"
+                  )}
+                >
+                  {cat}
+                </button>
+              );
+            })}
+          </PopoverContent>
+        </Popover>
       </div>
 
       {/* Row 3: Active filter strip — sticky under the global header so the

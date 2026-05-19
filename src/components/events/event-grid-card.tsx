@@ -2,7 +2,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { formatEventTime, isRecentlyAddedEvent } from "@/lib/utils";
-import { CATEGORY_EMOJI } from "@/lib/constants";
 import { formatEventDateLine } from "@/lib/events/format";
 import { isFreeEvent } from "@/lib/price-parser";
 import { EventCardPlaceholder } from "./event-card-placeholder";
@@ -24,7 +23,6 @@ export function EventGridCard({
   aspectClass = "aspect-[16/10]",
 }: EventGridCardProps) {
   const dateLine = formatEventDateLine(event);
-  const emoji = CATEGORY_EMOJI[event.category] || CATEGORY_EMOJI["Other"];
   const isFree = isFreeEvent(event.price_info);
 
   return (
@@ -73,7 +71,6 @@ export function EventGridCard({
           {/* Category + new badges (bottom-left) */}
           <div className="absolute bottom-2.5 left-2.5 flex items-center gap-1.5">
             <Badge className="rounded-full border-transparent bg-black/55 px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.14em] text-brand-cream backdrop-blur-md hover:bg-black/55">
-              {emoji && <span className="mr-1 not-italic">{emoji}</span>}
               {event.category}
             </Badge>
             {isRecentlyAddedEvent(event.created_at, event.start_date) && (

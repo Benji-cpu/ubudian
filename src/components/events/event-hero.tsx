@@ -2,7 +2,6 @@ import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Clock, Ticket } from "lucide-react";
 import { formatEventDate, formatEventTime } from "@/lib/utils";
-import { CATEGORY_EMOJI } from "@/lib/constants";
 import { EventCardPlaceholder } from "./event-card-placeholder";
 import type { Event } from "@/types";
 
@@ -12,7 +11,6 @@ interface EventHeroProps {
 }
 
 export function EventHero({ event, saveButton }: EventHeroProps) {
-  const emoji = CATEGORY_EMOJI[event.category] || CATEGORY_EMOJI["Other"];
   const hasImage = Boolean(event.cover_image_url);
 
   return (
@@ -44,7 +42,7 @@ export function EventHero({ event, saveButton }: EventHeroProps) {
         {/* Top-left chips (category) */}
         <div className="absolute left-4 top-4 flex flex-wrap items-center gap-2 sm:left-6 sm:top-6">
           <Badge className="bg-black/60 text-white backdrop-blur-sm hover:bg-black/60">
-            {emoji} {event.category}
+            {event.category}
           </Badge>
         </div>
 

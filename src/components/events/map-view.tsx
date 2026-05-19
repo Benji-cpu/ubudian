@@ -28,9 +28,9 @@ import {
 } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { CATEGORY_EMOJI } from "@/lib/constants";
 import { formatEventTime } from "@/lib/utils";
 import { rolledForward } from "@/lib/events/buckets";
+import { EventCardPlaceholder } from "./event-card-placeholder";
 import type { Event } from "@/types";
 
 import "leaflet/dist/leaflet.css";
@@ -185,7 +185,6 @@ export function MapView({ events }: MapViewProps) {
 
 function SelectedEventCard({ event }: { event: Event }) {
   const startDate = new Date(event.start_date);
-  const emoji = CATEGORY_EMOJI[event.category] || CATEGORY_EMOJI["Other"];
 
   return (
     <div className="flex flex-col">
@@ -200,14 +199,15 @@ function SelectedEventCard({ event }: { event: Event }) {
           />
         </div>
       ) : (
-        <div className="flex aspect-[4/3] w-full items-center justify-center bg-brand-cream text-5xl">
-          {emoji}
-        </div>
+        <EventCardPlaceholder
+          category={event.category}
+          className="aspect-[4/3] w-full"
+        />
       )}
 
       <SheetHeader className="px-5 pb-2 pt-5">
         <Badge className="mb-2 w-fit bg-brand-deep-green/10 text-brand-deep-green hover:bg-brand-deep-green/10">
-          {emoji} {event.category}
+          {event.category}
         </Badge>
         <SheetTitle className="font-serif text-xl leading-snug text-brand-deep-green">
           {event.title}

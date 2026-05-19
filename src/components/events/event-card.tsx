@@ -2,7 +2,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { formatEventTime, isRecentlyAddedEvent } from "@/lib/utils";
-import { CATEGORY_EMOJI } from "@/lib/constants";
 import { formatEventDateLine } from "@/lib/events/format";
 import { isFreeEvent } from "@/lib/price-parser";
 import { EventCardPlaceholder } from "./event-card-placeholder";
@@ -17,7 +16,6 @@ interface EventCardProps {
 
 export function EventCard({ event, saveButton }: EventCardProps) {
   const dateLine = formatEventDateLine(event);
-  const emoji = CATEGORY_EMOJI[event.category] || CATEGORY_EMOJI["Other"];
   const isFree = isFreeEvent(event.price_info);
 
   return (
@@ -64,7 +62,6 @@ export function EventCard({ event, saveButton }: EventCardProps) {
               variant="outline"
               className="rounded-full border-brand-deep-green/15 bg-transparent px-2 py-0.5 text-[10px] font-medium uppercase tracking-[0.14em] text-brand-deep-green/80"
             >
-              {emoji && <span className="mr-1 not-italic">{emoji}</span>}
               {event.category}
             </Badge>
             {event.is_core && (

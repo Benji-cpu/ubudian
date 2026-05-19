@@ -1,7 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
 import { format } from "date-fns";
-import { CATEGORY_EMOJI } from "@/lib/constants";
 import { EventCardPlaceholder } from "./event-card-placeholder";
 import { Sparkles } from "lucide-react";
 import {
@@ -135,7 +134,7 @@ export function ForYouRail({
                   />
                 )}
                 <div className="absolute bottom-2 left-2 rounded bg-black/60 px-2 py-1 text-xs font-medium text-white backdrop-blur-sm">
-                  {CATEGORY_EMOJI[event.category] || "✨"} {event.category}
+                  {event.category}
                 </div>
               </div>
               <div className="p-3">
