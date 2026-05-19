@@ -1,0 +1,35 @@
+{
+  "date": "2026-05-20",
+  "decisions": [
+    {
+      "id": "15a2a2ea-054c-41f2-b6a7-7949d107420a",
+      "action": "approve",
+      "reason": "Liquid Bloom + Temple Step at The Yoga Barn — cacao ceremony into headline live sets, framed as 'produced, intention-held event — not a rave'. Tier-A venue, named lineage, complete fields."
+    },
+    {
+      "id": "c126415b-b66a-4459-b7b0-944f4bd44d29",
+      "action": "approve",
+      "reason": "Raio (Rob Weber) — known Ubud sound-medicine facilitator. Blue Moon framing is editorial gold; ceremony anchor at Yoga Barn. ICP-perfect, complete fields."
+    },
+    {
+      "id": "035b9866-aefb-4724-82ea-2596f8a5d789",
+      "action": "approve",
+      "reason": "Friday ecstatic dance at The Yoga Barn — adults-only, ceremonial container language, named structure (warm-up → peak → integration). Tier-A venue, complete fields."
+    },
+    {
+      "id": "df358185-f7cd-4ebb-8d96-2991f5a38d19",
+      "action": "approve",
+      "reason": "Vibración~ Thursdays at Paradiso — one of Bali's longest-running ecstatic dance floors. Tier-A venue, named container rules (no phones/shoes/talking), complete fields."
+    },
+    {
+      "id": "cba53420-44e1-4aaf-920a-65552dc541b3",
+      "action": "approve",
+      "reason": "Somatic dance at Dragonfly Village — open-air rice-field shala, named facilitators (Ritual Beats + Emmalee Bevan), fire circle + steam sauna container. Adds novelty (new venue + new facilitator pair)."
+    },
+    {
+      "id": "63fd317b-81e8-4b3d-a4de-9e3c04e18081",
+      "action": "archive_off_topic",
+      "reason": "Past-dated single instance — start_date 2026-05-19 already occurred (today is 2026-05-20 WITA). RISE is a weekly Tuesday series; the next instance should be re-ingested as 2026-05-26. Surfacing this row would put a stale event on /events."
+    }
+  ]
+}
