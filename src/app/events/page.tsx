@@ -17,7 +17,7 @@ import { EventsHero } from "@/components/events/events-hero";
 import { FeaturedStrip } from "@/components/events/featured-strip";
 import { RefreshOnFocus } from "@/components/events/refresh-on-focus";
 import { CrossSectionRibbon } from "@/components/journeys/cross-section-ribbon";
-import { nowInBali } from "@/lib/events/bali-time";
+import { eventIsHappeningNow, nowInBali } from "@/lib/events/bali-time";
 import { filterEventsInRange } from "@/lib/events/filter-range";
 import { getActiveBoostedEventIds, getCategorySponsor } from "@/lib/sponsors/sponsor-service";
 import { PartnerCredit } from "@/components/sponsors/partner-credit";
@@ -224,7 +224,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
   // inside the active `from`/`to` window (or to today, if no window is set)
   // before handing the array down.
   const useOwnViewport = VIEWS_USING_OWN_VIEWPORT.has(view);
-  const viewEvents = useOwnViewport
+  let viewEvents = useOwnViewport
     ? allEvents
     : filterEventsInRange(
         allEvents,
@@ -233,6 +233,16 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
         undefined,
         boostedEventIds
       );
+
+  // Happening-now narrows the page-level array to events the bucket layer
+  // would actually put in the "Happening now" bucket. The DB pre-fetch is
+  // permissive (it returns every event whose span overlaps today, including
+  // recurring seeds from months back) so without this trim the hero count
+  // could read "134 gatherings" while the agenda only renders ~20.
+  if (params.happening === "true" && !useOwnViewport) {
+    const baliNow = nowInBali();
+    viewEvents = viewEvents.filter((event) => eventIsHappeningNow(event, baliNow));
+  }
 
   // The events hero is the home-style portal — full height, gradient
   // blending into the fixed nav. We `-mt-14` here so it sits flush under
@@ -245,7 +255,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
       <EventsHero totalCount={viewEvents.length} />
 
       {VIEWS_WITH_FEATURED_STRIP.has(view) && (
-        <FeaturedStrip events={allEvents} boostedEventIds={boostedEventIds} />
+        <FeaturedStrip events={viewEvents} boostedEventIds={boostedEventIds} />
       )}
 
       {/* Controls — clear hierarchy:
@@ -275,7 +285,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
 
         <div className="mt-6">
           <Suspense>
-            <EventFilters />
+            <EventFilters resultCount={viewEvents.length} />
           </Suspense>
           {params.category && categorySponsor && (
             <PartnerCredit

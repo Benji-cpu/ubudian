@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/sheet";
 import { EVENT_CATEGORIES } from "@/lib/constants";
 import { PRICE_BRACKETS } from "@/lib/price-parser";
-import { nowInBaliDate } from "@/lib/events/bali-time";
+import { baliCalendarDate } from "@/lib/events/bali-time";
 import { cn } from "@/lib/utils";
 import { ChevronDown, MapPin, SlidersHorizontal, X } from "lucide-react";
 import {
@@ -47,10 +47,13 @@ const FEATURED_CATEGORIES = [
 type DateFilter = { key: string; label: string; from: string; to: string };
 
 function buildDateFilters(): DateFilter[] {
-  // Anchor every chip to Bali wall time. The events DB is authored in Bali,
-  // so "Today" / "Tomorrow" must match the Bali calendar — not the user's
-  // browser or the Vercel UTC clock.
-  const today = nowInBaliDate();
+  // Anchor every chip to the Bali calendar. The events DB is authored in
+  // Bali, so "Today" / "Tomorrow" must match the Bali wall date — not the
+  // user's browser TZ or the Vercel UTC clock. `baliCalendarDate()` returns
+  // a Date whose LOCAL components match Bali so date-fns (`addDays`,
+  // `nextFriday`, `format`) operates on the right calendar without
+  // double-shifting.
+  const today = baliCalendarDate();
   const tomorrow = addDays(today, 1);
   return [
     {
@@ -95,7 +98,14 @@ const TIME_OPTIONS = [
   { value: "evening", label: "Evening" },
 ] as const;
 
-export function EventFilters() {
+interface EventFiltersProps {
+  /** How many events would currently match — surfaces in the All-filters
+      footer button so the user knows their input took effect even before
+      they close the sheet. */
+  resultCount?: number;
+}
+
+export function EventFilters({ resultCount }: EventFiltersProps = {}) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const activeCategory = searchParams.get("category");
@@ -516,7 +526,11 @@ export function EventFilters() {
               </Button>
               <SheetClose asChild>
                 <Button className="bg-brand-deep-green text-brand-cream hover:bg-brand-deep-green/90">
-                  Show events
+                  {typeof resultCount === "number"
+                    ? resultCount === 0
+                      ? "No matches — adjust"
+                      : `Show ${resultCount} ${resultCount === 1 ? "event" : "events"}`
+                    : "Show events"}
                 </Button>
               </SheetClose>
             </SheetFooter>

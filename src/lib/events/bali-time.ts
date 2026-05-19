@@ -60,11 +60,24 @@ export function nowInBali(now: Date = new Date()): BaliNow {
 }
 
 /**
- * Return a `Date` object whose UTC components match Bali's current local
- * Y/M/D/H/M. Useful when handing the value to date-fns (`addDays`,
- * `nextFriday`, `endOfWeek`, …) which read components via the host TZ —
- * combined with UTC-based readers it lets us reason about Bali wall time
- * without dragging a tz-aware library through every call site.
+ * Return a `Date` object whose **local** components (the ones date-fns
+ * reads by default: `getFullYear`, `getMonth`, `getDate`) match Bali's
+ * current Y/M/D. Use this whenever you'll pass the result to date-fns
+ * helpers (`addDays`, `nextFriday`, `endOfWeek`, `format`) — they apply
+ * local-tz semantics, and we need them to operate on the Bali calendar,
+ * not the user's browser TZ.
+ */
+export function baliCalendarDate(now: Date = new Date()): Date {
+  const { dateStr } = nowInBali(now);
+  const [y, m, d] = dateStr.split("-").map(Number);
+  return new Date(y, m - 1, d);
+}
+
+/**
+ * @deprecated Returns a Date whose UTC components match Bali's local Y/M/D.
+ * Easy to misuse with date-fns (which reads local components and double-
+ * shifts the date). Prefer {@link baliCalendarDate}, which is local-anchored
+ * and works correctly with all date-fns helpers.
  */
 export function nowInBaliDate(now: Date = new Date()): Date {
   const parts = new Intl.DateTimeFormat("en-US", {

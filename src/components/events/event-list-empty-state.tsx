@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { addDays, endOfWeek, format } from "date-fns";
 import { Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { nowInBaliDate } from "@/lib/events/bali-time";
+import { baliCalendarDate } from "@/lib/events/bali-time";
 
 /**
  * Empty state with context-aware fallbacks. When a user lands here we want
@@ -21,7 +21,7 @@ export function EventListEmptyState() {
   const hasSearch = !!searchParams.get("q");
   const hasHappening = searchParams.get("happening") === "true";
 
-  const today = nowInBaliDate();
+  const today = baliCalendarDate();
   const weekEnd = endOfWeek(today, { weekStartsOn: 1 });
 
   // Build a "Clear date filter" URL that drops only from/to.
