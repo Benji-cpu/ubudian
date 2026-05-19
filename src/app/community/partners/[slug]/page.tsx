@@ -41,7 +41,7 @@ export default async function CommunityPartnerPage({ params }: PageProps) {
   const { slug } = await params;
   const sponsor = await getSponsorBySlug(slug);
   if (!sponsor) notFound();
-  recordSponsorshipEvent({ sponsorId: sponsor.id, eventType: "profile_view" });
+  await recordSponsorshipEvent({ sponsorId: sponsor.id, eventType: "profile_view" });
 
   const instagramUrl = sponsor.instagram_handle
     ? `https://instagram.com/${sponsor.instagram_handle.replace("@", "")}`

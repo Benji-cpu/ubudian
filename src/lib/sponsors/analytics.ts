@@ -13,8 +13,12 @@ import type { SponsorshipEventType } from "@/types";
  * visitor refreshing the same page on the same day counts once. The partial
  * unique index on (sponsor_id, event_type, dedupe_key) in SQL turns repeat
  * writes into no-ops via onConflict=ignore.
+ *
+ * Note: `headers()` is called HERE (sync, outside `after()`) because Next
+ * disallows request-scoped APIs inside `after()` callbacks. The ip is
+ * captured up front and closed over.
  */
-export function recordSponsorshipEvent({
+export async function recordSponsorshipEvent({
   sponsorId,
   eventType,
   contextEntityType,
@@ -25,18 +29,25 @@ export function recordSponsorshipEvent({
   contextEntityType?: string;
   contextEntityId?: string;
 }) {
+  let ip = "unknown";
+  try {
+    const hdrs = await headers();
+    ip = clientIp(hdrs);
+  } catch {
+    // headers() can fail outside a request scope (e.g. static generation).
+    // Fall back to "unknown" — the dedup key just stays coarser.
+  }
+
+  const day = new Date().toISOString().split("T")[0];
+  const dedupeKey = createHash("sha256")
+    .update(`${ip}|${day}|${sponsorId}|${eventType}`)
+    .digest("hex")
+    .slice(0, 32);
+
   after(async () => {
     try {
-      const hdrs = await headers();
-      const ip = clientIp(hdrs);
-      const day = new Date().toISOString().split("T")[0];
-      const dedupeKey = createHash("sha256")
-        .update(`${ip}|${day}|${sponsorId}|${eventType}`)
-        .digest("hex")
-        .slice(0, 32);
-
       const admin = createAdminClient();
-      await admin
+      const { error } = await admin
         .from("sponsorship_events")
         .upsert(
           {
@@ -48,6 +59,9 @@ export function recordSponsorshipEvent({
           },
           { onConflict: "sponsor_id,event_type,dedupe_key", ignoreDuplicates: true }
         );
+      if (error) {
+        console.error("[sponsorship-analytics] upsert error:", error);
+      }
     } catch (err) {
       // Non-blocking; analytics is best-effort.
       console.error("[sponsorship-analytics] write failed:", err);

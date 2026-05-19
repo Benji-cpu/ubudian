@@ -117,7 +117,7 @@ export default async function EventPage({ params }: EventPageProps) {
 
     sponsorship = await getActiveSponsorshipFor("event", e.id);
     if (sponsorship) {
-      recordSponsorshipEvent({
+      await recordSponsorshipEvent({
         sponsorId: sponsorship.sponsor.id,
         eventType: "event_impression",
         contextEntityType: "event",
