@@ -15,6 +15,7 @@ import {
   logHealthEvent,
 } from "./health-utils";
 import { logActivity } from "./activity-log";
+import { nowInBali } from "@/lib/events/bali-time";
 
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@theubudian.com";
 const DEDUP_QUEUE_THRESHOLD = 20;
@@ -176,12 +177,12 @@ export async function runHealthCheck(): Promise<HealthCheckResult> {
 }
 
 /**
- * Archive all pending events whose start_date is in the past.
+ * Archive all pending events whose start_date is in the past (Bali wall clock).
  * Returns the number of events archived.
  */
 export async function archivePastPendingEvents(): Promise<number> {
   const supabase = createAdminClient();
-  const today = new Date().toISOString().split("T")[0]; // "YYYY-MM-DD"
+  const today = nowInBali().dateStr;
   const { data, error } = await supabase
     .from("events")
     .update({ status: "archived" })
@@ -192,6 +193,35 @@ export async function archivePastPendingEvents(): Promise<number> {
 
   if (error) {
     console.error("[archivePastPendingEvents] Error:", error);
+    return 0;
+  }
+  return data?.length ?? 0;
+}
+
+/**
+ * Archive approved single-occurrence events whose start_date AND end_date
+ * are in the past (Bali wall clock). Recurring events and multi-day events
+ * with a future end_date are left alone.
+ *
+ * The /events page hides these from users via an in-memory filter, but they
+ * still pollute admin views and dedup matching. This keeps the approved set
+ * drained going forward; one-time cleanup of the historical backlog lives
+ * in migration `20260520070000_archive_stale_approved_events.sql`.
+ */
+export async function archivePastApprovedEvents(): Promise<number> {
+  const supabase = createAdminClient();
+  const today = nowInBali().dateStr;
+  const { data, error } = await supabase
+    .from("events")
+    .update({ status: "archived", moderation_reason: `archived_past_date_${today}` })
+    .eq("status", "approved")
+    .eq("is_recurring", false)
+    .lt("start_date", today)
+    .or(`end_date.is.null,end_date.lt.${today}`)
+    .select("id");
+
+  if (error) {
+    console.error("[archivePastApprovedEvents] Error:", error);
     return 0;
   }
   return data?.length ?? 0;

@@ -21,17 +21,41 @@ export type LinkHealthReport = {
 const LINK_TIMEOUT_MS = 5000;
 const LINK_CONCURRENCY = 10;
 
-async function headOnce(url: string): Promise<number | string> {
+// Megatix, Tickettailor, and buytickets.at 403 every default-UA HEAD as bot
+// protection. Use a real browser UA and fall back from HEAD→GET on 4xx so
+// servers that don't accept HEAD (or treat it as suspicious) still get a
+// chance to return their real status.
+const LINK_HEALTH_UA =
+  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15";
+
+async function probe(url: string, method: "HEAD" | "GET"): Promise<number | string> {
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), LINK_TIMEOUT_MS);
   try {
-    const res = await fetch(url, { method: "HEAD", redirect: "follow", signal: ctrl.signal });
+    const res = await fetch(url, {
+      method,
+      redirect: "follow",
+      signal: ctrl.signal,
+      headers: {
+        "User-Agent": LINK_HEALTH_UA,
+        Accept:
+          "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+      },
+    });
     return res.status;
   } catch (err) {
     return err instanceof Error ? err.name : "fetch_error";
   } finally {
     clearTimeout(timer);
   }
+}
+
+async function headOnce(url: string): Promise<number | string> {
+  const first = await probe(url, "HEAD");
+  if (typeof first === "number" && first < 400) return first;
+  // HEAD returned 4xx/5xx or a non-numeric status — retry with GET. Many
+  // ticketing platforms (megatix, tickettailor) return 403 to HEAD by policy.
+  return probe(url, "GET");
 }
 
 async function runWithConcurrency<T, R>(

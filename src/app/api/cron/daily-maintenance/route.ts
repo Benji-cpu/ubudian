@@ -11,7 +11,7 @@
  * called externally by the remote scheduled agent on Anthropic infra.
  */
 import { NextResponse } from "next/server";
-import { archivePastPendingEvents } from "@/lib/ingestion/alerts";
+import { archivePastApprovedEvents, archivePastPendingEvents } from "@/lib/ingestion/alerts";
 import {
   archiveFuzzyDuplicateEvents,
   cancelStaleBookings,
@@ -35,6 +35,10 @@ export async function GET(request: Request) {
 
   const archivedPending = await archivePastPendingEvents().catch((err) => {
     errors.push(`archivePastPendingEvents: ${err?.message ?? String(err)}`);
+    return 0;
+  });
+  const archivedApproved = await archivePastApprovedEvents().catch((err) => {
+    errors.push(`archivePastApprovedEvents: ${err?.message ?? String(err)}`);
     return 0;
   });
   const purgedMessages = await purgeFailedMessages().catch((err) => {
@@ -70,6 +74,7 @@ export async function GET(request: Request) {
     finishedAt: new Date().toISOString(),
     autonomous: {
       archivedPendingEvents: archivedPending,
+      archivedApprovedEvents: archivedApproved,
       purgedFailedMessages: purgedMessages,
       cancelledStaleBookings: cancelledBookings,
       archivedDuplicateEvents: archivedDuplicates,

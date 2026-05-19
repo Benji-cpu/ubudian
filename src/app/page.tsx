@@ -110,7 +110,7 @@ export default async function HomePage() {
             <h1 className="font-serif text-5xl font-normal tracking-wide text-brand-gold sm:text-6xl lg:text-7xl">
               The Ubudian
             </h1>
-            <p className="mt-6 font-serif text-xl italic text-brand-cream sm:text-2xl">
+            <p className="mt-6 font-serif text-xl italic text-[#FAF5EC] sm:text-2xl">
               Your guide to Ubud&apos;s conscious community.
             </p>
             <p className="mx-auto mt-4 max-w-lg text-base text-brand-off-white/80">
@@ -136,7 +136,7 @@ export default async function HomePage() {
               <Button
                 asChild
                 size="lg"
-                className="bg-brand-gold text-brand-deep-green hover:bg-brand-gold/90 dark:bg-brand-gold dark:text-brand-deep-green dark:hover:bg-brand-gold/90"
+                className="bg-brand-gold text-[#2C4A3E] hover:bg-brand-gold/90 dark:bg-brand-gold dark:text-[#2C4A3E] dark:hover:bg-brand-gold/90"
               >
                 <Link href="/experiences/3-day-ubud-reset">
                   Start with a 3-Day Reset &rarr;
@@ -144,7 +144,7 @@ export default async function HomePage() {
               </Button>
               <Link
                 href="/quiz"
-                className="font-serif text-sm italic text-brand-cream/90 underline decoration-brand-cream/30 underline-offset-4 transition-colors hover:text-brand-gold hover:decoration-brand-gold/60"
+                className="font-serif text-sm italic text-[#FAF5EC]/90 underline decoration-[#FAF5EC]/30 underline-offset-4 transition-colors hover:text-brand-gold hover:decoration-brand-gold/60"
               >
                 Or take the 6-question quiz
               </Link>

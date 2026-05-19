@@ -265,6 +265,7 @@ interface DailyMaintenancePayload {
   finishedAt: string;
   autonomous: {
     archivedPendingEvents: number;
+    archivedApprovedEvents?: number;
     purgedFailedMessages: number;
     cancelledStaleBookings: number;
     archivedDuplicateEvents: number;
@@ -327,6 +328,7 @@ export function dailyMaintenanceDigest(p: DailyMaintenancePayload): string {
     <h3 style="margin:24px 0 8px;font-family:'Lora',Georgia,serif;color:${COLORS.deepGreen};font-size:16px;">Auto-fixed</h3>
     <table style="margin:8px 0;width:100%;border-collapse:collapse;font-size:14px;">
       <tr><td style="padding:6px 0;color:#888;">Past-pending events archived</td><td style="padding:6px 0;text-align:right;font-weight:600;">${a.archivedPendingEvents}</td></tr>
+      <tr><td style="padding:6px 0;color:#888;">Past-approved events archived</td><td style="padding:6px 0;text-align:right;font-weight:600;">${a.archivedApprovedEvents ?? 0}</td></tr>
       <tr><td style="padding:6px 0;color:#888;">Failed messages purged</td><td style="padding:6px 0;text-align:right;font-weight:600;">${a.purgedFailedMessages}</td></tr>
       <tr><td style="padding:6px 0;color:#888;">Stale bookings cancelled</td><td style="padding:6px 0;text-align:right;font-weight:600;">${a.cancelledStaleBookings}</td></tr>
       <tr><td style="padding:6px 0;color:#888;">Duplicate events archived</td><td style="padding:6px 0;text-align:right;font-weight:600;">${a.archivedDuplicateEvents}</td></tr>

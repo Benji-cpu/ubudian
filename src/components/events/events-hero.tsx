@@ -59,15 +59,15 @@ export function EventsHero({ totalCount }: EventsHeroProps) {
           <span className="italic">in Ubud.</span>
         </h1>
 
-        <p className="mt-6 font-serif text-xl italic text-brand-cream sm:text-2xl">
+        <p className="mt-6 font-serif text-xl italic text-[#FAF5EC] sm:text-2xl">
           The pulse of the valley, gathered daily.
         </p>
 
-        <p className="mx-auto mt-4 max-w-lg text-base text-brand-off-white/80">
+        <p className="mx-auto mt-4 max-w-lg text-base text-[#FAF5EC]/80">
           Sound journeys, tantra evenings, ecstatic dance, breathwork,
           ceremony, and the deep-conversation circles in between —{" "}
           {hasCount
-            ? `${totalCount} gatherings on right now.`
+            ? `${totalCount} gatherings on the agenda right now.`
             : "drawn from across the valley."}
         </p>
 
@@ -75,13 +75,13 @@ export function EventsHero({ totalCount }: EventsHeroProps) {
           <Button
             asChild
             size="lg"
-            className="bg-brand-gold text-brand-deep-green hover:bg-brand-gold/90 dark:bg-brand-gold dark:text-brand-deep-green dark:hover:bg-brand-gold/90"
+            className="bg-brand-gold text-[#2C4A3E] hover:bg-brand-gold/90 dark:bg-brand-gold dark:text-[#2C4A3E] dark:hover:bg-brand-gold/90"
           >
             <Link href="#events">Browse the agenda &rarr;</Link>
           </Button>
           <Link
             href="/experiences"
-            className="font-serif text-sm italic text-brand-cream/90 underline decoration-brand-cream/30 underline-offset-4 transition-colors hover:text-brand-gold hover:decoration-brand-gold/60"
+            className="font-serif text-sm italic text-[#FAF5EC]/90 underline decoration-[#FAF5EC]/30 underline-offset-4 transition-colors hover:text-brand-gold hover:decoration-brand-gold/60"
           >
             Or see the curated multi-day retreats
           </Link>
