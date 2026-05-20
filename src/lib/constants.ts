@@ -44,6 +44,7 @@ export const ADMIN_GROUPED_ROUTES: Record<string, string[]> = {
     "/admin/journeys",
     "/admin/practitioners",
     "/admin/partners",
+    "/admin/places",
   ],
   "/admin/commerce": ["/admin/bookings", "/admin/subscriptions"],
   "/admin/community": ["/admin/subscribers", "/admin/trusted-submitters", "/admin/feedback"],

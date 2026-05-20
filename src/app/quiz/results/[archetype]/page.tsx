@@ -3,7 +3,13 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { ARCHETYPES, ARCHETYPE_IDS } from "@/lib/quiz-data";
-import { getEventsForArchetype, getToursForArchetype, getStoriesForArchetype, getExperiencesForArchetype } from "@/lib/quiz-helpers";
+import {
+  getEventsForArchetype,
+  getToursForArchetype,
+  getStoriesForArchetype,
+  getExperiencesForArchetype,
+  getPractitionersForArchetype,
+} from "@/lib/quiz-helpers";
 import { getGuidesForArchetype } from "@/lib/guides/match-archetype";
 import { getStarterPack } from "@/lib/guides/starter-packs";
 import { getGuidesByRelatedSlugs } from "@/lib/guides/queries";
@@ -14,10 +20,11 @@ import { TourCard } from "@/components/tours/tour-card";
 import { StoryCard } from "@/components/stories/story-card";
 import { ExperienceCard } from "@/components/experiences/experience-card";
 import { GuideCard } from "@/components/guides/guide-card";
+import { PractitionerCard } from "@/components/practitioners/practitioner-card";
 import { RecommendedRetreatCta } from "@/components/journeys/recommended-retreat-cta";
 import { Button } from "@/components/ui/button";
 import { SITE_URL } from "@/lib/constants";
-import type { ArchetypeId, Event, Tour, Story, Experience, Guide } from "@/types";
+import type { ArchetypeId, Event, Tour, Story, Experience, Guide, Practitioner } from "@/types";
 import type { Metadata } from "next";
 
 interface PageProps {
@@ -67,6 +74,7 @@ export default async function ArchetypeResultPage({ params }: PageProps) {
   let stories: Story[] = [];
   let experiences: Experience[] = [];
   let guides: Guide[] = [];
+  let practitioners: Practitioner[] = [];
 
   const settings = await getSiteSettings();
 
@@ -74,7 +82,7 @@ export default async function ArchetypeResultPage({ params }: PageProps) {
     const supabase = await createClient();
     const today = new Date().toISOString().split("T")[0];
 
-    const [eventsRes, toursRes, storiesRes, experiencesRes, guidesRes] = await Promise.all([
+    const [eventsRes, toursRes, storiesRes, experiencesRes, guidesRes, practitionersRes] = await Promise.all([
       supabase
         .from("events")
         .select("*")
@@ -107,6 +115,11 @@ export default async function ArchetypeResultPage({ params }: PageProps) {
             .order("sort_order", { ascending: true })
             .limit(24)
         : Promise.resolve({ data: [] as Guide[] }),
+      supabase
+        .from("practitioners")
+        .select("*")
+        .eq("is_active", true)
+        .limit(24),
     ]);
 
     events = (eventsRes.data ?? []) as Event[];
@@ -114,6 +127,7 @@ export default async function ArchetypeResultPage({ params }: PageProps) {
     stories = (storiesRes.data ?? []) as Story[];
     experiences = (experiencesRes.data ?? []) as Experience[];
     guides = (guidesRes.data ?? []) as Guide[];
+    practitioners = (practitionersRes.data ?? []) as Practitioner[];
   } catch {
     // Supabase unreachable — render with empty recommendations
   }
@@ -122,6 +136,7 @@ export default async function ArchetypeResultPage({ params }: PageProps) {
   const matchedEvents = getEventsForArchetype(events, archetype.id);
   const matchedTours = getToursForArchetype(tours, archetype.id);
   const matchedStories = getStoriesForArchetype(stories, archetype.id);
+  const matchedPractitioners = getPractitionersForArchetype(practitioners, archetype.id);
   const matchedGuides = settings.guides_enabled
     ? getGuidesForArchetype(guides, archetype.id, 3)
     : [];
@@ -307,6 +322,23 @@ export default async function ArchetypeResultPage({ params }: PageProps) {
             <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {matchedStories.map((story) => (
                 <StoryCard key={story.id} story={story} />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Recommended practitioners */}
+        {matchedPractitioners.length > 0 && (
+          <div className="mt-12">
+            <h2 className="font-serif text-2xl font-medium text-brand-deep-green">
+              Practitioners for {archetype.name}
+            </h2>
+            <p className="mt-2 text-brand-charcoal-light">
+              The healers, bodyworkers and guides whose work tends to resonate with this spirit.
+            </p>
+            <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {matchedPractitioners.map((practitioner) => (
+                <PractitionerCard key={practitioner.id} practitioner={practitioner} />
               ))}
             </div>
           </div>

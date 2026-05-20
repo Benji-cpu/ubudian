@@ -227,6 +227,18 @@ export type PartnerKind =
   | "spa"
   | "other";
 
+export type PlaceKind =
+  | "temple"
+  | "venue"
+  | "cafe"
+  | "restaurant"
+  | "studio"
+  | "spa"
+  | "retreat_centre"
+  | "natural"
+  | "market"
+  | "other";
+
 export type CohortStatus = "open" | "almost_full" | "full" | "waitlist";
 
 export interface Journey {
@@ -319,12 +331,16 @@ export interface Practitioner {
   name: string;
   modalities: string[];
   bio: string | null;
+  short_description: string | null;
   photo_url: string | null;
+  hero_image_url: string | null;
   contact_whatsapp: string | null;
   contact_email: string | null;
   contact_instagram: string | null;
   base_location: string | null;
   theme_tags: string[];
+  archetype_tags: ArchetypeId[];
+  intent_tags: GuideIntent[];
   is_active: boolean;
   created_at: string;
   updated_at: string;
@@ -336,12 +352,43 @@ export interface Partner {
   name: string;
   kind: PartnerKind;
   description: string | null;
+  short_description: string | null;
+  hero_image_url: string | null;
   affiliate_url: string | null;
   commission_rate: number | null;
   contact_whatsapp: string | null;
   contact_email: string | null;
   base_location: string | null;
+  archetype_tags: ArchetypeId[];
+  intent_tags: GuideIntent[];
   is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Place {
+  id: string;
+  slug: string;
+  name: string;
+  kind: PlaceKind;
+  description: string | null;
+  short_description: string | null;
+  photo_urls: string[];
+  hero_image_url: string | null;
+  address: string | null;
+  neighbourhood: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  google_maps_url: string | null;
+  website_url: string | null;
+  instagram_handle: string | null;
+  opening_hours: string | null;
+  price_range: string | null;
+  theme_tags: string[];
+  archetype_tags: ArchetypeId[];
+  intent_tags: GuideIntent[];
+  is_published: boolean;
+  sort_order: number;
   created_at: string;
   updated_at: string;
 }
