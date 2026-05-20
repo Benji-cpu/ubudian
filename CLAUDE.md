@@ -43,7 +43,7 @@ npm run test:e2e   # Playwright E2E tests
 ## Architecture
 
 - `/src/app` — Pages and API routes (App Router)
-- `/src/components` — `ui/` (shadcn), `admin/`, `auth/`, `blog/`, `dashboard/`, `events/`, `homepage/`, `layout/`, `membership/`, `newsletter/`, `quiz/`, `skeletons/`, `stories/`, `tours/`
+- `/src/components` — `ui/` (shadcn), `admin/`, `auth/`, `blog/`, `dashboard/`, `events/`, `homepage/`, `layout/`, `membership/`, `newsletter/`, `partners/`, `places/`, `practitioners/`, `quiz/`, `skeletons/`, `stories/`, `tours/`
 - `/src/lib` — Core libraries:
   - `supabase/` — `server.ts`, `client.ts`, `admin.ts`, `middleware.ts`
   - `ingestion/` — Event ingestion pipeline (16+ files, see Ingestion section)
@@ -84,9 +84,9 @@ npm run test:e2e   # Playwright E2E tests
 
 ## Database
 
-19 tables across 4 domains. All have RLS enabled. `is_admin()` SQL function checks admin role.
+20 tables across 4 domains. All have RLS enabled. `is_admin()` SQL function checks admin role.
 
-**Content (8):** `profiles`, `blog_posts`, `stories`, `events`, `tours`, `newsletter_editions`, `newsletter_subscribers`, `trusted_submitters`
+**Content (9):** `profiles`, `blog_posts`, `stories`, `events`, `tours`, `newsletter_editions`, `newsletter_subscribers`, `trusted_submitters`, `places`
 **Ingestion (6):** `event_sources`, `ingestion_runs`, `raw_ingestion_messages`, `venue_aliases`, `dedup_matches`, `unresolved_venues` — admin-only RLS (except `venue_aliases` has public read)
 **Stripe (3):** `bookings`, `subscriptions`, `payments` — all amounts stored in **cents USD**
 **User (2):** `quiz_results`, `saved_events`

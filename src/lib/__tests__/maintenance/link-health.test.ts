@@ -77,9 +77,11 @@ describe("checkExternalLinkHealth", () => {
     expect(mockFrom).toHaveBeenCalledWith("events");
     expect(mockIn).toHaveBeenCalledWith("status", ["approved", "pending"]);
 
-    // 4 ticket URLs (3 non-null) + 2 unique map URLs = 5 unique targets
+    // 4 ticket URLs (3 non-null) + 2 unique map URLs = 5 unique targets.
+    // headOnce retries with GET on 4xx/5xx or non-numeric status, so the 3
+    // unhealthy URLs each get probed twice: 5 + 3 = 8 fetches total.
     expect(report.checked).toBe(5);
-    expect(fetchMock).toHaveBeenCalledTimes(5);
+    expect(fetchMock).toHaveBeenCalledTimes(8);
 
     const byUrl = new Map(report.broken.map((b) => [b.url, b]));
     expect(byUrl.has("https://ok.example/tickets/1")).toBe(false);
