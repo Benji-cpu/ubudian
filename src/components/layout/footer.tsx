@@ -60,6 +60,18 @@ export async function Footer() {
 
         {/* Social / Info */}
         <div className="mt-10 flex flex-wrap items-center justify-center gap-6">
+          <Link
+            href="/practitioners"
+            className="py-2 text-sm text-brand-cream/60 transition-colors hover:text-brand-gold"
+          >
+            Practitioners
+          </Link>
+          <Link
+            href="/places"
+            className="py-2 text-sm text-brand-cream/60 transition-colors hover:text-brand-gold"
+          >
+            Places
+          </Link>
           <a
             href="https://instagram.com/theubudian"
             target="_blank"
