@@ -10,8 +10,8 @@ export default function NewsletterLoading() {
             The Ubudian Newsletter
           </h1>
           <p className="mt-4 text-lg text-muted-foreground">
-            A curated weekly digest of events, stories, and local tips — delivered
-            to your inbox every week.
+            One email a week with the ceremonies, workshops, sound journeys,
+            community stories, and conversations that matter in Ubud right now.
           </p>
         </div>
       </section>

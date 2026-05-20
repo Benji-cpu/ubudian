@@ -10,8 +10,8 @@ export default function BlogLoading() {
             Blog
           </h1>
           <p className="mt-4 text-lg text-muted-foreground">
-            Stories, guides, and insights from Ubud — your go-to resource for
-            making the most of life in the heart of Bali.
+            The eat-pray-love reality, the spiritual circus, and honest takes
+            on life in Ubud&apos;s conscious scene.
           </p>
         </div>
       </section>

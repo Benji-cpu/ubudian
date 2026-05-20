@@ -65,7 +65,8 @@ export default function AboutPage() {
       {/* Hero */}
       <section className="bg-brand-cream px-4 py-16 sm:py-20">
         <div className="mx-auto max-w-3xl text-center">
-          <h1 className="font-serif text-4xl font-bold tracking-tight text-brand-deep-green sm:text-5xl">
+          <div className="mx-auto mb-6 h-px w-12 bg-brand-gold/40" />
+          <h1 className="font-serif text-4xl font-medium tracking-tight text-brand-deep-green sm:text-5xl">
             About The Ubudian
           </h1>
           <p className="mt-4 text-lg text-muted-foreground sm:text-xl">

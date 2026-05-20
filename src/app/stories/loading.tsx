@@ -10,8 +10,8 @@ export default function StoriesLoading() {
             Humans of Ubud
           </h1>
           <p className="mt-4 text-lg text-muted-foreground">
-            Meet the people who make Ubud special — locals, expats, artists,
-            healers, and entrepreneurs sharing their stories.
+            Tantra facilitators, breathwork guides, ceremony holders, organic
+            farmers — the humans who hold space in Ubud.
           </p>
         </div>
       </section>
