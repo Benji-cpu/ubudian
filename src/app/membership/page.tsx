@@ -7,19 +7,18 @@ import { createAdminClient } from "@/lib/supabase/admin";
 
 const COMMUNITY_FEATURES = [
   "Browse all events (tantra, ceremonies, ecstatic dance, sound journeys, and more)",
-  "Read Humans of Ubud stories and blog posts",
-  "Weekly community newsletter",
+  "The free weekly newsletter — handpicked picks, written by editors who live here",
   "Take the Ubud Spirit Quiz",
   "Save events to your dashboard",
 ];
 
 const INSIDER_FEATURES = [
   "Everything in Community Member, plus:",
-  "Members-only stories and deep dives",
-  "First access to new tours and events",
-  "Tour booking discounts",
+  "Early access to new retreats and journeys",
+  "Insider booking discounts on featured journeys",
+  "The Insider newsletter — long-form notes, scene gossip, off-roster gatherings",
   "Insider badge on your profile",
-  "Support independent community media",
+  "Support independent community media in Ubud",
 ];
 
 async function getActiveInsiderCount(): Promise<number> {

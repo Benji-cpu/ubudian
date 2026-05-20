@@ -17,7 +17,7 @@ You are running The Ubudian's morning routine. The site (https://theubudian.life
    - `digests/$(TZ=Asia/Makassar date +%F).md` — maintenance digest
    - `curator/log/$(TZ=Asia/Makassar date +%F).md` — what the curator discovered
    - `curator/approvals/$(TZ=Asia/Makassar date +%F).md` — what the approver did (or BLOCKED-stub if it failed)
-3. Brand register: lush, restrained, editorial — Aman / COMO / National Geographic. Audience: conscious-community / tantra / ecstatic-dance / contact-improv / cacao / breathwork scene for Ubud expats. NOT tourist-coded. Memory file: `feedback_lush_not_hippie.md`.
+3. Brand register: lush, restrained, editorial — Aman / COMO / National Geographic. Audience: conscious-community / tantra / ecstatic-dance / contact-improv / cacao / breathwork scene for Ubud expats. NOT tourist-coded. Memory file: `feedback_lush_not_hippie.md`. **Token gotcha:** `text-brand-cream` and `text-brand-deep-green` invert in dark mode (they're foreground tokens). Sections with `bg-gradient ... dark:from-...` (events hero, home canopy) need literal hex (`text-[#FAF5EC]`, `text-[#2C4A3E]`) — if a screenshot shows invisible text on a known-dark gradient, this is the first suspect. See `project_brand_var_inversion_on_locked_hero.md`.
 4. Last 5 entries of `docs/morning-prompt-log.md` — your memory of recent runs, things you learned, follow-ups still owed. (If the file doesn't exist, you're the first run — start it.)
 
 ## The work — do all of it, in roughly this order

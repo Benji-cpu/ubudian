@@ -36,7 +36,7 @@ npm run test:e2e   # Playwright E2E tests
   - `/api/cron/ingestion-health` — Vercel Cron, daily at 9 AM UTC
   - `/api/cron/daily-maintenance` — Claude remote trigger `trig_01CnuNJSs8m8wdVyeVrDHrKq` at `17 19 * * *` UTC (≈03:17 WITA). Agent: `.claude/agents/nightly-routine.md`.
   - **Daily curator** — Claude trigger `trig_01637DsCbz5qGn6r5RTP4hhi` at `47 19 * * *` UTC (≈03:47 WITA). Agent: `.claude/agents/daily-curator.md`. Discovers + ingests dance/tantra events into `pending`.
-  - **Daily event approver** — Claude trigger `trig_015VbLdAh4G8Wpz1hscSvRtC` at `52 19 * * *` UTC (≈03:52 WITA). Agent: `.claude/agents/daily-event-approver.md`. Walks the `pending` queue with Claude Sonnet judgement, approves / archives / escalates. Replaces the in-flight Gemini moderation gate. Commits `curator/approvals/YYYY-MM-DD.md` to main.
+  - ~~**Daily event approver** — Claude trigger `trig_015VbLdAh4G8Wpz1hscSvRtC`~~ — **disabled 2026-05-20** in favour of the interactive morning routine (`docs/morning-prompt.md`). The trigger still exists (set `enabled: true` to revive); the GH Actions workflows `approver-fetch.yml` + `approver-apply.yml` still run, but with no Opus trigger in between they're effectively dormant. Pending queue is now drained interactively each morning via Supabase MCP.
 - **Images**: `unoptimized: true` (no Next.js Image Optimization)
 - **Remote image hosts**: Unsplash, `*.supabase.co`, `api.telegram.org`
 
