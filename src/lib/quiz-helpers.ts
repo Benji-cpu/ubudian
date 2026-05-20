@@ -1,4 +1,11 @@
-import type { ArchetypeId, Event, Tour, Story, Experience } from "@/types";
+import type {
+  ArchetypeId,
+  Event,
+  Tour,
+  Story,
+  Experience,
+  Practitioner,
+} from "@/types";
 import { ARCHETYPES } from "./quiz-data";
 
 /**
@@ -65,6 +72,65 @@ export function getExperiencesForArchetype(
 
   if (combined.length < limit) {
     const remaining = experiences.filter((e) => !combined.includes(e));
+    combined.push(...remaining.slice(0, limit - combined.length));
+  }
+
+  return combined.slice(0, limit);
+}
+
+// Modality → archetype affinity for the Tier-2 fallback. A practitioner with
+// no explicit archetype_tag still surfaces if one of their modalities is in
+// the archetype's affinity set. Conservative — only edge cases where the
+// modality is unambiguously archetype-coded.
+const ARCHETYPE_MODALITY_AFFINITY: Record<ArchetypeId, string[]> = {
+  seeker: [
+    "breathwork",
+    "shamanic journey",
+    "shamanic",
+    "tantra",
+    "pranic healing",
+    "ifs",
+    "meditation",
+  ],
+  explorer: ["shamanic journey", "shamanic", "tantra", "5rhythms", "ecstatic dance"],
+  creative: ["sound healing", "cacao ceremony", "kirtan"],
+  connector: ["ecstatic dance", "5rhythms", "cacao ceremony", "contact improv"],
+  epicurean: [
+    "bodywork",
+    "massage",
+    "ayurveda",
+    "thai massage",
+    "tcm",
+    "acupuncture",
+    "polarity",
+    "tantra",
+  ],
+};
+
+export function getPractitionersForArchetype(
+  practitioners: Practitioner[],
+  archetype: ArchetypeId,
+  limit = 3,
+): Practitioner[] {
+  const affinityModalities = ARCHETYPE_MODALITY_AFFINITY[archetype] ?? [];
+  const affinitySet = new Set(affinityModalities.map((m) => m.toLowerCase()));
+
+  // Tier 1: explicit archetype_tags
+  const tagged = practitioners.filter((p) =>
+    p.archetype_tags?.includes(archetype),
+  );
+
+  // Tier 2: modality affinity
+  const modalityMatch = practitioners.filter(
+    (p) =>
+      !tagged.includes(p) &&
+      p.modalities?.some((m) => affinitySet.has(m.toLowerCase())),
+  );
+
+  const combined = [...tagged, ...modalityMatch];
+
+  if (combined.length < limit) {
+    const remaining = practitioners.filter((p) => !combined.includes(p));
     combined.push(...remaining.slice(0, limit - combined.length));
   }
 
