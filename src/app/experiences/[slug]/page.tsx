@@ -214,6 +214,7 @@ export default async function JourneyPage({ params }: JourneyPageProps) {
   // Roll up signals from atoms across every slot — drives the practitioner
   // rail, the map, and (later) personalisation. Done once, used many times.
   const practitionerIds = new Set<string>();
+  const partnerIds = new Set<string>();
   const mappableAtoms: JourneyAtom[] = [];
   const seenAtomIds = new Set<string>();
   for (const cs of candidatesBySlot.values()) {
@@ -221,6 +222,7 @@ export default async function JourneyPage({ params }: JourneyPageProps) {
       if (seenAtomIds.has(atom.id)) continue;
       seenAtomIds.add(atom.id);
       if (atom.practitioner_id) practitionerIds.add(atom.practitioner_id);
+      if (atom.partner_id) partnerIds.add(atom.partner_id);
       if (
         typeof atom.latitude === "number" &&
         typeof atom.longitude === "number" &&
@@ -230,6 +232,38 @@ export default async function JourneyPage({ params }: JourneyPageProps) {
         mappableAtoms.push(atom);
       }
     }
+  }
+
+  // Resolve practitioner_id / partner_id → slug so atom rows can link to their
+  // /practitioners/[slug] and /partners/[slug] detail pages instead of dead
+  // free-text. Phase 3 of guides.
+  const practitionerSlugs = new Map<string, string>();
+  const partnerSlugs = new Map<string, string>();
+  try {
+    const supabase = await createClient();
+    if (practitionerIds.size > 0) {
+      const { data: pracRows } = await supabase
+        .from("practitioners")
+        .select("id, slug")
+        .in("id", Array.from(practitionerIds))
+        .eq("is_active", true);
+      for (const r of (pracRows ?? []) as { id: string; slug: string }[]) {
+        practitionerSlugs.set(r.id, r.slug);
+      }
+    }
+    if (partnerIds.size > 0) {
+      const { data: partRows } = await supabase
+        .from("partners")
+        .select("id, slug")
+        .in("id", Array.from(partnerIds))
+        .eq("is_active", true);
+      for (const r of (partRows ?? []) as { id: string; slug: string }[]) {
+        partnerSlugs.set(r.id, r.slug);
+      }
+    }
+  } catch {
+    // Atoms fall back to affiliate_url / google_maps_url / inert when the
+    // lookup fails. Never break the page on a side-rail miss.
   }
 
   return (
@@ -419,6 +453,8 @@ export default async function JourneyPage({ params }: JourneyPageProps) {
                     journeyTitle={journey.title}
                     journeyUrl={journeyUrl}
                     anchorPartnerSlugs={anchorPartnerSlugs}
+                    practitionerSlugs={practitionerSlugs}
+                    partnerSlugs={partnerSlugs}
                   />
                 ))}
               </div>

@@ -28,6 +28,17 @@ interface JourneyDayCardProps {
    * their title with a subtle gold underline that links to the partner profile.
    */
   anchorPartnerSlugs?: Map<string, string>;
+  /**
+   * Map of practitioners.id → slug. Atoms with practitioner_id link out to
+   * their /practitioners/[slug] detail page when this is provided.
+   */
+  practitionerSlugs?: Map<string, string>;
+  /**
+   * Map of partners.id → slug for the affiliate `partners` table. Atoms with
+   * partner_id link out to /partners/[slug] when this is provided (and
+   * anchorPartnerSlugs hasn't already claimed them).
+   */
+  partnerSlugs?: Map<string, string>;
 }
 
 const DAY_TYPE_LABEL: Record<JourneyDayType, string> = {
@@ -76,6 +87,8 @@ export function JourneyDayCard({
   journeyTitle,
   journeyUrl,
   anchorPartnerSlugs,
+  practitionerSlugs,
+  partnerSlugs,
 }: JourneyDayCardProps) {
   const slotsByWindow = new Map<JourneyDayWindow, JourneyDaySlot[]>();
   for (const w of WINDOW_ORDER) slotsByWindow.set(w, []);
@@ -227,6 +240,8 @@ export function JourneyDayCard({
                       candidates={candidatesBySlot.get(slot.id) ?? []}
                       eventSlugs={eventSlugs}
                       anchorPartnerSlugs={anchorPartnerSlugs}
+                      practitionerSlugs={practitionerSlugs}
+                      partnerSlugs={partnerSlugs}
                     />
                   ))}
                 </ul>
@@ -244,11 +259,15 @@ function SlotRow({
   candidates,
   eventSlugs,
   anchorPartnerSlugs,
+  practitionerSlugs,
+  partnerSlugs,
 }: {
   slot: JourneyDaySlot;
   candidates: JourneyAtom[];
   eventSlugs: Map<string, string>;
   anchorPartnerSlugs?: Map<string, string>;
+  practitionerSlugs?: Map<string, string>;
+  partnerSlugs?: Map<string, string>;
 }) {
   return (
     <li className="rounded border border-brand-gold/15 bg-brand-cream/15 p-3">
@@ -272,6 +291,8 @@ function SlotRow({
               atom={atom}
               eventSlugs={eventSlugs}
               anchorPartnerSlugs={anchorPartnerSlugs}
+              practitionerSlugs={practitionerSlugs}
+              partnerSlugs={partnerSlugs}
             />
           ))}
         </ul>
@@ -284,12 +305,16 @@ function AtomLine({
   atom,
   eventSlugs,
   anchorPartnerSlugs,
+  practitionerSlugs,
+  partnerSlugs,
 }: {
   atom: JourneyAtom;
   eventSlugs: Map<string, string>;
   anchorPartnerSlugs?: Map<string, string>;
+  practitionerSlugs?: Map<string, string>;
+  partnerSlugs?: Map<string, string>;
 }) {
-  const href = atomHref(atom, eventSlugs);
+  const href = atomHref(atom, eventSlugs, practitionerSlugs, partnerSlugs);
   const useLightbox = !!atom.image_url;
   const actionLabel =
     atom.kind === "event_ref"
@@ -390,10 +415,26 @@ function AtomLine({
   );
 }
 
-function atomHref(atom: JourneyAtom, eventSlugs: Map<string, string>): string | null {
+function atomHref(
+  atom: JourneyAtom,
+  eventSlugs: Map<string, string>,
+  practitionerSlugs?: Map<string, string>,
+  partnerSlugs?: Map<string, string>,
+): string | null {
   if (atom.kind === "event_ref" && atom.event_id) {
     const slug = eventSlugs.get(atom.event_id);
     return slug ? `/events/${slug}` : null;
+  }
+  // FK-resolved internal hrefs beat external CTAs — the practitioner /
+  // partner profile is the editorial destination, the affiliate URL is the
+  // outbound action that lives on that profile.
+  if (atom.practitioner_id) {
+    const slug = practitionerSlugs?.get(atom.practitioner_id);
+    if (slug) return `/practitioners/${slug}`;
+  }
+  if (atom.partner_id) {
+    const slug = partnerSlugs?.get(atom.partner_id);
+    if (slug) return `/partners/${slug}`;
   }
   if (atom.affiliate_url) return atom.affiliate_url;
   if (atom.google_maps_url) return atom.google_maps_url;
