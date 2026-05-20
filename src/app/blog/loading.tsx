@@ -1,20 +1,19 @@
 import { PostCardSkeleton } from "@/components/skeletons/post-card-skeleton";
+import { PageHero } from "@/components/layout/page-hero";
 
 export default function BlogLoading() {
   return (
     <div>
-      <section className="bg-brand-cream px-4 py-16 sm:py-20">
-        <div className="mx-auto max-w-3xl text-center">
-          <div className="mx-auto mb-6 h-px w-12 bg-brand-gold/40" />
-          <h1 className="font-serif text-4xl font-medium tracking-tight text-brand-deep-green sm:text-5xl">
-            Blog
-          </h1>
-          <p className="mt-4 text-lg text-muted-foreground">
+      <PageHero
+        variant="cream"
+        title="Blog"
+        subtitle={
+          <>
             The eat-pray-love reality, the spiritual circus, and honest takes
             on life in Ubud&apos;s conscious scene.
-          </p>
-        </div>
-      </section>
+          </>
+        }
+      />
       <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="grid gap-8 md:grid-cols-2">
           {Array.from({ length: 4 }).map((_, i) => (

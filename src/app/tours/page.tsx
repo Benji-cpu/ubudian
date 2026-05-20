@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { TourCard } from "@/components/tours/tour-card";
 import { NewsletterSignup } from "@/components/layout/newsletter-signup";
+import { PageHero } from "@/components/layout/page-hero";
 import { CrossSectionRibbon } from "@/components/journeys/cross-section-ribbon";
 import { getSiteSettings } from "@/lib/site-settings";
 import type { Tour } from "@/types";
@@ -36,19 +37,11 @@ export default async function ToursPage() {
 
   return (
     <div>
-      {/* Hero */}
-      <section className="bg-brand-cream px-4 py-16 sm:py-20">
-        <div className="mx-auto max-w-3xl text-center">
-          <div className="mx-auto mb-6 h-px w-12 bg-brand-gold/40" />
-          <h1 className="font-serif text-4xl font-medium tracking-tight text-brand-deep-green sm:text-5xl">
-            Walk the Land
-          </h1>
-          <p className="mt-4 text-lg text-muted-foreground">
-            Rice terraces, sacred water temples, jungle waterfalls, and food trails
-            through the warungs and markets — with guides who live here and love this place.
-          </p>
-        </div>
-      </section>
+      <PageHero
+        variant="cream"
+        title="Walk the Land"
+        subtitle="Rice terraces, sacred water temples, jungle waterfalls, and food trails through the warungs and markets — with guides who live here and love this place."
+      />
 
       <CrossSectionRibbon
         pitch="Tours are day-shaped. Looking for something multi-day?"

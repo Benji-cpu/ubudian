@@ -6,6 +6,7 @@ import { queryWithRetry } from "@/lib/supabase/retry";
 import { StoryCard } from "@/components/stories/story-card";
 import { ThemeFilter } from "@/components/stories/theme-filter";
 import { CrossSectionRibbon } from "@/components/journeys/cross-section-ribbon";
+import { PageHero } from "@/components/layout/page-hero";
 import { getSiteSettings } from "@/lib/site-settings";
 import type { Story } from "@/types";
 
@@ -51,19 +52,11 @@ export default async function StoriesPage({ searchParams }: StoriesPageProps) {
 
   return (
     <div>
-      {/* Hero */}
-      <section className="bg-brand-cream px-4 py-16 sm:py-20">
-        <div className="mx-auto max-w-3xl text-center">
-          <div className="mx-auto mb-6 h-px w-12 bg-brand-gold/40" />
-          <h1 className="font-serif text-4xl font-medium tracking-tight text-brand-deep-green sm:text-5xl">
-            Humans of Ubud
-          </h1>
-          <p className="mt-4 text-lg text-muted-foreground">
-            Tantra facilitators, breathwork guides, ceremony holders, organic
-            farmers — the humans who hold space in Ubud.
-          </p>
-        </div>
-      </section>
+      <PageHero
+        variant="cream"
+        title="Humans of Ubud"
+        subtitle="Tantra facilitators, breathwork guides, ceremony holders, organic farmers — the humans who hold space in Ubud."
+      />
 
       <CrossSectionRibbon
         pitch="Want a curated retreat where you'll actually meet some of these humans?"

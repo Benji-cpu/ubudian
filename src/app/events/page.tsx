@@ -244,12 +244,8 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
     viewEvents = viewEvents.filter((event) => eventIsHappeningNow(event, baliNow));
   }
 
-  // The events hero is the home-style portal — full height, gradient
-  // blending into the fixed nav. We `-mt-14` here so it sits flush under
-  // the header (matching `src/app/page.tsx:91`).
-
   return (
-    <div className="-mt-14">
+    <div>
       <RefreshOnFocus />
 
       <EventsHero totalCount={viewEvents.length} />

@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { NewsletterSignup } from "@/components/layout/newsletter-signup";
+import { PageHero } from "@/components/layout/page-hero";
 import { HomepageScrollSnap } from "@/components/homepage/scroll-snap";
 import { FeaturedStories } from "@/components/homepage/featured-stories";
 import { FeaturedEvents } from "@/components/homepage/featured-events";
@@ -88,32 +89,14 @@ export default async function HomePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
       />
       <HomepageScrollSnap />
-      <div className="-mt-14">
+      <div>
         {/* Canopy (Hero) */}
-        <section className="relative flex min-h-[100dvh] items-center justify-center overflow-hidden bg-gradient-to-b from-[#2C4A3E] via-[#3A5F50] to-[#8BAF8A] dark:from-[#0D1A14] dark:via-[#152820] dark:to-[#1A2A22]">
-          <svg
-            className="pointer-events-none absolute inset-0 h-full w-full opacity-5"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <defs>
-              <pattern id="botanical" x="0" y="0" width="120" height="120" patternUnits="userSpaceOnUse">
-                <circle cx="60" cy="60" r="40" fill="none" stroke="#F0EAD6" strokeWidth="0.5" />
-                <circle cx="60" cy="60" r="20" fill="none" stroke="#F0EAD6" strokeWidth="0.5" />
-                <line x1="60" y1="20" x2="60" y2="100" stroke="#F0EAD6" strokeWidth="0.3" />
-                <line x1="20" y1="60" x2="100" y2="60" stroke="#F0EAD6" strokeWidth="0.3" />
-              </pattern>
-            </defs>
-            <rect width="100%" height="100%" fill="url(#botanical)" />
-          </svg>
-
-          <div className="relative z-10 mx-auto max-w-3xl px-4 text-center">
-            <h1 className="font-serif text-5xl font-normal tracking-wide text-brand-gold sm:text-6xl lg:text-7xl">
-              The Ubudian
-            </h1>
-            <p className="mt-6 font-serif text-xl italic text-[#FAF5EC] sm:text-2xl">
-              Your guide to Ubud&apos;s conscious community.
-            </p>
-            <p className="mx-auto mt-4 max-w-lg text-base text-brand-off-white/80">
+        <PageHero
+          variant="deep-green"
+          title="The Ubudian"
+          subtitle={<>Your guide to Ubud&apos;s conscious community.</>}
+          body={
+            <>
               Ceremonies, sound journeys, ecstatic dance, tantra workshops, and everything
               in between —{" "}
               <Link href="/events" className="text-brand-off-white underline decoration-brand-off-white/30 underline-offset-2 transition-colors hover:text-brand-gold hover:decoration-brand-gold">events</Link>
@@ -131,8 +114,10 @@ export default async function HomePage() {
               )}
               , and a{" "}
               <Link href="#newsletter" className="text-brand-off-white underline decoration-brand-off-white/30 underline-offset-2 transition-colors hover:text-brand-gold hover:decoration-brand-gold">weekly newsletter</Link>.
-            </p>
-            <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
+            </>
+          }
+          actions={
+            <>
               <Button
                 asChild
                 size="lg"
@@ -148,13 +133,10 @@ export default async function HomePage() {
               >
                 Or take the 6-question quiz
               </Link>
-            </div>
-          </div>
-
-          <div className="absolute bottom-10 left-1/2 -translate-x-1/2">
-            <div className="animate-pulse-down h-3 w-3 rounded-full bg-brand-gold" />
-          </div>
-        </section>
+            </>
+          }
+          showScrollDot
+        />
 
         {/* Earth (Events) — moved up to section 2 */}
         <section className="flex min-h-[100dvh] items-center bg-gradient-to-b from-brand-warm-cream to-brand-off-white px-4 py-20 sm:py-28">

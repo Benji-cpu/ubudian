@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { EditionCard } from "@/components/newsletter/edition-card";
 import { NewsletterSignup } from "@/components/layout/newsletter-signup";
+import { PageHero } from "@/components/layout/page-hero";
 import { getSiteSettings } from "@/lib/site-settings";
 import type { NewsletterEdition } from "@/types";
 
@@ -36,27 +37,23 @@ export default async function NewsletterPage() {
 
   return (
     <div>
-      {/* Hero + Signup */}
-      <section className="bg-brand-cream px-4 py-16 sm:py-20">
-        <div className="mx-auto max-w-3xl text-center">
-          <div className="mx-auto mb-6 h-px w-12 bg-brand-gold/40" />
-          <h1 className="font-serif text-4xl font-medium tracking-tight text-brand-deep-green sm:text-5xl">
-            The Ubudian Newsletter
-          </h1>
-          <p className="mt-4 text-lg text-muted-foreground">
-            One email a week with the ceremonies, workshops, sound journeys,
-            community stories, and conversations that matter in Ubud right now.
-          </p>
-          <NewsletterSignup className="mx-auto mt-8 max-w-md" />
-          <p className="mx-auto mt-4 max-w-md text-sm text-muted-foreground">
-            Already subscribed?{" "}
-            <Link href="/quiz" className="font-medium text-brand-terracotta hover:underline">
-              Take the Ubud Spirit Quiz
-            </Link>{" "}
-            to get personalized picks in your weekly email.
-          </p>
-        </div>
-      </section>
+      <PageHero
+        variant="cream"
+        title="The Ubudian Newsletter"
+        subtitle="One email a week with the ceremonies, workshops, sound journeys, community stories, and conversations that matter in Ubud right now."
+        actions={
+          <>
+            <NewsletterSignup className="mx-auto mt-2 max-w-md" />
+            <p className="mx-auto mt-4 max-w-md text-sm text-muted-foreground">
+              Already subscribed?{" "}
+              <Link href="/quiz" className="font-medium text-brand-terracotta hover:underline">
+                Take the Ubud Spirit Quiz
+              </Link>{" "}
+              to get personalized picks in your weekly email.
+            </p>
+          </>
+        }
+      />
 
       {/* Archive */}
       <section className="mx-auto max-w-4xl px-4 py-12 sm:px-6">

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { NewsletterSignup } from "@/components/layout/newsletter-signup";
+import { PageHero } from "@/components/layout/page-hero";
 import {
   Sparkles,
   Calendar,
@@ -63,18 +64,11 @@ export default function AboutPage() {
   return (
     <div>
       {/* Hero */}
-      <section className="bg-brand-cream px-4 py-16 sm:py-20">
-        <div className="mx-auto max-w-3xl text-center">
-          <div className="mx-auto mb-6 h-px w-12 bg-brand-gold/40" />
-          <h1 className="font-serif text-4xl font-medium tracking-tight text-brand-deep-green sm:text-5xl">
-            About The Ubudian
-          </h1>
-          <p className="mt-4 text-lg text-muted-foreground sm:text-xl">
-            One place for everything happening in Ubud&apos;s conscious
-            community.
-          </p>
-        </div>
-      </section>
+      <PageHero
+        variant="cream"
+        title="About The Ubudian"
+        subtitle="One place for everything happening in Ubud's conscious community."
+      />
 
       {/* The Problem */}
       <section className="mx-auto max-w-3xl px-4 py-16 sm:px-6">
