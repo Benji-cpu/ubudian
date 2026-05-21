@@ -209,13 +209,13 @@ async function fetchGroupChats(): Promise<NormalisedChat[]> {
 /**
  * Fetch recent messages from a single chat via WAHA REST API.
  */
-async function fetchChatMessages(chatId: string, limit = 100): Promise<WahaRestMessage[]> {
+async function fetchChatMessages(chatId: string, limit = 30): Promise<WahaRestMessage[]> {
   const baseUrl = process.env.WAHA_API_URL;
   if (!baseUrl) return [];
 
   try {
     const res = await fetch(
-      `${baseUrl}/api/default/chats/${encodeURIComponent(chatId)}/messages?limit=${limit}&downloadMedia=true`,
+      `${baseUrl}/api/default/chats/${encodeURIComponent(chatId)}/messages?limit=${limit}`,
       { headers: WAHA_FETCH_HEADERS() }
     );
 
@@ -361,7 +361,12 @@ const whatsappAdapter: SourceAdapter = {
 
     const rawMessages: RawMessage[] = [];
 
-    for (const group of filteredGroups) {
+    // Jitter between per-group fetches — bursty polling triggers WA anti-spam logout.
+    const jitteredDelay = (minMs: number, maxMs: number) =>
+      new Promise((r) => setTimeout(r, Math.floor(minMs + Math.random() * (maxMs - minMs))));
+
+    for (let gi = 0; gi < filteredGroups.length; gi++) {
+      const group = filteredGroups[gi];
       const messages = await fetchChatMessages(group.id);
 
       for (const msg of messages) {
@@ -388,6 +393,10 @@ const whatsappAdapter: SourceAdapter = {
         rawMessages.push(
           wahaRestMessageToRawMessage(msg, group.id, imageUrl, group.name)
         );
+      }
+
+      if (gi < filteredGroups.length - 1) {
+        await jitteredDelay(8_000, 15_000);
       }
     }
 
