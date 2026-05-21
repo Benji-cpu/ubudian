@@ -44,10 +44,12 @@ jobs:
           if [ -n "${{ github.event.inputs.date }}" ]; then
             DATE="${{ github.event.inputs.date }}"
           else
-            # On a push, use the most recently modified inbox file. This is
-            # robust to the curator agent committing multiple days in a single
-            # push (it shouldn't, but be defensive).
-            DATE=$(ls -t curator/inbox/*.json 2>/dev/null | head -1 | sed -E 's|.*/([0-9]{4}-[0-9]{2}-[0-9]{2})\.json|\1|')
+            # On a push, use the lexicographically-greatest (= newest date)
+            # inbox file. ls -t can't be trusted on a fresh git checkout: every
+            # file has the same mtime, so the fallback ordering is unstable
+            # and in practice ended up picking the oldest file — see commits
+            # 2026-05-18..2026-05-21, all of which processed 2026-05-19.json.
+            DATE=$(ls -1 curator/inbox/*.json 2>/dev/null | sort | tail -1 | sed -E 's|.*/([0-9]{4}-[0-9]{2}-[0-9]{2})\.json|\1|')
           fi
 
           if [ -z "$DATE" ] || [ ! -f "curator/inbox/${DATE}.json" ]; then
