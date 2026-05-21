@@ -43,13 +43,13 @@ export async function generateMetadata({ params }: StoryPageProps): Promise<Meta
       .single();
 
     if (!story) {
-      return { title: "Story Not Found | The Ubudian" };
+      return { title: "Story Not Found" };
     }
 
     const s = story as Story;
 
     return {
-      title: s.meta_title || `${s.subject_name} — Humans of Ubud | The Ubudian`,
+      title: s.meta_title || `${s.subject_name} — Humans of Ubud`,
       description: s.meta_description || s.subject_tagline || undefined,
       openGraph: {
         title: s.meta_title || `${s.subject_name} — Humans of Ubud`,
@@ -60,7 +60,7 @@ export async function generateMetadata({ params }: StoryPageProps): Promise<Meta
       },
     };
   } catch {
-    return { title: "Story Not Found | The Ubudian" };
+    return { title: "Story Not Found" };
   }
 }
 

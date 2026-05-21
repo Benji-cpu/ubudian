@@ -39,13 +39,13 @@ export async function generateMetadata({ params }: TourPageProps): Promise<Metad
       .single();
 
     if (!tour) {
-      return { title: "Tour Not Found | The Ubudian" };
+      return { title: "Tour Not Found" };
     }
 
     const t = tour as Tour;
 
     return {
-      title: `${t.title} | Secret Tours | The Ubudian`,
+      title: `${t.title} | Secret Tours`,
       description: t.short_description || t.description?.slice(0, 160),
       openGraph: {
         title: t.title,
@@ -54,7 +54,7 @@ export async function generateMetadata({ params }: TourPageProps): Promise<Metad
       },
     };
   } catch {
-    return { title: "Tour Not Found | The Ubudian" };
+    return { title: "Tour Not Found" };
   }
 }
 

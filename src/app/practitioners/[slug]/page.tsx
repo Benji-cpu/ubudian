@@ -51,9 +51,9 @@ export async function generateMetadata({
 }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const practitioner = await getPractitioner(slug);
-  if (!practitioner) return { title: "Practitioner | The Ubudian" };
+  if (!practitioner) return { title: "Practitioner" };
   return {
-    title: `${practitioner.name} | The Ubudian`,
+    title: `${practitioner.name}`,
     description:
       practitioner.short_description ??
       practitioner.bio?.slice(0, 160) ??

@@ -10,7 +10,7 @@ import type { ArchetypeId, QuizResultRecord } from "@/types";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "My Spirit | The Ubudian",
+  title: "My Spirit",
 };
 
 export default async function ArchetypePage() {

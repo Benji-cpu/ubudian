@@ -30,9 +30,9 @@ export async function generateMetadata({
 }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const partner = await getPartner(slug);
-  if (!partner) return { title: "Partner | The Ubudian" };
+  if (!partner) return { title: "Partner" };
   return {
-    title: `${partner.name} | The Ubudian`,
+    title: `${partner.name}`,
     description:
       partner.short_description ??
       partner.description?.slice(0, 160) ??

@@ -46,13 +46,13 @@ export async function generateMetadata({ params }: EventPageProps): Promise<Meta
       .single();
 
     if (!event) {
-      return { title: "Event Not Found | The Ubudian" };
+      return { title: "Event Not Found" };
     }
 
     const e = event as Event;
 
     return {
-      title: `${e.title} | Events in Ubud | The Ubudian`,
+      title: `${e.title} | Events in Ubud`,
       description: e.short_description || e.description?.slice(0, 160),
       openGraph: {
         title: e.title,
@@ -62,7 +62,7 @@ export async function generateMetadata({ params }: EventPageProps): Promise<Meta
       },
     };
   } catch {
-    return { title: "Event Not Found | The Ubudian" };
+    return { title: "Event Not Found" };
   }
 }
 

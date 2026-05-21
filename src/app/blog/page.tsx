@@ -8,7 +8,7 @@ import { getSiteSettings } from "@/lib/site-settings";
 import type { BlogPost } from "@/types";
 
 export const metadata: Metadata = {
-  title: "Blog | The Ubudian",
+  title: "Blog",
   description:
     "The eat-pray-love reality, the spiritual circus, and the honest conversations Ubud's community is actually having.",
 };

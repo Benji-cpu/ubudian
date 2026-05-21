@@ -27,7 +27,7 @@ export async function generateMetadata({
   const { slug } = await params;
   const guide = await getGuideBySlug(slug);
   if (!guide) {
-    return { title: "Guide | The Ubudian" };
+    return { title: "Guide" };
   }
   return {
     title: `${guide.title} | The Ubudian Guides`,

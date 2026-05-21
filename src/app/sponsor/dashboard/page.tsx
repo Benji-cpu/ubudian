@@ -13,7 +13,7 @@ import { SPONSOR_TIER_PRICE_LABEL } from "@/lib/stripe/sponsor-pricing";
 import type { Sponsor, Sponsorship } from "@/types";
 
 export const metadata: Metadata = {
-  title: "Partner Dashboard | The Ubudian",
+  title: "Partner Dashboard",
 };
 
 const TIER_NAME: Record<Sponsor["tier"], string> = {

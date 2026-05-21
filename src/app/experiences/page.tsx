@@ -17,7 +17,7 @@ const LISTING_HERO_IMAGE =
   "https://vzooblnkztbjgfbdfzxl.supabase.co/storage/v1/object/public/images/experiences/1778200913187-listing-hero.png";
 
 export const metadata: Metadata = {
-  title: "Ubud Retreats | The Ubudian",
+  title: "Ubud Retreats",
   description:
     "An introduction into Ubud's conscious community — practitioners, circles, and tables that don't open easily. Small cohort, luxury villa, four to eight people, hand-picked for fit.",
 };

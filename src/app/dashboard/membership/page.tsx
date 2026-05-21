@@ -11,7 +11,7 @@ import { CheckCircle, Sparkles } from "lucide-react";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Membership | The Ubudian",
+  title: "Membership",
 };
 
 export default async function DashboardMembershipPage() {

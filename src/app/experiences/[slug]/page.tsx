@@ -60,7 +60,7 @@ export async function generateMetadata({ params }: JourneyPageProps): Promise<Me
       .eq("slug", slug)
       .eq("is_published", true)
       .single();
-    if (!journey) return { title: "Journey Not Found | The Ubudian" };
+    if (!journey) return { title: "Journey Not Found" };
     const j = journey as Journey;
     return {
       title: `${j.title} — Ubud Retreat`,
@@ -78,7 +78,7 @@ export async function generateMetadata({ params }: JourneyPageProps): Promise<Me
       },
     };
   } catch {
-    return { title: "Journey Not Found | The Ubudian" };
+    return { title: "Journey Not Found" };
   }
 }
 

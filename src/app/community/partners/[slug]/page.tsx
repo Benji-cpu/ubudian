@@ -21,9 +21,9 @@ interface PageProps {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const sponsor = await getSponsorBySlug(slug);
-  if (!sponsor) return { title: "Partner Not Found | The Ubudian" };
+  if (!sponsor) return { title: "Partner Not Found" };
   return {
-    title: `${sponsor.name} | Community Partners | The Ubudian`,
+    title: `${sponsor.name} | Community Partners`,
     description: sponsor.tagline ?? sponsor.description?.slice(0, 160) ?? undefined,
     openGraph: {
       title: sponsor.name,

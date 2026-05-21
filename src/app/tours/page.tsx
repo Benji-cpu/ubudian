@@ -9,7 +9,7 @@ import { getSiteSettings } from "@/lib/site-settings";
 import type { Tour } from "@/types";
 
 export const metadata: Metadata = {
-  title: "Secret Tours | The Ubudian",
+  title: "Secret Tours",
   description:
     "Walk the rice terraces, visit sacred water temples, trek through jungles, and eat your way through Ubud with local guides.",
 };

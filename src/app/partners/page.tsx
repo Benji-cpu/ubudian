@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { SponsorLeadForm } from "@/components/partners/sponsor-lead-form";
 
 export const metadata: Metadata = {
-  title: "Become a Community Partner | The Ubudian",
+  title: "Become a Community Partner",
   description:
     "Yoga studios, ceremony spaces, healers, restaurants, villas — partner with The Ubudian to reach Ubud's conscious community through editorial placements, not ads.",
 };

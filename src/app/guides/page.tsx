@@ -11,7 +11,7 @@ import { GUIDE_INTENTS, getIntentConfig, isGuideIntent } from "@/lib/guides/inte
 import type { Guide, GuideIntent } from "@/types";
 
 export const metadata: Metadata = {
-  title: "Guides | The Ubudian",
+  title: "Guides",
   description:
     "Free, opinionated, lived-in. Field-tested orientation for Ubud — and the playbooks for what people actually came here for.",
 };

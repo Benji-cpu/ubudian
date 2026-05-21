@@ -14,9 +14,9 @@ export async function generateMetadata({
 }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const place = await getPlaceBySlug(slug);
-  if (!place) return { title: "Place | The Ubudian" };
+  if (!place) return { title: "Place" };
   return {
-    title: `${place.name} | The Ubudian`,
+    title: `${place.name}`,
     description:
       place.short_description ?? place.description?.slice(0, 160) ?? undefined,
   };

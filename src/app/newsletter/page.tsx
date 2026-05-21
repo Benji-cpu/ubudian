@@ -9,7 +9,7 @@ import { getSiteSettings } from "@/lib/site-settings";
 import type { NewsletterEdition } from "@/types";
 
 export const metadata: Metadata = {
-  title: "Newsletter Archive | The Ubudian",
+  title: "Newsletter Archive",
   description:
     "Browse past editions of The Ubudian Weekly — events, stories, and community happenings from Ubud's conscious scene.",
 };

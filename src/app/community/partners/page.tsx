@@ -5,7 +5,7 @@ import { listActiveSponsors } from "@/lib/sponsors/sponsor-service";
 import type { Sponsor } from "@/types";
 
 export const metadata: Metadata = {
-  title: "Community Partners | The Ubudian",
+  title: "Community Partners",
   description:
     "The studios, ceremony spaces, healers, restaurants and villas who hold this platform with us — and who you can lean into when you arrive in Ubud.",
 };

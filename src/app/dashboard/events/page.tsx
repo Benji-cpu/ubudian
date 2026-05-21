@@ -8,7 +8,7 @@ import type { Event } from "@/types";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "My Agenda | The Ubudian",
+  title: "My Agenda",
 };
 
 export default async function DashboardEventsPage() {

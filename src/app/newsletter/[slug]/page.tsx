@@ -30,7 +30,7 @@ export async function generateMetadata({ params }: EditionPageProps): Promise<Me
       .single();
 
     if (!edition) {
-      return { title: "Edition Not Found | The Ubudian" };
+      return { title: "Edition Not Found" };
     }
 
     const e = edition as NewsletterEdition;
@@ -40,7 +40,7 @@ export async function generateMetadata({ params }: EditionPageProps): Promise<Me
       description: e.preview_text || undefined,
     };
   } catch {
-    return { title: "Edition Not Found | The Ubudian" };
+    return { title: "Edition Not Found" };
   }
 }
 

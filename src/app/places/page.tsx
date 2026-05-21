@@ -6,7 +6,7 @@ import { PlaceCard } from "@/components/places/place-card";
 import type { PlaceKind } from "@/types";
 
 export const metadata: Metadata = {
-  title: "Places | The Ubudian",
+  title: "Places",
   description:
     "Temples, studios, cafés and quiet rooms — the venues the guides and journeys lean on.",
 };

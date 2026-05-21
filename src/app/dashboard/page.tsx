@@ -13,7 +13,7 @@ import type { ArchetypeId, Event, Story, Experience, QuizResultRecord } from "@/
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "My Dashboard | The Ubudian",
+  title: "My Dashboard",
 };
 
 export default async function DashboardPage() {

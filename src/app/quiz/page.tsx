@@ -4,7 +4,7 @@ import type { Event, Tour, Story, Experience } from "@/types";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Discover Your Ubud Spirit | The Ubudian",
+  title: "Discover Your Ubud Spirit",
   description:
     "Take the 90-second quiz to find your Ubud archetype — Seeker, Explorer, Creative, Connector, or Epicurean — and discover the events, ceremonies, and community that match your energy.",
 };

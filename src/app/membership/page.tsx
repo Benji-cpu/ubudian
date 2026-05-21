@@ -1,9 +1,15 @@
+import type { Metadata } from "next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Check, Sparkles, Users } from "lucide-react";
 import { SubscribeButton } from "@/components/membership/subscribe-button";
 import { PricingToggle } from "@/components/membership/pricing-toggle";
 import { createAdminClient } from "@/lib/supabase/admin";
+
+export const metadata: Metadata = {
+  title: "Membership",
+  description: "Go deeper with The Ubudian — long-form notes, early access to retreats, and insider booking discounts.",
+};
 
 const COMMUNITY_FEATURES = [
   "Browse all events (tantra, ceremonies, ecstatic dance, sound journeys, and more)",

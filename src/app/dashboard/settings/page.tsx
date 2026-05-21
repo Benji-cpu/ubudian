@@ -6,7 +6,7 @@ import type { Metadata } from "next";
 import type { ArchetypeId } from "@/types";
 
 export const metadata: Metadata = {
-  title: "Settings | The Ubudian",
+  title: "Settings",
 };
 
 export default async function SettingsPage() {

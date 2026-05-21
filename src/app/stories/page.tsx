@@ -11,7 +11,7 @@ import { getSiteSettings } from "@/lib/site-settings";
 import type { Story } from "@/types";
 
 export const metadata: Metadata = {
-  title: "Humans of Ubud | The Ubudian",
+  title: "Humans of Ubud",
   description:
     "Tantra facilitators, breathwork guides, ceremony holders, organic farmers — the humans who hold space in Ubud.",
 };

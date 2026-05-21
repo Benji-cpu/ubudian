@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { EventSubmissionForm } from "@/components/events/event-submission-form";
 
 export const metadata: Metadata = {
-  title: "Submit an Event | The Ubudian",
+  title: "Submit an Event",
   description: "Submit your ceremony, workshop, gathering, or event to The Ubudian community calendar.",
 };
 

@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "About | The Ubudian",
+  title: "About",
   description:
     "One place for everything happening in Ubud's conscious community — events, stories, tours, and a weekly newsletter.",
 };

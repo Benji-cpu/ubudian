@@ -41,13 +41,13 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
       .single();
 
     if (!post) {
-      return { title: "Post Not Found | The Ubudian" };
+      return { title: "Post Not Found" };
     }
 
     const blogPost = post as BlogPost;
 
     return {
-      title: blogPost.meta_title || `${blogPost.title} | The Ubudian`,
+      title: blogPost.meta_title || `${blogPost.title}`,
       description: blogPost.meta_description || blogPost.excerpt || undefined,
       openGraph: {
         title: blogPost.meta_title || blogPost.title,
@@ -58,7 +58,7 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
       },
     };
   } catch {
-    return { title: "Post Not Found | The Ubudian" };
+    return { title: "Post Not Found" };
   }
 }
 

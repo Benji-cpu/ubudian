@@ -6,7 +6,7 @@ import { PractitionerCard } from "@/components/practitioners/practitioner-card";
 import type { Practitioner } from "@/types";
 
 export const metadata: Metadata = {
-  title: "Practitioners | The Ubudian",
+  title: "Practitioners",
   description:
     "The healers, bodyworkers, sound carriers and quiet teachers we've sat with — the people behind the practice in Ubud.",
 };
