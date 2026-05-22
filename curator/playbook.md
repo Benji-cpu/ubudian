@@ -82,3 +82,4 @@ Facilitators are first-class: if you see the same name organising 3+ events acro
 (Append dated one-liners. Consolidate weekly. Each lesson must be specific and falsifiable.)
 
 - 2026-05-18 — Playbook v1 established. Vibe register codified as dance + tantra + ceremony. No yoga, no cinema.
+- 2026-05-23 — Pool/club venues (Cretya, etc.) reliably use "ritual", "deep connection", and "mysticism" in copy for what are functionally DJ music events. The venue type (day club, poolside, entertainment complex) is the shortcut filter — if the primary infrastructure is poolside + DJ booth, reject before reading the copy.
