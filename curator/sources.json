@@ -14,28 +14,28 @@
       "url": "https://paradisoubud.com/events",
       "type": "wordpress",
       "themes": ["dance"],
-      "note": "Skip the cinema schedule — only the ecstatic dance / live music slots."
+      "note": "Skip the cinema schedule — only the ecstatic dance / live music slots. Note: Thursday nights run multiple overlapping series (Vibración, Resonanz, Dance Temple) — treat as a family of events; admin should clarify which Megatix slugs are live. Tuesday 18:00 Dissolve :: Eros is a separate contact-dance event from Moving Waves 15:00."
     },
     {
       "name": "Sanctuary Ubud",
       "url": "https://thesanctuaryubud.com",
       "type": "website",
       "themes": ["tantra"],
-      "note": "Tantra intensives and embodied workshops. Their site sometimes hides dates inside booking flows — follow through if needed."
+      "note": "Tantra intensives and embodied workshops. Their site sometimes hides dates inside booking flows — follow through if needed. No indexed web presence found for June/July 2026 — check Instagram before assuming no events."
     },
     {
       "name": "Blossom Space Ubud",
       "url": "https://blossomubud.com",
       "type": "website",
       "themes": ["tantra", "dance"],
-      "note": "Tantra, conscious sexuality, embodied dance. New venue, growing programme."
+      "note": "Tantra, conscious sexuality, embodied dance. New venue, growing programme. Note: no indexed web presence found as of May 2026 — may be operating primarily via Instagram/WhatsApp. Verify the venue name spelling before each run."
     },
     {
       "name": "Pyramids of Chi",
       "url": "https://pyramidsofchi.com/events",
       "type": "website",
       "themes": ["sound", "ceremony"],
-      "note": "Sound healing — gong, bowl, breath journeys. Own ticketing system."
+      "note": "Sound healing — gong, bowl, breath journeys. Own ticketing system. Two distinct tiers: (1) daily tourist sessions 350k IDR — reject; (2) monthly community ceremonies (Full Moon, Into the Heart Cacao, solstice specials) — ingest. Into the Heart Cacao date only available on full-calendar page (403 blocked); contact events@pyramidsofchi.com if needed."
     },
     {
       "name": "Dragonfly Village Ubud",
@@ -66,6 +66,13 @@
       "type": "internal",
       "themes": ["dance", "tantra", "ceremony"],
       "note": "Query the events table for source.slug='megatix' AND created_at > NOW() - INTERVAL '36 hours' to surface new entries the existing adapter pulled. Re-tag if they fit our themes but were mis-categorised."
+    },
+    {
+      "name": "Dragon Tea Temple",
+      "url": "https://www.instagram.com/dragon.tea.temple/",
+      "type": "instagram",
+      "themes": ["ceremony", "dance", "sound"],
+      "note": "Jl. Penestanan No.8, Sayan, Ubud. Candlelit ceremonial garden. Monthly New Moon Kirtan & Sacred Tea + Full Moon Kirtan (Bhakti Bliss Bali / Jeremy Sol) — format: kirtan + sacred tea + ecstatic dance by fire + cosmic sound healing. Also hosts Kintsugi (Tuluvi Arts) and annual MAGDALENA ceremony (Jul 22). Tickets via Megatix. Promoted from discovered_pending 2026-05-24 (3 qualifying logs: May 20, May 21, May 24). Linktree: linktr.ee/dragonteatemple."
     }
   ],
   "instagram_handles": [
@@ -84,14 +91,7 @@
       "url": "https://www.alchemyyogacenter.com/ubud-events",
       "first_seen": "2026-05-19",
       "themes": ["dance", "ceremony", "sound"],
-      "note": "Hosts weekly RISE Ecstatic Dance (Tue 7-9pm) and Full Moon Bhakti celebrations. Sayan rice-field setting. Strong community anchor. Candidate for priority_a after 3 logs."
-    },
-    {
-      "name": "Dragon Tea Temple",
-      "url": "https://linktr.ee/dragonteatemple",
-      "first_seen": "2026-05-20",
-      "themes": ["ceremony", "sound", "dance"],
-      "note": "Jl. Penestanan No.8, Sayan, Ubud. Candlelit ceremonial garden space. Runs monthly New Moon Kirtan & Sacred Tea (Bhakti Bliss Bali) and Full Moon Kirtan — format is kirtan + sacred tea + ecstatic dance by fire + cosmic sound healing. Exactly our universe. Instagram: @dragon.tea.temple. Candidate for priority_b after 2 more logs."
+      "note": "Hosts weekly RISE Ecstatic Dance (Tue 7-9pm) and Full Moon Bhakti celebrations with Jeremy Sol. Sayan rice-field setting. Strong community anchor. At 2 qualifying logs (May 19, May 23) — needs 1 more to promote to priority_a."
     },
     {
       "name": "Azadi Retreat",
@@ -105,14 +105,14 @@
       "url": "https://www.anandasarita.com/events/essence-of-love",
       "first_seen": "2026-05-20",
       "themes": ["tantra"],
-      "note": "Penestanan, Ubud (above Karma House Chai and Tattoo). Weekly Saturday Tantra Essence couples workshop ('Essence of Love') in Ananda Sarita lineage. 500k IDR/couple. Strong recurring signal for Tantra & Intimacy category. Ticket Tailor: tickettailor.com/events/barastudio/1755020. Candidate for priority_b."
+      "note": "Penestanan, Ubud (above Karma House Chai and Tattoo). Weekly Saturday Tantra Essence couples workshop ('Essence of Love') in Ananda Sarita lineage. 500k IDR/couple. Strong recurring signal for Tantra & Intimacy category. Ticket Tailor: tickettailor.com/events/barastudio/1755020. Candidate for priority_b. Note: Bara Studio also hosts non-tantra Bachata workshops — filter those out."
     },
     {
       "name": "Heart Space Bali",
       "url": "https://www.heartspacebali.com",
       "first_seen": "2026-05-21",
       "themes": ["ceremony", "sound"],
-      "note": "Central Ubud yoga/ceremony studio. Weekly cacao ceremony + sound bath (Fri & Sun 7PM) with Balinese ritual component. Also runs yin and sound sessions throughout the week. Primary offering is ceremonial — not a yoga studio. Candidate for priority_b after 2 more logs."
+      "note": "Central Ubud yoga/ceremony studio. Weekly cacao ceremony + sound bath (Fri & Sun 7PM) with Balinese ritual component. Primary offering is ceremonial — not a yoga studio. At 2 qualifying logs (May 21, May 22) — needs 1 more to promote to priority_b."
     },
     {
       "name": "School of Unified Healing",
@@ -120,6 +120,27 @@
       "first_seen": "2026-05-21",
       "themes": ["ceremony", "sound"],
       "note": "Ubud — hosts New Moon Bhakti Kirtan series with Steven Light & Valentina (kirtan + dinner + fire circle format). Venue identity needs more investigation — only seen via a single Megatix listing. Track before promoting."
+    },
+    {
+      "name": "Akasha New Earth Haven",
+      "url": "https://www.newearthhavenbali.com/events",
+      "first_seen": "2026-05-24",
+      "themes": ["dance", "ceremony", "sound"],
+      "note": "Eco-dome and bamboo pavilion retreat at Ubud's jungle edge, with organic gardens and natural swimming pool. Weekly Saturday Ecstatic Dance & Cacao Ceremony (6–10 PM) led by Karunika — opens with Vital Cacao Ceremony by fire, flows into ecstatic dance, closes with sound healing. SuperMoon editions add breathwork. On-site vegan restaurant. Fills the Saturday gap in our calendar. Candidate for priority_b after 2 more qualifying logs. Instagram handle not yet confirmed."
+    },
+    {
+      "name": "Casa Curandera Bali",
+      "url": "https://megatix.co.id/events/afrobeats-tribal-dance-in-ubud",
+      "first_seen": "2026-05-24",
+      "themes": ["dance"],
+      "note": "Ubud area. Hosts recurring Saturday Afrobeats and tribal rhythm dance events with DJ Zaia Lynn. No confirmed June/July 2026 date surfaced — site blocks direct fetch. Venue identity (Casa Curandera = 'healer's house') suggests ceremony-adjacent space. Track for specific dates before promoting."
+    },
+    {
+      "name": "PURNAMA Full Moon Dance Ritual",
+      "url": "https://megatix.co.id/events/purnama-a-fullmoon-dance-ritual",
+      "first_seen": "2026-05-24",
+      "themes": ["dance", "ceremony", "sound"],
+      "note": "Monthly full moon event (Purnama = Balinese full moon). Format: Cacao Ceremony with Shiva → Ecstatic Dance with Todjon → Sound & Movement closing with YINTELLIGENCE (Chris Fox). 5:30–8 PM format. Venue unconfirmed (Megatix 403). June 11 and July 10 are the 2026 Purnama full moon dates — likely editions exist but not indexed. Check Megatix directly when their blocks ease. Would score ~7–8 if dates confirmed."
     }
   ],
   "rejected_permanent": [],
@@ -129,7 +150,7 @@
       "instagram": null,
       "first_seen": "2026-05-19",
       "events_seen": ["Full Moon Cacao Ceremony — The Yoga Barn"],
-      "note": "Medicine man, sound healer, musician. Runs monthly full moon ceremonies at Yoga Barn. Well-known in Ubud scene. BaliSpirit Festival presenter."
+      "note": "Medicine man, sound healer, musician. Runs monthly full moon (Abuela Luna) ceremonies at Yoga Barn. Well-known in Ubud scene. BaliSpirit Festival presenter."
     },
     {
       "name": "Jada Jane Boh",
@@ -156,8 +177,12 @@
       "name": "Bhakti Bliss Bali (Jeremy Sol)",
       "instagram": "@bhaktiblissbali",
       "first_seen": "2026-05-20",
-      "events_seen": ["New Moon Kirtan & Sacred Tea — Dragon Tea Temple (Jun 25)"],
-      "note": "Leads New Moon and Full Moon Kirtan at Dragon Tea Temple. Kirtan + ecstatic dance + sound healing format. Regular Ubud scene presence."
+      "events_seen": [
+        "New Moon Kirtan & Sacred Tea — Dragon Tea Temple (Jun 25)",
+        "Full Moon Kirtan & Sacred Tea — Dragon Tea Temple (Jun 15)",
+        "Solstice Kirtan, Cacao & Fire Ritual — AYMC (Jun 21)"
+      ],
+      "note": "Confirmed anchor facilitator in the Ubud devotional scene — 3 events across Dragon Tea Temple and AYMC (weekly maintenance 2026-05-24). Format: kirtan + ecstatic dance + sound healing + fire ritual. Founder of Bhakti Bliss Bali. Also runs recurring monthly Full Moon Bhakti Celebration at AYMC (no confirmed July date yet). Track for AYMC full moon editions."
     },
     {
       "name": "YUJOY",
@@ -171,7 +196,7 @@
       "instagram": "@ecstantric_dance",
       "first_seen": "2026-05-20",
       "events_seen": ["ECSTANTRIC DANCE — Lodtunduh, Ubud (Sep 7)"],
-      "note": "Run ECSTANTRIC DANCE, a tantra flow + ecstatic dance fusion format. Experts in tantra, yoga, meditation. Based in Bali. Distinct offering — track for future editions."
+      "note": "Run ECSTANTRIC DANCE, a tantra flow + ecstatic dance fusion format. Experts in tantra, yoga, meditation. Based in Bali. Distinct offering — track for future June/July editions."
     },
     {
       "name": "Dharmaraj",
@@ -207,6 +232,27 @@
       "first_seen": "2026-05-23",
       "events_seen": ["AYNI New Moon Sacred Fire & Cacao Ceremony — The Yoga Barn (~Jun 14)"],
       "note": "Practitioner of Andean and Mayan Earth Keeper traditions, 14 years of lineage study. Runs AYNI New Moon Sacred Fire & Cacao series at The Yoga Barn — ceremony weaves cacao medicina, sacred fire, prayer, and medicine music. AYNI = sacred reciprocity (Quechua). Megatix slug: ayni-new-moon-cacao-ceremony-june. No Instagram or last name confirmed."
+    },
+    {
+      "name": "Amia Rosa",
+      "instagram": null,
+      "first_seen": "2026-05-24",
+      "events_seen": ["MAGDALENA — Dragon Tea Temple (Jul 22)"],
+      "note": "Feminine Healer, Magdalene Priestess & Channel. Leads the annual MAGDALENA ceremony at Dragon Tea Temple on Mary Magdalene's feast day (July 22). Event format: sacred story + devotional dance + Blue Lotus tea ceremony, with Gigi Courau (harp/harmonium) and Zhenya Topov (handpan/crystal bowls). No Instagram found yet."
+    },
+    {
+      "name": "Karunika",
+      "instagram": null,
+      "first_seen": "2026-05-24",
+      "events_seen": ["Saturday Ecstatic Dance & Cacao Ceremony — Akasha New Earth Haven (weekly Sat)"],
+      "note": "Ecstatic dance DJ and cacao facilitator. Leads the weekly Saturday ceremony at Akasha New Earth Haven (cacao by fire → ecstatic dance → sound healing). Resident facilitator. No Instagram handle confirmed. Track for more events and IG discovery."
+    },
+    {
+      "name": "Shiva + Todjon (PURNAMA)",
+      "instagram": null,
+      "first_seen": "2026-05-24",
+      "events_seen": ["PURNAMA Full Moon Dance Ritual — Ubud (recurring full moon)"],
+      "note": "Run PURNAMA, a monthly full moon ritual: Cacao Ceremony (Shiva) → Ecstatic Dance (Todjon) → Sound & Movement with YINTELLIGENCE/Chris Fox. Strong format, exactly our universe. No confirmed June/July 2026 Megatix dates found — Megatix returns 403 on their event page. Check directly for confirmed dates. No IG handles found for either."
     }
   ]
 }

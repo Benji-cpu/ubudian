@@ -83,3 +83,4 @@ Facilitators are first-class: if you see the same name organising 3+ events acro
 
 - 2026-05-18 — Playbook v1 established. Vibe register codified as dance + tantra + ceremony. No yoga, no cinema.
 - 2026-05-23 — Pool/club venues (Cretya, etc.) reliably use "ritual", "deep connection", and "mysticism" in copy for what are functionally DJ music events. The venue type (day club, poolside, entertainment complex) is the shortcut filter — if the primary infrastructure is poolside + DJ booth, reject before reading the copy.
+- 2026-05-24 — Paradiso Thursday is a scheduling stack, not a single event: Dance Temple (18:30), Resonanz (19:30), and Vibración share the same venue/night under different brand slugs. When one Thursday Paradiso event is already in the DB, treat all others as potential duplicates and note the confusion in the log rather than ingesting blind. Admin should audit the Thursday Megatix slugs and retire obsolete ones.
