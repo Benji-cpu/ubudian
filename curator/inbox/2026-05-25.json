@@ -1,0 +1,51 @@
+{
+  "date": "2026-05-25",
+  "events": [
+    {
+      "title": "Essence of Love — Weekly Couples Tantra Workshop",
+      "description": "A weekly evening gathering for partners at Bara Studio in Penestanan, Ubud, guided by certified Tantra Essence facilitators trained in the lineage of Ma Ananda Sarita. The session weaves partner meditations, embodied intimacy exercises, Tantra-inspired breath and movement, and conscious touch — all held in a structured, trauma-aware container. A space where the nervous system can relax and hearts meet without performance pressure. Participants must attend with their own partner (romantic partner, lover, or loving friend). Doors open at 6:20 PM for a prompt start. Find it by searching 'Karma House Chai and Tattoo' on maps — Bara Studio is located directly above.",
+      "short_description": "Weekly tantra partner practice at Bara Studio, Penestanan. Certified Ananda Sarita lineage facilitators. Couples only. 500k IDR.",
+      "category": "Tantra & Intimacy",
+      "venue_name": "Bara Studio @ Karma House",
+      "venue_address": "Penestanan, Ubud, Bali",
+      "start_date": "2026-05-30",
+      "end_date": null,
+      "start_time": "18:20",
+      "end_time": null,
+      "is_recurring": true,
+      "recurrence_rule": "FREQ=WEEKLY;BYDAY=SA",
+      "price_info": "500,000 IDR per couple (advance booking via Ticket Tailor)",
+      "external_ticket_url": "https://www.tickettailor.com/events/barastudio/1755020",
+      "source_url": "https://www.anandasarita.com/events/essence-of-love",
+      "organizer_name": "Bara Studio",
+      "organizer_instagram": "@baradancestudio",
+      "cover_image_url": null,
+      "quality_score": 0.7,
+      "content_flags": [],
+      "intent_tags": ["romance", "community"]
+    },
+    {
+      "title": "Friday Cacao Ceremony with Balinese Ritual & Sacred Sound",
+      "description": "A weekly Friday evening ceremony at Heart Space Bali in central Ubud, weaving a cacao ceremony with Balinese ritual elements, restorative yin yoga, and live sacred sound healing. Founded in 2020, Heart Space is a ceremony-first studio rooted in the ceremonial traditions of Ubud, dedicated to integrating plant medicine, Balinese ritual, and sound. Distinct from their Sunday morning format: Friday evenings are the more ceremonially anchored of the two weekly offerings. Located at Jl. Nyuh Kuning No.1, a short walk from the central market. Doors at 7 PM.",
+      "short_description": "Weekly Friday cacao ceremony with Balinese ritual, yin yoga, and live sacred sound in central Ubud. 7 PM.",
+      "category": "Ceremony & Sound",
+      "venue_name": "Heart Space Bali",
+      "venue_address": "Jl. Nyuh Kuning No. 1, Ubud, Bali",
+      "start_date": "2026-05-29",
+      "end_date": null,
+      "start_time": "19:00",
+      "end_time": null,
+      "is_recurring": true,
+      "recurrence_rule": "FREQ=WEEKLY;BYDAY=FR",
+      "price_info": null,
+      "external_ticket_url": null,
+      "source_url": "https://www.heartspacebali.com/cacao-ceremony-ubud",
+      "organizer_name": "Heart Space Bali",
+      "organizer_instagram": null,
+      "cover_image_url": null,
+      "quality_score": 0.7,
+      "content_flags": [],
+      "intent_tags": ["spirit", "community"]
+    }
+  ]
+}
