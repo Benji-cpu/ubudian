@@ -143,6 +143,14 @@
       "note": "Monthly full moon event (Purnama = Balinese full moon). Format: Cacao Ceremony with Shiva → Ecstatic Dance with Todjon → Sound & Movement closing with YINTELLIGENCE (Chris Fox). 5:30–8 PM format. Venue unconfirmed (Megatix 403). June 11 and July 10 are the 2026 Purnama full moon dates — likely editions exist but not indexed. Check Megatix directly when their blocks ease. Would score ~7–8 if dates confirmed."
     }
   ],
+    {
+      "name": "Om Ham Retreat & Resort",
+      "url": "https://omhamretreat.com/sound-healing-kirtan-with-sawitri/",
+      "first_seen": "2026-05-26",
+      "themes": ["ceremony", "sound"],
+      "note": "Central Ubud retreat hosting monthly lunar-aligned ceremonies: Purnima Sound Bath & Kirtan (full moon, singing bowls + devotional chanting) and Floating New Moon Sound Bath — both led by Sawitri (certified sound healing therapist). Recurring format on moon dates. Track for specific June/July 2026 dates before ingesting."
+    }
+  ],
   "rejected_permanent": [],
   "facilitators_pending": [
     {
@@ -246,6 +254,20 @@
       "first_seen": "2026-05-24",
       "events_seen": ["Saturday Ecstatic Dance & Cacao Ceremony — Akasha New Earth Haven (weekly Sat)"],
       "note": "Ecstatic dance DJ and cacao facilitator. Leads the weekly Saturday ceremony at Akasha New Earth Haven (cacao by fire → ecstatic dance → sound healing). Resident facilitator. No Instagram handle confirmed. Track for more events and IG discovery."
+    },
+    {
+      "name": "Ilahi Sufi Qawwali (Tahir Qawwal & Alexandra Amïe)",
+      "instagram": null,
+      "first_seen": "2026-05-26",
+      "events_seen": ["Ilahi Sufi Qawwali — Ceremonial Ecstasy — The Yoga Barn (Jun 17)", "Ecstatic Rose Temple: Sufi Music Night — The Yoga Barn (recurring, past editions Jul 2025, Mar 2026)"],
+      "note": "World's first all-women's Qawwali ensemble. Founded by Tahir Qawwal and Alexandra Amïe. BaliSpirit Festival presenter. Performs globally; Ubud appearances at Yoga Barn and The Rose Temple. Recurring Ubud presence. Site: ilahiqawwali.com. The Jun 17 Ceremonial Ecstasy edition is confirmed 2026 via Google snippet; the Ecstatic Rose Temple series has a separate Megatix slug (Jul26) but AllEvents dates that series to Mar 2026 (past)."
+    },
+    {
+      "name": "Sawitri",
+      "instagram": null,
+      "first_seen": "2026-05-26",
+      "events_seen": ["Purnima Sound Bath & Kirtan — Om Ham Retreat (monthly full moon)", "Floating New Moon Sound Bath — Om Ham Retreat (monthly new moon)"],
+      "note": "Certified sound healing therapist resident at Om Ham Retreat & Resort, Ubud. Leads monthly lunar-aligned ceremonies: Purnima Sound Bath & Kirtan (singing bowls + devotional chanting on full moon) and Floating New Moon Sound Bath. Recurring format but specific June/July 2026 dates not yet confirmed online."
     },
     {
       "name": "Shiva + Todjon (PURNAMA)",
