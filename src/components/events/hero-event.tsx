@@ -11,9 +11,10 @@ import type { Event } from "@/types";
 interface HeroEventProps {
   event: Event;
   saveButton?: React.ReactNode;
+  label?: string;
 }
 
-export function HeroEvent({ event, saveButton }: HeroEventProps) {
+export function HeroEvent({ event, saveButton, label = "Featured today" }: HeroEventProps) {
   const dateLine = formatEventDateLine(event, new Date(), "long");
 
   return (
@@ -39,7 +40,7 @@ export function HeroEvent({ event, saveButton }: HeroEventProps) {
             <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
             <div className="absolute left-4 top-4 flex items-center gap-2">
               <Badge className="bg-brand-gold text-white hover:bg-brand-gold">
-                Featured today
+                {label}
               </Badge>
               <Badge className="bg-black/60 text-white backdrop-blur-sm hover:bg-black/60">
                 {event.category}

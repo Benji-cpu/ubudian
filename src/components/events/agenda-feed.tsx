@@ -66,8 +66,33 @@ export function AgendaFeed({
     boostedEventIds,
   });
 
-  // Hero: top-ranked event that has not yet finished.
-  const hero = ranked[0]?.event;
+  // Bucket the full set first so the hero is anchored to *today*, not just
+  // whatever ranks highest. Surfacing a Jun-29 event under a "Featured today"
+  // badge on a quiet Tuesday reads as a lie. Walk buckets nearest-to-furthest
+  // and pick the top-ranked event within the first non-empty bucket.
+  const heroBuckets = bucketEventsByTime(events, now, boostedEventIds);
+  const HERO_PRIORITY: { key: EventBucket; label: string }[] = [
+    { key: "happening_now", label: "Happening now" },
+    { key: "today", label: "Featured today" },
+    { key: "in_progress", label: "Running this week" },
+    { key: "tomorrow", label: "Featured tomorrow" },
+    { key: "weekend", label: "Featured this weekend" },
+    { key: "next_week", label: "Featured this week" },
+    { key: "later", label: "Coming up" },
+  ];
+  let hero: Event | undefined;
+  let heroLabel = "Featured today";
+  for (const { key, label } of HERO_PRIORITY) {
+    if (heroBuckets[key].length === 0) continue;
+    const bucketIds = new Set(heroBuckets[key].map((e) => e.id));
+    const topInBucket = ranked.find((r) => bucketIds.has(r.event.id));
+    if (topInBucket) {
+      // Use the bucket's rolled-forward copy so the date matches the badge.
+      hero = heroBuckets[key].find((e) => e.id === topInBucket.event.id) ?? topInBucket.event;
+      heroLabel = label;
+      break;
+    }
+  }
 
   // For You rail — only when we have honest signal from the viewer.
   // Signed-out users see no rail (the page doesn't claim to know them);
@@ -103,7 +128,7 @@ export function AgendaFeed({
 
   return (
     <div className="space-y-12">
-      {hero && <HeroEvent event={hero} saveButton={renderSave(hero)} />}
+      {hero && <HeroEvent event={hero} label={heroLabel} saveButton={renderSave(hero)} />}
 
       {hasSignal && forYouCandidates.length > 0 && (
         <ForYouRail
