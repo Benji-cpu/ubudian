@@ -38,20 +38,11 @@ export function EventCardPlaceholder({
         style={{ backgroundImage: GRAIN_DATA_URL, backgroundRepeat: "repeat" }}
       />
 
-      {/* Editorial typography lockup */}
-      <div className="relative z-10 flex flex-col items-center px-3 text-center">
-        <span
-          aria-hidden
-          className="mb-2 h-px w-7 bg-brand-gold/55 sm:w-10"
-        />
-        <span className="font-serif text-[10px] font-medium uppercase leading-tight tracking-[0.22em] text-brand-cream/85 sm:text-[11px]">
-          {category}
-        </span>
-        <span
-          aria-hidden
-          className="mt-2 h-px w-7 bg-brand-gold/55 sm:w-10"
-        />
-      </div>
+      {/* Hairline gold rule — single editorial mark, no doubled category label */}
+      <span
+        aria-hidden
+        className="relative z-10 h-px w-7 bg-brand-gold/60 sm:w-10"
+      />
     </div>
   );
 }

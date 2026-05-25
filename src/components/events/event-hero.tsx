@@ -29,7 +29,7 @@ export function EventHero({ event, saveButton }: EventHeroProps) {
         ) : (
           <EventCardPlaceholder
             category={event.category}
-            className="h-full w-full text-6xl"
+            className="h-full w-full"
           />
         )}
 
