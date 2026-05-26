@@ -140,9 +140,8 @@
       "url": "https://megatix.co.id/events/purnama-a-fullmoon-dance-ritual",
       "first_seen": "2026-05-24",
       "themes": ["dance", "ceremony", "sound"],
-      "note": "Monthly full moon event (Purnama = Balinese full moon). Format: Cacao Ceremony with Shiva → Ecstatic Dance with Todjon → Sound & Movement closing with YINTELLIGENCE (Chris Fox). 5:30–8 PM format. Venue unconfirmed (Megatix 403). June 11 and July 10 are the 2026 Purnama full moon dates — likely editions exist but not indexed. Check Megatix directly when their blocks ease. Would score ~7–8 if dates confirmed."
-    }
-  ],
+      "note": "Monthly full moon event (Purnama = Balinese full moon). Format: Cacao Ceremony with Shiva → Ecstatic Dance with Todjon → Sound & Movement closing with YINTELLIGENCE (Chris Fox). 5:30–8 PM format. Venue unconfirmed (Megatix 403). Astronomical full moons: Jun 29 and Jul 29 2026 (corrected 2026-05-27 — earlier note of Jun 11/Jul 10 was wrong). Check Megatix directly when their blocks ease. Would score ~7–8 if dates confirmed."
+    },
     {
       "name": "Om Ham Retreat & Resort",
       "url": "https://omhamretreat.com/sound-healing-kirtan-with-sawitri/",
@@ -275,6 +274,13 @@
       "first_seen": "2026-05-24",
       "events_seen": ["PURNAMA Full Moon Dance Ritual — Ubud (recurring full moon)"],
       "note": "Run PURNAMA, a monthly full moon ritual: Cacao Ceremony (Shiva) → Ecstatic Dance (Todjon) → Sound & Movement with YINTELLIGENCE/Chris Fox. Strong format, exactly our universe. No confirmed June/July 2026 Megatix dates found — Megatix returns 403 on their event page. Check directly for confirmed dates. No IG handles found for either."
+    },
+    {
+      "name": "Akari Tamura (Anandamoyi Dasi)",
+      "instagram": null,
+      "first_seen": "2026-05-27",
+      "events_seen": ["Wednesday Kirtan: Songs of Love — Dragon Tea Temple (bi-weekly Wed)"],
+      "note": "Experienced kirtan leader since 2013, multi-instrumentalist, author of 'Mantra Song Book', professional vocal & music coach. Leads bi-weekly Wednesday Kirtan: Songs of Love at Dragon Tea Temple (Jl. Penestanan No.8, Sayan, Ubud) — ancient Sanskrit mantras + Bhakti stories + uplifting tea. Promoted by Zest Ubud on Facebook. Megatix slug: wednesday-kirtan-songs-of-love-with-akari-tamura-and-friends (403-blocked; no specific upcoming date confirmed). Track for confirmed dates."
     }
   ]
 }
