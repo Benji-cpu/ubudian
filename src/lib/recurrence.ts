@@ -110,9 +110,10 @@ export function expandRecurrence(
   const end = startOfDay(rangeEnd);
   const start = startOfDay(rangeStart);
 
-  // Multi-day weekly (e.g. Mon/Wed/Fri): walk each candidate day in
-  // the range and emit if the weekday matches.
-  if (rule.frequency === "weekly" && Array.isArray(rule.day_of_week)) {
+  // Weekly with day_of_week (single or multi): walk each candidate day in
+  // the range and emit if the weekday matches. Honours the rule even when
+  // the seed's weekday disagrees (bad-data tolerance).
+  if (rule.frequency === "weekly" && rule.day_of_week !== undefined) {
     const days = daysOfWeekArray(rule);
     const dates: Date[] = [];
     let cursor = seed;

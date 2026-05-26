@@ -225,16 +225,18 @@ function nextOccurrence(event: Event, today: string): Event {
   // If currently inside an active instance (today within span), don't roll.
   const endAnchor = event.end_date ?? event.start_date;
   if (event.start_date <= today && endAnchor >= today) return event;
-  // Already upcoming — leave alone.
-  if (event.start_date >= today) return event;
 
-  // Multi-day weekly (Mon/Wed/Fri etc.): pick the soonest matching weekday
-  // on or after today, without stepping a whole 7-day stride that would
-  // skip closer occurrences.
-  if (rule.frequency === "weekly" && Array.isArray(rule.day_of_week)) {
+  // Weekly with day_of_week (single or multi): pick the soonest matching
+  // weekday on or after max(today, start_date). Don't stride from the seed
+  // — that breaks when the seed's weekday disagrees with the rule (e.g. a
+  // Friday-weekly row whose start_date was accidentally seeded on a Saturday).
+  // Also covers future-anchored rows where start_date itself is on the wrong
+  // weekday.
+  if (rule.frequency === "weekly" && rule.day_of_week !== undefined) {
     const days = daysOfWeekArray(rule);
     if (days.length > 0) {
-      let probe = today;
+      const anchor = event.start_date > today ? event.start_date : today;
+      let probe = anchor;
       for (let i = 0; i < 14; i++) {
         if (days.includes(dayOfWeekFromDateStr(probe))) {
           const newEnd = spanDays > 0 ? addDays(probe, spanDays) : event.end_date;
@@ -244,6 +246,9 @@ function nextOccurrence(event: Event, today: string): Event {
       }
     }
   }
+
+  // Already upcoming and no weekday-snap applies — leave alone.
+  if (event.start_date >= today) return event;
 
   // Roll forward by the rule's step until start >= today.
   // Safety cap at 400 iterations (over a year for weekly).
