@@ -12,10 +12,10 @@ export function IntentRail({ activeIntent }: IntentRailProps) {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-8 flex items-baseline justify-between gap-6">
           <div>
-            <p className="text-[11px] uppercase tracking-[0.22em] text-brand-gold">
+            <p className="text-[11px] uppercase tracking-[0.22em] text-brand-gold/90">
               Find your way in
             </p>
-            <h2 className="mt-2 font-serif text-2xl font-medium text-brand-deep-green sm:text-3xl">
+            <h2 className="mt-2 font-serif text-2xl font-medium text-brand-deep-green dark:text-brand-off-white sm:text-3xl">
               What are you here for?
             </h2>
           </div>
@@ -50,12 +50,12 @@ export function IntentRail({ activeIntent }: IntentRailProps) {
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 33vw, 20vw"
                       className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-brand-deep-green/85 via-brand-deep-green/15 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#2C4A3E]/85 via-[#2C4A3E]/15 to-transparent" />
                     <div className="absolute inset-x-0 bottom-0 p-4">
-                      <h3 className="font-serif text-lg font-medium leading-tight text-brand-cream sm:text-xl">
+                      <h3 className="font-serif text-lg font-medium leading-tight text-[#FAF5EC] sm:text-xl">
                         {intent.label}
                       </h3>
-                      <p className="mt-1.5 text-[13px] leading-snug text-brand-cream/80 line-clamp-2">
+                      <p className="mt-1.5 text-[13px] leading-snug text-[#FAF5EC]/80 line-clamp-2">
                         {intent.blurb}
                       </p>
                     </div>

@@ -6,7 +6,7 @@ export function MembersOnlyPaywall() {
   return (
     <div className="rounded-lg border border-brand-gold/20 bg-brand-cream/50 px-6 py-12 text-center">
       <Lock className="mx-auto h-10 w-10 text-brand-gold" />
-      <h3 className="mt-4 font-serif text-xl font-bold text-brand-deep-green">
+      <h3 className="mt-4 font-serif text-xl font-bold text-brand-deep-green dark:text-brand-off-white">
         Members-Only Content
       </h3>
       <p className="mt-2 text-muted-foreground">

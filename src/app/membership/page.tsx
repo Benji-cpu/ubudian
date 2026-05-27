@@ -136,7 +136,7 @@ export default async function MembershipPage() {
 
       {/* Patronage framing */}
       <div className="mt-16 rounded-xl bg-brand-cream/60 px-6 py-10 text-center">
-        <p className="font-serif text-xl leading-relaxed text-brand-deep-green">
+        <p className="font-serif text-xl leading-relaxed text-brand-deep-green dark:text-brand-off-white">
           The Ubudian is independent, community-funded, and ad-free.
           <br className="hidden sm:block" /> Insider members keep it that way.
         </p>

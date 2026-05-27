@@ -135,7 +135,7 @@ export function PageHero({
           <div className="mx-auto mb-6 h-px w-12 bg-brand-gold/40" />
         )}
 
-        <h1 className="font-serif text-4xl font-medium tracking-tight text-brand-deep-green sm:text-5xl">
+        <h1 className="font-serif text-4xl font-medium tracking-tight text-brand-deep-green dark:text-brand-off-white sm:text-5xl">
           {title}
         </h1>
 

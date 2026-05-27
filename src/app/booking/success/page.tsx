@@ -42,7 +42,7 @@ export default async function BookingSuccessPage({ searchParams }: BookingSucces
           {booking ? (
             <div className="mt-6 w-full space-y-3 text-left">
               <div className="rounded-lg bg-brand-cream p-4 text-sm">
-                <p className="font-semibold text-brand-deep-green">{tourTitle}</p>
+                <p className="font-semibold text-brand-deep-green dark:text-brand-off-white">{tourTitle}</p>
                 <div className="mt-2 space-y-1 text-muted-foreground">
                   <p>Reference: <strong className="text-foreground">{booking.booking_reference}</strong></p>
                   <p>Guests: {booking.num_guests}</p>

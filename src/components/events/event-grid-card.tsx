@@ -74,7 +74,7 @@ export function EventGridCard({
               {event.category}
             </Badge>
             {isRecentlyAddedEvent(event.created_at, event.start_date) && (
-              <span className="rounded-full bg-brand-cream/95 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.16em] text-brand-deep-green">
+              <span className="rounded-full bg-[#FAF5EC]/95 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.16em] text-[#2C4A3E]">
                 New
               </span>
             )}
