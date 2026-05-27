@@ -123,23 +123,38 @@ export function WelcomeFirstLoginModal() {
           </DialogDescription>
         </DialogHeader>
 
-        {inLaunchWindow && (
-          <p className="rounded-md border border-brand-gold/40 bg-brand-gold/10 px-3 py-2 text-center text-sm leading-snug text-brand-deep-green">
-            We&rsquo;re in launch month &mdash; what you tell us right now genuinely
-            shapes what gets built next.
+        <div className="rounded-md border border-brand-gold/40 bg-brand-gold/10 px-3 py-3 text-sm leading-relaxed text-brand-deep-green">
+          <p className="font-semibold">One quick ask: send us your feedback.</p>
+          <p className="mt-1 text-foreground/80">
+            {inLaunchWindow ? (
+              <>
+                We&rsquo;re in our launch month and actively building this. What
+                you tell us right now &mdash; the good, the broken, the missing
+                &mdash; directly shapes what we ship next.
+              </>
+            ) : (
+              <>
+                What you tell us &mdash; the good, the broken, the missing
+                &mdash; directly shapes what we build next.
+              </>
+            )}
           </p>
-        )}
+        </div>
 
-        <ul className="mt-1 space-y-3 text-sm leading-relaxed">
+        <p className="text-sm text-foreground/80">
+          Especially helpful right now:
+        </p>
+
+        <ul className="space-y-3 text-sm leading-relaxed">
           <li className="flex gap-3">
             <CalendarHeart
               className="mt-0.5 h-4 w-4 shrink-0 text-brand-deep-green"
               aria-hidden="true"
             />
             <span>
-              <strong className="font-semibold">Events</strong> &mdash; a wrong
-              listing, one we&rsquo;re missing, or an Instagram / WhatsApp / Telegram
-              group we should be watching. Drop the link.
+              <strong className="font-semibold">Events we&rsquo;re missing</strong>{" "}
+              &mdash; a wrong listing, one we don&rsquo;t have yet, or an Instagram
+              / WhatsApp / Telegram group we should be watching. Drop the link.
             </span>
           </li>
           <li className="flex gap-3">
@@ -148,9 +163,9 @@ export function WelcomeFirstLoginModal() {
               aria-hidden="true"
             />
             <span>
-              <strong className="font-semibold">Features</strong> &mdash; healers,
-              massage, restaurants, retreats, a category we don&rsquo;t have yet.
-              Tell us what&rsquo;s missing.
+              <strong className="font-semibold">Features you wish existed</strong>{" "}
+              &mdash; healers, massage, restaurants, retreats, a category we
+              don&rsquo;t have yet. Tell us what&rsquo;s missing.
             </span>
           </li>
           <li className="flex gap-3">
@@ -159,27 +174,42 @@ export function WelcomeFirstLoginModal() {
               aria-hidden="true"
             />
             <span>
-              <strong className="font-semibold">Bugs & rough edges</strong>{" "}
-              &mdash; anything that looks broken or annoying. We read everything
-              within a day.
+              <strong className="font-semibold">Bugs &amp; rough edges</strong>{" "}
+              &mdash; anything broken or annoying. We read everything within a
+              day.
             </span>
           </li>
         </ul>
 
         <p className="text-muted-foreground text-xs leading-relaxed">
-          Tap the{" "}
+          You can send feedback any time from the{" "}
           <span className="inline-flex h-5 w-5 translate-y-1 items-center justify-center rounded-full bg-[#2C4A3E] text-[#C9A84C]">
             <MessageSquarePlus className="h-3 w-3" aria-hidden="true" />
           </span>{" "}
-          button bottom-right, any time. It&rsquo;s all welcome.
+          button bottom-right of every page.
         </p>
 
-        <Button
-          onClick={() => handleOpenChange(false)}
-          className="mt-1 w-full bg-[#2C4A3E] text-[#C9A84C] hover:bg-[#2C4A3E]/90 focus-visible:ring-[#C9A84C]/60 sm:w-auto sm:self-end"
-        >
-          I&rsquo;m in &mdash; let&rsquo;s go
-        </Button>
+        <div className="mt-1 flex flex-col gap-2 sm:flex-row sm:justify-end">
+          <Button
+            variant="ghost"
+            onClick={() => handleOpenChange(false)}
+            className="w-full text-foreground/70 hover:text-foreground sm:w-auto"
+          >
+            Maybe later
+          </Button>
+          <Button
+            onClick={() => {
+              handleOpenChange(false);
+              if (typeof window !== "undefined") {
+                window.dispatchEvent(new CustomEvent("ubudian:open-feedback"));
+              }
+            }}
+            className="w-full bg-[#2C4A3E] text-[#C9A84C] hover:bg-[#2C4A3E]/90 focus-visible:ring-[#C9A84C]/60 sm:w-auto"
+          >
+            <MessageSquarePlus className="mr-2 h-4 w-4" aria-hidden="true" />
+            Send feedback now
+          </Button>
+        </div>
       </DialogContent>
     </Dialog>
   );

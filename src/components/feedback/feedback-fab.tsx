@@ -32,6 +32,13 @@ export function FeedbackFab() {
     });
   }, []);
 
+  useEffect(() => {
+    if (!isLoggedIn) return;
+    const onOpenRequest = () => handleOpen();
+    window.addEventListener("ubudian:open-feedback", onOpenRequest);
+    return () => window.removeEventListener("ubudian:open-feedback", onOpenRequest);
+  }, [isLoggedIn]);
+
   if (!isLoggedIn) return null;
 
   function handleOpen() {

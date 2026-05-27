@@ -125,6 +125,8 @@ export interface Event {
   rejection_reason: string | null;
   is_placeholder: boolean;
   is_core: boolean;
+  is_members_only: boolean;
+  members_only_teaser: string | null;
   archetype_tags: ArchetypeId[];
   intent_tags: GuideIntent[];
   // Ingestion fields
@@ -636,6 +638,10 @@ export interface Booking {
 
 export type SubscriptionStatus = "active" | "trialing" | "past_due" | "canceled" | "unpaid" | "incomplete";
 
+export type SubscriptionReviewStatus = "auto_approved" | "pending_review" | "approved" | "rejected";
+
+export type CommissionAttributionSource = "cookie" | "utm" | "manual" | "partner_page";
+
 export interface Subscription {
   id: string;
   profile_id: string;
@@ -648,6 +654,50 @@ export interface Subscription {
   current_period_start: string | null;
   current_period_end: string | null;
   cancel_at_period_end: boolean;
+  payment_country: string | null;
+  payment_last4: string | null;
+  review_status: SubscriptionReviewStatus;
+  review_notes: string | null;
+  reviewed_by: string | null;
+  reviewed_at: string | null;
+  commission_partner_id: string | null;
+  commission_attribution_source: CommissionAttributionSource | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CommissionPartner {
+  id: string;
+  handle: string;
+  display_name: string;
+  contact_email: string;
+  contact_phone: string | null;
+  commission_pct: number;
+  profile_id: string | null;
+  bio: string | null;
+  avatar_url: string | null;
+  notes: string | null;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export type CommissionPayoutStatus = "pending" | "paid" | "void";
+
+export interface CommissionPayout {
+  id: string;
+  partner_id: string;
+  period_start: string;
+  period_end: string;
+  signups_count: number;
+  gross_cents: number;
+  amount_cents: number;
+  status: CommissionPayoutStatus;
+  paid_at: string | null;
+  payment_method: string | null;
+  payment_reference: string | null;
+  notes: string | null;
+  created_by: string | null;
   created_at: string;
   updated_at: string;
 }

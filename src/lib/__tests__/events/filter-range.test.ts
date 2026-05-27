@@ -31,6 +31,8 @@ function makeEvent(partial: Partial<Event> & { id: string; start_date: string })
     rejection_reason: null,
     is_placeholder: false,
     is_core: false,
+    is_members_only: false,
+    members_only_teaser: null,
     archetype_tags: [],
     intent_tags: [],
     source_id: null,
