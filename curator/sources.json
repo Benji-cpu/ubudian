@@ -177,21 +177,35 @@
       "url": "https://www.blissbase.app/",
       "type": "competitor_aggregator",
       "themes": ["dance", "tantra", "ceremony"],
-      "note": "Conscious-events aggregator focused on the Ubud + global wellness scene. Walk the landing page (Denpasar 50km radius surfaces Ubud) and click into each event card — the event description occasionally contains an external Megatix / Eventbrite ticket URL inline. **Attribution rules apply** (see playbook): NEVER store a blissbase URL in source_url, external_ticket_url, or description. Capture the original ticket URL when present; recreate the listing in our voice when not. Use only as a discovery surface — primary value is in surfacing new venues and facilitators."
+      "note": "**API-DIRECT (preferred):** `curl -sS 'https://www.blissbase.app/__data.json'` returns a SvelteKit-encoded JSON payload of the rolling near-term Bali feed (default ~8 events per call, lat=-8.65593/lng=115.217, totalEvents currently ~51 in the 50km Denpasar radius). The payload's `events[].sourceUrl` IS the original Megatix / Eventbrite / WhatsApp / Ticket Tailor URL — that's the only field worth keeping. Decoder: `data = json['nodes'][1]['data']; root = data[0]; ev_ids = data[root['events']]`. Pagination beyond page 1 is currently unresolved (cookie-set page/limit/distance fields don't appear to take effect via the public endpoint); rely on daily polling of the rolling feed rather than backfilling. **Attribution rules apply** (see playbook): NEVER store a blissbase URL in source_url, external_ticket_url, or description. Recreate descriptions in our voice — blissbase descriptions often contain chakra-soup language. Primary value: surfacing new venues and facilitators in addition to direct events."
     },
     {
       "name": "Soulwise",
       "url": "https://soulwise.io/",
       "type": "competitor_aggregator",
       "themes": ["tantra", "ceremony", "dance"],
-      "note": "Listing marketplace (practitioners post directly). Heavy on yoga / kundalini / individual sessions — most listings hard-reject. Filter by Tantra / Dance / Ceremonies categories explicitly. Most ceremony listings are 1-on-1 private sessions (REJECT — we surface group gatherings only). **Attribution rules apply** — never store soulwise.io URLs. The only outbound links inside listings point back to soulwise's own RSVP page — strip them. Primary value: surfacing new venues (e.g. La Portal to Shamballah)."
+      "note": "Built on Sharetribe — sitemap at `https://soulwise.io/sitemap-recent-listings.xml` exposes all ~393 listing UUIDs (each `https://soulwise.io/l/<uuid>` returns the SSR'd detail page; the JSON is inline `<script>` tags). Marketplace skews heavily yoga / kundalini / 1-on-1 sessions — most listings hard-reject. The Sharetribe Flex API (`flex-api.sharetribe.com`) requires an OAuth access token; not worth wiring up just for read access. Filter by Tantra / Dance / Ceremonies categories explicitly. **Attribution rules apply** — never store soulwise.io URLs. Outbound RSVP links inside listings point back to soulwise itself — strip them. Primary value: surfacing new venues (La Portal to Shamballah, the few non-yoga listings)."
     },
     {
       "name": "ToDo.Today — Ubud",
       "url": "https://todo.today/ubud/",
       "type": "competitor_aggregator",
       "themes": ["dance", "ceremony"],
-      "note": "Cloudflare-protected — Playwright headless hits the bot challenge and stalls. Try direct Bash curl with a realistic user-agent or fall back to their WhatsApp channel (origin format). Brand register skews digital-nomad-traveler, not conscious-community native, so filter aggressively. **Attribution rules apply.** Founded by Eran, started as a Koh Phangan WhatsApp group; now also covers Pai, Chiang Mai, Bangkok. First-run blocker — document and revisit."
+      "note": "**BLOCKED — Cloudflare managed challenge** (`cType: 'managed'`). Confirmed 2026-05-27: both `todo.today/ubud` and `dev.todo.today/ubud` return a 403 + JS-cookie challenge from `curl -A '<realistic UA>'`; Playwright headless stalls on 'Just a moment...' page. Realistic paths forward: (a) **Playwright in headed mode** — Cloudflare often lets visible browsers through, but defeats the automation premise; (b) **paid scraping service** (Bright Data, ScrapingBee, Apify with browser rendering) — adds cost and complexity; (c) **their public WhatsApp channel** — the platform's origin format and probably their highest-fidelity feed anyway; (d) **skip**. Founded by Eran (Koh Phangan WhatsApp-group origin → Pai/Chiang Mai/Bangkok/Ubud). Brand register is digital-nomad-traveler, not conscious-community native, so even if we get past the wall expect aggressive filtering. **Attribution rules apply.** Revisit if a low-cost path opens up."
+    },
+    {
+      "name": "ubud.app",
+      "url": "https://www.ubud.app/",
+      "type": "competitor_aggregator",
+      "themes": ["dance", "ceremony", "sound"],
+      "note": "Closest editorial competitor — same niche, same city, same handpicked register. Likely a one-person editorial curation operation (no /create or organiser portal visible). Apparently no public API or events JSON; the site is a small landing PWA with embedded content. Walk the landing page weekly via WebFetch / Playwright; primary value is observing their cadence and catching events that bypass our other sources. **Attribution rules apply** — never link or credit. Contact email is `hello@ubud.app`."
+    },
+    {
+      "name": "BaliSpirit — community events calendar",
+      "url": "https://www.balispirit.com/community/events",
+      "type": "competitor_aggregator",
+      "themes": ["dance", "tantra", "ceremony", "sound"],
+      "note": "Incumbent calendar from the BaliSpirit Festival organisation (running since 2003). Covers all of Bali + Lombok/Gilis (filter for Ubud + Tegallalang + Penestanan + Pejeng). Seven broad buckets (free / festivals / food / music / ceremonies / wellness / movie). Low curation, high coverage — the opposite of our taste filter. Walk weekly via WebFetch; expect ~80%+ rejection rate but the ceremony + music buckets occasionally surface events the focused aggregators miss. **Attribution rules apply** (keep the original ticket URL if present; never reference balispirit.com)."
     }
   ],
   "rejected_permanent": [],
