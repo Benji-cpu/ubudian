@@ -68,6 +68,21 @@ async function loadCanonicalNames(): Promise<string[]> {
  * 3. Fuzzy match against all canonical venue names (≥ 0.85 similarity)
  * If all passes fail, tracks as an unresolved venue for admin review.
  */
+const IGNORE_RAW_PATTERNS = [
+  /^ubud$/i,
+  /^ubud,?\s*bali(\s*area)?$/i,
+  /^ubud[\s,]+gianyar/i,
+  /^ubud\s+(center|centre)$/i,
+  /^online$/i,
+  /^zoom$/i,
+  /^private (venue|villa)/i,
+  /location shared/i,
+  /^north (of\s+)?(ubud|bali)$/i,
+  /^\d+\s*minutes?\s+from\s+ubud/i,
+  /multiple locations/i,
+  /^studio space$/i,
+];
+
 export async function normalizeVenue(venueName: string | null | undefined): Promise<string | null> {
   if (!venueName?.trim()) return null;
 
@@ -101,12 +116,18 @@ export async function normalizeVenue(venueName: string | null | undefined): Prom
 
   if (bestMatch) return bestMatch;
 
-  // All passes failed — track as unresolved venue (fire-and-forget)
-  trackUnresolvedVenue(venueName.trim(), normalized).catch((err) => {
-    console.error("[venue-normalizer] Failed to track unresolved venue:", err);
-  });
+  const trimmed = venueName.trim();
+  const shouldSkipTracking =
+    trimmed.length > 120 || IGNORE_RAW_PATTERNS.some((p) => p.test(trimmed));
 
-  return venueName.trim();
+  if (!shouldSkipTracking) {
+    // Fire-and-forget upsert into unresolved_venues for admin review
+    trackUnresolvedVenue(trimmed, normalized).catch((err) => {
+      console.error("[venue-normalizer] Failed to track unresolved venue:", err);
+    });
+  }
+
+  return trimmed;
 }
 
 /**
