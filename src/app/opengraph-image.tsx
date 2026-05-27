@@ -32,45 +32,26 @@ export default async function RootOgImage() {
         <div
           style={{
             display: "flex",
-            flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
             width: 640,
             height: 640,
             borderRadius: 120,
-            border: "4px solid rgba(201,168,76,0.55)",
             background: "#2C4A3E",
           }}
         >
           <div
             style={{
               display: "flex",
-              width: 150,
-              height: 3,
-              background: "rgba(201,168,76,0.7)",
-              marginBottom: 28,
-            }}
-          />
-          <div
-            style={{
-              display: "flex",
               fontStyle: "italic",
-              fontSize: 440,
+              fontSize: 540,
               lineHeight: 1,
               color: "#C9A84C",
+              marginTop: 80,
             }}
           >
             u
           </div>
-          <div
-            style={{
-              display: "flex",
-              width: 150,
-              height: 3,
-              background: "rgba(201,168,76,0.7)",
-              marginTop: 28,
-            }}
-          />
         </div>
 
         <div
