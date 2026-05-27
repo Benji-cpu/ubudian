@@ -39,7 +39,7 @@ export function EventGridCard({
               alt=""
               fill
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-              className="object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-[1.06] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+              className="object-cover object-[center_25%] transition-transform duration-[1200ms] ease-out group-hover:scale-[1.06] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
             />
           ) : (
             <EventCardPlaceholder
@@ -70,7 +70,7 @@ export function EventGridCard({
 
           {/* Category + new badges (bottom-left) */}
           <div className="absolute bottom-2.5 left-2.5 flex items-center gap-1.5">
-            <Badge className="rounded-full border-transparent bg-black/55 px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.14em] text-brand-cream backdrop-blur-md hover:bg-black/55">
+            <Badge className="rounded-full border-transparent bg-black/70 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-white backdrop-blur-md hover:bg-black/70">
               {event.category}
             </Badge>
             {isRecentlyAddedEvent(event.created_at, event.start_date) && (

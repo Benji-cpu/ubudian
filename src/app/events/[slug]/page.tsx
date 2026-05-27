@@ -203,10 +203,10 @@ export default async function EventPage({ params }: EventPageProps) {
             <div className="mt-3 text-foreground">
               <div className="flex items-start gap-2">
                 <MapPin className="mt-0.5 h-5 w-5 shrink-0 text-brand-gold" />
-                <div>
-                  <p className="font-medium">{e.venue_name}</p>
+                <div className="min-w-0 flex-1">
+                  <p className="font-medium break-words">{e.venue_name}</p>
                   {e.venue_address && (
-                    <p className="text-sm text-muted-foreground">{e.venue_address}</p>
+                    <p className="text-sm text-muted-foreground break-words">{e.venue_address}</p>
                   )}
                   {e.venue_map_url && isSafeUrl(e.venue_map_url) && (
                     <a

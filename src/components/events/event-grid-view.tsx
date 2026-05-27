@@ -22,7 +22,7 @@ interface EventGridViewProps {
 // random / per-render shuffling.
 const ASPECTS = [
   "aspect-[16/10]",
-  "aspect-[4/5]",
+  "aspect-[3/2]",
   "aspect-[1/1]",
   "aspect-[5/4]",
 ];

@@ -89,7 +89,7 @@ export function ShareButtons({ title, url, text }: ShareButtonsProps) {
         {instaCopied ? (
           <>
             <Check className="mr-1.5 h-4 w-4" />
-            Link copied! Share on Instagram
+            Link copied
           </>
         ) : (
           <>

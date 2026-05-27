@@ -45,7 +45,7 @@ export default function RootLayout({
       <head>
         <link rel="alternate" type="application/rss+xml" title="The Ubudian" href="/feed.xml" />
       </head>
-      <body className={`${sourceSans.variable} ${lora.variable} antialiased`}>
+      <body className={`${sourceSans.variable} ${lora.variable} overflow-x-hidden antialiased`}>
         <ThemeProvider>
           <div className="flex min-h-screen flex-col">
             <Header />
