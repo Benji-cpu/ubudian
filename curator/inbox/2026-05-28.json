@@ -1,0 +1,51 @@
+{
+  "date": "2026-05-28",
+  "events": [
+    {
+      "title": "Kirtan: Mantra Medicine & Sacred Cacao",
+      "description": "Sayuri Healing Food has quietly become one of Ubud's most-loved devotional anchors — their Thursday evening kirtan draws a community that treats mantra as medicine rather than performance. The format opens with sacred cacao and moves through a guided kirtan journey: Sanskrit call-and-response, collective voice, and the kind of presence only found in a room full of people who aren't performing. Founded by Sayuri Tanaka (raw food chef and BaliSpirit Festival presenter), the café at Jalan Sukma Kesuma in Peliatan has held this Thursday circle for years. Walk-in or contact the venue via Instagram.",
+      "short_description": "Sayuri Healing Food's Thursday circle: sacred cacao opens the evening, Sanskrit mantra chanting carries it.",
+      "category": "Ceremony & Sound",
+      "venue_name": "Sayuri Healing Food",
+      "venue_address": "Jl. Sukma Kesuma No. 2, Peliatan, Ubud, Bali",
+      "start_date": "2026-05-28",
+      "end_date": null,
+      "start_time": "18:00",
+      "end_time": null,
+      "is_recurring": true,
+      "recurrence_rule": "FREQ=WEEKLY;BYDAY=TH",
+      "price_info": null,
+      "external_ticket_url": null,
+      "source_url": null,
+      "organizer_name": "Sayuri Healing Food",
+      "organizer_instagram": "@sayuri_healing_food",
+      "cover_image_url": null,
+      "quality_score": 0.8,
+      "content_flags": [],
+      "intent_tags": ["spirit", "community"]
+    },
+    {
+      "title": "Sunday Kirtan with Vasudev",
+      "description": "Called Ubud's most-loved kirtan by the community that keeps showing up for it — Sayuri Healing Food's Sunday evening session with Vasudev is a weekly constant at the Peliatan venue. No ceremony scaffolding, no elaborate programme: just live voice, mantra, and a circle that's been meeting for years. Doors open at 6 PM, walk-in welcome.",
+      "short_description": "Ubud's perennial Sunday kirtan at Sayuri Healing Food in Peliatan — live mantra with Vasudev, walk-in at 6 PM.",
+      "category": "Ceremony & Sound",
+      "venue_name": "Sayuri Healing Food",
+      "venue_address": "Jl. Sukma Kesuma No. 2, Peliatan, Ubud, Bali",
+      "start_date": "2026-06-01",
+      "end_date": null,
+      "start_time": "18:00",
+      "end_time": null,
+      "is_recurring": true,
+      "recurrence_rule": "FREQ=WEEKLY;BYDAY=SU",
+      "price_info": null,
+      "external_ticket_url": null,
+      "source_url": null,
+      "organizer_name": "Sayuri Healing Food",
+      "organizer_instagram": "@sayuri_healing_food",
+      "cover_image_url": null,
+      "quality_score": 0.7,
+      "content_flags": [],
+      "intent_tags": ["spirit", "community"]
+    }
+  ]
+}

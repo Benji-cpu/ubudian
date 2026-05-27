@@ -169,6 +169,20 @@
       "first_seen": "2026-05-27",
       "themes": ["ceremony", "sound"],
       "note": "Penestanan yoga studio that also hosts a recurring Wednesday Shakti Bhakti Kirtan with Anu Karoliina + Friends (acoustic chanting, 200k IDR). Surfaced via Blissbase. Treat as a kirtan venue **only** — skip their yoga schedule (hard-reject)."
+    },
+    {
+      "name": "Sayuri Healing Food",
+      "url": "https://sayurihealingfood.com/events-schedule/",
+      "first_seen": "2026-05-28",
+      "themes": ["ceremony", "sound"],
+      "note": "Established Ubud plant-based restaurant + event space (Jl. Sukma Kesuma No. 2, Peliatan, Kecamatan Ubud). Founded by Sayuri Tanaka (49K IG @sayuri_healing_food, BaliSpirit Festival presenter). Hosts weekly Thursday Kirtan: Mantra Medicine & Sacred Cacao (18:00) and weekly Sunday Kirtan with Vasudev (18:00) — called 'Ubud's most favourite Kirtan' by the community. Also hosts occasional ecstatic kirtan evenings and other ceremonies. Events page 403-blocked — walk in or check IG. At 1 qualifying log (May 28) — needs 2 more for priority_b. Events website also 403-blocked."
+    },
+    {
+      "name": "Mudra Cafe (The Cobra Room)",
+      "url": "https://mudracafe.com/",
+      "first_seen": "2026-05-28",
+      "themes": ["ceremony", "sound"],
+      "note": "Restaurant/café at Jl. Goutama Selatan No. 22, central Ubud. Has a separate intimate event space called 'The Cobra Room' that hosts 'Shakti Bhakti: Kirtan & Cacao' recurring Thursday events (Megatix slug: mudra-kirtan). Possible facilitator: Anu Karoliina (naming mirrors her Intuitive Flow Wednesday event). Verify facilitator and day/time before ingesting — could conflict with or complement the Sayuri Thursday kirtan. At 1 qualifying log (May 28) — track before promoting."
     }
   ],
   "competitor_harvest": [
@@ -409,6 +423,13 @@
       "first_seen": "2026-05-27",
       "events_seen": ["Shakti Bhakti Kirtan — Intuitive Flow Yogastudio, Penestanan (Wed May 27)"],
       "note": "Kirtan leader; runs recurring weekly Wednesday acoustic kirtan ('Shakti Bhakti vibes') at Intuitive Flow Yogastudio, Penestanan. 200k IDR. Format: community chanting + mantra + 'chanting to the Divine'. Surfaced via Blissbase competitor-harvest — no ticket URL exposed, walk-in or DM organiser. Track for further editions and IG discovery."
+    },
+    {
+      "name": "Vasudev",
+      "instagram": null,
+      "first_seen": "2026-05-28",
+      "events_seen": ["Sunday Kirtan — Sayuri Healing Food, Peliatan Ubud (weekly Sun 18:00)"],
+      "note": "Sunday kirtan facilitator at Sayuri Healing Food, Jl. Sukma Kesuma No. 2, Peliatan. YouTube presence confirmed ('Sunday Kirtan at Sayuri Healing Food - With Vasudev'). No Instagram or last name found. Recurring weekly Sunday session described as 'Ubud's most favourite Kirtan'. Track for IG discovery."
     },
     {
       "name": "Akari Tamura (Anandamoyi Dasi)",
