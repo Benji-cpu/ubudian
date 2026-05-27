@@ -168,7 +168,7 @@ export function WelcomeFirstLoginModal() {
 
         <p className="text-muted-foreground text-xs leading-relaxed">
           Tap the{" "}
-          <span className="inline-flex h-5 w-5 translate-y-1 items-center justify-center rounded-full bg-brand-deep-green text-brand-gold">
+          <span className="inline-flex h-5 w-5 translate-y-1 items-center justify-center rounded-full bg-[#2C4A3E] text-[#C9A84C]">
             <MessageSquarePlus className="h-3 w-3" aria-hidden="true" />
           </span>{" "}
           button bottom-right, any time. It&rsquo;s all welcome.
@@ -176,7 +176,7 @@ export function WelcomeFirstLoginModal() {
 
         <Button
           onClick={() => handleOpenChange(false)}
-          className="mt-1 w-full bg-brand-deep-green text-brand-gold hover:bg-brand-deep-green/90 sm:w-auto sm:self-end"
+          className="mt-1 w-full bg-[#2C4A3E] text-[#C9A84C] hover:bg-[#2C4A3E]/90 focus-visible:ring-[#C9A84C]/60 sm:w-auto sm:self-end"
         >
           I&rsquo;m in &mdash; let&rsquo;s go
         </Button>
