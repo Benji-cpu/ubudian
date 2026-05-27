@@ -73,19 +73,24 @@ After accepting an event, set fields like this:
 
 ## Competitor harvest — attribution rules
 
-Three competitor aggregators (Blissbase, Soulwise, ToDo.Today) live under `sources.json.competitor_harvest`. They are **scouts, not sources**. We use them as a discovery surface because they've already done the work of finding interesting Ubud events, but we do **not** credit or link to them. The walk steps in the agent doc cover *how* to scrape; this section covers *what to do with what you find*.
+Every entry in `sources.json.competitor_harvest` is a **scout, not a source**. We use these aggregators + community channels as a discovery surface because they've already done the work of finding interesting Ubud events, but we do **not** credit or link to them. The walk steps in the agent doc cover *how* to scrape; this section covers *what to do with what you find*.
 
-When you harvest an event from a competitor aggregator, you MUST:
+When you harvest an event from any competitor-harvest scout, you MUST:
 
-1. **Strip the aggregator URL.** Never set `source_url` or `external_ticket_url` to a blissbase.app / soulwise.io / todo.today URL. Never reference these domains in `description`, `organizer_name`, or any other field. Never use an aggregator's slug as a fallback identifier.
-2. **Preserve original ticket URLs.** If the aggregator exposes a downstream ticket link (Megatix, Eventbrite, Ticket Tailor, Lu.ma, or the venue's own site) inside the event description or as an outbound link, capture **that** URL into both `source_url` (it's our dedup Layer-1 key) and `external_ticket_url` (it's the public CTA). Validate it's a real ticket page, not a soft RSVP back to the aggregator.
-3. **Recreate when no ticket URL exists.** If the aggregator only shows a description with no real outbound link (Blissbase is structurally like this — most events have no ticket URL, walk-in or DM-the-organiser), ingest with `source_url=null` and `external_ticket_url=null`. The event still lands as `pending`; the morning routine decides whether to ship it CTA-less, hunt the missing link, or archive.
-4. **Rewrite the description in our voice.** Don't paste the aggregator's copy. The Ubudian register is lush + restrained + editorial; aggregators (especially the practitioner-marketplace ones) tend toward emoji-soup, all-caps, and chakra adjectives. Strip that, summarise the format, name the facilitator, anchor the venue.
-5. **Log the scout internally.** In `curator/log/${TODAY}.md`, note "harvested from {blissbase|soulwise|todo.today}: {event title}" so we have an audit trail. The log lives in the repo, not in the events DB.
+1. **Strip the aggregator URL.** Never set `source_url` or `external_ticket_url` to any scout-domain URL. The current forbidden list:
+   - **Aggregators:** `blissbase.app`, `soulwise.io`, `todo.today`, `ubud.app`, `balispirit.com`, `balibuddies.com`, `allevents.in`, `cooldestinations.com`, `nowbali.co.id`, `numundo.org`.
+   - **Community channels:** `facebook.com/groups/*`, any `facebook.com/<community-page>` we harvest from, WhatsApp group invite links (`chat.whatsapp.com/*`).
+   - Never reference these domains in `description`, `organizer_name`, or any other field. Never use a scout's slug as a fallback identifier. If a new scout is added to `sources.json.competitor_harvest`, its domain is automatically on this list.
+2. **Preserve original ticket URLs.** If the scout exposes a downstream ticket link (Megatix, Eventbrite, Ticket Tailor, Lu.ma, or the venue's own site) inside the event description or as an outbound link, capture **that** URL into both `source_url` (it's our dedup Layer-1 key) and `external_ticket_url` (it's the public CTA). Validate it's a real ticket page, not a soft RSVP back to the scout. Strip affiliate query params (`?aid=…`, `?utm_*`, `?ref=…`) — the canonical event URL only.
+3. **Recreate when no ticket URL exists.** If the scout only shows a description with no real outbound link (Blissbase is structurally like this — most events have no ticket URL, walk-in or DM-the-organiser; same for most WhatsApp drops), ingest with `source_url=null` and `external_ticket_url=null`. The event still lands as `pending`; the card will render without a CTA, which is correct — sending users to a competitor would be worse. The morning routine decides whether to ship it CTA-less, hunt the missing link, or archive.
+4. **Rewrite the description in our voice.** Don't paste the scout's copy. The Ubudian register is lush + restrained + editorial; aggregators (especially the practitioner-marketplace ones) tend toward emoji-soup, all-caps, and chakra adjectives. Strip that, summarise the format, name the facilitator, anchor the venue.
+5. **Log the scout internally.** In `curator/log/${TODAY}.md`, note "harvested from {scout-slug}: {event title}" so we have an audit trail. The log lives in the repo, not in the events DB.
 
-The 2026-05-25 "never year-roll a stale Megatix slug" lesson is doubly important here: if an aggregator surfaces a Megatix link ending in `-2024`, `-2025`, or showing "Sales Closed" / "This event has already taken place", **skip**.
+**Special case — WhatsApp scout channels (ShambAllah etc.):** the *channel itself* is the scout (never store the invite link on an event), but individual event posts the channel relays frequently carry direct Megatix / Ticket Tailor / venue URLs — those are first-party and SHOULD be preserved per rule 2. A WhatsApp curator forwarding a Megatix link is functionally identical to us finding the same Megatix link directly.
 
-The vibe filter and quality rubric (4 axes, ≥6/10) apply unchanged to competitor-harvested events. A blissbase event is not "in" by virtue of being on blissbase — most won't survive the filter (their universe is broader than ours; they accept yoga, kundalini, satsang, networking, all of which we hard-reject).
+The 2026-05-25 "never year-roll a stale Megatix slug" lesson is doubly important here: if a scout surfaces a Megatix link ending in `-2024`, `-2025`, or showing "Sales Closed" / "This event has already taken place", **skip**.
+
+The vibe filter and quality rubric (4 axes, ≥6/10) apply unchanged to scout-harvested events. A blissbase event is not "in" by virtue of being on blissbase — most won't survive the filter (their universe is broader than ours; they accept yoga, kundalini, satsang, networking, all of which we hard-reject).
 
 ## Discovery
 

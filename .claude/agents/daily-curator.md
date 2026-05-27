@@ -66,33 +66,48 @@ For each entry in `sources.json.priority_b`:
   ```
   These are already in the DB — you're not re-ingesting them. Use them to spot patterns: which Megatix events fit our themes that the existing flow may have mis-categorised? Note the IDs in your log; do not duplicate.
 
-## Step 3b — Walk competitor-harvest aggregators
+## Step 3b — Walk competitor-harvest scouts
 
-For each entry in `sources.json.competitor_harvest` (Blissbase, Soulwise, ToDo.Today):
+Iterate every entry in `sources.json.competitor_harvest`. The bucket mixes API-direct aggregators, HTML-only aggregators, FB groups/pages, and a WhatsApp curator channel — they need different fetch strategies. The **playbook is the single source of truth on attribution + URL-forbidden-domain rules** (see `curator/playbook.md` "Competitor harvest — attribution rules"); do not duplicate them here. Update only the playbook when the forbidden list changes.
 
-- **Blissbase** (`https://www.blissbase.app/`) — **API-direct fetch is preferred** over Playwright:
+### API-direct (preferred — fast, clean field extraction)
+
+- **Blissbase** (`https://www.blissbase.app/`):
   ```bash
   curl -sS -A 'Mozilla/5.0' 'https://www.blissbase.app/__data.json' > /tmp/bb.json
   ```
   Decode the SvelteKit index-encoded JSON: `data = payload['nodes'][1]['data']`; `root = data[0]`; `ev_ids = data[root['events']]`; each `ev = data[ev_idx]` has fields `name`, `startAt` (Date tuple), `endAt`, `timezone`, `address` (list of indices), `price`, `description` (HTML), `host`, `sourceUrl` — every field value is itself an index back into `data`. The `sourceUrl` field IS the original Megatix / Eventbrite / Ticket Tailor / WhatsApp URL — preserve it as both `source_url` and `external_ticket_url`. Default radius=50km from Denpasar, ~8 events per fetch, totalEvents currently ~51. Pagination beyond page 1 hasn't been worked out — rely on daily polling of the rolling feed.
 - **Soulwise** (`https://soulwise.io/`): Walk `https://soulwise.io/sitemap-recent-listings.xml` (~393 URLs). For each `https://soulwise.io/l/<uuid>`, fetch via `curl` — the listing detail is inline `<script>`-tagged JSON. Filter the title/category for Tantra / Dance / Ceremonies; skip Yoga / Meditation / Breathwork / Energy Healing (hard-reject) and all "Individual session" listings (we surface group gatherings only). Soulwise's outbound RSVP links point back to itself — strip them. The Sharetribe Flex API exists (`flex-api.sharetribe.com`) but requires OAuth — not worth wiring up.
-- **ToDo.Today** (`https://todo.today/ubud/`) — Cloudflare challenge passes via the bundled stealth script:
+- **AllEvents.in — Ubud** (`https://allevents.in/ubud-id/all`): Public HTML, no auth. WebFetch the page; events are rendered with JSON-LD `<script type="application/ld+json">` blocks of `@type: Event`. Extract `name`, `startDate`, `endDate`, `location.name`, `organizer.name`, and `offers.url` (the downstream ticket URL — Megatix / Eventbrite / Ticket Tailor / venue-direct). If `offers.url` resolves back to allevents.in itself, treat as no-URL. High noise — vibe-filter aggressively.
+
+### Cloudflare-walled (use the stealth script)
+
+- **ToDo.Today** (`https://todo.today/ubud/`):
   ```bash
   node scripts/scrape/todo-today.mjs 'https://todo.today/ubud/' > /tmp/td-today.html
   node scripts/scrape/todo-today.mjs 'https://todo.today/ubud/tomorrow/' > /tmp/td-tom.html
   ```
   Today's page is server-rendered (extract titles from `h2`/`h3` inside `tt-event-listing-row` div). Tomorrow's page is JS-populated post-render (the script waits 3s before snapshotting; bump if the listings still come up empty). Per-event detail URLs are NOT exposed as plain anchors — extract titles + adjacent description text from the rendered HTML. Expect aggressive vibe-filter rejection (the brand is digital-nomad-traveler).
-- **ubud.app** (`https://www.ubud.app/`): Walk weekly via WebFetch — small editorial PWA, no API. Closest direct editorial competitor; high signal.
-- **BaliSpirit** (`https://www.balispirit.com/community/events`): Walk weekly via WebFetch. Incumbent broad-coverage calendar; filter aggressively for Ubud + our 3 categories. Preserve any embedded ticket URL.
 
-**Apply the playbook's attribution rules to every harvested event** (see `curator/playbook.md` "Competitor harvest — attribution rules"). Specifically:
+### HTML-only walks (lower frequency)
 
-- Never set `source_url` or `external_ticket_url` to a blissbase.app / soulwise.io / todo.today URL.
-- Capture downstream Megatix / Eventbrite / Ticket Tailor URLs when the aggregator exposes them.
-- When no ticket URL exists, ingest with both URL fields `null` and rewrite the description in our voice (lush, restrained, editorial — not the aggregator's emoji-soup register).
-- In the daily log, list each harvested event under "Harvested from {aggregator}:" so we have an audit trail. Do NOT note the aggregator anywhere in the events DB.
+- **ubud.app** (`https://www.ubud.app/`): WebFetch weekly — small editorial PWA, no API. Closest direct editorial competitor; high signal.
+- **BaliSpirit** (`https://www.balispirit.com/community/events`): WebFetch weekly. Incumbent broad-coverage calendar; filter aggressively for Ubud + our 3 categories. Preserve any embedded ticket URL.
+- **BaliBuddies** (`https://balibuddies.com/events-listings/`): WebFetch weekly. Card CTAs occasionally expose downstream Megatix / Ticket Tailor links — capture only those.
+- **Cool Destinations — Ubud** (`https://www.cooldestinations.com/go/ubud/calendar/`): WebFetch monthly (not daily — yield is festival-tier only). All outbound links must be checked: strip anything affiliate-tagged (`?aid=`, `?utm_*`, Booking.com, Klook, GetYourGuide); keep only venue-direct or ticket-direct.
+- **NOW! Bali — annual events** (`https://www.nowbali.co.id/biggest-events-in-bali-annual-calendar/`): WebFetch **quarterly**, not daily. Used only for festival-tier discovery (Bali Spirit Fest, Ubud Writers, Folk Fest, Open Studios) — these usually land via other sources too, so this is a safety net.
+- **NuMundo — Bali places** (`https://numundo.org/places?location=bali`): WebFetch weekly, but read it as a **venue-discovery** source, not an events source. Surface new conscious centres → append to `discovered_pending`. Only ingest events when a venue's own ticketing URL is exposed on its place page.
 
-The vibe filter (Step 5) and quality rubric (Step 7) apply unchanged. Most aggregator listings will hard-reject — that's normal. Their universe is broader than ours.
+### Routed through existing ingestion adapters (do NOT handle in this agent)
+
+The following entries appear in `competitor_harvest` for discoverability and forbidden-domain bookkeeping, but their actual event volume comes from the ingestion adapter pipeline, not this agent's daily walk:
+
+- **Ubud Conscious Community (FB group)**, **Ubud Events (FB page)**, **Ubud Dance Community (FB group)** — handled by `src/lib/ingestion/adapters/facebook.ts` and `apify-instagram.ts`. If those adapters aren't currently active for these channels, flag in your daily log under "Adapter coverage gap" — don't try to scrape FB groups from this agent.
+- **ShambAllah WhatsApp curator channel** — once Benji joins and provides the channel ID, handled by `src/lib/ingestion/adapters/whatsapp.ts` via the existing WAHA stack. Until then, flag the missing invite in your daily log under "Source-list followups". This is the single highest-value scout we don't yet ingest — chase the invite.
+
+**Apply the playbook's attribution rules to every harvested event** — see `curator/playbook.md` "Competitor harvest — attribution rules" for the canonical forbidden-domain list and the "preserve direct ticket URLs / null otherwise" rule. In the daily log, list each harvested event under "Harvested from {scout-slug}:" — do NOT note the scout anywhere in the events DB.
+
+The vibe filter (Step 5) and quality rubric (Step 7) apply unchanged. Most scout listings will hard-reject — that's normal. Their universe is broader than ours.
 
 ## Step 4 — Walk Instagram handles
 

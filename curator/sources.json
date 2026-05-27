@@ -206,6 +206,69 @@
       "type": "competitor_aggregator",
       "themes": ["dance", "tantra", "ceremony", "sound"],
       "note": "Incumbent calendar from the BaliSpirit Festival organisation (running since 2003). Covers all of Bali + Lombok/Gilis (filter for Ubud + Tegallalang + Penestanan + Pejeng). Seven broad buckets (free / festivals / food / music / ceremonies / wellness / movie). Low curation, high coverage — the opposite of our taste filter. Walk weekly via WebFetch; expect ~80%+ rejection rate but the ceremony + music buckets occasionally surface events the focused aggregators miss. **Attribution rules apply** (keep the original ticket URL if present; never reference balispirit.com)."
+    },
+    {
+      "name": "AllEvents.in — Ubud",
+      "url": "https://allevents.in/ubud-id/all",
+      "type": "competitor_aggregator",
+      "themes": ["dance", "ceremony", "sound", "tantra"],
+      "note": "Global event aggregator with a city vertical for Ubud. Server-rendered HTML carries JSON-LD `<script type=\"application/ld+json\">` Event schema — extract dates/venue/organiser from there; downstream ticket URL lives in `offers.url` when present. High noise (parties, networking, generic festivals) — vibe-filter aggressively. **Attribution rules apply** — never store an allevents.in URL anywhere on an event. Walk weekly."
+    },
+    {
+      "name": "BaliBuddies — events listings",
+      "url": "https://balibuddies.com/events-listings/",
+      "type": "competitor_aggregator",
+      "themes": ["ceremony", "dance"],
+      "note": "Commercial Bali insider's-guide portal. Mostly festivals and tourism-adjacent events; expect low yield against our universe. Card CTAs occasionally expose downstream Megatix / Ticket Tailor / venue-site links — capture only those. **Attribution rules apply** — never store balibuddies.com URLs. Walk weekly; demote to monthly if yield stays at zero."
+    },
+    {
+      "name": "Cool Destinations — Ubud calendar",
+      "url": "https://www.cooldestinations.com/go/ubud/calendar/",
+      "type": "competitor_aggregator",
+      "themes": ["dance", "ceremony"],
+      "note": "Affiliate/SEO calendar; most outbound links are affiliate-tagged (Booking.com, Klook, GetYourGuide) — strip those entirely. The festival-grade entries occasionally cite venue-direct ticketing — keep only those. **Attribution rules apply**. Walk monthly, not daily."
+    },
+    {
+      "name": "NOW! Bali — annual events",
+      "url": "https://www.nowbali.co.id/biggest-events-in-bali-annual-calendar/",
+      "type": "competitor_aggregator",
+      "themes": ["ceremony"],
+      "note": "Glossy lifestyle magazine's annual events overview. Low frequency, high signal for festival-tier events (Bali Spirit Fest, Ubud Writers, Folk Fest, Open Studios). Refresh quarterly, not daily. **Attribution rules apply** — never store nowbali.co.id URLs."
+    },
+    {
+      "name": "NuMundo — Bali places",
+      "url": "https://numundo.org/places?location=bali",
+      "type": "competitor_aggregator",
+      "themes": ["ceremony", "dance", "tantra"],
+      "note": "Global transformational-places directory. Places-first, not events-first — surface a new conscious centre/retreat venue, then check its place page for any listed upcoming events. Yield is low but venue-discovery value is high. Walk weekly for *new venues* (append to `discovered_pending`); only ingest events directly when a venue's own ticketing URL is exposed. **Attribution rules apply**."
+    },
+    {
+      "name": "Ubud Conscious Community (Facebook group)",
+      "url": "https://www.facebook.com/groups/UbudConsciousCommunity/",
+      "type": "competitor_aggregator",
+      "themes": ["dance", "tantra", "ceremony", "sound"],
+      "note": "~25k-member community firehose — the actual social layer where Ubud's conscious scene posts events. High noise (housing posts, lost-cat posts, recommendation threads) but high signal when events appear. **Operational path:** route through the existing `facebook.ts` / `apify-instagram.ts` adapter pattern rather than the curator agent (curator can't auth into FB groups). Treat this source-list entry as the registration of the firehose; volume comes from the adapter pipeline. **Attribution rules apply** — never store facebook.com group URLs on events; capture only the downstream ticket URL the organiser posts."
+    },
+    {
+      "name": "Ubud Events (Facebook page)",
+      "url": "https://www.facebook.com/ubudevents/",
+      "type": "competitor_aggregator",
+      "themes": ["dance", "ceremony"],
+      "note": "Public Facebook page — easier to scrape than a closed group. Posts a mix of own-events and signal-boosts. Route through the existing `facebook.ts` adapter. **Attribution rules apply** — capture only downstream ticket URLs; never store facebook.com page URLs."
+    },
+    {
+      "name": "Ubud Dance Community (Facebook group)",
+      "url": "https://www.facebook.com/groups/210154899106811/",
+      "type": "competitor_aggregator",
+      "themes": ["dance"],
+      "note": "Dance-vertical-only community. Lower volume than Ubud Conscious Community but very high signal-to-noise for our `Dance & Movement` category. Route through `facebook.ts` adapter. **Attribution rules apply**."
+    },
+    {
+      "name": "ShambAllah WhatsApp curator channel",
+      "url": null,
+      "type": "competitor_aggregator",
+      "themes": ["dance", "tantra", "ceremony", "sound"],
+      "note": "**Highest-value scout we don't yet ingest.** Daily human-curated drop — admin only posts selected events per day (described publicly as 'free of clutter, admin only posts selected events every day'). This is the closest existing analogue to The Ubudian's own editorial register, so each post is essentially pre-filtered for our universe. **Operational path:** once Benji joins (provide invite link / channel ID), route through the existing `whatsapp.ts` WAHA adapter and treat the channel ID as a `priority_a`-grade source rather than a competitor. Until joined, this entry is a placeholder reminding the morning routine to chase the invite. **Attribution rules apply** — never store the WhatsApp invite URL on an event; capture only the downstream Megatix / Ticket Tailor / venue URL the curator pastes."
     }
   ],
   "rejected_permanent": [],
