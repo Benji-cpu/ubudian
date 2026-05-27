@@ -6,6 +6,7 @@ export interface Profile {
   role: "user" | "admin";
   stripe_customer_id: string | null;
   ics_token: string | null;
+  welcomed_at: string | null;
   created_at: string;
   updated_at: string;
   primary_archetype?: string | null;

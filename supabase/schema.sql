@@ -12,6 +12,7 @@ CREATE TABLE profiles (
   avatar_url TEXT,
   role TEXT DEFAULT 'user',  -- 'user' | 'admin'
   ics_token TEXT UNIQUE,     -- Per-user token for ICS calendar feed subscription
+  welcomed_at TIMESTAMPTZ,   -- NULL until the user dismisses the first-login welcome modal
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );

@@ -67,7 +67,7 @@ export function FeedbackFab() {
       {!open && (
         <Button
           onClick={handleOpen}
-          className="fixed bottom-6 right-6 z-40 h-12 w-12 rounded-full shadow-lg bg-brand-deep-green text-brand-gold hover:bg-brand-deep-green/90 dark:bg-card dark:hover:bg-card/90"
+          className="group fixed bottom-6 right-6 z-40 h-12 w-12 rounded-full shadow-lg bg-brand-deep-green text-brand-gold hover:bg-brand-deep-green/90 dark:bg-card dark:hover:bg-card/90 transition-all duration-300 [body[data-onboarding-spotlight=true]_&]:ring-4 [body[data-onboarding-spotlight=true]_&]:ring-brand-gold/70 [body[data-onboarding-spotlight=true]_&]:scale-110 motion-safe:[body[data-onboarding-spotlight=true]_&]:animate-pulse"
           size="icon"
           aria-label="Send feedback"
         >
