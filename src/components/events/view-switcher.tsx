@@ -83,7 +83,7 @@ export function ViewSwitcher() {
                   "hover:bg-brand-deep-green/5 hover:text-brand-deep-green dark:hover:bg-brand-gold/10 dark:hover:text-brand-gold",
                   "focus-visible:ring-2 focus-visible:ring-brand-gold/40",
                   isActive &&
-                    "bg-brand-deep-green text-brand-cream shadow-sm hover:bg-brand-deep-green hover:text-brand-cream dark:bg-brand-gold dark:text-brand-deep-green dark:hover:bg-brand-gold dark:hover:text-brand-deep-green"
+                    "bg-brand-deep-green text-brand-cream shadow-sm hover:bg-brand-deep-green hover:text-brand-cream dark:bg-brand-gold dark:text-[#2C4A3E] dark:hover:bg-brand-gold dark:hover:text-[#2C4A3E]"
                 )}
               >
                 <Icon className="h-4 w-4" />

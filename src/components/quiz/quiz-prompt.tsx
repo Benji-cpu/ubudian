@@ -48,7 +48,7 @@ export function QuizPrompt() {
       <div className="relative w-full max-w-sm overflow-hidden rounded-2xl border border-brand-charcoal/10 bg-brand-cream shadow-[0_20px_60px_-20px_rgba(44,74,62,0.35)] dark:border-brand-gold/15 dark:bg-[#1A1A1A] dark:shadow-[0_20px_60px_-20px_rgba(0,0,0,0.6)]">
         <button
           onClick={dismiss}
-          className="absolute right-3 top-3 rounded-full p-1.5 text-brand-charcoal/40 transition-colors hover:bg-brand-charcoal/5 hover:text-brand-charcoal dark:text-brand-cream/40 dark:hover:bg-brand-cream/5 dark:hover:text-brand-cream"
+          className="absolute right-3 top-3 rounded-full p-1.5 text-brand-charcoal/40 transition-colors hover:bg-brand-charcoal/5 hover:text-brand-charcoal dark:text-[#FAF5EC]/40 dark:hover:bg-[#FAF5EC]/5 dark:hover:text-[#FAF5EC]"
           aria-label="Dismiss"
         >
           <X className="h-3.5 w-3.5" />
@@ -68,7 +68,7 @@ export function QuizPrompt() {
           >
             Find your kind of Ubud<span className="text-brand-gold">.</span>
           </h2>
-          <p className="mt-1.5 text-sm text-brand-charcoal/70 dark:text-brand-cream/70">
+          <p className="mt-1.5 text-sm text-brand-charcoal/70 dark:text-[#FAF5EC]/75">
             Six questions. Ninety seconds. We&rsquo;ll point you to the places, people and
             moments that fit you.
           </p>
@@ -77,13 +77,13 @@ export function QuizPrompt() {
             <Link
               href="/quiz"
               onClick={dismiss}
-              className="inline-flex items-center justify-center rounded-full bg-brand-deep-green px-5 py-2.5 text-sm font-medium text-brand-cream transition-colors hover:bg-brand-deep-green/90 dark:bg-brand-gold dark:text-brand-deep-green dark:hover:bg-brand-gold/90"
+              className="inline-flex items-center justify-center rounded-full bg-brand-deep-green px-5 py-2.5 text-sm font-medium text-brand-cream transition-colors hover:bg-brand-deep-green/90 dark:bg-brand-gold dark:text-[#2C4A3E] dark:hover:bg-brand-gold/90"
             >
               Take the quiz
             </Link>
             <button
               onClick={dismiss}
-              className="text-sm text-brand-charcoal/55 transition-colors hover:text-brand-charcoal dark:text-brand-cream/55 dark:hover:text-brand-cream"
+              className="text-sm text-brand-charcoal/55 transition-colors hover:text-brand-charcoal dark:text-[#FAF5EC]/70 dark:hover:text-[#FAF5EC]"
             >
               Not now
             </button>
