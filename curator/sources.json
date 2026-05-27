@@ -148,6 +148,50 @@
       "first_seen": "2026-05-26",
       "themes": ["ceremony", "sound"],
       "note": "Central Ubud retreat hosting monthly lunar-aligned ceremonies: Purnima Sound Bath & Kirtan (full moon, singing bowls + devotional chanting) and Floating New Moon Sound Bath — both led by Sawitri (certified sound healing therapist). Recurring format on moon dates. Track for specific June/July 2026 dates before ingesting."
+    },
+    {
+      "name": "ASH at Nuanu Creative City",
+      "url": null,
+      "first_seen": "2026-05-27",
+      "themes": ["ceremony", "dance", "sound"],
+      "note": "Performance / ritual space inside Nuanu Creative City (just south of Ubud). Hosted Mariama Del Mar's Five Temples of Her live ritual-dance performance (May 27). Surfaced via Blissbase competitor-harvest. Format leans concert/performance rather than participatory circle — verify each booking. At 1 qualifying log; needs 2 more."
+    },
+    {
+      "name": "La Portal to Shamballah",
+      "url": null,
+      "first_seen": "2026-05-27",
+      "themes": ["ceremony", "dance"],
+      "note": "Vegetarian restaurant + events space in Peliatan, Ubud. Hosts weekly Wednesday Authenticity 'The Game' (free, authentic-relating format) and recurring Dabka Palestinian Dance. Surfaced via Soulwise competitor-harvest. Heart-opening / connection events, free entry. At 1 qualifying log; needs 2 more."
+    },
+    {
+      "name": "Intuitive Flow Yogastudio — Penestanan (non-yoga events only)",
+      "url": "https://www.intuitiveflowbali.com/",
+      "first_seen": "2026-05-27",
+      "themes": ["ceremony", "sound"],
+      "note": "Penestanan yoga studio that also hosts a recurring Wednesday Shakti Bhakti Kirtan with Anu Karoliina + Friends (acoustic chanting, 200k IDR). Surfaced via Blissbase. Treat as a kirtan venue **only** — skip their yoga schedule (hard-reject)."
+    }
+  ],
+  "competitor_harvest": [
+    {
+      "name": "Blissbase",
+      "url": "https://www.blissbase.app/",
+      "type": "competitor_aggregator",
+      "themes": ["dance", "tantra", "ceremony"],
+      "note": "Conscious-events aggregator focused on the Ubud + global wellness scene. Walk the landing page (Denpasar 50km radius surfaces Ubud) and click into each event card — the event description occasionally contains an external Megatix / Eventbrite ticket URL inline. **Attribution rules apply** (see playbook): NEVER store a blissbase URL in source_url, external_ticket_url, or description. Capture the original ticket URL when present; recreate the listing in our voice when not. Use only as a discovery surface — primary value is in surfacing new venues and facilitators."
+    },
+    {
+      "name": "Soulwise",
+      "url": "https://soulwise.io/",
+      "type": "competitor_aggregator",
+      "themes": ["tantra", "ceremony", "dance"],
+      "note": "Listing marketplace (practitioners post directly). Heavy on yoga / kundalini / individual sessions — most listings hard-reject. Filter by Tantra / Dance / Ceremonies categories explicitly. Most ceremony listings are 1-on-1 private sessions (REJECT — we surface group gatherings only). **Attribution rules apply** — never store soulwise.io URLs. The only outbound links inside listings point back to soulwise's own RSVP page — strip them. Primary value: surfacing new venues (e.g. La Portal to Shamballah)."
+    },
+    {
+      "name": "ToDo.Today — Ubud",
+      "url": "https://todo.today/ubud/",
+      "type": "competitor_aggregator",
+      "themes": ["dance", "ceremony"],
+      "note": "Cloudflare-protected — Playwright headless hits the bot challenge and stalls. Try direct Bash curl with a realistic user-agent or fall back to their WhatsApp channel (origin format). Brand register skews digital-nomad-traveler, not conscious-community native, so filter aggressively. **Attribution rules apply.** Founded by Eran, started as a Koh Phangan WhatsApp group; now also covers Pai, Chiang Mai, Bangkok. First-run blocker — document and revisit."
     }
   ],
   "rejected_permanent": [],
@@ -274,6 +318,20 @@
       "first_seen": "2026-05-24",
       "events_seen": ["PURNAMA Full Moon Dance Ritual — Ubud (recurring full moon)"],
       "note": "Run PURNAMA, a monthly full moon ritual: Cacao Ceremony (Shiva) → Ecstatic Dance (Todjon) → Sound & Movement with YINTELLIGENCE/Chris Fox. Strong format, exactly our universe. No confirmed June/July 2026 Megatix dates found — Megatix returns 403 on their event page. Check directly for confirmed dates. No IG handles found for either."
+    },
+    {
+      "name": "Mariama Del Mar",
+      "instagram": null,
+      "first_seen": "2026-05-27",
+      "events_seen": ["Five Temples of Her — ASH, Nuanu Creative City (May 27)"],
+      "note": "Spiritual dancer + world music vocalist. Format: 90-min live-stage performance blending tribal fusion, contemporary movement, Japanese fan dance, and live ethnic-instrument music (didgeridoo, duduk, flutes, cello, piano, jaw harp, frame drums). Surfaced via Blissbase competitor-harvest. Megatix slug uses affiliate tag (?aid=MARIAMA) — direct ticketing. Performance-style rather than participatory; track for further editions before promoting."
+    },
+    {
+      "name": "Anu Karoliina",
+      "instagram": null,
+      "first_seen": "2026-05-27",
+      "events_seen": ["Shakti Bhakti Kirtan — Intuitive Flow Yogastudio, Penestanan (Wed May 27)"],
+      "note": "Kirtan leader; runs recurring weekly Wednesday acoustic kirtan ('Shakti Bhakti vibes') at Intuitive Flow Yogastudio, Penestanan. 200k IDR. Format: community chanting + mantra + 'chanting to the Divine'. Surfaced via Blissbase competitor-harvest — no ticket URL exposed, walk-in or DM organiser. Track for further editions and IG discovery."
     },
     {
       "name": "Akari Tamura (Anandamoyi Dasi)",

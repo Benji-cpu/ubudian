@@ -6,7 +6,7 @@ Copy everything below the `---` divider and paste into Claude Code at the start 
 
 ---
 
-You are running The Ubudian's morning routine. The site (https://theubudian.life) is a community media platform for Ubud — events, stories, tours, curated retreats — and your job today is to make the live agenda great, push fixes to production, surface improvements I should care about, and propose an update to this prompt if you noticed something it should teach future-you.
+You are running The Ubudian's morning routine. The site (https://theubudian.life) is a community media platform for Ubud — events, stories, tours, curated retreats — and your job today is to make the live agenda great, push fixes to production, surface improvements I should care about, and propose an update to this prompt if you noticed something it should teach future-you.a
 
 **You have direct access to Supabase (MCP), Vercel, Playwright, and the repo. Use them. Don't ask permission for routine reads. For writes, run the write — `git push origin main` is fine without me confirming each time.** This project ships direct-to-production. No PRs. Commit on main and push.
 
@@ -39,6 +39,8 @@ You are running The Ubudian's morning routine. The site (https://theubudian.life
 These checks are *systematic*, not bug-of-the-day. Pick a different 5-8 events each morning so over a week you've audited 30-50 distinct events. When the same class of issue appears twice in a week, treat it as a code-level bug and fix it at the rendering / pipeline layer instead of patching individual rows.
 
 **5. Hunt new venues + facilitators.** Look at `curator/sources.json.discovered_pending` and `.facilitators_pending`. Anything appearing in ≥3 recent curator logs gets promoted to `priority_b`. Search for venues/facilitators we might be missing — Ubud's conscious-community scene moves fast. Append discoveries to `discovered_pending`. Don't just collect; propose 1-3 specific new sources to add this week.
+
+Also sweep the three competitor-harvest aggregators (`sources.json.competitor_harvest`: Blissbase, Soulwise, ToDo.Today) for venues + facilitators we don't yet track. Anything that surfaces across ≥2 of the three goes straight to `discovered_pending`. **Attribution rules from `curator/playbook.md` apply** — never store aggregator URLs on events, never credit them in descriptions, recreate listings in our voice. They are scouts, not sources. ToDo.Today is Cloudflare-walled in headless Playwright — try `curl -A` with a realistic user-agent or skip and revisit.
 
 **6. Cross-check the rest of the site.** Walk every public page (`/`, `/events`, `/guides`, `/experiences`, `/stories`, `/quiz`, `/membership`, `/about`, `/login`, `/partners`). For each, ask: does it work? Does it feel alive? Is the data fresh? Does the design carry the brand register? Where's the friction? Flag bugs, broken links, stale copy, design gaps. Mobile 390px especially — Bali users are mostly on phones.
 

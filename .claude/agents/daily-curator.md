@@ -66,6 +66,23 @@ For each entry in `sources.json.priority_b`:
   ```
   These are already in the DB — you're not re-ingesting them. Use them to spot patterns: which Megatix events fit our themes that the existing flow may have mis-categorised? Note the IDs in your log; do not duplicate.
 
+## Step 3b — Walk competitor-harvest aggregators
+
+For each entry in `sources.json.competitor_harvest` (Blissbase, Soulwise, ToDo.Today):
+
+- **Blissbase** (`https://www.blissbase.app/`): WebFetch or Playwright the landing page (location auto-resolves to Denpasar 50km radius, which covers Ubud). For each event card visible, click into the detail page (`/YYYY-MM-DD-slug`) and capture title, date, time, venue, organiser, price, description, and — most importantly — scan the description text for an outbound ticket URL (Megatix, Eventbrite, Ticket Tailor, etc.). Most blissbase listings have NO outbound ticket URL — that's expected; ingest those with `source_url=null` and `external_ticket_url=null`.
+- **Soulwise** (`https://soulwise.io/`): Visit `?pub_categoryLevel1=tantra`, `?pub_categoryLevel1=dance`, and `?pub_categoryLevel1=cacao` (the Ceremonies filter). Skip Yoga / Meditation / Breathwork / Energy Healing (hard-reject) and all "Individual session" listings (we surface group gatherings only). For surviving listings, click through to the detail page. Soulwise's outbound RSVP links go back to soulwise itself — strip them. The only useful outbound URL is occasionally a venue-site link buried in the description.
+- **ToDo.Today** (`https://todo.today/ubud/`): Cloudflare bot challenge blocks Playwright headless. Try a Bash `curl -A '<realistic user-agent>'` fallback. If it still 403s, log it as `failed:cloudflare` and move on — better to skip than dump time on it.
+
+**Apply the playbook's attribution rules to every harvested event** (see `curator/playbook.md` "Competitor harvest — attribution rules"). Specifically:
+
+- Never set `source_url` or `external_ticket_url` to a blissbase.app / soulwise.io / todo.today URL.
+- Capture downstream Megatix / Eventbrite / Ticket Tailor URLs when the aggregator exposes them.
+- When no ticket URL exists, ingest with both URL fields `null` and rewrite the description in our voice (lush, restrained, editorial — not the aggregator's emoji-soup register).
+- In the daily log, list each harvested event under "Harvested from {aggregator}:" so we have an audit trail. Do NOT note the aggregator anywhere in the events DB.
+
+The vibe filter (Step 5) and quality rubric (Step 7) apply unchanged. Most aggregator listings will hard-reject — that's normal. Their universe is broader than ours.
+
 ## Step 4 — Walk Instagram handles
 
 For each handle in `sources.json.instagram_handles` not already covered in Step 2, use WebSearch to find recent posts and classify them.

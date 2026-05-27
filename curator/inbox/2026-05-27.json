@@ -1,0 +1,51 @@
+{
+  "date": "2026-05-27",
+  "events": [
+    {
+      "title": "Five Temples of Her — Live Ritual Performance",
+      "description": "A ninety-minute live ritual performance from Mariama Del Mar — spiritual dancer and world-music vocalist — staged at ASH inside Nuanu Creative City, just south of Ubud. The piece moves through myth, tradition, and inner transformation as a continuous arc, weaving tribal-fusion and contemporary movement, Japanese fan dance, and devotional vocal work (including traditional Turkish songs) over a live ensemble: didgeridoo, duduk, flutes, cello, piano, jaw harp, frame drums. Musicians include Kuropros (cello), Tatiana Gordeeva (piano), and multi-instrumentalists Stepan Suvorov and Alex Ostapenko. Closer in form to ceremony-as-concert than to a participatory dance evening — sit, watch, listen, drop in. One night only.",
+      "short_description": "Mariama Del Mar's ninety-minute live ritual performance at ASH, Nuanu — tribal-fusion + contemporary movement + devotional vocals over a live ethno ensemble. May 27.",
+      "category": "Ceremony & Sound",
+      "venue_name": "ASH at Nuanu Creative City",
+      "venue_address": "Nuanu Creative City, Bali",
+      "start_date": "2026-05-27",
+      "end_date": null,
+      "start_time": "19:00",
+      "end_time": null,
+      "is_recurring": false,
+      "recurrence_rule": null,
+      "price_info": "Tickets via Megatix",
+      "external_ticket_url": "https://megatix.co.id/events/five-temples-of-her-ash?aid=MARIAMA",
+      "source_url": "https://megatix.co.id/events/five-temples-of-her-ash?aid=MARIAMA",
+      "organizer_name": "Mariama Del Mar",
+      "organizer_instagram": null,
+      "cover_image_url": null,
+      "quality_score": 0.7,
+      "content_flags": [],
+      "intent_tags": ["spirit", "community"]
+    },
+    {
+      "title": "Shakti Bhakti Kirtan with Anu Karoliina",
+      "description": "A weekly Wednesday acoustic kirtan held at Intuitive Flow in Penestanan — community chanting to the Divine, mantra by candlelight, voices rising over a small acoustic ensemble. Led by Anu Karoliina and friends as a recurring open gathering: bring your voice, sit in the circle, let the call-and-response do the work. The studio is small and intentional; the format is devotional rather than performative. Doors at 6:30 PM, walk-in friendly. Contribution 200,000 IDR.",
+      "short_description": "Weekly Wednesday acoustic kirtan with Anu Karoliina in Penestanan — community chanting to the Divine. 6:30 PM, 200k IDR.",
+      "category": "Ceremony & Sound",
+      "venue_name": "Intuitive Flow Yogastudio",
+      "venue_address": "Jl. Raya Penestanan, Penestanan, Ubud, Bali",
+      "start_date": "2026-05-27",
+      "end_date": null,
+      "start_time": "18:30",
+      "end_time": null,
+      "is_recurring": true,
+      "recurrence_rule": "FREQ=WEEKLY;BYDAY=WE",
+      "price_info": "200,000 IDR",
+      "external_ticket_url": null,
+      "source_url": null,
+      "organizer_name": "Anu Karoliina + Friends",
+      "organizer_instagram": null,
+      "cover_image_url": null,
+      "quality_score": 0.6,
+      "content_flags": [],
+      "intent_tags": ["spirit", "community"]
+    }
+  ]
+}
