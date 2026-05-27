@@ -9,6 +9,7 @@ import { FeedbackFab } from "@/components/feedback/feedback-fab";
 import { ActivityTrailInstaller } from "@/components/feedback/activity-trail-installer";
 import { AuthSync } from "@/components/auth/auth-sync";
 import { WelcomeFirstLoginModal } from "@/components/onboarding/welcome-first-login-modal";
+import { FeedbackNudge } from "@/components/onboarding/feedback-nudge";
 import { ThemeProvider } from "@/components/theme-provider";
 import { SITE_NAME, SITE_DESCRIPTION, SITE_URL } from "@/lib/constants";
 import "./globals.css";
@@ -55,6 +56,7 @@ export default function RootLayout({
           <Toaster />
           <FeedbackFab />
           <WelcomeFirstLoginModal />
+          <FeedbackNudge />
           <ActivityTrailInstaller />
           <AuthSync />
         </ThemeProvider>
