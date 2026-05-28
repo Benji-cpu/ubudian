@@ -1,0 +1,51 @@
+{
+  "date": "2026-05-29",
+  "events": [
+    {
+      "title": "Shakti Bhakti: Kirtan & Cacao",
+      "description": "A weekly Thursday gathering in the intimate Cobra Room at Mudra Cafe, one of central Ubud's most tucked-away community spaces. Anu Karoliina & Friends lead a 90-minute devotional session blending ceremonial cacao with acoustic kirtan — mantras, harmonium, percussion, and the voices of those gathered. The format is participatory and drop-in: arrive, receive the cacao, and let the music carry you. No prior experience needed. Limited to the room's capacity, which keeps it personal and warm.",
+      "short_description": "Weekly Thursday kirtan and cacao ceremony led by Anu Karoliina & Friends in the intimate Cobra Room at Mudra Cafe, central Ubud.",
+      "category": "Ceremony & Sound",
+      "venue_name": "Mudra Cafe — The Cobra Room",
+      "venue_address": "Jl. Goutama Selatan No. 22, Ubud, Bali",
+      "start_date": "2026-05-29",
+      "end_date": null,
+      "start_time": "18:00",
+      "end_time": "19:30",
+      "is_recurring": true,
+      "recurrence_rule": "RRULE:FREQ=WEEKLY;BYDAY=TH",
+      "price_info": "IDR 150,000 early bird / IDR 200,000 at the door",
+      "external_ticket_url": "https://megatix.co.id/events/mudra-kirtan",
+      "source_url": "https://megatix.co.id/events/mudra-kirtan",
+      "organizer_name": "Anu Karoliina",
+      "organizer_instagram": null,
+      "cover_image_url": null,
+      "quality_score": 0.7,
+      "content_flags": [],
+      "intent_tags": ["spirit", "community"]
+    },
+    {
+      "title": "New Moon Bhakti Kirtan",
+      "description": "A ceremonial evening rooted in devotion: Steven Light and Valentina guide the voices of the gathered into the sacred union of Shiva and Shakti — Kali and Shiva, Radhe and Krishna, Sita and Rama. The evening opens with Bhakti Kirtan at 17:30, weaving ancient Sanskrit mantras and devotional song, then pauses for a communal dinner from organic and locally farmed produce at 19:00. At 20:00 the fire circle opens — a ceremonial space for intentions, prayers, and musical sharing in free flow. Presale IDR 220,000 / door IDR 320,000.",
+      "short_description": "A Bhakti Kirtan evening of devotional song, organic dinner, and ceremonial fire circle at School of Unified Healing, Ubud.",
+      "category": "Ceremony & Sound",
+      "venue_name": "School of Unified Healing",
+      "venue_address": "Jl. Subak Sok Wayah, Ubud, Bali",
+      "start_date": "2026-07-06",
+      "end_date": null,
+      "start_time": "17:00",
+      "end_time": "21:30",
+      "is_recurring": false,
+      "recurrence_rule": null,
+      "price_info": "IDR 220,000 presale / IDR 320,000 at the door",
+      "external_ticket_url": "https://megatix.co.id/events/new-moon-bhakti-kirtan-june",
+      "source_url": "https://megatix.co.id/events/new-moon-bhakti-kirtan-june",
+      "organizer_name": "Steven Light & Valentina",
+      "organizer_instagram": null,
+      "cover_image_url": null,
+      "quality_score": 0.7,
+      "content_flags": [],
+      "intent_tags": ["spirit", "community"]
+    }
+  ]
+}
