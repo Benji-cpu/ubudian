@@ -177,7 +177,9 @@ export async function runHealthCheck(): Promise<HealthCheckResult> {
 }
 
 /**
- * Archive all pending events whose start_date is in the past (Bali wall clock).
+ * Archive pending events whose start_date is in the past (Bali wall clock).
+ * Recurring rows are left alone — their start_date is a seed the renderer
+ * rolls forward, so a past seed is normal and must not trigger archive.
  * Returns the number of events archived.
  */
 export async function archivePastPendingEvents(): Promise<number> {
@@ -187,6 +189,7 @@ export async function archivePastPendingEvents(): Promise<number> {
     .from("events")
     .update({ status: "archived" })
     .eq("status", "pending")
+    .eq("is_recurring", false)
     .lt("start_date", today)
     .not("start_date", "is", null)
     .select("id");
