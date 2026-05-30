@@ -43,6 +43,13 @@
       "type": "instagram",
       "themes": ["dance", "ceremony", "sound"],
       "note": "Newer venue, IG-first publishing. High signal-to-noise for our themes."
+    },
+    {
+      "name": "Alchemy Yoga & Meditation Center (AYMC)",
+      "url": "https://www.alchemyyogacenter.com/ubud-events",
+      "type": "website",
+      "themes": ["dance", "ceremony", "sound"],
+      "note": "Rice-field setting in Sayan. Hosts weekly RISE Ecstatic Dance (Tue 7-9pm), monthly Full Moon Bhakti celebrations with Jeremy Sol, and Kim Kindersley ceremonial breathwork (recurring Fridays, IDR 225k). Strong community anchor. Promoted from discovered_pending 2026-05-31 (3 qualifying logs: May 19, May 23, May 26). Instagram: @alchemyyogacenterubud. Weekly RISE and Solstice Kirtan Jun 21 already in DB — scan for new specials."
     }
   ],
   "priority_b": [
@@ -93,13 +100,6 @@
     "pyramidsofchi"
   ],
   "discovered_pending": [
-    {
-      "name": "Alchemy Yoga & Meditation Center (AYMC)",
-      "url": "https://www.alchemyyogacenter.com/ubud-events",
-      "first_seen": "2026-05-19",
-      "themes": ["dance", "ceremony", "sound"],
-      "note": "Hosts weekly RISE Ecstatic Dance (Tue 7-9pm) and Full Moon Bhakti celebrations with Jeremy Sol. Sayan rice-field setting. Strong community anchor. At 2 qualifying logs (May 19, May 23) — needs 1 more to promote to priority_a."
-    },
     {
       "name": "Azadi Retreat",
       "url": "https://retreat.guru/centers/9803-1/azadi-retreat",
@@ -182,7 +182,7 @@
       "url": "https://mudracafe.com/",
       "first_seen": "2026-05-28",
       "themes": ["ceremony", "sound"],
-      "note": "Restaurant/café at Jl. Goutama Selatan No. 22, central Ubud. Has a separate intimate event space called 'The Cobra Room' that hosts 'Shakti Bhakti: Kirtan & Cacao' recurring Thursday events (Megatix slug: mudra-kirtan). Possible facilitator: Anu Karoliina (naming mirrors her Intuitive Flow Wednesday event). Verify facilitator and day/time before ingesting — could conflict with or complement the Sayuri Thursday kirtan. At 1 qualifying log (May 28) — track before promoting."
+      "note": "Restaurant/café at Jl. Goutama Selatan No. 22, central Ubud. Has a separate intimate event space called 'The Cobra Room' that hosts 'Shakti Bhakti: Kirtan & Cacao' recurring Thursday events (Megatix slug: mudra-kirtan). Possible facilitator: Anu Karoliina (naming mirrors her Intuitive Flow Wednesday event). Also hosts 'The Red Tent' — a bi-weekly Friday women's circle (6-8:30pm, tea + singing + sharing + praying) with no confirmed facilitator name yet. Kirtan ingested May 29. At 2 qualifying logs (May 28, May 29) — needs 1 more for priority_b."
     }
   ],
   "competitor_harvest": [
@@ -430,6 +430,13 @@
       "first_seen": "2026-05-28",
       "events_seen": ["Sunday Kirtan — Sayuri Healing Food, Peliatan Ubud (weekly Sun 18:00)"],
       "note": "Sunday kirtan facilitator at Sayuri Healing Food, Jl. Sukma Kesuma No. 2, Peliatan. YouTube presence confirmed ('Sunday Kirtan at Sayuri Healing Food - With Vasudev'). No Instagram or last name found. Recurring weekly Sunday session described as 'Ubud's most favourite Kirtan'. Track for IG discovery."
+    },
+    {
+      "name": "Kim Kindersley",
+      "instagram": "@heartofbreath.life",
+      "first_seen": "2026-05-31",
+      "events_seen": ["Ceremonial Breathwork (weekly Fri 2-4pm, IDR 225k) — AYMC Ubud", "Ceremonial Breathwork 2-Day Immersion — Dragonfly Village Ubud (confirmed Jul 27-28 2025; 2026 edition expected)"],
+      "note": "Ceremonial breathwork facilitator, 30+ years experience. WhaleDreaming practitioner. Holds weekly Friday sessions at AYMC Ubud and an annual 2-day WhaleDreaming immersion at Dragonfly Village (Jul 27-28, 2025 slug 'ceremonial-breathwork-immersion' confirmed past; 2026 slug expected in early July). Website: heartofbreath.life. Megatix slugs: 'ceremonial-breathwork-with-kim-kindersley-at-dragonfly-village' (standing), 'ceremonial-breathwork-immersion' (2025 past). When 2026 Dragonfly slug appears, it would score ~8 — immediate inbox."
     },
     {
       "name": "Akari Tamura (Anandamoyi Dasi)",
