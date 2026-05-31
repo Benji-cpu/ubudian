@@ -87,6 +87,13 @@
       "type": "website",
       "themes": ["ceremony", "sound"],
       "note": "Central Ubud ceremony studio (Jl. Nyuh Kuning No. 1). Weekly Friday 7 PM (cacao + Balinese ritual + sacred sound) and Sunday 7 PM (cacao + restorative movement + sound). Primary offering is ceremonial — not a yoga studio. Promoted from discovered_pending 2026-05-25 (3 qualifying logs: May 21, May 22, May 25)."
+    },
+    {
+      "name": "Mudra Cafe (The Cobra Room)",
+      "url": "https://mudracafe.com/",
+      "type": "website",
+      "themes": ["ceremony", "sound"],
+      "note": "Restaurant/café at Jl. Goutama Selatan No. 22, central Ubud. Intimate event space 'The Cobra Room' hosts the weekly Thursday 'Shakti Bhakti: Kirtan & Cacao' (18:00) led by Anu Karoliina, plus 'The Red Tent' bi-weekly Friday women's circle (no confirmed facilitator yet). Promoted from discovered_pending 2026-05-31 (2 curator logs May 28+29 + web-confirmed live weekly, approved 2026-05-31). Megatix posts dated per-edition slugs that rot weekly (mudra-kirtan + kirtanwithanu both return 'already taken place') — do NOT trust those as ticket CTAs; the recurring card runs without one."
     }
   ],
   "instagram_handles": [
@@ -176,13 +183,6 @@
       "first_seen": "2026-05-28",
       "themes": ["ceremony", "sound"],
       "note": "Established Ubud plant-based restaurant + event space (Jl. Sukma Kesuma No. 2, Peliatan, Kecamatan Ubud). Founded by Sayuri Tanaka (49K IG @sayuri_healing_food, BaliSpirit Festival presenter). Hosts weekly Thursday Kirtan: Mantra Medicine & Sacred Cacao (18:00) and weekly Sunday Kirtan with Vasudev (18:00) — called 'Ubud's most favourite Kirtan' by the community. Also hosts occasional ecstatic kirtan evenings and other ceremonies. Events page 403-blocked — walk in or check IG. At 1 qualifying log (May 28) — needs 2 more for priority_b. Events website also 403-blocked."
-    },
-    {
-      "name": "Mudra Cafe (The Cobra Room)",
-      "url": "https://mudracafe.com/",
-      "first_seen": "2026-05-28",
-      "themes": ["ceremony", "sound"],
-      "note": "Restaurant/café at Jl. Goutama Selatan No. 22, central Ubud. Has a separate intimate event space called 'The Cobra Room' that hosts 'Shakti Bhakti: Kirtan & Cacao' recurring Thursday events (Megatix slug: mudra-kirtan). Possible facilitator: Anu Karoliina (naming mirrors her Intuitive Flow Wednesday event). Also hosts 'The Red Tent' — a bi-weekly Friday women's circle (6-8:30pm, tea + singing + sharing + praying) with no confirmed facilitator name yet. Kirtan ingested May 29. At 2 qualifying logs (May 28, May 29) — needs 1 more for priority_b."
     }
   ],
   "competitor_harvest": [
@@ -421,8 +421,8 @@
       "name": "Anu Karoliina",
       "instagram": null,
       "first_seen": "2026-05-27",
-      "events_seen": ["Shakti Bhakti Kirtan — Intuitive Flow Yogastudio, Penestanan (Wed May 27)"],
-      "note": "Kirtan leader; runs recurring weekly Wednesday acoustic kirtan ('Shakti Bhakti vibes') at Intuitive Flow Yogastudio, Penestanan. 200k IDR. Format: community chanting + mantra + 'chanting to the Divine'. Surfaced via Blissbase competitor-harvest — no ticket URL exposed, walk-in or DM organiser. Track for further editions and IG discovery."
+      "events_seen": ["Shakti Bhakti: Kirtan & Cacao — Mudra Cafe (The Cobra Room), central Ubud (Thursdays 18:00) — LIVE/approved 2026-05-31"],
+      "note": "Kirtan leader. CORRECTED 2026-05-31: her 'Shakti Bhakti' KIRTAN runs every Thursday 6–7:30pm at The Cobra Room @ Mudra Cafe (central Ubud), web-confirmed. Intuitive Flow (Penestanan) is her FLOW-YOGA venue, NOT a kirtan venue — the earlier 'Intuitive Flow Wed kirtan' row was a curator venue/day mis-attribution and was archived as a dup. Format: community chanting + mantra + cacao. Megatix slugs (mudra-kirtan, kirtanwithanu) rot weekly to 'already taken place' — no reliable ticket URL; walk-in / DM organiser. IG handle still unknown — track."
     },
     {
       "name": "Vasudev",

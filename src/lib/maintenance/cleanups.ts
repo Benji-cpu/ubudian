@@ -20,6 +20,7 @@ export type LinkHealthReport = {
 
 const LINK_TIMEOUT_MS = 5000;
 const LINK_CONCURRENCY = 10;
+const LINK_BODY_SCAN_BYTES = 4000;
 
 // Megatix, Tickettailor, and buytickets.at 403 every default-UA HEAD as bot
 // protection. Use a real browser UA and fall back from HEAD→GET on 4xx so
@@ -28,7 +29,24 @@ const LINK_CONCURRENCY = 10;
 const LINK_HEALTH_UA =
   "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15";
 
-async function probe(url: string, method: "HEAD" | "GET"): Promise<number | string> {
+// A Cloudflare interstitial ("Just a moment…", "Attention Required") returns a
+// 403/503 to every UA we can send — including a real browser's — so the host is
+// actually reachable and the listing is fine. Treat these as healthy rather than
+// spamming the digest review queue every single day (tickettailor.com does this).
+const CF_CHALLENGE = /just a moment|attention required|cf-mitigated|enable javascript and cookies|cf_chl_|challenge-platform/i;
+
+// Ticketing platforms that recycle a per-edition slug serve a 200 page reading
+// "This event has already taken place" once the date passes. The URL is "alive"
+// but the CTA is dead — a distinct, actionable problem from a real 4xx/5xx.
+const STALE_EVENT = /this event has (already )?(taken place|ended|passed|finished)|event has ended|sale has ended|tickets are no longer/i;
+
+// Hosts that can return a healthy 200 while the underlying event is stale, so we
+// must read the body even on a 2xx HEAD to catch the "already taken place" case.
+const STALE_PRONE_HOST = /(?:\/\/|\.)megatix\./i;
+
+type ProbeResult = { status: number | string; body: string };
+
+async function probe(url: string, method: "HEAD" | "GET"): Promise<ProbeResult> {
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), LINK_TIMEOUT_MS);
   try {
@@ -42,20 +60,54 @@ async function probe(url: string, method: "HEAD" | "GET"): Promise<number | stri
           "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
       },
     });
-    return res.status;
+    // HEAD has no body; only read (a capped slice of) the body on GET so we can
+    // tell a Cloudflare challenge / stale-event page apart from a real failure.
+    let body = "";
+    if (method === "GET") {
+      try {
+        body = (await res.text()).slice(0, LINK_BODY_SCAN_BYTES).toLowerCase();
+      } catch {
+        body = "";
+      }
+    }
+    return { status: res.status, body };
   } catch (err) {
-    return err instanceof Error ? err.name : "fetch_error";
+    return { status: err instanceof Error ? err.name : "fetch_error", body: "" };
   } finally {
     clearTimeout(timer);
   }
 }
 
-async function headOnce(url: string): Promise<number | string> {
+async function headOnce(url: string): Promise<ProbeResult> {
   const first = await probe(url, "HEAD");
-  if (typeof first === "number" && first < 400) return first;
+  if (typeof first.status === "number" && first.status < 400) {
+    // Healthy HEAD. But some hosts (megatix) serve 200 for a passed event, so
+    // GET-verify the body for those before trusting the green status.
+    if (STALE_PRONE_HOST.test(url)) return probe(url, "GET");
+    return first;
+  }
   // HEAD returned 4xx/5xx or a non-numeric status — retry with GET. Many
-  // ticketing platforms (megatix, tickettailor) return 403 to HEAD by policy.
+  // ticketing platforms (megatix, tickettailor) return 403 to HEAD by policy,
+  // and GET gives us a body to classify (challenge vs genuinely broken).
   return probe(url, "GET");
+}
+
+/**
+ * Decide whether a probe result represents a genuinely broken link. Cloudflare
+ * challenges are reachable (not broken); stale ticketing pages are broken but
+ * flagged with a `stale` label so the human/agent clears the CTA rather than
+ * chasing a "down" host. Everything ≥400 or non-numeric stays broken.
+ */
+function classifyLink(result: ProbeResult): { broken: boolean; status: number | string } {
+  const { status, body } = result;
+  if (typeof status === "number" && (status === 403 || status === 503) && CF_CHALLENGE.test(body)) {
+    return { broken: false, status: "cf-challenge" };
+  }
+  if (typeof status === "number" && status < 400 && STALE_EVENT.test(body)) {
+    return { broken: true, status: "stale" };
+  }
+  if (typeof status === "number") return { broken: status >= 400, status };
+  return { broken: true, status };
 }
 
 async function runWithConcurrency<T, R>(
@@ -133,12 +185,8 @@ export async function checkExternalLinkHealth(): Promise<LinkHealthReport> {
       broken.push({ entity: t.entity, id: t.id, url: t.url, status: "fetch_error" });
       return;
     }
-    const status = res.value;
-    if (typeof status === "number") {
-      if (status >= 400) broken.push({ entity: t.entity, id: t.id, url: t.url, status });
-    } else {
-      broken.push({ entity: t.entity, id: t.id, url: t.url, status });
-    }
+    const { broken: isBroken, status } = classifyLink(res.value);
+    if (isBroken) broken.push({ entity: t.entity, id: t.id, url: t.url, status });
   });
 
   return { checked: targets.length, broken };

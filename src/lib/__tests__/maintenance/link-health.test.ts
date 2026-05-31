@@ -103,6 +103,66 @@ describe("checkExternalLinkHealth", () => {
     expect(typeof thrown?.status).toBe("string");
   });
 
+  it("treats a Cloudflare challenge (403 + 'Just a moment') as healthy, not broken", async () => {
+    mockOr.mockResolvedValue({
+      data: [
+        {
+          id: "evt-cf",
+          external_ticket_url: "https://www.tickettailor.com/events/barastudio/1755020",
+          venue_name: null,
+          venue_map_url: null,
+          status: "approved",
+        },
+      ],
+      error: null,
+    });
+
+    const fetchMock = vi.fn(async (_url: string | URL, init?: RequestInit) => {
+      // HEAD and GET both 403; only GET carries the interstitial body.
+      if (init?.method === "GET") {
+        return new Response("<title>Just a moment...</title>", { status: 403 });
+      }
+      return new Response(null, { status: 403 });
+    });
+    globalThis.fetch = fetchMock as unknown as typeof fetch;
+
+    const report = await checkExternalLinkHealth();
+    expect(report.checked).toBe(1);
+    expect(report.broken).toEqual([]); // challenge ≠ broken
+  });
+
+  it("flags a megatix 200 'already taken place' page as stale", async () => {
+    mockOr.mockResolvedValue({
+      data: [
+        {
+          id: "evt-stale",
+          external_ticket_url: "https://megatix.co.id/events/mudra-kirtan",
+          venue_name: null,
+          venue_map_url: null,
+          status: "approved",
+        },
+      ],
+      error: null,
+    });
+
+    const fetchMock = vi.fn(async (_url: string | URL, init?: RequestInit) => {
+      if (init?.method === "GET") {
+        return new Response("<p>This event has already taken place.</p>", { status: 200 });
+      }
+      return new Response(null, { status: 200 }); // healthy HEAD, but megatix is stale-prone → GET-verified
+    });
+    globalThis.fetch = fetchMock as unknown as typeof fetch;
+
+    const report = await checkExternalLinkHealth();
+    expect(report.checked).toBe(1);
+    expect(report.broken).toHaveLength(1);
+    expect(report.broken[0]).toMatchObject({
+      entity: "event",
+      id: "evt-stale",
+      status: "stale",
+    });
+  });
+
   it("dedupes venue map URLs across events", async () => {
     mockOr.mockResolvedValue({
       data: [
