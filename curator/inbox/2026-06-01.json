@@ -1,0 +1,28 @@
+{
+  "date": "2026-06-01",
+  "events": [
+    {
+      "title": "Inner Meeting — A 3-Day Tantra Retreat",
+      "description": "A three-day residential tantra retreat held at a private venue in Ubud, facilitated by Anand Revati and Katya Reihan. The programme draws from the Vigyana Bhairava Tantra tradition and weaves together a daily sequence of tantric meditations, pranic activation breathwork, active meditations, sensory awakening practices, and conscious tantric touch. Designed to be accessible for complete beginners while holding depth for experienced practitioners. Open to individuals, couples, and all genders and sexual orientations. Daily rhythm: morning session (9–13:00), afternoon session (15–17:30), evening session (18–20:30), with integration space in between. Venue details sent by email upon ticket purchase. Facilitated in English with Chinese translation available.",
+      "short_description": "A three-day tantra immersion in Ubud guided by Anand Revati and Katya Reihan — Vigyana Bhairava Tantra practices, breathwork, sensory awakening, and conscious touch.",
+      "category": "Tantra & Intimacy",
+      "venue_name": "Private venue, Ubud",
+      "venue_address": "Ubud, Bali (exact address provided upon ticket purchase)",
+      "start_date": "2026-07-12",
+      "end_date": "2026-07-14",
+      "start_time": "10:00",
+      "end_time": "20:30",
+      "is_recurring": false,
+      "recurrence_rule": null,
+      "price_info": "Tickets via Megatix — pricing not confirmed",
+      "external_ticket_url": "https://megatix.co.id/events/inner-meeting",
+      "source_url": "https://megatix.co.id/events/inner-meeting",
+      "organizer_name": "Anand Revati & Katya Reihan",
+      "organizer_instagram": "@ecstantric_dance",
+      "cover_image_url": null,
+      "quality_score": 0.6,
+      "content_flags": [],
+      "intent_tags": ["romance", "community"]
+    }
+  ]
+}
