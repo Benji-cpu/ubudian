@@ -271,6 +271,27 @@ describe("bucketEventsByTime", () => {
       expect(buckets.tomorrow.map((e) => e.id)).toEqual(["tues-weekly"]);
       expect(buckets.tomorrow[0].start_date).toBe("2026-04-21");
     });
+
+    // Regression for the 2026-06-01 "Sunday Kirtan" bug: a BYDAY=SU weekly whose
+    // start_date was seeded on a Monday that happened to equal today. The
+    // active-instance guard short-circuited on start_date == today and rendered
+    // Monday everywhere instead of rolling to the next Sunday.
+    it("rolls a Sunday-weekly event seeded on a Monday == today forward to Sunday", () => {
+      const mon = baliClock("2026-04-20", 10); // a Monday
+      const event = makeEvent({
+        id: "sun-kirtan",
+        start_date: "2026-04-20", // a Monday — disagrees with the BYDAY=SU rule
+        start_time: "18:00",
+      });
+      event.is_recurring = true;
+      event.recurrence_rule = "FREQ=WEEKLY;BYDAY=SU";
+
+      const buckets = bucketEventsByTime([event], mon);
+      const rolled = Object.values(buckets)
+        .flat()
+        .find((e) => e.id === "sun-kirtan");
+      expect(rolled?.start_date).toBe("2026-04-26"); // next Sunday, not Monday
+    });
   });
 
   describe("sponsorship boost", () => {

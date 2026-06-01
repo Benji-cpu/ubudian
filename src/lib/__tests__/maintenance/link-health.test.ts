@@ -163,6 +163,42 @@ describe("checkExternalLinkHealth", () => {
     });
   });
 
+  it("flags a megatix 200 as stale via past JSON-LD date even when the 'taken place' copy is buried past the scan window", async () => {
+    // Mirrors real megatix HTML: schema.org block near the top carries a past
+    // startDate, while the human-readable "already taken place" copy sits ~26KB
+    // deep. The JSON-LD signal must catch it regardless of body-scan limits.
+    mockOr.mockResolvedValue({
+      data: [
+        {
+          id: "evt-jsonld-stale",
+          external_ticket_url: "https://megatix.co.id/events/beauty-way-jun",
+          venue_name: null,
+          venue_map_url: null,
+          status: "approved",
+        },
+      ],
+      error: null,
+    });
+
+    const body =
+      `<html><head><script type="application/ld+json">` +
+      `{"@context":"https://schema.org","@type":"Event",` +
+      `"startDate":"2024-06-29T19:00:00+08:00","endDate":"2024-06-29T22:00:00+08:00"}` +
+      `</script></head><body>${"x".repeat(28000)}` +
+      `<p>This event has already taken place.</p></body></html>`;
+
+    const fetchMock = vi.fn(async (_url: string | URL, init?: RequestInit) => {
+      if (init?.method === "GET") return new Response(body, { status: 200 });
+      return new Response(null, { status: 200 }); // healthy HEAD → megatix GET-verified
+    });
+    globalThis.fetch = fetchMock as unknown as typeof fetch;
+
+    const report = await checkExternalLinkHealth();
+    expect(report.checked).toBe(1);
+    expect(report.broken).toHaveLength(1);
+    expect(report.broken[0]).toMatchObject({ id: "evt-jsonld-stale", status: "stale" });
+  });
+
   it("dedupes venue map URLs across events", async () => {
     mockOr.mockResolvedValue({
       data: [

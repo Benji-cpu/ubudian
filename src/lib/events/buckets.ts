@@ -222,9 +222,20 @@ function nextOccurrence(event: Event, today: string): Event {
       ? daysBetween(event.start_date, event.end_date)
       : 0;
 
-  // If currently inside an active instance (today within span), don't roll.
-  const endAnchor = event.end_date ?? event.start_date;
-  if (event.start_date <= today && endAnchor >= today) return event;
+  // If currently inside a genuine multi-day instance (today within the span),
+  // don't roll — a retreat on its day 4 should keep showing. We require a REAL
+  // span (end_date after start_date). A single-day recurring row must NOT treat
+  // start_date == today as an "active instance": when its seed weekday disagrees
+  // with the rule (e.g. a Sunday kirtan accidentally seeded on a Monday), that
+  // short-circuits the weekday-snap below and renders the wrong day.
+  if (
+    event.end_date &&
+    event.end_date > event.start_date &&
+    event.start_date <= today &&
+    event.end_date >= today
+  ) {
+    return event;
+  }
 
   // Weekly with day_of_week (single or multi): pick the soonest matching
   // weekday on or after max(today, start_date). Don't stride from the seed

@@ -5,6 +5,7 @@
  */
 import { createAdminClient } from "@/lib/supabase/admin";
 import { titleSimilarity } from "@/lib/maintenance/similarity";
+import { nowInBali } from "@/lib/events/bali-time";
 
 export type BrokenLink = {
   entity: "event" | "venue";
@@ -20,7 +21,10 @@ export type LinkHealthReport = {
 
 const LINK_TIMEOUT_MS = 5000;
 const LINK_CONCURRENCY = 10;
-const LINK_BODY_SCAN_BYTES = 4000;
+// Megatix renders the "already taken place" copy ~26KB into the document, well
+// past a 4KB window — which silently defeated stale detection. Scan enough of
+// the body to reach it (and the JSON-LD block near the top is cheap either way).
+const LINK_BODY_SCAN_BYTES = 40000;
 
 // Megatix, Tickettailor, and buytickets.at 403 every default-UA HEAD as bot
 // protection. Use a real browser UA and fall back from HEAD→GET on 4xx so
@@ -43,6 +47,20 @@ const STALE_EVENT = /this event has (already )?(taken place|ended|passed|finishe
 // Hosts that can return a healthy 200 while the underlying event is stale, so we
 // must read the body even on a 2xx HEAD to catch the "already taken place" case.
 const STALE_PRONE_HOST = /(?:\/\/|\.)megatix\./i;
+
+// Stale-prone ticketing pages (megatix) embed a schema.org JSON-LD block near
+// the top of the document carrying the real event date. That's a far more
+// reliable stale signal than the "already taken place" copy buried deep in the
+// body — a no-year slug like `/events/beauty-way-jun` 200s happily while the
+// JSON-LD startDate reads 2024. Parse it and treat an event whose last day is
+// already past as stale, even on a healthy 200.
+const JSONLD_START_DATE = /"startdate"\s*:\s*"(\d{4}-\d{2}-\d{2})/i;
+const JSONLD_END_DATE = /"enddate"\s*:\s*"(\d{4}-\d{2}-\d{2})/i;
+
+/** Last calendar day (YYYY-MM-DD) the embedded JSON-LD claims, or null. */
+function embeddedEventLastDay(body: string): string | null {
+  return body.match(JSONLD_END_DATE)?.[1] ?? body.match(JSONLD_START_DATE)?.[1] ?? null;
+}
 
 type ProbeResult = { status: number | string; body: string };
 
@@ -98,13 +116,22 @@ async function headOnce(url: string): Promise<ProbeResult> {
  * flagged with a `stale` label so the human/agent clears the CTA rather than
  * chasing a "down" host. Everything ≥400 or non-numeric stays broken.
  */
-function classifyLink(result: ProbeResult): { broken: boolean; status: number | string } {
+function classifyLink(
+  result: ProbeResult,
+  todayISO: string,
+): { broken: boolean; status: number | string } {
   const { status, body } = result;
   if (typeof status === "number" && (status === 403 || status === 503) && CF_CHALLENGE.test(body)) {
     return { broken: false, status: "cf-challenge" };
   }
-  if (typeof status === "number" && status < 400 && STALE_EVENT.test(body)) {
-    return { broken: true, status: "stale" };
+  if (typeof status === "number" && status < 400) {
+    // Healthy HTTP status, but the listing itself may be a past edition. Two
+    // signals: the embedded JSON-LD event date is already behind us, or the
+    // page carries the "already taken place" copy. Either means a dead CTA.
+    const lastDay = embeddedEventLastDay(body);
+    if ((lastDay && lastDay < todayISO) || STALE_EVENT.test(body)) {
+      return { broken: true, status: "stale" };
+    }
   }
   if (typeof status === "number") return { broken: status >= 400, status };
   return { broken: true, status };
@@ -178,6 +205,7 @@ export async function checkExternalLinkHealth(): Promise<LinkHealthReport> {
 
   const settled = await runWithConcurrency(targets, LINK_CONCURRENCY, (t) => headOnce(t.url));
 
+  const todayISO = nowInBali().dateStr;
   const broken: BrokenLink[] = [];
   settled.forEach((res, i) => {
     const t = targets[i];
@@ -185,7 +213,7 @@ export async function checkExternalLinkHealth(): Promise<LinkHealthReport> {
       broken.push({ entity: t.entity, id: t.id, url: t.url, status: "fetch_error" });
       return;
     }
-    const { broken: isBroken, status } = classifyLink(res.value);
+    const { broken: isBroken, status } = classifyLink(res.value, todayISO);
     if (isBroken) broken.push({ entity: t.entity, id: t.id, url: t.url, status });
   });
 
