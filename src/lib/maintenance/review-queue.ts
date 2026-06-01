@@ -69,7 +69,10 @@ export async function buildReviewQueue(linkHealth?: LinkHealthReport): Promise<R
     .map((e) => {
       const reasons: string[] = [];
       if (e.end_date && e.end_date < e.start_date) reasons.push("end_date < start_date");
-      if (!e.start_time) reasons.push("missing start_time");
+      // Multi-day, all-day events (festivals, art crawls, markets) legitimately have no
+      // single start_time — flagging them is noise that recurs in the digest every day.
+      const isMultiDay = !!e.end_date && e.end_date > e.start_date;
+      if (!e.start_time && !isMultiDay) reasons.push("missing start_time");
       return reasons.length
         ? { id: e.id, title: e.title, reason: reasons.join("; ") }
         : null;

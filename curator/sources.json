@@ -236,6 +236,13 @@
   ],
   "discovered_pending": [
     {
+      "name": "Nuanu Creative City — informal CI jams",
+      "url": "https://nuanu.com/",
+      "first_seen": "2026-06-02",
+      "themes": ["dance"],
+      "note": "User-reported (Mieka + Celina, 2026-06-01): informal contact-improv jams run at Nuanu on days Moksa Dojo / Paradiso aren't on. No fixed public schedule — announced in the Ubud CI Telegram (see competitor_harvest). Track for a concrete recurring slot once that Telegram scout is joined. Distinct from 'ASH at Nuanu', which we already track separately."
+    },
+    {
       "name": "Azadi Retreat",
       "url": "https://retreat.guru/centers/9803-1/azadi-retreat",
       "first_seen": "2026-05-20",
@@ -411,6 +418,20 @@
       "type": "competitor_aggregator",
       "themes": ["dance", "tantra", "ceremony", "sound"],
       "note": "**Highest-value scout we don't yet ingest.** Daily human-curated drop — admin only posts selected events per day (described publicly as 'free of clutter, admin only posts selected events every day'). This is the closest existing analogue to The Ubudian's own editorial register, so each post is essentially pre-filtered for our universe. **Operational path:** once Benji joins (provide invite link / channel ID), route through the existing `whatsapp.ts` WAHA adapter and treat the channel ID as a `priority_a`-grade source rather than a competitor. Until joined, this entry is a placeholder reminding the morning routine to chase the invite. **Attribution rules apply** — never store the WhatsApp invite URL on an event; capture only the downstream Megatix / Ticket Tailor / venue URL the curator pastes."
+    },
+    {
+      "name": "Ubud Contact Improv / Water Contact Telegram",
+      "url": "https://t.me/+fVtY9V8HAtJlMzRi",
+      "type": "competitor_aggregator",
+      "themes": ["dance"],
+      "note": "**User-reported gap (Mieka, 2026-06-01; Celina posted an alt invite https://t.me/+g8AH2_HdzIdhNDli).** Telegram channel where Ubud's contact-improv community posts jams, classes and *water contact* sessions. Two users independently flagged that the informal Nuanu jams (run 'whenever Moksa Dojo isn't on') live here and are missing from our agenda — squarely our `Dance & Movement` ICP. **Operational path:** needs Benji to join from his phone (closed invite, same blocker as the ShambAllah WhatsApp channel), then route via a Telegram adapter with the bot as a member. Highest-value CI scout we don't yet ingest. **Attribution rules apply** — never store the t.me invite on an event."
+    },
+    {
+      "name": "Brazilian Zouk / Latin socials WhatsApp (Ubud)",
+      "url": "https://chat.whatsapp.com/G7HT6SrlkJBHERw1QFX6Lz",
+      "type": "competitor_aggregator",
+      "themes": ["dance"],
+      "note": "**User-reported (Celina, 2026-06-01).** WhatsApp group for Brazilian zouk socials + Latin dance in Ubud. **Borderline ICP** — partner-dance / 'more normie' than the conscious-community core; we already carry one zouk social (CREMOSO at Bara). Whether to broaden into social Latin/zouk is a Benji design-direction call before ingesting. Parked as a tracked scout, not promoted. **Attribution rules apply**."
     }
   ],
   "rejected_permanent": [],
