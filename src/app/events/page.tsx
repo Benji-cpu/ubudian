@@ -399,9 +399,11 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
 
       {/* Newsletter capture. The agenda is the highest-intent surface on the
           site — a visitor who scrolled the week is the likeliest to want it
-          delivered. Literal-hex cream on the locked-dark green band (the
-          brand-cream token inverts in dark mode). */}
-      <section className="border-t border-brand-gold/15 bg-brand-deep-green">
+          delivered. Literal hex for BOTH the green band and the cream text —
+          --brand-deep-green / --brand-cream are foreground tokens that invert
+          in dark mode, so `bg-brand-deep-green` would render light-sage at
+          night. Lock the band the same way the events/home heroes are locked. */}
+      <section className="border-t border-brand-gold/15 bg-[#2C4A3E]">
         <div className="mx-auto max-w-2xl px-4 py-16 text-center sm:px-6">
           <p className="font-serif text-2xl text-[#FAF5EC] sm:text-3xl">
             Never miss the good ones.
