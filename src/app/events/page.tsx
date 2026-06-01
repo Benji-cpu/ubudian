@@ -21,6 +21,9 @@ import { eventIsHappeningNow, nowInBali } from "@/lib/events/bali-time";
 import { filterEventsInRange } from "@/lib/events/filter-range";
 import { getActiveBoostedEventIds, getCategorySponsor } from "@/lib/sponsors/sponsor-service";
 import { PartnerCredit } from "@/components/sponsors/partner-credit";
+import { splitByTier, pickSpotlight, bannerEyebrow } from "@/lib/events/discovery";
+import { FestivalBanner } from "@/components/events/festival-banner";
+import { MoreHappenings } from "@/components/events/more-happenings";
 import type { ArchetypeId, Event, Experience, QuizResultRecord, Sponsor } from "@/types";
 
 const VIEWS_USING_OWN_VIEWPORT = new Set(["calendar", "week"]);
@@ -244,14 +247,38 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
     viewEvents = viewEvents.filter((event) => eventIsHappeningNow(event, baliNow));
   }
 
+  // Two-tier split: the conscious-community CORE agenda renders first; the
+  // broader DISCOVERY set (festivals, galleries, markets, food, performance)
+  // lives in the collapsed "More happenings" section below. When a category
+  // filter resolves entirely to discovery (e.g. ?category=Art%20%26%20Culture),
+  // discovery becomes the primary feed so we never show an empty core agenda
+  // above a hidden section. Calendar/Week views keep their full set untouched.
+  const { core, discovery } = splitByTier(viewEvents);
+  const primaryEvents = core.length ? core : discovery;
+  const extraDiscovery = core.length ? discovery : [];
+  const spotlight = useOwnViewport ? null : pickSpotlight(discovery);
+  const heroCount = useOwnViewport ? viewEvents.length : primaryEvents.length;
+
   return (
     <div>
       <RefreshOnFocus />
 
-      <EventsHero totalCount={viewEvents.length} />
+      <EventsHero totalCount={heroCount} />
+
+      {spotlight && (
+        <div className="mt-2">
+          <FestivalBanner
+            href={`/events/${spotlight.slug}`}
+            eyebrow={bannerEyebrow(spotlight)}
+            title={spotlight.title}
+            line={spotlight.short_description}
+            dismissKey={`ubudian:spotlight:${spotlight.id}`}
+          />
+        </div>
+      )}
 
       {VIEWS_WITH_FEATURED_STRIP.has(view) && (
-        <FeaturedStrip events={viewEvents} boostedEventIds={boostedEventIds} />
+        <FeaturedStrip events={primaryEvents} boostedEventIds={boostedEventIds} />
       )}
 
       {/* Controls — clear hierarchy:
@@ -316,27 +343,51 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
       {/* Content */}
       <section className="mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:px-8">
         {isFeedView ? (
-          <Suspense>
-            <AgendaFeed
-              events={viewEvents}
-              currentProfileId={currentProfileId}
-              savedEventIds={savedEventIds}
-              viewerArchetypes={viewerArchetypes}
-              archetypeLabel={archetypeLabel}
-              boostedEventIds={boostedEventIds}
-            />
-          </Suspense>
+          <>
+            <Suspense>
+              <AgendaFeed
+                events={primaryEvents}
+                currentProfileId={currentProfileId}
+                savedEventIds={savedEventIds}
+                viewerArchetypes={viewerArchetypes}
+                archetypeLabel={archetypeLabel}
+                boostedEventIds={boostedEventIds}
+              />
+            </Suspense>
+            {extraDiscovery.length > 0 && (
+              <div className="mt-14">
+                <MoreHappenings
+                  events={extraDiscovery}
+                  currentProfileId={currentProfileId}
+                  savedEventIds={savedEventIds}
+                  boostedEventIds={boostedEventIds}
+                />
+              </div>
+            )}
+          </>
         ) : isMapView ? (
-          <MapView events={viewEvents} />
+          <MapView events={primaryEvents} />
         ) : (
-          <Suspense>
-            <PriceFilteredEvents
-              events={useOwnViewport ? allEvents : viewEvents}
-              view={view}
-              currentProfileId={currentProfileId}
-              savedEventIds={savedEventIds}
-            />
-          </Suspense>
+          <>
+            <Suspense>
+              <PriceFilteredEvents
+                events={useOwnViewport ? allEvents : primaryEvents}
+                view={view}
+                currentProfileId={currentProfileId}
+                savedEventIds={savedEventIds}
+              />
+            </Suspense>
+            {!useOwnViewport && extraDiscovery.length > 0 && (
+              <div className="mt-14">
+                <MoreHappenings
+                  events={extraDiscovery}
+                  currentProfileId={currentProfileId}
+                  savedEventIds={savedEventIds}
+                  boostedEventIds={boostedEventIds}
+                />
+              </div>
+            )}
+          </>
         )}
       </section>
 

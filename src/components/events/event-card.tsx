@@ -3,6 +3,7 @@ import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { formatEventTime, isRecentlyAddedEvent } from "@/lib/utils";
 import { formatEventDateLine } from "@/lib/events/format";
+import { getTimeSensitivityLabel } from "@/lib/events/discovery";
 import { isFreeEvent } from "@/lib/price-parser";
 import { EventCardPlaceholder } from "./event-card-placeholder";
 import { EventCardExternalLinks } from "./event-card-external-links";
@@ -17,6 +18,7 @@ interface EventCardProps {
 export function EventCard({ event, saveButton }: EventCardProps) {
   const dateLine = formatEventDateLine(event);
   const isFree = isFreeEvent(event.price_info);
+  const timeSensitivity = getTimeSensitivityLabel(event);
 
   return (
     <Link href={`/events/${event.slug}`} className="group block">
@@ -50,10 +52,16 @@ export function EventCard({ event, saveButton }: EventCardProps) {
             <h3 className="font-serif text-lg font-medium leading-snug tracking-tight text-brand-deep-green line-clamp-1 flex-1 transition-colors">
               {event.title}
             </h3>
-            {isRecentlyAddedEvent(event.created_at, event.start_date) && (
-              <span className="shrink-0 rounded-full bg-brand-gold/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.16em] text-brand-deep-green">
-                New
+            {timeSensitivity ? (
+              <span className="shrink-0 rounded-full bg-brand-terracotta px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.16em] text-white">
+                {timeSensitivity}
               </span>
+            ) : (
+              isRecentlyAddedEvent(event.created_at, event.start_date) && (
+                <span className="shrink-0 rounded-full bg-brand-gold/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.16em] text-brand-deep-green">
+                  New
+                </span>
+              )
             )}
           </div>
 

@@ -125,6 +125,13 @@ export interface Event {
   rejection_reason: string | null;
   is_placeholder: boolean;
   is_core: boolean;
+  /** Which feed tier this event lives in. `core` = the conscious-community
+   *  agenda (rendered first). `discovery` = the broader "More happenings in
+   *  Ubud" section (festivals, galleries, markets, food, performance).
+   *  Orthogonal to is_core — a gallery opening is is_core=false + discovery. */
+  event_tier: "core" | "discovery";
+  /** Editorial flag for the single floating festival banner above the feed. */
+  is_spotlight: boolean;
   is_members_only: boolean;
   members_only_teaser: string | null;
   archetype_tags: ArchetypeId[];

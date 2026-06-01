@@ -60,6 +60,7 @@ export const EVENT_CATEGORIES = [
   "Circle & Community",
   "Music & Performance",
   "Art & Culture",
+  "Food & Makers",
   "Retreat & Training",
   "Other",
 ] as const;
@@ -110,6 +111,7 @@ export const CATEGORY_EMOJI: Record<string, string> = {
   "Circle & Community": "⭕",
   "Music & Performance": "🎵",
   "Art & Culture": "🎨",
+  "Food & Makers": "🧺",
   "Retreat & Training": "🏕️",
   "Other": "📌",
 };
@@ -123,6 +125,7 @@ export const CATEGORY_GRADIENTS: Record<string, string> = {
   "Circle & Community": "from-orange-600 to-amber-800",
   "Music & Performance": "from-purple-600 to-indigo-800",
   "Art & Culture": "from-rose-500 to-pink-700",
+  "Food & Makers": "from-amber-600 to-stone-800",
   "Retreat & Training": "from-emerald-600 to-green-900",
   "Other": "from-gray-500 to-slate-700",
 };
@@ -142,6 +145,7 @@ export const CATEGORY_BRAND_GRADIENTS: Record<string, string> = {
   "Circle & Community": "from-[#B85C3F] via-[#A8853A] to-[#C9A84C]",
   "Music & Performance": "from-[#2D2D2D] via-[#1F3A32] to-[#2C4A3E]",
   "Art & Culture": "from-[#B85C3F] via-[#7A3E2B] to-[#2C4A3E]",
+  "Food & Makers": "from-[#C9A84C] via-[#A8853A] to-[#2C4A3E]",
   "Retreat & Training": "from-[#2C4A3E] via-[#253D33] to-[#2D2D2D]",
   "Other": "from-[#2D2D2D] via-[#2C4A3E] to-[#3A5A4A]",
 };
