@@ -67,7 +67,7 @@ interface EventsPageProps {
 
 export default async function EventsPage({ searchParams }: EventsPageProps) {
   const params = await searchParams;
-  const view = params.view || "feed";
+  const view = params.view || "list";
 
   let allEvents: Event[] = [];
   let categoryGuide: Experience | null = null;
@@ -294,7 +294,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
           <Suspense>
             <EventSearch />
           </Suspense>
-          <div className="flex items-center gap-2 sm:flex-shrink-0">
+          <div className="flex flex-wrap items-center gap-2 sm:flex-nowrap sm:flex-shrink-0">
             {!isFeedView && !isMapView && (
               <Suspense>
                 <EventSortSelect />

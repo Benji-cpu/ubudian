@@ -52,7 +52,7 @@ const VIEWS = [
 export function ViewSwitcher() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const currentView = searchParams.get("view") || "feed";
+  const currentView = searchParams.get("view") || "list";
 
   function setView(view: string) {
     const params = new URLSearchParams(searchParams.toString());

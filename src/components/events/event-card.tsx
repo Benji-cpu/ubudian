@@ -49,7 +49,7 @@ export function EventCard({ event, saveButton }: EventCardProps) {
         {/* Content */}
         <div className="min-w-0 flex-1">
           <div className="flex items-start gap-2">
-            <h3 className="font-serif text-lg font-medium leading-snug tracking-tight text-brand-deep-green line-clamp-1 flex-1 transition-colors">
+            <h3 className="font-serif text-lg font-medium leading-snug tracking-tight text-brand-deep-green line-clamp-2 flex-1 transition-colors">
               {event.title}
             </h3>
             {timeSensitivity ? (
