@@ -32,6 +32,12 @@ export interface ParsedEvent {
   content_flags?: string[];
   // Guide intent tagging (set by LLM)
   intent_tags?: string[];
+  // Feed tier. `discovery` routes the event into the "More happenings in Ubud"
+  // section (festivals, gallery openings, markets, food, performance) instead of
+  // the core conscious-community agenda. Defaults to `core` when unset. Note:
+  // `is_spotlight` (the festival banner) is intentionally NOT settable here —
+  // the banner stays an editorial/admin decision.
+  event_tier?: "core" | "discovery";
   // Source tracking (set by adapter)
   source_url?: string | null;
   source_event_id?: string | null;

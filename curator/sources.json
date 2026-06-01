@@ -1,6 +1,6 @@
 {
-  "version": 1,
-  "_doc": "Compounding source list. The daily curator agent reads this each run and may append to discovered_pending. Promote venues from discovered_pending into priority_a/b only after they've shown up in at least 3 daily logs with quality events. Edit this file directly to add or retire sources.",
+  "version": 2,
+  "_doc": "Compounding source list. The daily curator agent reads this each run and may append to discovered_pending. Promote venues from discovered_pending into priority_a/b only after they've shown up in at least 3 daily logs with quality events. Edit this file directly to add or retire sources. priority_a/b + instagram_handles + competitor_harvest feed the CORE conscious tier; discovery_sources feed the DISCOVERY tier (event_tier='discovery') — festivals/galleries/markets/food/performance, first-party only, greater-Ubud only. See curator/playbook.md 'Discovery tier'.",
   "priority_a": [
     {
       "name": "Yoga Barn — events calendar",
@@ -94,6 +94,134 @@
       "type": "website",
       "themes": ["ceremony", "sound"],
       "note": "Restaurant/café at Jl. Goutama Selatan No. 22, central Ubud. Intimate event space 'The Cobra Room' hosts the weekly Thursday 'Shakti Bhakti: Kirtan & Cacao' (18:00) led by Anu Karoliina, plus 'The Red Tent' bi-weekly Friday women's circle (no confirmed facilitator yet). Promoted from discovered_pending 2026-05-31 (2 curator logs May 28+29 + web-confirmed live weekly, approved 2026-05-31). Megatix posts dated per-edition slugs that rot weekly (mudra-kirtan + kirtanwithanu both return 'already taken place') — do NOT trust those as ticket CTAs; the recurring card runs without one."
+    }
+  ],
+  "discovery_sources": [
+    {
+      "name": "Ubud Food Festival",
+      "url": "https://www.ubudfoodfestival.com/",
+      "instagram": "ubudfoodfest",
+      "type": "website",
+      "tier": "discovery",
+      "category_hint": "Food & Makers",
+      "note": "Annual, late May, Taman Kuliner. INGEST AS ONE PARENT CARD pointing at the official programme — never a card per dinner/masterclass. Theme + dates announced ~6-8 weeks out. 2026 edition (28-31 May) already passed."
+    },
+    {
+      "name": "Ubud Writers & Readers Festival (UWRF)",
+      "url": "https://www.ubudwritersfestival.com/",
+      "instagram": "ubudwritersfest",
+      "type": "website",
+      "tier": "discovery",
+      "category_hint": "Art & Culture",
+      "note": "Annual, late Oct, across Ubud venues. ONE PARENT CARD — 100+ sessions roll into the single festival event. Free art-exhibition openings can be distinct events if separately RSVP'd. Already seeded 2026 (21-25 Oct)."
+    },
+    {
+      "name": "Ubud Open Studios",
+      "url": "https://www.ubudopenstudios.com/",
+      "instagram": "ubudopenstudios",
+      "type": "website",
+      "tier": "discovery",
+      "category_hint": "Art & Culture",
+      "note": "Annual, early June, 60+ studios across Ubud + Gianyar. Self-guided crawl = one parent card; Art Talks programme can be separate if separately ticketed. Already seeded 2026 (5-7 Jun, spotlight)."
+    },
+    {
+      "name": "Ubud Village Jazz Festival",
+      "url": "https://ubudvillagejazzfestival.com/",
+      "instagram": "ubudvillagejazzfestival",
+      "type": "website",
+      "tier": "discovery",
+      "category_hint": "Music & Performance",
+      "note": "Annual, early Aug, Sthala (Wos River, Ubud). One parent card. Lineup + Megatix early-bird announced Apr-Jun. Already seeded 2026 (7-8 Aug)."
+    },
+    {
+      "name": "Ubud Folk Festival",
+      "url": "https://www.instagram.com/ubudfolkfest/",
+      "instagram": "ubudfolkfest",
+      "type": "instagram",
+      "tier": "discovery",
+      "category_hint": "Music & Performance",
+      "note": "Annual, ~April, Biji World (Mas, greater-Ubud). Folk/indie/world music + live art + vinyl market. One parent card."
+    },
+    {
+      "name": "Komaneka Fine Art Gallery",
+      "url": "https://gallery.komaneka.com/",
+      "instagram": "komaneka_gallery",
+      "type": "website",
+      "tier": "discovery",
+      "category_hint": "Art & Culture",
+      "note": "Monkey Forest Rd, Ubud. 4-6 short-run exhibitions/year + vernissages. Opening nights are one-off discovery events (often the only time the artist is present). First-party site posts full curatorial text + dates."
+    },
+    {
+      "name": "Titik Dua / W Barwa Gallery",
+      "url": "https://titikdua.id/",
+      "instagram": "titikduaubud",
+      "type": "instagram",
+      "tier": "discovery",
+      "category_hint": "Art & Culture",
+      "note": "Peliatan (greater-Ubud). Highest-reach Ubud gallery IG (~25k). Monthly exhibitions + artist talks + book launches. Strongest single signal for openings in the design/architecture-adjacent space."
+    },
+    {
+      "name": "Tonyraka Art Gallery",
+      "url": "https://www.instagram.com/tonyrakagallery/",
+      "instagram": "tonyrakagallery",
+      "type": "instagram",
+      "tier": "discovery",
+      "category_hint": "Art & Culture",
+      "note": "Jl. Raya Mas (Mas village, greater-Ubud). Contemporary/modern/tribal. Posts opening nights on IG. Separate Art Lounge (@tonyrakaartlounge)."
+    },
+    {
+      "name": "ARMA — Agung Rai Museum of Art",
+      "url": "https://www.armabali.com/",
+      "instagram": "armamuseum",
+      "type": "website",
+      "tier": "discovery",
+      "category_hint": "Art & Culture",
+      "note": "Pengosekan, Ubud. Museum exhibitions + annual ARMA Fest (Sept). Ingest exhibitions + the festival; SKIP the nightly tourist dance shows (Kecak/Legong as standalone admission) unless a distinct special edition."
+    },
+    {
+      "name": "Gaya Art Space / Gaya Ceramic Arts Centre",
+      "url": "https://www.instagram.com/gayacac/",
+      "instagram": "gayacac",
+      "type": "instagram",
+      "tier": "discovery",
+      "category_hint": "Art & Culture",
+      "note": "Sayan (greater-Ubud). Monthly artist talks + ceramic exhibitions + residency showcases. Non-profit gallery register — on-brand."
+    },
+    {
+      "name": "Purga Artspace",
+      "url": "https://www.instagram.com/purgaartspace/",
+      "instagram": "purgaartspace",
+      "type": "instagram",
+      "tier": "discovery",
+      "category_hint": "Art & Culture",
+      "note": "Jl. Bisma, Ubud. Artist-run space + Littletalks bookshop + cafe. Irregular but genuine exhibition openings; participates in Ubud Open Studios."
+    },
+    {
+      "name": "Ubud Organic Farmers Market",
+      "url": "https://ubudorganicmarket.org/",
+      "instagram": "ubudorganicfarmersmarket",
+      "type": "website",
+      "tier": "discovery",
+      "category_hint": "Food & Makers",
+      "note": "Saturdays 9am-1pm, Jl. Raya Pengosekan. Already seeded as a recurring resident anchor. As a SOURCE here, surface only special editions / one-off maker markets — the weekly instance already lives in the feed (don't duplicate)."
+    },
+    {
+      "name": "Locavore NXT / Locavore events",
+      "url": "https://locavorenxt.com/",
+      "instagram": "locavorenxt",
+      "type": "website",
+      "tier": "discovery",
+      "category_hint": "Food & Makers",
+      "note": "Ubud. Chef collabs, six-hands dinners, guest-chef takeovers — structurally one-off (the pairing never reassembles). Sharpest time-sensitivity in the discovery tier. First-party booking only."
+    },
+    {
+      "name": "Paradiso Ubud (performance / salons — NOT cinema)",
+      "url": "https://www.instagram.com/paradisoubud/",
+      "instagram": "paradisoubud",
+      "type": "instagram",
+      "tier": "discovery",
+      "category_hint": "Music & Performance",
+      "note": "Cross-ref: Paradiso is also a core priority_a source for ecstatic dance. For DISCOVERY, surface its curated live-music / performance-art / salon nights. Cinema stays hard-rejected unless the tight Phase-4 panel/Q&A exception is met. Dedup against the core entry + any seeded events."
     }
   ],
   "instagram_handles": [

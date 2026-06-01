@@ -24,6 +24,15 @@ The Ubudian is **lush, restrained, editorial**. Aman / COMO / National Geographi
 
 Quality over quantity. A day with 6 dope events is better than a day with 30 mediocre ones. If a source yields nothing today, it yields nothing today — do not pad.
 
+## Two tiers — core + discovery
+
+You now feed **two** universes (see `playbook.md` for the full rules):
+
+- **Core** (`event_tier='core'`, the default) — the conscious-community agenda: Dance & Movement, Tantra & Intimacy, Ceremony & Sound. This is your existing beat (`priority_a`, `priority_b`, the IG handles, the competitor-harvest scouts).
+- **Discovery** (`event_tier='discovery'`) — the broader "More happenings in Ubud" tier: **named festivals (big + small), art gallery/studio openings + exhibitions, farmers/artisan markets, food (chef collabs, foraging dinners, supper clubs), live music + performance.** Sourced from `sources.json.discovery_sources`. **Focus = festivals/markets/galleries/food — NOT Balinese ceremony** (occasional light touch at most, never the banner).
+
+Discovery has its own hard rules in `playbook.md` ("Discovery tier"): **first-party sources only** (never an aggregator URL), **greater-Ubud only** (exclude Nuanu/Sanur/Denpasar), **festival = one parent card** (never 20 sub-events), **suppress pure-recurring bulk**, and **`is_spotlight` is editorial — never set it**. Stamp every discovery event with `event_tier='discovery'`.
+
 ## Step 1 — Confirm date and load context
 
 ```bash
@@ -113,6 +122,19 @@ The vibe filter (Step 5) and quality rubric (Step 7) apply unchanged. Most scout
 
 For each handle in `sources.json.instagram_handles` not already covered in Step 2, use WebSearch to find recent posts and classify them.
 
+## Step 4b — Walk discovery-tier sources
+
+For each entry in `sources.json.discovery_sources`, fetch by `type` (website → WebFetch + parse; instagram → WebSearch the handle). These feed the **discovery** tier — festivals, galleries, markets, food, performance. Apply the playbook's **Discovery tier** rules, not the core vibe filter:
+
+- **First-party only.** Every discovery event must trace to a first-party source. If you learn of a festival/opening via an aggregator scout, confirm it on the official site/IG before ingesting, and link only the first-party URL. Never store an aggregator URL.
+- **Greater-Ubud only.** Drop Denpasar / Sanur / Nuanu / Canggu events.
+- **Festival = one parent card.** Ingest a multi-session festival as a single event pointing at its official programme — do not emit a card per dinner/session.
+- **Suppress pure-recurring bulk.** A standing weekly market/show enters only when the instance is distinguished; a couple of genuine resident anchors may run `is_recurring=true`.
+- **Stamp `event_tier='discovery'`** on every event from this step. **Never set `is_spotlight`** — the banner is editorial.
+- Map category to `Art & Culture` / `Music & Performance` / `Food & Makers` (or `Dance & Movement` for a festival movement session). Quality rubric is the same ≥6, weighting time-sensitivity harder.
+
+Yield here is lumpy — most days a discovery source has nothing new (a festival announces once, months out). That's fine; don't pad.
+
 ## Step 5 — Apply the vibe filter (see playbook.md)
 
 For each candidate, reject if it matches any **Hard reject** in `playbook.md`:
@@ -152,7 +174,8 @@ Score on facilitator reputation, description specificity, venue quality, novelty
 
 For each accepted event, set:
 
-- `category`: `"Dance & Movement"` | `"Tantra & Intimacy"` | `"Ceremony & Sound"` (exactly one)
+- `category`: exactly one — core: `"Dance & Movement"` | `"Tantra & Intimacy"` | `"Ceremony & Sound"`; discovery: `"Art & Culture"` | `"Music & Performance"` | `"Food & Makers"` (or `"Dance & Movement"` for a festival movement session).
+- `event_tier`: `"discovery"` for discovery-universe events; omit (defaults `"core"`) for the three conscious categories. **Never set `is_spotlight`** — not a curator field.
 - `intent_tags`: per the playbook tagging rules
 - `quality_score`: the integer / 10, as a float (e.g. 7 → 0.7)
 - `content_flags`: `[]` unless something warrants a flag
@@ -178,7 +201,8 @@ Schema (matches `ParsedEvent` in `src/lib/ingestion/types.ts`):
       "title": "string",
       "description": "string",
       "short_description": "string | null",
-      "category": "Dance & Movement | Tantra & Intimacy | Ceremony & Sound",
+      "category": "Dance & Movement | Tantra & Intimacy | Ceremony & Sound | Art & Culture | Music & Performance | Food & Makers",
+      "event_tier": "core | discovery (omit for core; set 'discovery' for festivals/galleries/markets/food/performance)",
       "venue_name": "string | null",
       "venue_address": "string | null",
       "start_date": "YYYY-MM-DD",

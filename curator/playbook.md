@@ -20,6 +20,44 @@ Three categories only, mapping 1:1 to `EVENT_CATEGORIES` in `src/lib/constants.t
 | Tantra, conscious sexuality, embodied intimacy, sacred sexuality | `Tantra & Intimacy` |
 | Cacao ceremony, sound bath, gong/bowl journey, breathwork-as-ceremony, moon ceremony | `Ceremony & Sound` |
 
+These three are the **core** tier (`event_tier='core'` — the default). They render first in the conscious-community agenda.
+
+## Discovery tier — the second universe (`event_tier='discovery'`)
+
+A separate, broader universe that lands in the "More happenings in Ubud" section **below** the core feed — diverse, time-sensitive cultural events that residents want to catch before they're gone. Stamp every event from this universe with `event_tier='discovery'` (the core three omit the field / default to `core`).
+
+| Discovery universe | DB `category` |
+|--------------------|---------------|
+| Named festivals (big + small): Food Festival, Writers & Readers, Open Studios, Folk Festival, jazz/world-music festivals | `Art & Culture` or `Music & Performance` per type |
+| Art gallery / studio openings (vernissages), exhibitions, artist talks, open studios | `Art & Culture` |
+| Live music, jazz, gamelan-as-concert, performance art, curated salons | `Music & Performance` |
+| Farmers / artisan / maker markets, chef collabs, foraging dinners, supper clubs, producer showcases | `Food & Makers` |
+| Festival movement sessions (e.g. an ecstatic-dance slot inside a festival) | `Dance & Movement` — but still `event_tier='discovery'` |
+
+**What discovery is NOT:** Balinese ceremony (Nyepi / Galungan / Purnama) is an **occasional light touch at most** — never the focus, never the banner. The focus is festivals, markets, galleries, food, performance. (This is a deliberate steer; do not centre the ceremonial calendar.)
+
+### Discovery hard rules (all must hold)
+
+1. **First-party sources only.** A discovery event is eligible ONLY if it traces to a first-party source — the festival's official site/IG, the gallery's own page/IG, or the venue. Aggregators (NOW! Bali, Honeycombers, BaliBuddies, ubudcommunity, allevents) may help you *learn* an event exists, but you must then confirm + link it first-party. **Never** set `source_url`/`external_ticket_url` to an aggregator, and never ingest a discovery event sourced solely from one. The existing `competitor_harvest` attribution rules apply unchanged.
+2. **Greater-Ubud only.** Ubud + Penestanan, Nyuh Kuning, Mas, Pengosekan, Peliatan, Sayan/Kedewatan, Tegallalang fringe. **Exclude** Denpasar (Bali Arts Festival/PKB), Sanur (Balinale), Nuanu/Tabanan (Art & Bali), Canggu. Walkable/scooterable from Ubud, not all-of-Bali.
+3. **Festival = ONE parent card.** A festival that nests many sub-events (UFF's 20–40 dinners, UWRF's 100 sessions) is ingested as a **single parent event** pointing at the official programme — never sprayed as sibling cards. Sub-event spam is the discovery tier's biggest flood risk.
+4. **Suppress pure-recurring directory bulk.** A weekly market or standing gamelan/Kecak show only enters when the instance is *distinguished* (special edition, guest, finale). A small number of genuine resident anchors (e.g. the Saturday organic market) may run as `is_recurring=true` — but do not fill discovery with weekly listings; the value is can't-repeat-it intelligence, not a directory.
+5. **`is_spotlight` is not yours to set.** The single floating festival banner is an editorial/admin decision. Never set it from the curator.
+
+### Discovery reject list (in addition to the core hard-rejects below)
+
+- **Tourist craft markets** — Pasar Seni Ubud and mass-woodcarving/batik stalls. Zero curatorial intent.
+- **Day-tour activity classes** — cooking classes, batik/silver workshops sold via GetYourGuide / Klook / Airbnb Experiences as tourist activities.
+- **Nightly tourist dance shows** sold as standalone admission — Ubud Palace / Uluwatu Kecak/Legong/Barong as a ticketed tourist product. (A distinct festival or special edition is fine.)
+- **Resort/hotel F&B promos** dressed as culture — "cultural dinner" buffets, hotel festival-package deals. Exception: a named non-profit benefit or a genuine one-off collaborator.
+- **Festival glamping / hotel packages** riding a festival brand by association.
+- **Out-of-valley destination events** (see rule 2).
+- **Cinema stays hard-rejected by default.** Narrow Phase-4 exception (tight, conjunctive): eligible ONLY if (curated / art-house / festival) AND (a filmmaker or expert panel / Q&A is present) AND (single evening or festival window, not a standing schedule).
+
+### Discovery scoring note
+
+Same 4-axis ≥6 rubric, but weight **time-sensitivity / novelty** harder — a one-off gallery opening or a foraging dinner that never reassembles outscores a standing weekly offering. The whole point of the tier is the moment you can't catch next week.
+
 ## Hard rejects (do not ingest)
 
 Reject any event where the **primary** offering is one of:
@@ -61,7 +99,8 @@ Tie-breaker: if the event description mentions consent, integration, or trauma-i
 
 After accepting an event, set fields like this:
 
-- `category`: one of the three from the Universe table.
+- `event_tier`: `"discovery"` for anything from the Discovery-tier universe (festivals, galleries, markets, food, performance); omit the field (defaults to `"core"`) for the three conscious categories.
+- `category`: one of the three core categories, OR a discovery category (`Art & Culture` / `Music & Performance` / `Food & Makers`) for discovery-tier events.
 - `intent_tags` (from the LLM parser enum `["romance", "community", "spirit", "living", "local_culture"]`):
   - Dance → `["community"]` (mostly), add `"spirit"` if framed as devotional.
   - Tantra → `["romance"]`, add `"community"` if it's a circle rather than couples work.
@@ -108,3 +147,4 @@ Facilitators are first-class: if you see the same name organising 3+ events acro
 - 2026-05-27 — Competitor-harvest walk added (Blissbase, Soulwise, ToDo.Today). They are scouts, not sources — never credit them, never store their URLs. Use them to find venues/facilitators/events we don't yet track. First-run yield was small in event volume (most aggregator listings are yoga/kundalini/individual-sessions that hard-reject) but high in venue discovery (ASH Nuanua, La Portal to Shamballah, Intuitive Flow). ToDo.Today is Cloudflare-walled — Playwright headless can't pass the challenge; revisit. Blissbase rarely exposes outbound ticket URLs; expect `source_url=null` on most harvested events.
 - 2026-05-27 (rev) — **Blissbase has a hidden API** at `/__data.json` returning the rolling Bali feed (~8 events, totalEvents=51 in 50km radius). The `events[].sourceUrl` field IS the original Megatix / Eventbrite / Ticket Tailor URL — exposes far more outbound links than the rendered HTML did (revising the rev-1 lesson that "blissbase rarely exposes ticket URLs"). Use the API directly instead of Playwright click-throughs; ~10x faster, cleaner field extraction. Pagination beyond page 1 isn't worked out — daily polling of the rolling feed is the workable pattern. Soulwise has a `sitemap-recent-listings.xml` with ~393 listing UUIDs; walk that instead of clicking through category filters. ubud.app + BaliSpirit calendar added to `competitor_harvest` as additional weekly walks.
 - 2026-05-25 — **NEVER year-roll a stale Megatix slug.** Megatix archives every past edition under its original slug ("supermoon-suara-semesta-001", "ayni-new-moon-cacao-ceremony-june"). If a Megatix listing shows "This event has already taken place" or "Sales Closed", **skip it**. Do not assume the same event runs next year on the same calendar date and infer a 2026 date — new editions get new slugs (-002, -2026, etc.). Four stale 2021/2023/2024/2025 listings reached `pending` this week (AYNI, MAGDALENA, Solstice Kirtan, New Moon Cacao w/ Levi Banner, Ecstatic Dance in the Dark, SUPERMOON, West African Tribal Dance) — all archived in the morning routine. Verification rule: before adding any Megatix slug to inbox, fetch the page and confirm the listed date is ≥ today; if Megatix is bot-blocking (403), fall back to the venue's own site or IG to confirm a current edition exists.
+- 2026-06-01 — **Discovery tier launched.** The curator now feeds a second universe (`event_tier='discovery'`): festivals, gallery/studio openings, markets, food, performance — sourced from `sources.json.discovery_sources` (14 first-party sources seeded). Lands in the "More happenings in Ubud" section below the core feed. Hard rules: first-party only (never an aggregator URL), greater-Ubud only (no Nuanu/Sanur/Denpasar), festival = one parent card (not N sub-events), suppress pure-recurring bulk, NOT ceremony-focused, never set `is_spotlight` (banner is editorial). Pipeline already carries `event_tier` end-to-end (route → createEventFromParsed → events row); events still land `pending` for the approver.

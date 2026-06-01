@@ -906,6 +906,9 @@ export async function createEventFromParsed(
           quality_score: qualityScore || null,
           content_flags: mergedFlags,
           intent_tags: parsed.intent_tags ?? [],
+          // Curator/discovery events route into the "More happenings" tier;
+          // everything else defaults to the core conscious-community feed.
+          event_tier: parsed.event_tier === "discovery" ? "discovery" : "core",
           ai_approved_at: aiApprovedAt,
           moderation_reason: moderationReason,
           latitude,
