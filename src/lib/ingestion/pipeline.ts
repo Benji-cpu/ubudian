@@ -20,6 +20,7 @@ import { logHealthEvent } from "./health-utils";
 import { logActivity } from "./activity-log";
 import { enrichFromUrls, applyEnrichment } from "./url-enricher";
 import { geocodeVenue } from "@/lib/geocoding";
+import { isStaleProneTicketHost, fetchTicketLastDay } from "@/lib/events/ticket-freshness";
 import type { IngestionRunResult, ParsedEvent, ProcessResult, RawMessage } from "./types";
 
 /**
@@ -859,6 +860,33 @@ export async function createEventFromParsed(
       })
       .eq("id", messageId);
     return { messageId, status: "rejected" };
+  }
+
+  // Year-roll guard. A no-year Megatix slug (`/events/beauty-way-jun`) 200s for a
+  // past edition while the parser stamps the current year onto it, sailing past
+  // the past-date filter above with a future start_date. The page's JSON-LD
+  // carries the real date — if it's already behind us, this is a phantom. Only
+  // for non-recurring stale-prone hosts (evergreen recurring slugs legitimately
+  // show the next edition); best-effort, so a fetch failure never blocks ingest.
+  if (!parsed.is_recurring) {
+    const ticketUrl = parsed.external_ticket_url || parsed.source_url;
+    if (ticketUrl && isStaleProneTicketHost(ticketUrl)) {
+      const realLastDay = await fetchTicketLastDay(ticketUrl);
+      if (realLastDay && realLastDay < today) {
+        await supabase
+          .from("raw_ingestion_messages")
+          .update({
+            parsed_event_data: {
+              ...((typeof parsed === "object" ? parsed : {}) as Record<string, unknown>),
+              _past_skipped: true,
+              _past_reason: `ticket page is a past edition (jsonld=${realLastDay}, parsed start=${parsed.start_date}, today=${today})`,
+            },
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", messageId);
+        return { messageId, status: "rejected" };
+      }
+    }
   }
 
   // Always pending — the daily Claude approver routine is the editorial gate.

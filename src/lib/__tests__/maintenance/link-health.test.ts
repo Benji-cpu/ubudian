@@ -9,7 +9,7 @@ vi.mock("@/lib/supabase/admin", () => ({
   createAdminClient: () => ({ from: mockFrom }),
 }));
 
-import { checkExternalLinkHealth } from "@/lib/maintenance/cleanups";
+import { checkExternalLinkHealth, archiveStaleTicketedEvents } from "@/lib/maintenance/cleanups";
 
 describe("checkExternalLinkHealth", () => {
   const originalFetch = globalThis.fetch;
@@ -229,5 +229,61 @@ describe("checkExternalLinkHealth", () => {
     const report = await checkExternalLinkHealth();
     expect(report).toEqual({ checked: 0, broken: [] });
     expect(fetchMock).not.toHaveBeenCalled();
+  });
+});
+
+describe("archiveStaleTicketedEvents", () => {
+  // A thenable query-builder mock: every chained method returns the same chain,
+  // and awaiting at any point resolves to `result`. createAdminClient().from is
+  // re-pointed per call so we can hand back the fetch result, then the archive
+  // result, then the clear result in sequence.
+  function chain(result: unknown) {
+    const c: Record<string, unknown> = {};
+    for (const m of ["select", "update", "in", "eq"]) c[m] = vi.fn(() => c);
+    c.then = (res: (v: unknown) => unknown, rej: (e: unknown) => unknown) =>
+      Promise.resolve(result).then(res, rej);
+    return c;
+  }
+
+  beforeEach(() => {
+    mockFrom.mockReset();
+  });
+
+  it("archives non-recurring stale events and clears CTAs on recurring ones", async () => {
+    mockFrom
+      .mockReturnValueOnce(
+        chain({
+          data: [
+            { id: "one-off", is_recurring: false },
+            { id: "weekly", is_recurring: true },
+          ],
+          error: null,
+        }),
+      )
+      .mockReturnValueOnce(chain({ data: [{ id: "one-off" }], error: null })) // archive
+      .mockReturnValueOnce(chain({ data: [{ id: "weekly" }], error: null })); // clear
+
+    const result = await archiveStaleTicketedEvents({
+      checked: 3,
+      broken: [
+        { entity: "event", id: "one-off", url: "https://megatix.co.id/a", status: "stale" },
+        { entity: "event", id: "weekly", url: "https://megatix.co.id/b", status: "stale" },
+        { entity: "event", id: "real-404", url: "https://x/404", status: 404 }, // not stale → ignored
+        { entity: "venue", id: "V", url: "https://maps/x", status: "stale" }, // venue → ignored
+      ],
+    });
+
+    expect(result.archived).toBe(1);
+    expect(result.clearedCtas).toBe(1);
+    expect(result.errors).toEqual([]);
+  });
+
+  it("no-ops when the report has no stale event links", async () => {
+    const result = await archiveStaleTicketedEvents({
+      checked: 1,
+      broken: [{ entity: "event", id: "x", url: "https://x/404", status: 404 }],
+    });
+    expect(result).toEqual({ archived: 0, clearedCtas: 0, errors: [] });
+    expect(mockFrom).not.toHaveBeenCalled();
   });
 });

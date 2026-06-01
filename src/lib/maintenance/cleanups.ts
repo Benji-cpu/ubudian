@@ -220,6 +220,75 @@ export async function checkExternalLinkHealth(): Promise<LinkHealthReport> {
   return { checked: targets.length, broken };
 }
 
+export type StaleSweepResult = {
+  archived: number;
+  clearedCtas: number;
+  errors: string[];
+};
+
+/**
+ * Act on the `stale`-classified ticketing links from a {@link LinkHealthReport}.
+ * A stale link means the page 200s but the event is a past edition (JSON-LD date
+ * behind us / "already taken place"). The action depends on whether the event
+ * recurs:
+ *   - non-recurring → the whole listing is a phantom → archive it.
+ *   - recurring     → the event is real but its per-edition slug rotated → just
+ *                     clear the dead CTA so the card renders without a button.
+ *
+ * Only acts on `status === "stale"` (the high-confidence past-date signal),
+ * never on transient 4xx/5xx or fetch errors. Idempotent: a second run finds
+ * the rows already archived / already null and no-ops.
+ */
+export async function archiveStaleTicketedEvents(
+  report: LinkHealthReport,
+): Promise<StaleSweepResult> {
+  const result: StaleSweepResult = { archived: 0, clearedCtas: 0, errors: [] };
+  const staleIds = report.broken
+    .filter((b) => b.entity === "event" && b.status === "stale")
+    .map((b) => b.id);
+  if (staleIds.length === 0) return result;
+
+  const supabase = createAdminClient();
+  const { data, error } = await supabase
+    .from("events")
+    .select("id, is_recurring")
+    .in("id", staleIds)
+    .eq("status", "approved");
+  if (error) {
+    result.errors.push(`archiveStaleTicketedEvents fetch: ${error.message}`);
+    return result;
+  }
+
+  const rows = (data ?? []) as { id: string; is_recurring: boolean }[];
+  const toArchive = rows.filter((r) => !r.is_recurring).map((r) => r.id);
+  const toClear = rows.filter((r) => r.is_recurring).map((r) => r.id);
+  const today = nowInBali().dateStr;
+
+  if (toArchive.length) {
+    const { data: archived, error: archErr } = await supabase
+      .from("events")
+      .update({ status: "archived", moderation_reason: `stale_link_auto_${today}` })
+      .in("id", toArchive)
+      .eq("status", "approved")
+      .select("id");
+    if (archErr) result.errors.push(`archiveStaleTicketedEvents archive: ${archErr.message}`);
+    else result.archived = (archived ?? []).length;
+  }
+
+  if (toClear.length) {
+    const { data: cleared, error: clearErr } = await supabase
+      .from("events")
+      .update({ external_ticket_url: null })
+      .in("id", toClear)
+      .eq("status", "approved")
+      .select("id");
+    if (clearErr) result.errors.push(`archiveStaleTicketedEvents clear: ${clearErr.message}`);
+    else result.clearedCtas = (cleared ?? []).length;
+  }
+
+  return result;
+}
+
 /**
  * Hard-delete raw_ingestion_messages with status='failed' that are older than
  * 30 days. The pipeline retries failed messages for 24h then leaves them.

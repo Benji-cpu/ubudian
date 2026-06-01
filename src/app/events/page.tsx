@@ -17,6 +17,7 @@ import { EventsHero } from "@/components/events/events-hero";
 import { FeaturedStrip } from "@/components/events/featured-strip";
 import { RefreshOnFocus } from "@/components/events/refresh-on-focus";
 import { CrossSectionRibbon } from "@/components/journeys/cross-section-ribbon";
+import { NewsletterSignup } from "@/components/layout/newsletter-signup";
 import { eventIsHappeningNow, nowInBali } from "@/lib/events/bali-time";
 import { filterEventsInRange } from "@/lib/events/filter-range";
 import { getActiveBoostedEventIds, getCategorySponsor } from "@/lib/sponsors/sponsor-service";
@@ -395,6 +396,26 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
         pitch="Don't want to plan it day-by-day? We've curated multi-day retreats."
         cta="See the curated retreats"
       />
+
+      {/* Newsletter capture. The agenda is the highest-intent surface on the
+          site — a visitor who scrolled the week is the likeliest to want it
+          delivered. Literal-hex cream on the locked-dark green band (the
+          brand-cream token inverts in dark mode). */}
+      <section className="border-t border-brand-gold/15 bg-brand-deep-green">
+        <div className="mx-auto max-w-2xl px-4 py-16 text-center sm:px-6">
+          <p className="font-serif text-2xl text-[#FAF5EC] sm:text-3xl">
+            Never miss the good ones.
+          </p>
+          <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-[#FAF5EC]/70">
+            One email a week — the ceremonies, dance floors, and circles worth
+            clearing an evening for, before they fill up.
+          </p>
+          <NewsletterSignup
+            variant="dark"
+            className="mx-auto mt-6 max-w-md text-left"
+          />
+        </div>
+      </section>
     </div>
   );
 }

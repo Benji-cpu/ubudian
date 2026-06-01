@@ -14,10 +14,12 @@ import { NextResponse } from "next/server";
 import { archivePastApprovedEvents, archivePastPendingEvents } from "@/lib/ingestion/alerts";
 import {
   archiveFuzzyDuplicateEvents,
+  archiveStaleTicketedEvents,
   cancelStaleBookings,
   checkExternalLinkHealth,
   purgeFailedMessages,
   type LinkHealthReport,
+  type StaleSweepResult,
 } from "@/lib/maintenance/cleanups";
 import { garbageCollectArchivedEventImages, type ImageGcResult } from "@/lib/maintenance/image-gc";
 import { buildReviewQueue } from "@/lib/maintenance/review-queue";
@@ -64,6 +66,18 @@ export async function GET(request: Request) {
     return { checked: 0, broken: [] };
   });
 
+  // Auto-resolve the past-edition ("stale") links the check just found:
+  // archive non-recurring phantoms, clear the dead CTA on recurring rows. Runs
+  // off the report above so the agenda never carries a dead ticket link for
+  // more than a day. Only touches status==="stale", never transient failures.
+  const staleSweep: StaleSweepResult = await archiveStaleTicketedEvents(linkHealth).catch(
+    (err) => {
+      errors.push(`archiveStaleTicketedEvents: ${err?.message ?? String(err)}`);
+      return { archived: 0, clearedCtas: 0, errors: [] };
+    },
+  );
+  if (staleSweep.errors.length) errors.push(...staleSweep.errors);
+
   const review = await buildReviewQueue(linkHealth).catch((err) => {
     errors.push(`buildReviewQueue: ${err?.message ?? String(err)}`);
     return null;
@@ -79,6 +93,8 @@ export async function GET(request: Request) {
       cancelledStaleBookings: cancelledBookings,
       archivedDuplicateEvents: archivedDuplicates,
       collectedArchivedImages: imageGc.collected,
+      archivedStaleLinkEvents: staleSweep.archived,
+      clearedStaleCtas: staleSweep.clearedCtas,
     },
     linkHealth,
     review,
