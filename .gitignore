@@ -60,6 +60,10 @@ e2e/test-results/
 .superpowers/
 skills-lock.json
 
+# editor + supabase CLI local state (machine-specific, not project work)
+.vscode/
+supabase/.temp/
+
 # vercel
 .vercel
 
