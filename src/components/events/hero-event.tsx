@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatEventTime } from "@/lib/utils";
 import { formatEventDateLine } from "@/lib/events/format";
+import { categoryShortLabel } from "@/lib/constants";
 import { EventCardPlaceholder } from "./event-card-placeholder";
 import { Calendar, Clock, MapPin, ArrowRight } from "lucide-react";
 import type { Event } from "@/types";
@@ -39,11 +40,11 @@ export function HeroEvent({ event, saveButton, label = "Featured today" }: HeroE
             )}
             <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
             <div className="absolute left-4 top-4 flex items-center gap-2">
-              <Badge className="bg-brand-gold text-white hover:bg-brand-gold">
+              <Badge className="bg-brand-gold text-[#2C4A3E] hover:bg-brand-gold">
                 {label}
               </Badge>
-              <Badge className="bg-black/60 text-white backdrop-blur-sm hover:bg-black/60">
-                {event.category}
+              <Badge className="bg-[#1A1A1A]/60 text-[#FAF5EC] backdrop-blur-sm hover:bg-[#1A1A1A]/60">
+                {categoryShortLabel(event.category)}
               </Badge>
             </div>
             {saveButton && (

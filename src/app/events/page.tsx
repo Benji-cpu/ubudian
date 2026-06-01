@@ -7,14 +7,11 @@ import { getCurrentProfile } from "@/lib/auth";
 import { ARCHETYPES } from "@/lib/quiz-data";
 import { AgendaFeed } from "@/components/events/agenda-feed";
 import { PriceFilteredEvents } from "@/components/events/price-filtered-events";
-import { ViewSwitcher } from "@/components/events/view-switcher";
-import { EventSortSelect } from "@/components/events/event-sort-select";
 import { EventFilters } from "@/components/events/event-filters";
 import { EventSearch } from "@/components/events/event-search";
 import { CategoryGuideLink } from "@/components/events/category-guide-link";
 import { MapView } from "@/components/events/map-view";
 import { EventsHero } from "@/components/events/events-hero";
-import { FeaturedStrip } from "@/components/events/featured-strip";
 import { RefreshOnFocus } from "@/components/events/refresh-on-focus";
 import { CrossSectionRibbon } from "@/components/journeys/cross-section-ribbon";
 import { NewsletterSignup } from "@/components/layout/newsletter-signup";
@@ -28,9 +25,6 @@ import { MoreHappenings } from "@/components/events/more-happenings";
 import type { ArchetypeId, Event, Experience, QuizResultRecord, Sponsor } from "@/types";
 
 const VIEWS_USING_OWN_VIEWPORT = new Set(["calendar", "week"]);
-// The feed view renders its own HeroEvent + ForYou rail + happening-now
-// section, so the FeaturedStrip would just duplicate signal there.
-const VIEWS_WITH_FEATURED_STRIP = new Set(["list", "grid", "map"]);
 
 export const metadata: Metadata = {
   title: "Events in Ubud",
@@ -63,6 +57,7 @@ interface EventsPageProps {
     archetype?: string;
     free?: string;
     intents?: string;
+    festivals?: string;
   }>;
 }
 
@@ -248,6 +243,19 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
     viewEvents = viewEvents.filter((event) => eventIsHappeningNow(event, baliNow));
   }
 
+  // "Festivals" chip — special one-off events (festivals, launch parties,
+  // gallery openings), NOT regular recurring classes. Applied client-side on
+  // the rolled-forward array (same rationale as from/to) so recurring seeds
+  // aren't stripped at the DB layer. All survivors are discovery/spotlight, so
+  // splitByTier's empty-core fallback (primaryEvents = discovery) renders them.
+  if (params.festivals === "true" && !useOwnViewport) {
+    viewEvents = viewEvents.filter(
+      (event) =>
+        !event.is_recurring &&
+        (event.event_tier === "discovery" || event.is_spotlight)
+    );
+  }
+
   // Two-tier split: the conscious-community CORE agenda renders first; the
   // broader DISCOVERY set (festivals, galleries, markets, food, performance)
   // lives in the collapsed "More happenings" section below. When a category
@@ -273,44 +281,29 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
             eyebrow={bannerEyebrow(spotlight)}
             title={spotlight.title}
             line={spotlight.short_description}
-            dismissKey={`ubudian:spotlight:${spotlight.id}`}
           />
         </div>
       )}
 
-      {VIEWS_WITH_FEATURED_STRIP.has(view) && (
-        <FeaturedStrip events={primaryEvents} boostedEventIds={boostedEventIds} />
-      )}
-
-      {/* Controls — clear hierarchy:
-            1. Search (the strongest affordance — what most users want first)
-            2. Date / "What's on now" chips (the second strongest)
-            3. Categories (quieter, scrollable on mobile)
-            Sort + View tuck right of search as quiet utilities. */}
+      {/* Controls — a single calm toolbar:
+            1. Search (the strongest affordance)
+            2. Dance / Tantra / Festivals chips + one "Filters" button
+            Everything else (view, sort, dates, time, price, venue) lives
+            inside the Filters sheet, hidden by default. */}
       <section
         id="events"
-        className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8"
+        className="mx-auto min-w-0 max-w-7xl px-4 py-8 sm:px-6 lg:px-8"
       >
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div className="flex min-w-0 flex-col gap-3">
           <Suspense>
             <EventSearch />
           </Suspense>
-          <div className="flex flex-wrap items-center gap-2 sm:flex-nowrap sm:flex-shrink-0">
-            {!isFeedView && !isMapView && (
-              <Suspense>
-                <EventSortSelect />
-              </Suspense>
-            )}
-            <Suspense>
-              <ViewSwitcher />
-            </Suspense>
-          </div>
-        </div>
-
-        <div className="mt-6">
           <Suspense>
             <EventFilters resultCount={viewEvents.length} />
           </Suspense>
+        </div>
+
+        <div className="mt-4">
           {params.category && categorySponsor && (
             <PartnerCredit
               sponsor={categorySponsor}
@@ -327,13 +320,13 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
           <div className="mt-4 flex items-center justify-between rounded-lg border border-brand-gold/20 bg-brand-gold/5 px-4 py-3">
             <p className="text-sm text-foreground">
               Showing events matched to your archetype:{" "}
-              <span className="font-semibold text-brand-deep-green">
+              <span className="font-semibold text-brand-deep-green dark:text-brand-gold">
                 {ARCHETYPE_NAMES[params.archetype]}
               </span>
             </p>
             <Link
               href="/events"
-              className="text-sm font-medium text-brand-deep-green underline underline-offset-2 hover:text-brand-gold"
+              className="text-sm font-medium text-brand-deep-green underline underline-offset-2 hover:text-brand-gold dark:text-brand-gold"
             >
               Show all events
             </Link>

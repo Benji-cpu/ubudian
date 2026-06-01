@@ -65,6 +65,29 @@ export const EVENT_CATEGORIES = [
   "Other",
 ] as const;
 
+/**
+ * Single-word display labels for category chips and card badges. DISPLAY ONLY —
+ * the canonical full category strings stay in the DB; never write these back.
+ * Anything not mapped falls back to its full label via `categoryShortLabel`.
+ */
+export const CATEGORY_SHORT_LABEL: Record<string, string> = {
+  "Dance & Movement": "Dance",
+  "Tantra & Intimacy": "Tantra",
+  "Ceremony & Sound": "Ceremony",
+  "Yoga & Meditation": "Yoga",
+  "Healing & Bodywork": "Healing",
+  "Circle & Community": "Circle",
+  "Music & Performance": "Music",
+  "Art & Culture": "Art",
+  "Food & Makers": "Food",
+  "Retreat & Training": "Retreat",
+};
+
+/** Safe accessor — full category in, single word out (falls back to the full label). */
+export function categoryShortLabel(category: string): string {
+  return CATEGORY_SHORT_LABEL[category] ?? category;
+}
+
 export const CONTENT_STATUS = ["draft", "published", "archived"] as const;
 export const EVENT_STATUS = ["pending", "approved", "rejected", "archived"] as const;
 

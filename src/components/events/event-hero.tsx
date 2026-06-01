@@ -2,6 +2,7 @@ import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Clock, Ticket } from "lucide-react";
 import { formatEventDate, formatEventTime } from "@/lib/utils";
+import { categoryShortLabel } from "@/lib/constants";
 import { EventCardPlaceholder } from "./event-card-placeholder";
 import type { Event } from "@/types";
 
@@ -41,8 +42,8 @@ export function EventHero({ event, saveButton }: EventHeroProps) {
 
         {/* Top-left chips (category) */}
         <div className="absolute left-4 top-4 flex flex-wrap items-center gap-2 sm:left-6 sm:top-6">
-          <Badge className="bg-black/60 text-white backdrop-blur-sm hover:bg-black/60">
-            {event.category}
+          <Badge className="bg-[#1A1A1A]/60 text-[#FAF5EC] backdrop-blur-sm hover:bg-[#1A1A1A]/60">
+            {categoryShortLabel(event.category)}
           </Badge>
         </div>
 
@@ -55,7 +56,7 @@ export function EventHero({ event, saveButton }: EventHeroProps) {
 
         {/* Desktop-only: title & meta overlay at the bottom of the image */}
         <div className="absolute inset-x-0 bottom-0 hidden p-8 md:block lg:p-10">
-          <h1 className="max-w-3xl font-serif text-4xl font-semibold leading-[1.1] tracking-tight text-white drop-shadow-sm lg:text-5xl">
+          <h1 className="max-w-3xl font-serif text-4xl font-semibold leading-[1.1] tracking-tight text-[#FAF5EC] drop-shadow-sm lg:text-5xl">
             {event.title}
           </h1>
           <div className="mt-5 flex flex-wrap items-center gap-2">
@@ -120,7 +121,7 @@ function Chip({
   const styles: Record<typeof variant, string> = {
     default: "bg-card text-foreground shadow-sm",
     light: "bg-card text-foreground ring-1 ring-brand-gold/20",
-    price: "bg-brand-terracotta text-white shadow-sm",
+    price: "bg-[#B85C3F] text-white shadow-sm",
     "price-light": "bg-brand-terracotta/10 text-brand-terracotta ring-1 ring-brand-terracotta/20",
   };
 

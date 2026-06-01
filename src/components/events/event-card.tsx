@@ -5,6 +5,7 @@ import { formatEventTime, isRecentlyAddedEvent } from "@/lib/utils";
 import { formatEventDateLine } from "@/lib/events/format";
 import { getTimeSensitivityLabel } from "@/lib/events/discovery";
 import { isFreeEvent } from "@/lib/price-parser";
+import { categoryShortLabel } from "@/lib/constants";
 import { EventCardPlaceholder } from "./event-card-placeholder";
 import { EventCardExternalLinks } from "./event-card-external-links";
 import { MapPin, Clock, Calendar, User } from "lucide-react";
@@ -40,7 +41,7 @@ export function EventCard({ event, saveButton }: EventCardProps) {
             />
           )}
           {isFree && (
-            <div className="absolute left-1.5 top-1.5 rounded-full bg-brand-gold px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-[0.16em] text-brand-deep-green shadow-sm">
+            <div className="absolute left-1.5 top-1.5 rounded-full bg-brand-gold px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-[0.16em] text-[#2C4A3E] shadow-sm">
               Free
             </div>
           )}
@@ -53,12 +54,12 @@ export function EventCard({ event, saveButton }: EventCardProps) {
               {event.title}
             </h3>
             {timeSensitivity ? (
-              <span className="shrink-0 rounded-full bg-brand-terracotta px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.16em] text-white">
+              <span className="shrink-0 rounded-full bg-[#B85C3F] px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.16em] text-white">
                 {timeSensitivity}
               </span>
             ) : (
               isRecentlyAddedEvent(event.created_at, event.start_date) && (
-                <span className="shrink-0 rounded-full bg-brand-gold/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.16em] text-brand-deep-green">
+                <span className="shrink-0 rounded-full bg-brand-gold/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.16em] text-brand-deep-green dark:text-brand-gold">
                   New
                 </span>
               )
@@ -68,14 +69,14 @@ export function EventCard({ event, saveButton }: EventCardProps) {
           <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
             <Badge
               variant="outline"
-              className="rounded-full border-brand-deep-green/15 bg-transparent px-2 py-0.5 text-[10px] font-medium uppercase tracking-[0.14em] text-brand-deep-green/80"
+              className="rounded-full border-brand-deep-green/15 bg-transparent px-2 py-0.5 text-[10px] font-medium uppercase tracking-[0.14em] text-brand-deep-green/80 dark:text-brand-gold"
             >
-              {event.category}
+              {categoryShortLabel(event.category)}
             </Badge>
             {event.is_core && (
               <span
                 title="Weekly community anchor"
-                className="rounded-full border border-brand-gold/60 px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.16em] text-brand-gold"
+                className="rounded-full border border-brand-gold/60 px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.16em] text-brand-deep-green dark:text-brand-gold"
               >
                 Core
               </span>
@@ -115,7 +116,7 @@ export function EventCard({ event, saveButton }: EventCardProps) {
               externalTicketUrl={event.external_ticket_url}
             />
             {event.organizer_name && (
-              <span className="ml-auto flex items-center gap-1 text-[11px] text-muted-foreground/80 truncate">
+              <span className="ml-auto flex items-center gap-1 text-[11px] text-muted-foreground truncate">
                 <User className="h-3 w-3 shrink-0" />
                 <span className="truncate">{event.organizer_name}</span>
               </span>

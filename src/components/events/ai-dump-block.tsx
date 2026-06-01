@@ -144,7 +144,7 @@ export function AiDumpBlock({ onParsed }: AiDumpBlockProps) {
           onChange={(e) => setText(e.target.value)}
           placeholder="Paste the announcement text here…"
           rows={5}
-          className="mt-1 bg-white/80"
+          className="mt-1 bg-card/80"
           disabled={status === "loading"}
         />
       </div>

@@ -32,7 +32,7 @@ export async function Footer() {
           <h3 className="mt-4 font-serif text-2xl font-normal text-brand-gold">
             {SITE_NAME}
           </h3>
-          <p className="mt-2 text-sm text-brand-sage">
+          <p className="mt-2 text-sm text-brand-off-white/80">
             The edgy, messy, transformative heart of Ubud
           </p>
         </div>
@@ -43,7 +43,7 @@ export async function Footer() {
             <Link
               key={link.href}
               href={link.href}
-              className="py-2 text-sm text-brand-off-white/70 transition-colors hover:text-brand-off-white"
+              className="py-2 text-sm text-brand-off-white/80 transition-colors hover:text-brand-off-white"
             >
               {link.label}
             </Link>
@@ -52,7 +52,7 @@ export async function Footer() {
 
         {/* Newsletter */}
         <div className="mx-auto mt-10 max-w-md text-center">
-          <p className="text-sm text-brand-off-white/70">
+          <p className="text-sm text-brand-off-white/80">
             One email a week — ceremonies, workshops, sound journeys, and the stories worth reading.
           </p>
           <NewsletterSignup variant="dark" className="mt-4" />
@@ -62,13 +62,13 @@ export async function Footer() {
         <div className="mt-10 flex flex-wrap items-center justify-center gap-6">
           <Link
             href="/practitioners"
-            className="py-2 text-sm text-brand-cream/60 transition-colors hover:text-brand-gold"
+            className="py-2 text-sm text-brand-off-white/80 transition-colors hover:text-brand-gold"
           >
             Practitioners
           </Link>
           <Link
             href="/places"
-            className="py-2 text-sm text-brand-cream/60 transition-colors hover:text-brand-gold"
+            className="py-2 text-sm text-brand-off-white/80 transition-colors hover:text-brand-gold"
           >
             Places
           </Link>
@@ -76,20 +76,20 @@ export async function Footer() {
             href="https://instagram.com/theubudian"
             target="_blank"
             rel="noopener noreferrer"
-            className="py-2 text-sm text-brand-cream/60 transition-colors hover:text-brand-gold"
+            className="py-2 text-sm text-brand-off-white/80 transition-colors hover:text-brand-gold"
           >
             Instagram
           </a>
           <Link
             href="/about"
-            className="py-2 text-sm text-brand-cream/60 transition-colors hover:text-brand-gold"
+            className="py-2 text-sm text-brand-off-white/80 transition-colors hover:text-brand-gold"
           >
             About &amp; Contact
           </Link>
         </div>
 
         {/* Copyright */}
-        <div className="mt-10 text-center text-sm text-brand-cream/50">
+        <div className="mt-10 text-center text-sm text-brand-off-white/80">
           &copy; {new Date().getFullYear()} {SITE_NAME}. All rights reserved.
         </div>
       </div>

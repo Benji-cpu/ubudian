@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { format } from "date-fns";
+import { categoryShortLabel } from "@/lib/constants";
 import { EventCardPlaceholder } from "./event-card-placeholder";
 import { Sparkles } from "lucide-react";
 import {
@@ -133,8 +134,8 @@ export function ForYouRail({
                     className="h-full w-full text-4xl"
                   />
                 )}
-                <div className="absolute bottom-2 left-2 rounded bg-black/60 px-2 py-1 text-xs font-medium text-white backdrop-blur-sm">
-                  {event.category}
+                <div className="absolute bottom-2 left-2 rounded bg-[#1A1A1A]/60 px-2 py-1 text-xs font-medium text-[#FAF5EC] backdrop-blur-sm">
+                  {categoryShortLabel(event.category)}
                 </div>
               </div>
               <div className="p-3">

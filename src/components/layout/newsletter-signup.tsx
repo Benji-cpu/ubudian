@@ -96,7 +96,7 @@ export function NewsletterSignup({ className, variant = "light" }: NewsletterSig
           aria-label="Subscribe to newsletter"
           className={
             isDark
-              ? "bg-brand-gold text-brand-deep-green hover:bg-brand-gold/90"
+              ? "bg-brand-gold text-[#1A2A22] hover:bg-brand-gold/90"
               : undefined
           }
         >

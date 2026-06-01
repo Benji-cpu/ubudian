@@ -5,6 +5,7 @@ import { formatEventTime, isRecentlyAddedEvent } from "@/lib/utils";
 import { formatEventDateLine } from "@/lib/events/format";
 import { getTimeSensitivityLabel } from "@/lib/events/discovery";
 import { isFreeEvent } from "@/lib/price-parser";
+import { categoryShortLabel } from "@/lib/constants";
 import { EventCardPlaceholder } from "./event-card-placeholder";
 import { EventCardExternalLinks } from "./event-card-external-links";
 import { MapPin, Clock, Calendar, User } from "lucide-react";
@@ -65,18 +66,18 @@ export function EventGridCard({
 
           {/* Free ribbon (top-left) */}
           {isFree && (
-            <div className="absolute left-3 top-3 rounded-full bg-brand-gold px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-brand-deep-green shadow-md">
+            <div className="absolute left-3 top-3 rounded-full bg-brand-gold px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-[#2C4A3E] shadow-md">
               Free
             </div>
           )}
 
           {/* Category + new badges (bottom-left) */}
           <div className="absolute bottom-2.5 left-2.5 flex items-center gap-1.5">
-            <Badge className="rounded-full border-transparent bg-black/70 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-white backdrop-blur-md hover:bg-black/70">
-              {event.category}
+            <Badge className="rounded-full border-transparent bg-[#1A1A1A]/70 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#FAF5EC] backdrop-blur-md hover:bg-[#1A1A1A]/70">
+              {categoryShortLabel(event.category)}
             </Badge>
             {timeSensitivity ? (
-              <span className="rounded-full bg-brand-terracotta px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.16em] text-white shadow-sm">
+              <span className="rounded-full bg-[#B85C3F] px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.16em] text-white shadow-sm">
                 {timeSensitivity}
               </span>
             ) : (

@@ -24,17 +24,20 @@ interface EventCalendarProps {
   events: Event[];
 }
 
+// Brand-toned dots, keyed to the real EVENT_CATEGORIES. Literal hex / brand
+// tokens only (no neutral grays or utility brights) so they read in both themes.
 const CATEGORY_COLORS: Record<string, string> = {
-  "Music & Live Performance": "bg-brand-terracotta",
-  "Yoga & Wellness": "bg-brand-sage",
-  "Art & Culture": "bg-brand-gold",
-  "Food & Drink": "bg-orange-400",
-  "Community & Social": "bg-brand-mid-green",
-  "Workshop & Class": "bg-blue-400",
-  "Market & Shopping": "bg-purple-400",
-  "Sports & Adventure": "bg-red-400",
-  "Kids & Family": "bg-pink-400",
-  "Other": "bg-gray-400",
+  "Dance & Movement": "bg-brand-terracotta",
+  "Tantra & Intimacy": "bg-brand-gold",
+  "Ceremony & Sound": "bg-brand-mid-green",
+  "Yoga & Meditation": "bg-brand-sage",
+  "Healing & Bodywork": "bg-[#7C9A92]",
+  "Circle & Community": "bg-[#5A8A70]",
+  "Music & Performance": "bg-[#C77F5A]",
+  "Art & Culture": "bg-[#B59B6A]",
+  "Food & Makers": "bg-[#9C6B4A]",
+  "Retreat & Training": "bg-[#4F7A66]",
+  "Other": "bg-brand-deep-green/40",
 };
 
 export function EventCalendar({ events }: EventCalendarProps) {
@@ -142,7 +145,7 @@ export function EventCalendar({ events }: EventCalendarProps) {
                     <span
                       className={cn(
                         "h-1.5 w-1.5 shrink-0 rounded-full",
-                        CATEGORY_COLORS[ev.category] || "bg-gray-400"
+                        CATEGORY_COLORS[ev.category] || "bg-brand-deep-green/40"
                       )}
                     />
                     <span className="truncate">{ev.title}</span>

@@ -8,7 +8,7 @@ import {
   PaginatedEvents,
   EventRowSkeleton,
 } from "./paginated-events";
-import { bucketEventsByTime, type EventBucket } from "@/lib/events/buckets";
+import { groupEventsByDate } from "@/lib/events/group-by-date";
 import type { Event } from "@/types";
 
 interface EventListProps {
@@ -17,31 +17,9 @@ interface EventListProps {
   savedEventIds?: string[];
 }
 
-type BucketLabel = string;
-
 type ListRow =
-  | { kind: "header"; bucket: BucketLabel; id: string }
+  | { kind: "header"; label: string; id: string }
   | { kind: "event"; event: Event; id: string };
-
-const BUCKET_ORDER: EventBucket[] = [
-  "happening_now",
-  "today",
-  "tomorrow",
-  "in_progress",
-  "weekend",
-  "next_week",
-  "later",
-];
-
-const BUCKET_LABEL: Record<EventBucket, string> = {
-  happening_now: "Happening now",
-  today: "Today",
-  tomorrow: "Tomorrow",
-  in_progress: "Running this week",
-  weekend: "This weekend",
-  next_week: "Next week",
-  later: "Later this month and beyond",
-};
 
 export function EventList({
   events,
@@ -51,15 +29,11 @@ export function EventList({
   const savedSet = new Set(savedEventIds ?? []);
 
   const rows: ListRow[] = useMemo(() => {
-    const buckets = bucketEventsByTime(events);
     const out: ListRow[] = [];
-    for (const key of BUCKET_ORDER) {
-      const bucketEvents = buckets[key];
-      if (bucketEvents.length === 0) continue;
-      const label = BUCKET_LABEL[key];
-      out.push({ kind: "header", bucket: label, id: `header-${key}` });
-      for (const event of bucketEvents) {
-        out.push({ kind: "event", event, id: `${event.id}-${key}` });
+    for (const group of groupEventsByDate(events)) {
+      out.push({ kind: "header", label: group.label, id: `header-${group.dateKey}` });
+      for (const event of group.events) {
+        out.push({ kind: "event", event, id: `${event.id}-${group.dateKey}` });
       }
     }
     return out;
@@ -77,9 +51,13 @@ export function EventList({
           return (
             <h2
               key={row.id}
-              className="mt-8 mb-1 first:mt-0 font-serif text-xl font-medium text-brand-deep-green"
+              className="mt-8 mb-2 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.18em] text-brand-deep-green first:mt-1 dark:text-brand-gold"
             >
-              {row.bucket}
+              <span className="whitespace-nowrap">{row.label}</span>
+              <span
+                aria-hidden
+                className="h-px flex-1 bg-brand-deep-green/15 dark:bg-brand-gold/20"
+              />
             </h2>
           );
         }

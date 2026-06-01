@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
+import { categoryShortLabel } from "@/lib/constants";
 import { EventCardPlaceholder } from "@/components/events/event-card-placeholder";
 import { Calendar, Heart } from "lucide-react";
 import type { Event } from "@/types";
@@ -54,8 +55,8 @@ export function PopularThisWeek({ events }: PopularThisWeekProps) {
                     />
                   )}
                   <div className="absolute bottom-2 left-2">
-                    <Badge className="bg-black/60 text-white backdrop-blur-sm hover:bg-black/60 text-[10px]">
-                      {event.category}
+                    <Badge className="bg-[#1A1A1A]/60 text-[#FAF5EC] backdrop-blur-sm hover:bg-[#1A1A1A]/60 text-[10px]">
+                      {categoryShortLabel(event.category)}
                     </Badge>
                   </div>
                 </div>
