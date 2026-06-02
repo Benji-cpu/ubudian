@@ -1,11 +1,17 @@
 /**
  * GET /api/cron/ingest-events
  *
- * Vercel Cron Job endpoint. Runs every 4 hours.
+ * Vercel Cron Job endpoint. Runs daily (0 17 * * * UTC per vercel.json).
  * Checks which sources are due based on their fetch_interval_minutes
  * and triggers ingestion runs for each.
  *
  * Protected by CRON_SECRET header.
+ *
+ * maxDuration=60: a single source sweep (e.g. Megatix's ~50 listings, each
+ * dedup'd + venue-normalised + geocoded) routinely needs >10s. Without this
+ * the function was killed at the Hobby default of 10s mid-Megatix every day,
+ * so last_fetched_at never advanced and the whole fleet went dry. 60s is the
+ * Hobby ceiling and matches the sibling curator-ingest / approver-apply routes.
  */
 
 import { NextResponse } from "next/server";
@@ -14,6 +20,8 @@ import { runIngestion, processRawMessage } from "@/lib/ingestion";
 import type { RawMessage } from "@/lib/ingestion";
 import { refreshLinkedEvents } from "@/lib/ingestion/refresher";
 import "@/lib/ingestion/adapters";
+
+export const maxDuration = 60;
 
 export async function GET(request: Request) {
   // Verify cron secret
@@ -36,7 +44,7 @@ export async function GET(request: Request) {
   }
 
   const startTime = Date.now();
-  const MAX_ELAPSED_MS = 7000; // leave 3s buffer for Vercel Hobby 10s timeout
+  const MAX_ELAPSED_MS = 50000; // leave ~10s buffer under the 60s maxDuration
 
   // --- Phase 1: Retry stuck/failed messages FIRST (highest priority) ---
   // These are webhook-delivered messages that failed LLM parsing.
