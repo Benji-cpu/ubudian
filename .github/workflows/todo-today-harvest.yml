@@ -1,0 +1,66 @@
+name: todo-today-harvest
+
+# Daily harvest of todo.today/ubud — the richest Ubud event aggregator.
+# Runs a stealthed headless Chromium (full browser, unrestricted egress, no
+# 10-60s Vercel limit), pulls the site's own JSON API, ICP-filters, and POSTs
+# the survivors to /api/cron/curator-ingest under the 'todo-today' source. They
+# land as `pending` for the daily routine to triage.
+#
+# Why GH Actions and not the Vercel cron: the harvest needs a real browser
+# (Cloudflare bypass) and the ingest is heavy per-event — exactly what blows the
+# Vercel function timeout. GH runners have neither constraint.
+
+on:
+  schedule:
+    - cron: '30 18 * * *' # 02:30 WITA daily — after the 01:00 adapter sweep, before the morning routine
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: todo-today-harvest
+  cancel-in-progress: false
+
+jobs:
+  harvest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install deps + Playwright Chromium
+        run: |
+          npm ci --no-audit --no-fund
+          npx playwright install --with-deps chromium
+
+      - name: Harvest ToDo.Today -> payload
+        id: harvest
+        run: |
+          set -euo pipefail
+          node scripts/scrape/todo-today-harvest.mjs --out /tmp/payload.json
+          COUNT=$(jq '.events | length' /tmp/payload.json)
+          DATE=$(jq -r '.date' /tmp/payload.json)
+          echo "count=$COUNT" >> "$GITHUB_OUTPUT"
+          echo "::notice::ToDo.Today harvested $COUNT ICP events for $DATE"
+
+      - name: POST to curator-ingest
+        if: steps.harvest.outputs.count != '0'
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          set -euo pipefail
+          RESPONSE=$(curl -fsS -X POST \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            -H "Content-Type: application/json" \
+            -d @/tmp/payload.json \
+            "https://theubudian.life/api/cron/curator-ingest")
+          echo "$RESPONSE" | jq .
+          ING=$(echo "$RESPONSE" | jq -r '.ingested // 0')
+          DUP=$(echo "$RESPONSE" | jq -r '.duplicates // 0')
+          FAIL=$(echo "$RESPONSE" | jq -r '.failed // 0')
+          echo "::notice::ToDo.Today ingested $ING ($DUP duplicates, $FAIL failed)"

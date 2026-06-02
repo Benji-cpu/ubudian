@@ -12,7 +12,13 @@
  *      pipeline (dedup, normalisation, geocoding, moderation), then forces
  *      `status='pending'` so the admin queue still owns final approval.
  *
- * Body shape: { date: "YYYY-MM-DD", events: ParsedEvent[] }
+ * Body shape: { date: "YYYY-MM-DD", events: ParsedEvent[], source?: string }
+ *
+ * `source` (optional, default "curator") lets sibling git-as-bus harvesters
+ * reuse this same pre-parsed ingest path under their own event_sources row —
+ * e.g. the ToDo.Today GH Actions harvester POSTs { source: "todo-today", ... }
+ * so its events dedup/attribute cleanly against their own source. Any slug is
+ * accepted as long as the row exists and is a safe identifier.
  */
 
 import { NextResponse } from "next/server";
@@ -24,7 +30,9 @@ import type { ParsedEvent } from "@/lib/ingestion/types";
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
-const CURATOR_SLUG = "curator";
+const DEFAULT_SLUG = "curator";
+// Slugs this route is allowed to ingest under (must each have an event_sources row).
+const ALLOWED_SLUGS = new Set(["curator", "todo-today"]);
 
 export async function POST(request: Request) {
   const authHeader = request.headers.get("authorization");
@@ -32,13 +40,15 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  let body: { date?: string; events?: ParsedEvent[] };
+  let body: { date?: string; events?: ParsedEvent[]; source?: string };
   try {
     body = await request.json();
   } catch {
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
+  const sourceSlug =
+    body.source && ALLOWED_SLUGS.has(body.source) ? body.source : DEFAULT_SLUG;
   const date = body.date;
   const events = body.events;
   if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
@@ -53,15 +63,15 @@ export async function POST(request: Request) {
 
   const supabase = createAdminClient();
 
-  // Resolve curator source row
+  // Resolve the target source row (curator by default; harvesters pass their own)
   const { data: source, error: sourceError } = await supabase
     .from("event_sources")
     .select("id, name")
-    .eq("slug", CURATOR_SLUG)
+    .eq("slug", sourceSlug)
     .single();
   if (sourceError || !source) {
     return NextResponse.json(
-      { error: `Curator source not found — apply migration 20260518120000_add_curator_source.sql` },
+      { error: `Source '${sourceSlug}' not found in event_sources` },
       { status: 500 }
     );
   }
@@ -176,7 +186,7 @@ export async function POST(request: Request) {
 
   await logActivity({
     category: "run_summary",
-    title: `Curator: ${ingested} events from ${events.length} candidates (${date})`,
+    title: `${source.name}: ${ingested} events from ${events.length} candidates (${date})`,
     details: {
       source_name: source.name,
       run_id: runId,
