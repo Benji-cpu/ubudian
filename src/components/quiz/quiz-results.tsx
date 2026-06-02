@@ -167,10 +167,13 @@ export function QuizResults({
       {/* Conversion block — matched events preview + gated CTA */}
       <div className="mt-10">
         <h3 className="font-serif text-2xl font-medium text-brand-deep-green">
-          Events Matched to Your Spirit
+          Your custom spread
         </h3>
         <p className="mt-2 text-brand-charcoal-light">
-          Real events happening in Ubud, picked for {archetype.name}.
+          A handful of gatherings — and the journeys further down — picked for{" "}
+          {archetype.name}. Sign in to keep this spread on your profile and
+          we&apos;ll keep tuning it; if you left your email, it&apos;s already on
+          its way to your inbox.
         </p>
 
         {/* Show first 3 event cards */}
