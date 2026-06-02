@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   startOfMonth,
@@ -9,16 +9,25 @@ import {
   endOfWeek,
   eachDayOfInterval,
   format,
+  parseISO,
   isSameMonth,
   isToday,
   addMonths,
   subMonths,
 } from "date-fns";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { expandRecurrence } from "@/lib/recurrence";
 import type { Event } from "@/types";
+import { EventCard } from "./event-card";
 
 interface EventCalendarProps {
   events: Event[];
@@ -44,6 +53,9 @@ export function EventCalendar({ events }: EventCalendarProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const monthParam = searchParams.get("month");
+
+  // The "yyyy-MM-dd" key of the day whose events are zoomed into, or null (closed).
+  const [selectedDay, setSelectedDay] = useState<string | null>(null);
 
   const currentMonth = useMemo(
     () => (monthParam ? new Date(`${monthParam}-01`) : new Date()),
@@ -77,6 +89,18 @@ export function EventCalendar({ events }: EventCalendarProps) {
     });
     return map;
   }, [events, currentMonth]);
+
+  // The selected day's events, sorted into a top-to-bottom agenda by start time
+  // (untimed events fall to the bottom).
+  const selectedDayEvents = useMemo(() => {
+    if (!selectedDay) return [];
+    return [...(eventsByDate[selectedDay] ?? [])].sort((a, b) => {
+      if (!a.start_time && !b.start_time) return 0;
+      if (!a.start_time) return 1;
+      if (!b.start_time) return -1;
+      return a.start_time.localeCompare(b.start_time);
+    });
+  }, [selectedDay, eventsByDate]);
 
   function navigate(direction: "prev" | "next") {
     const newMonth = direction === "prev"
@@ -116,16 +140,18 @@ export function EventCalendar({ events }: EventCalendarProps) {
           const dateKey = format(day, "yyyy-MM-dd");
           const dayEvents = eventsByDate[dateKey] || [];
           const inMonth = isSameMonth(day, currentMonth);
+          const hasEvents = dayEvents.length > 0;
 
-          return (
-            <div
-              key={dateKey}
-              className={cn(
-                "min-h-[80px] border border-border/50 p-1",
-                !inMonth && "bg-muted/30",
-                isToday(day) && "bg-brand-pale-green"
-              )}
-            >
+          const cellClassName = cn(
+            "min-h-[80px] border border-border/50 p-1 text-left",
+            !inMonth && "bg-muted/30",
+            isToday(day) && "bg-brand-pale-green",
+            hasEvents &&
+              "w-full cursor-pointer transition-colors hover:bg-brand-pale-green/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold focus-visible:ring-inset"
+          );
+
+          const cellContent = (
+            <>
               <span
                 className={cn(
                   "text-xs",
@@ -157,10 +183,57 @@ export function EventCalendar({ events }: EventCalendarProps) {
                   </span>
                 )}
               </div>
+            </>
+          );
+
+          // Days with events become buttons that zoom into a single-day list;
+          // empty days stay inert (nothing to open).
+          return hasEvents ? (
+            <button
+              key={dateKey}
+              type="button"
+              onClick={() => setSelectedDay(dateKey)}
+              aria-label={`View ${dayEvents.length} ${
+                dayEvents.length === 1 ? "event" : "events"
+              } on ${format(day, "d MMMM")}`}
+              className={cellClassName}
+            >
+              {cellContent}
+            </button>
+          ) : (
+            <div key={dateKey} className={cellClassName}>
+              {cellContent}
             </div>
           );
         })}
       </div>
+
+      {/* Single-day zoom: click a populated day to see its full list of events. */}
+      <Dialog
+        open={selectedDay !== null}
+        onOpenChange={(open) => !open && setSelectedDay(null)}
+      >
+        <DialogContent className="max-h-[85vh] gap-0 overflow-hidden p-0 sm:max-w-xl">
+          {selectedDay && (
+            <>
+              <DialogHeader className="border-b border-border/60 px-6 py-4 text-left">
+                <DialogTitle className="font-serif text-xl font-medium text-brand-deep-green dark:text-brand-gold">
+                  {format(parseISO(selectedDay), "EEEE, d MMMM")}
+                </DialogTitle>
+                <DialogDescription>
+                  {selectedDayEvents.length}{" "}
+                  {selectedDayEvents.length === 1 ? "gathering" : "gatherings"}
+                </DialogDescription>
+              </DialogHeader>
+              <div className="max-h-[70vh] space-y-3 overflow-y-auto px-6 py-4">
+                {selectedDayEvents.map((ev) => (
+                  <EventCard key={ev.id} event={ev} hideDate />
+                ))}
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

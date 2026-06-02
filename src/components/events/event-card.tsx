@@ -14,9 +14,15 @@ import type { Event } from "@/types";
 interface EventCardProps {
   event: Event;
   saveButton?: React.ReactNode;
+  /**
+   * Hide the per-card date line. Used by the calendar's single-day view, where
+   * the dialog header already states the date — and where a recurring event's
+   * own start_date would otherwise read as the wrong day.
+   */
+  hideDate?: boolean;
 }
 
-export function EventCard({ event, saveButton }: EventCardProps) {
+export function EventCard({ event, saveButton, hideDate }: EventCardProps) {
   const dateLine = formatEventDateLine(event);
   const isFree = isFreeEvent(event.price_info);
   const timeSensitivity = getTimeSensitivityLabel(event);
@@ -81,10 +87,12 @@ export function EventCard({ event, saveButton }: EventCardProps) {
                 Core
               </span>
             )}
-            <span className="flex items-center gap-1 font-medium text-foreground/85">
-              <Calendar className="h-3 w-3 text-brand-deep-green/70" />
-              {dateLine}
-            </span>
+            {!hideDate && (
+              <span className="flex items-center gap-1 font-medium text-foreground/85">
+                <Calendar className="h-3 w-3 text-brand-deep-green/70" />
+                {dateLine}
+              </span>
+            )}
             {(event.start_time || event.end_time) && (
               <span className="flex items-center gap-1">
                 <Clock className="h-3 w-3 text-brand-deep-green/60" />
