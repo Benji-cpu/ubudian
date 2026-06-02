@@ -89,6 +89,10 @@ export default async function EventPage({ params }: EventPageProps) {
     }
 
     e = event as Event;
+    // The embedding column rides on select("*"); grab it for similarity, then
+    // strip it so the 768-float vector never serialises down to a client component.
+    const queryEmbedding = (event as Record<string, unknown>).embedding ?? null;
+    delete (e as unknown as Record<string, unknown>).embedding;
 
     const profile = await getCurrentProfile();
     if (profile) {
@@ -102,18 +106,44 @@ export default async function EventPage({ params }: EventPageProps) {
       initiallySaved = !!saved;
     }
 
-    const { data: relatedEvents, error: relatedError } = await supabase
-      .from("events")
-      .select("*")
-      .eq("status", "approved")
-      .eq("category", e.category)
-      .neq("id", e.id)
-      .gte("start_date", new Date().toISOString().split("T")[0])
-      .order("start_date", { ascending: true })
-      .limit(4);
+    // "More like this" — semantic nearest neighbours by embedding cosine.
+    if (queryEmbedding) {
+      const { data: matches } = await supabase.rpc("match_events_by_embedding", {
+        query_embedding: queryEmbedding,
+        match_count: 6,
+        exclude_id: e.id,
+      });
+      const ids = ((matches ?? []) as { id: string }[]).map((m) => m.id);
+      if (ids.length > 0) {
+        const { data: rel } = await supabase
+          .from("events")
+          .select("*")
+          .in("id", ids)
+          .eq("status", "approved");
+        const order = new Map(ids.map((id, i) => [id, i] as const));
+        related = ((rel ?? []) as Event[])
+          .sort((a, b) => (order.get(a.id) ?? 99) - (order.get(b.id) ?? 99))
+          .slice(0, 4);
+        related.forEach((r) => delete (r as unknown as Record<string, unknown>).embedding);
+      }
+    }
 
-    if (relatedError) console.error("Related events query error:", relatedError);
-    related = (relatedEvents ?? []) as Event[];
+    // Fallback to same-category upcoming when the event isn't embedded yet
+    // (just ingested, sweep pending) or similarity returned nothing.
+    if (related.length === 0) {
+      const { data: relatedEvents, error: relatedError } = await supabase
+        .from("events")
+        .select("*")
+        .eq("status", "approved")
+        .eq("category", e.category)
+        .neq("id", e.id)
+        .gte("start_date", new Date().toISOString().split("T")[0])
+        .order("start_date", { ascending: true })
+        .limit(4);
+      if (relatedError) console.error("Related events query error:", relatedError);
+      related = ((relatedEvents ?? []) as Event[]);
+      related.forEach((r) => delete (r as unknown as Record<string, unknown>).embedding);
+    }
 
     sponsorship = await getActiveSponsorshipFor("event", e.id);
     if (sponsorship) {
@@ -276,7 +306,7 @@ export default async function EventPage({ params }: EventPageProps) {
         {related.length > 0 && (
           <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
             <h2 className="font-serif text-2xl font-bold text-brand-deep-green">
-              More {e.category} Events
+              More like this
             </h2>
             <div className="mt-8 grid gap-3 md:grid-cols-2">
               {related.map((relatedEvent) => (
