@@ -32,7 +32,16 @@ export const maxDuration = 60;
 
 const DEFAULT_SLUG = "curator";
 // Slugs this route is allowed to ingest under (must each have an event_sources row).
-const ALLOWED_SLUGS = new Set(["curator", "todo-today"]);
+// All GH-Actions harvesters POST under their own slug; the route does the per-event
+// createEventFromParsed work (dedup, geocode, year-roll guard) and forces pending.
+const ALLOWED_SLUGS = new Set([
+  "curator",
+  "todo-today",
+  "megatix",
+  "blissbase",
+  "soulwise",
+  "instagram-public",
+]);
 
 export async function POST(request: Request) {
   const authHeader = request.headers.get("authorization");
