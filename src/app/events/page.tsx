@@ -21,6 +21,7 @@ import { filterEventsInRange } from "@/lib/events/filter-range";
 import { getActiveBoostedEventIds, getCategorySponsor } from "@/lib/sponsors/sponsor-service";
 import { PartnerCredit } from "@/components/sponsors/partner-credit";
 import { splitByTier, pickSpotlight, bannerEyebrow } from "@/lib/events/discovery";
+import { stripEmbeddings } from "@/lib/events/strip-embedding";
 import { FestivalBanner } from "@/components/events/festival-banner";
 import { MoreHappenings } from "@/components/events/more-happenings";
 import type { ArchetypeId, Event, Experience, QuizResultRecord, Sponsor } from "@/types";
@@ -73,6 +74,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
   let viewerArchetypes: ArchetypeId[] | null = null;
   let archetypeLabel: string | null = null;
   let boostedEventIds: Set<string> = new Set();
+  let tasteSimByEventId: Map<string, number> | undefined;
   let categorySponsor: Sponsor | null = null;
 
   try {
@@ -203,7 +205,25 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
       return query;
     }, "events-list");
     if (error) console.error("Events query error:", error);
-    allEvents = (events ?? []) as Event[];
+    allEvents = stripEmbeddings((events ?? []) as Event[]);
+
+    // Behavioural taste rail — for signed-in users who've hearted events, score
+    // every approved event by cosine to the centroid of their saved events.
+    if (currentProfileId && savedEventIds.length > 0) {
+      const { data: tasteVec } = await supabase.rpc("user_taste_vector", {
+        p_profile_id: currentProfileId,
+      });
+      if (tasteVec) {
+        const { data: sims } = await supabase.rpc("match_events_by_embedding", {
+          query_embedding: tasteVec,
+          match_count: 300,
+          exclude_id: null,
+        });
+        tasteSimByEventId = new Map(
+          ((sims ?? []) as { id: string; similarity: number }[]).map((s) => [s.id, s.similarity])
+        );
+      }
+    }
 
     // Community-partner data — boost-sort eligible event IDs and (when filtered
     // by category) the anchor sponsor that owns that category.
@@ -357,6 +377,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
                 viewerArchetypes={viewerArchetypes}
                 archetypeLabel={archetypeLabel}
                 boostedEventIds={boostedEventIds}
+                tasteSimByEventId={tasteSimByEventId}
               />
             </Suspense>
             {extraDiscovery.length > 0 && (

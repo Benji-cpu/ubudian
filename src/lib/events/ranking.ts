@@ -20,6 +20,13 @@ export interface RankingContext {
   /** Optional save_count lookup when events carry it as a separate field. */
   saveCountByEventId?: Map<string, number>;
   /**
+   * Per-event cosine similarity to the viewer's *taste vector* (the centroid of
+   * the events they've hearted), precomputed server-side via the
+   * `user_taste_vector` + `match_events_by_embedding` RPCs. scoreEvent is pure
+   * and sync, so the DB work happens upstream and the result is passed in here.
+   */
+  tasteSimByEventId?: Map<string, number>;
+  /**
    * Event IDs currently sponsored at Partner+ tier. Gets a strong boost so
    * the surface honours the "top placement" promise we sell, without changing
    * the card visually elsewhere. Patron-tier sponsors are NOT included here.
@@ -35,6 +42,8 @@ export interface ScoredEvent<T extends Event = Event> {
     quality: number;
     popularity: number;
     personalization: number;
+    /** Behavioural match — similarity to the centroid of the viewer's hearts. */
+    taste: number;
     /** Boost for hand-curated weekly anchors (is_core). */
     coreBoost: number;
     /**
@@ -98,6 +107,19 @@ export function personalizationComponent(
   return Math.min(1, overlap / viewerArchetypes.length);
 }
 
+/**
+ * Behavioural taste match. Raw cosine to the taste centroid sits high for the
+ * whole corpus (wellness events cluster), so we rescale: similarity at or below
+ * FLOOR contributes nothing, CEIL maps to 1. This keeps the signal discriminative
+ * rather than handing every event ~0.8.
+ */
+export function tasteComponent(sim: number | undefined | null): number {
+  if (sim == null || !Number.isFinite(sim)) return 0;
+  const FLOOR = 0.7;
+  const CEIL = 0.95;
+  return clamp01((sim - FLOOR) / (CEIL - FLOOR));
+}
+
 export function scoreEvent<T extends Event & { save_count?: number }>(
   event: T,
   ctx: RankingContext = {}
@@ -115,6 +137,7 @@ export function scoreEvent<T extends Event & { save_count?: number }>(
     (typeof event.save_count === "number" ? event.save_count : 0);
   const popularity = popularityComponent(saveCount);
   const personalization = personalizationComponent(event.archetype_tags, ctx.viewerArchetypes);
+  const taste = tasteComponent(ctx.tasteSimByEventId?.get(event.id));
 
   // Core anchors get a steady visibility boost so they don't drown in one-off noise.
   const coreBoost = event.is_core ? 0.4 : 0;
@@ -131,7 +154,8 @@ export function scoreEvent<T extends Event & { save_count?: number }>(
     time + // 0–1
     0.8 * quality + // 0–0.8
     0.6 * popularity + // ~0–1.5 in practice
-    1.2 * personalization + // 0–1.2
+    1.2 * personalization + // 0–1.2 (explicit archetype intent leads)
+    1.0 * taste + // 0–1.0 (behavioural; sits just below archetype)
     coreBoost + // 0 or 0.4
     festivalBoost + // 0 or 0.9
     sponsorBoost; // 0 or 1.5
@@ -144,6 +168,7 @@ export function scoreEvent<T extends Event & { save_count?: number }>(
       quality,
       popularity,
       personalization,
+      taste,
       coreBoost,
       festivalBoost,
       sponsorBoost,

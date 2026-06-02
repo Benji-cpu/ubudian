@@ -5,6 +5,7 @@ import {
   timeComponent,
   popularityComponent,
   personalizationComponent,
+  tasteComponent,
 } from "@/lib/events/ranking";
 import type { Event } from "@/types";
 
@@ -109,6 +110,23 @@ describe("personalizationComponent", () => {
   });
   it("is zero with no overlap", () => {
     expect(personalizationComponent(["seeker"], ["explorer"])).toBe(0);
+  });
+});
+
+describe("tasteComponent", () => {
+  it("is zero for missing / non-finite similarity", () => {
+    expect(tasteComponent(undefined)).toBe(0);
+    expect(tasteComponent(null)).toBe(0);
+    expect(tasteComponent(NaN)).toBe(0);
+  });
+  it("is zero at or below the floor (whole corpus clusters high)", () => {
+    expect(tasteComponent(0.7)).toBe(0);
+    expect(tasteComponent(0.5)).toBe(0);
+  });
+  it("rescales floor..ceil into 0..1 and clamps above ceil", () => {
+    expect(tasteComponent(0.95)).toBe(1);
+    expect(tasteComponent(0.99)).toBe(1);
+    expect(tasteComponent(0.825)).toBeCloseTo(0.5, 5);
   });
 });
 

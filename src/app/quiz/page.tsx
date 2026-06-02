@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { QuizContainer } from "@/components/quiz/quiz-container";
+import { stripEmbeddings } from "@/lib/events/strip-embedding";
 import type { Event, Tour, Story, Experience } from "@/types";
 import type { Metadata } from "next";
 
@@ -40,7 +41,7 @@ export default async function QuizPage() {
       .limit(12),
   ]);
 
-  const events = (eventsRes.data ?? []) as Event[];
+  const events = stripEmbeddings((eventsRes.data ?? []) as Event[]);
   const tours = (toursRes.data ?? []) as Tour[];
   const stories = (storiesRes.data ?? []) as Story[];
   const experiences = (experiencesRes.data ?? []) as Experience[];

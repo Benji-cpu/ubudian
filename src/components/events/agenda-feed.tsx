@@ -14,6 +14,8 @@ interface AgendaFeedProps {
   archetypeLabel?: string | null;
   /** Event IDs with an active Partner+ sponsorship — boost in ranking + buckets. */
   boostedEventIds?: Set<string>;
+  /** Per-event cosine to the viewer's taste vector (centroid of their hearts). */
+  tasteSimByEventId?: Map<string, number>;
 }
 
 const BUCKET_ORDER: { key: EventBucket; label: string; subtitle?: string }[] = [
@@ -33,6 +35,7 @@ export function AgendaFeed({
   viewerArchetypes,
   archetypeLabel,
   boostedEventIds,
+  tasteSimByEventId,
 }: AgendaFeedProps) {
   const now = new Date();
   const savedSet = new Set(savedEventIds);
@@ -64,6 +67,7 @@ export function AgendaFeed({
     now,
     viewerArchetypes: viewerArchetypes ?? undefined,
     boostedEventIds,
+    tasteSimByEventId,
   });
 
   // Bucket the full set first so the hero is anchored to *today*, not just
@@ -114,6 +118,10 @@ export function AgendaFeed({
     ? ranked
         .filter((r) => r.event.id !== hero?.id && !savedSet.has(r.event.id))
         .filter((r) => {
+          // Behavioural taste (similarity to the centroid of their hearts) is
+          // the strongest signal; explicit archetype overlap next; category
+          // overlap with saves is the fallback when no taste vector is available.
+          if (r.components.taste > 0.15) return true;
           if (hasArchetype && r.components.personalization > 0) return true;
           if (hasSaves && savedCategories.has(r.event.category)) return true;
           return false;

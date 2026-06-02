@@ -4,6 +4,7 @@ import { getCurrentProfile } from "@/lib/auth";
 import { getOrCreateIcsToken } from "@/lib/events/ics-token";
 import { SITE_URL } from "@/lib/constants";
 import { DashboardEventsTabs } from "./dashboard-events-tabs";
+import { stripEmbeddings } from "@/lib/events/strip-embedding";
 import type { Event } from "@/types";
 import type { Metadata } from "next";
 
@@ -32,12 +33,14 @@ export default async function DashboardEventsPage() {
     getOrCreateIcsToken(profile.id),
   ]);
 
-  const submittedEvents = (submittedRes.data ?? []) as Event[];
+  const submittedEvents = stripEmbeddings((submittedRes.data ?? []) as Event[]);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const savedAll = (savedRes.data ?? [])
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    .map((row: any) => row.events as Event)
-    .filter(Boolean) as Event[];
+  const savedAll = stripEmbeddings(
+    (savedRes.data ?? [])
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .map((row: any) => row.events as Event)
+      .filter(Boolean) as Event[]
+  );
 
   // Upcoming, approved, sorted ascending by date then time
   const savedEvents = savedAll
