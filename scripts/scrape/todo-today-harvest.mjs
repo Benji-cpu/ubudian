@@ -47,16 +47,22 @@ const API = (q) => `/api/todo-today/v1/events?channel=ubud${q}`;
 //  7 Music, 8 Food&Drink, 9 Special, 10 Relationships&Connection, 11 Family&Kids,
 //  13 Learning, 15 Comedy, 16 Local Culture, 17 Parties&Nightlife,
 //  19 Tantra&Sensual Arts, 22 Business, 24 Theater.)
+// Values MUST match the events.category vocabulary exactly, or
+// createEventFromParsed defaults them to "Other":
+//   Dance & Movement | Yoga & Meditation | Ceremony & Sound | Tantra & Intimacy
+//   Art & Culture | Circle & Community | Retreat & Training | Music & Performance
+//   Healing & Bodywork | Food & Makers | Other
 const CATEGORY_MAP = {
   2: "Dance & Movement",
-  4: "Ceremony",
-  19: "Tantra",
-  10: "Connection",
-  7: "Music",
-  5: "Arts & Creativity",
+  4: "Ceremony & Sound",
+  19: "Tantra & Intimacy",
+  10: "Circle & Community",
+  7: "Music & Performance",
+  5: "Art & Culture",
 };
 // Ambiguous buckets allowed ONLY when the title matches a positive ICP keyword.
 const GATED_CATEGORIES = { 1: "Wellness", 6: "Community", 9: "Special" };
+const GATED_CATEGORY = "Ceremony & Sound"; // breathwork/cacao/sound land here
 
 const POSITIVE_ICP =
   /\b(breathwork|breath\s?work|cacao|kirtan|ecstatic|5\s?rhythms|contact improv|somatic|sound (bath|healing|journey)|gong|tantra|sensual|ceremony|ceremonial|sacred|medicine|shaman|womb|yoni|sufi|whirling|qawwali|devotional|bhakti|circle|cuddle|authentic relating)\b/i;
@@ -112,7 +118,7 @@ function mapEvent(ev) {
   if (NEGATIVE_ICP.test(hay)) return null;
   let category;
   if (allowed) category = allowed;
-  else if (gated && POSITIVE_ICP.test(hay)) category = "Ceremony";
+  else if (gated && POSITIVE_ICP.test(hay)) category = GATED_CATEGORY;
   else return null; // off-ICP
 
   const rec = recurrenceFrom(ev);
