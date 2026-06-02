@@ -1,0 +1,67 @@
+name: aggregator-harvest
+
+# Daily harvest of the plain-fetch aggregators (no browser needed) → POST to
+# /api/cron/curator-ingest in small chunks. Currently: Megatix (moved off the
+# timing-out Vercel cron). Each source runs in its own continue-on-error step so
+# one source failing can't block the others.
+#
+# Why chunked: the curator-ingest route geocodes + dedups per event under a 60s
+# maxDuration; a 60-event POST 504s. We POST in batches of 15 (~25-35s each).
+
+on:
+  schedule:
+    - cron: '40 18 * * *' # 02:40 WITA daily (after todo-today at 02:30)
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: aggregator-harvest
+  cancel-in-progress: false
+
+jobs:
+  harvest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      CRON_SECRET: ${{ secrets.CRON_SECRET }}
+      INGEST_URL: https://theubudian.life/api/cron/curator-ingest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # Reusable chunked POST: post_chunks <payload.json>
+      - name: Define helper
+        run: |
+          cat > /tmp/post_chunks.sh <<'SH'
+          set -uo pipefail
+          FILE="$1"
+          TOTAL=$(jq '.events | length' "$FILE")
+          SRC=$(jq -r '.source' "$FILE")
+          DATE=$(jq -r '.date' "$FILE")
+          if [ "$TOTAL" -eq 0 ]; then echo "::notice::$SRC: 0 events harvested"; exit 0; fi
+          ING=0; DUP=0; FAIL=0
+          i=0
+          while [ "$i" -lt "$TOTAL" ]; do
+            jq -c --argjson i "$i" --arg s "$SRC" --arg d "$DATE" \
+              '{date:$d, source:$s, events:(.events[$i:($i+15)])}' "$FILE" > /tmp/chunk.json
+            RESP=$(curl -fsS --max-time 90 -X POST \
+              -H "Authorization: Bearer $CRON_SECRET" -H "Content-Type: application/json" \
+              -d @/tmp/chunk.json "$INGEST_URL" || echo '{}')
+            ING=$((ING + $(echo "$RESP" | jq -r '.ingested // 0')))
+            DUP=$((DUP + $(echo "$RESP" | jq -r '.duplicates // 0')))
+            FAIL=$((FAIL + $(echo "$RESP" | jq -r '.failed // 0')))
+            i=$((i + 15))
+          done
+          echo "::notice::$SRC ingested $ING ($DUP duplicates, $FAIL failed) of $TOTAL harvested"
+          SH
+          chmod +x /tmp/post_chunks.sh
+
+      - name: Megatix
+        continue-on-error: true
+        run: |
+          node scripts/scrape/megatix-harvest.mjs --out /tmp/megatix.json
+          bash /tmp/post_chunks.sh /tmp/megatix.json
