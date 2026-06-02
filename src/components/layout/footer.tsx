@@ -86,6 +86,12 @@ export async function Footer() {
           >
             About &amp; Contact
           </Link>
+          <Link
+            href="/privacy"
+            className="py-2 text-sm text-brand-off-white/80 transition-colors hover:text-brand-gold"
+          >
+            Privacy
+          </Link>
         </div>
 
         {/* Copyright */}
