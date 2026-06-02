@@ -22,7 +22,18 @@ import type { TelegramUpdate } from "../src/lib/ingestion/adapters/telegram";
 // Register the adapter
 import "../src/lib/ingestion/adapters/telegram";
 
-const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+// Prefer a dedicated dev bot. Local polling is destructive to whatever bot it
+// runs against (it deletes that bot's webhook to use getUpdates), so by default
+// we never run it against the production bot — set TELEGRAM_DEV_BOT_TOKEN to a
+// second BotFather bot added to the same groups and poll that instead.
+const DEV_BOT_TOKEN = process.env.TELEGRAM_DEV_BOT_TOKEN;
+const BOT_TOKEN = DEV_BOT_TOKEN || process.env.TELEGRAM_BOT_TOKEN;
+const usingProdBot = !DEV_BOT_TOKEN;
+// Escape hatch: poll the production bot anyway (restores its webhook on a
+// graceful exit). A hard kill still leaves prod without a webhook until the
+// nightly self-heal re-asserts it — so this is opt-in, not the default.
+const FORCE_PROD_POLL = process.env.TELEGRAM_POLL_FORCE === "1";
+
 if (!BOT_TOKEN) {
   console.warn("[telegram-poll] TELEGRAM_BOT_TOKEN not set — polling disabled");
   process.exit(0);
@@ -73,15 +84,31 @@ async function tgPost(method: string, body: Record<string, unknown>) {
 
 async function main() {
   // Check for an existing production webhook before clearing it.
-  // We'll restore it when polling stops so production keeps working.
   const webhookInfo = await tg("getWebhookInfo");
   const existingWebhookUrl: string | null = webhookInfo?.result?.url || null;
   const isProductionWebhook =
     !!existingWebhookUrl && !existingWebhookUrl.includes("localhost");
 
-  if (isProductionWebhook) {
+  // Guard: never silently break production. If we'd be polling the prod bot and
+  // it has a live webhook, bail unless explicitly forced — deleting it here and
+  // relying on a graceful exit to restore it is exactly how prod has gone dark.
+  if (usingProdBot && isProductionWebhook && !FORCE_PROD_POLL) {
+    console.warn("\n[telegram-poll] Production webhook is live on the production bot:");
+    console.warn(`[telegram-poll]   ${existingWebhookUrl}`);
+    console.warn("[telegram-poll] Skipping local polling so it isn't torn down.\n");
+    console.warn("[telegram-poll] To test ingestion locally, either:");
+    console.warn("[telegram-poll]   • set TELEGRAM_DEV_BOT_TOKEN to a second bot in the same groups (recommended), or");
+    console.warn("[telegram-poll]   • set TELEGRAM_POLL_FORCE=1 to poll the prod bot (restores the webhook on a clean exit).\n");
+    process.exit(0);
+  }
+
+  // Only the prod bot's webhook is worth restoring; a dev bot has none.
+  const shouldRestoreWebhook = usingProdBot && isProductionWebhook;
+  if (DEV_BOT_TOKEN) {
+    console.log("[telegram-poll] Using TELEGRAM_DEV_BOT_TOKEN — production bot untouched.\n");
+  } else if (shouldRestoreWebhook) {
     console.log(`[telegram-poll] Production webhook detected: ${existingWebhookUrl}`);
-    console.log("[telegram-poll] It will be restored when polling stops.\n");
+    console.log("[telegram-poll] FORCE mode: it will be restored when polling stops.\n");
   }
 
   // Delete any existing webhook (required for getUpdates to work)
@@ -226,14 +253,26 @@ async function main() {
   console.log("Polling stopped.");
 
   // Restore production webhook so Vercel keeps receiving messages
-  if (isProductionWebhook) {
+  if (shouldRestoreWebhook) {
     console.log(`\n[telegram-poll] Restoring production webhook: ${existingWebhookUrl}`);
     const webhookSecret = process.env.TELEGRAM_WEBHOOK_SECRET;
+    if (!webhookSecret) {
+      // Restoring without secret_token re-registers a webhook that 401s every
+      // update (the route validates the X-Telegram-Bot-Api-Secret-Token header).
+      // This is the exact failure that took prod down — refuse to do it silently.
+      console.error(
+        "[telegram-poll] TELEGRAM_WEBHOOK_SECRET is missing — restoring without it would 401 every update."
+      );
+      console.error(
+        "[telegram-poll] Set TELEGRAM_WEBHOOK_SECRET in .env.local, then run 'Register Webhook' in the admin panel."
+      );
+      return;
+    }
     const body: Record<string, unknown> = {
       url: existingWebhookUrl,
+      secret_token: webhookSecret,
       allowed_updates: ["message", "channel_post"],
     };
-    if (webhookSecret) body.secret_token = webhookSecret;
     const result = await tgPost("setWebhook", body);
     if (result.ok) {
       console.log("[telegram-poll] Production webhook restored.");

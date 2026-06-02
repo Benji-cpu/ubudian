@@ -27,8 +27,15 @@ import type { TelegramUpdate } from "@/lib/ingestion/adapters/telegram";
 import "@/lib/ingestion/adapters/telegram";
 
 export async function POST(request: Request) {
-  // Verify webhook secret via X-Telegram-Bot-Api-Secret-Token header
-  const secret = request.headers.get("x-telegram-bot-api-secret-token");
+  // Verify the webhook secret. Telegram sends it as the
+  // X-Telegram-Bot-Api-Secret-Token header when the webhook is registered with
+  // `secret_token`. We also accept it as a `?secret=` query param as a fallback,
+  // because the registration scripts bake it into the URL — without this
+  // fallback, a webhook registered with only the query param (no secret_token)
+  // 401s every update. The header is preferred; the query param is the safety net.
+  const secret =
+    request.headers.get("x-telegram-bot-api-secret-token") ||
+    new URL(request.url).searchParams.get("secret");
 
   if (!secret || secret !== process.env.TELEGRAM_WEBHOOK_SECRET) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

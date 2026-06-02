@@ -22,6 +22,7 @@ import {
   type StaleSweepResult,
 } from "@/lib/maintenance/cleanups";
 import { garbageCollectArchivedEventImages, type ImageGcResult } from "@/lib/maintenance/image-gc";
+import { ensureTelegramWebhook, type TelegramWebhookHealth } from "@/lib/maintenance/telegram-webhook-health";
 import { buildReviewQueue } from "@/lib/maintenance/review-queue";
 import { sendTransactionalEmail } from "@/lib/email";
 import { dailyMaintenanceDigest } from "@/lib/email-templates";
@@ -61,6 +62,14 @@ export async function GET(request: Request) {
   });
   if (imageGc.errors.length) errors.push(...imageGc.errors.map((e) => `imageGc: ${e}`));
 
+  const telegramWebhook: TelegramWebhookHealth = await ensureTelegramWebhook().catch((err) => {
+    errors.push(`ensureTelegramWebhook: ${err?.message ?? String(err)}`);
+    return { checked: false, action: "error" as const, reason: err?.message ?? String(err) };
+  });
+  if (telegramWebhook.action === "error" && telegramWebhook.reason) {
+    errors.push(`telegramWebhook: ${telegramWebhook.reason}`);
+  }
+
   const linkHealth: LinkHealthReport = await checkExternalLinkHealth().catch((err) => {
     errors.push(`checkExternalLinkHealth: ${err?.message ?? String(err)}`);
     return { checked: 0, broken: [] };
@@ -96,6 +105,7 @@ export async function GET(request: Request) {
       archivedStaleLinkEvents: staleSweep.archived,
       clearedStaleCtas: staleSweep.clearedCtas,
     },
+    telegramWebhook,
     linkHealth,
     review,
     errors,
