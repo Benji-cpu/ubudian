@@ -12,6 +12,7 @@ import { EventSearch } from "@/components/events/event-search";
 import { CategoryGuideLink } from "@/components/events/category-guide-link";
 import { MapView } from "@/components/events/map-view";
 import { EventsHero } from "@/components/events/events-hero";
+import { ArchetypeExplainer } from "@/components/quiz/archetype-explainer";
 import { RefreshOnFocus } from "@/components/events/refresh-on-focus";
 import { CrossSectionRibbon } from "@/components/journeys/cross-section-ribbon";
 import { NewsletterSignup } from "@/components/layout/newsletter-signup";
@@ -333,6 +334,16 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
           </div>
         )}
       </section>
+
+      {/* Orientation — only for visitors who haven't taken the quiz and aren't
+          already filtering by archetype. Once they have a spirit, the feed is
+          personalised and this nudge would be noise. Kept slim so the agenda
+          stays close to the fold. */}
+      {!viewerArchetypes && !params.archetype && !useOwnViewport && (
+        <section className="mx-auto max-w-7xl px-4 pb-8 sm:px-6 lg:px-8">
+          <ArchetypeExplainer variant="strip" />
+        </section>
+      )}
 
       {/* Content */}
       <section className="mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:px-8">

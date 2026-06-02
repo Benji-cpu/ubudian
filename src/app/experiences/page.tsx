@@ -6,6 +6,7 @@ import { getCurrentProfile } from "@/lib/auth";
 import { JourneyCard } from "@/components/journeys/journey-card";
 import { WhatsIncludedIcons } from "@/components/journeys/whats-included-icons";
 import { DifferentiatorStrip } from "@/components/journeys/differentiator-strip";
+import { JourneyExplainer } from "@/components/journeys/journey-explainer";
 import { WordReveal } from "@/components/ui/word-reveal";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { GrainTexture } from "@/components/ui/grain-texture";
@@ -101,6 +102,9 @@ export default async function ExperiencesPage() {
 
       {/* Differentiator — the typographic moment */}
       <DifferentiatorStrip />
+
+      {/* Clarify the two axes a first-timer conflates: length + mode */}
+      <JourneyExplainer />
 
       {/* What an Ubud Retreat actually delivers — icon row */}
       <section className="mx-auto max-w-5xl px-4 py-16 sm:px-6 sm:py-20">
