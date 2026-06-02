@@ -107,8 +107,10 @@ After accepting an event, set fields like this:
   - Ceremony / Sound → `["spirit"]`, add `"community"` if it's a circle.
 - `quality_score`: the score / 10 you computed above, expressed as a 0–1 float.
 - `content_flags`: leave empty `[]` unless something genuinely warrants a flag.
+- `archetype_tags`: 1–3 of the 5 archetype IDs (`seeker | explorer | creative | connector | epicurean`) whose vibe fits the event. seeker = spiritual depth (ceremony, breath, shadow, tantra, meditation); explorer = edge/threshold (ecstatic dance, contact improv, men's/women's circles); creative = art/music/making; connector = community/belonging (circles, shared gatherings); epicurean = sensory pleasure (sound, cacao, bodywork, food, live music). These bridge events to quiz results — set them.
+- `vibe_tags`: 0–4 fine-grained facets from the controlled vocabulary in `src/lib/vibe-tags.ts` (`ecstatic-dance`, `5rhythms`, `contact-improv`, `cacao-ceremony`, `sound-bath`, `kirtan-mantra`, `breathwork`, `tantra`, `kundalini-activation`, `shadow-work`, `womens-circle`, `mens-circle`, `meditation-stillness`, `energy-healing`, `conscious-movement`, `partner-dance`, `live-music`, `art-exhibition`, `food-gathering`). Pick only what clearly applies; empty is fine. These power event-to-event similarity.
 
-`archetype_tags` are NOT set during ingestion — those are guide/content tags set by editorial.
+(Reversed 2026-06-02: `archetype_tags` used to be editorial-only. They are now set at ingestion alongside `vibe_tags`. The **embedding** vector is NOT your job — the nightly maintenance sweep computes it automatically; never put an embedding in the inbox JSON.)
 
 ## Competitor harvest — attribution rules
 

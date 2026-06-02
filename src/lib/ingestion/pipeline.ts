@@ -934,6 +934,11 @@ export async function createEventFromParsed(
           quality_score: qualityScore || null,
           content_flags: mergedFlags,
           intent_tags: parsed.intent_tags ?? [],
+          // Archetype + vibe facets from the parser (quiz bridge + similarity).
+          // Empty arrays when the parser omits them; the nightly sweep backfills
+          // any stragglers and computes the embedding.
+          archetype_tags: parsed.archetype_tags ?? [],
+          vibe_tags: parsed.vibe_tags ?? [],
           // Curator/discovery events route into the "More happenings" tier;
           // everything else defaults to the core conscious-community feed.
           event_tier: parsed.event_tier === "discovery" ? "discovery" : "core",

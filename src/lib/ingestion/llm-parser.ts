@@ -20,6 +20,8 @@ import {
 } from "./llm-prompts";
 import type { ParsedEvent } from "./types";
 import { withLLMRetry } from "./llm-retry";
+import { ARCHETYPE_IDS } from "@/lib/quiz-data";
+import { VIBE_TAGS } from "@/lib/vibe-tags";
 
 /**
  * Error class for LLM API failures.
@@ -110,6 +112,18 @@ const parsedEventItemSchema = {
       type: SchemaType.ARRAY as const,
       items: { type: SchemaType.STRING as const, enum: ["romance", "community", "spirit", "living", "local_culture"] },
       description: "Which guide intent(s) this event serves. 'romance' = tantra/intimacy/dating; 'community' = circles, groups, gatherings; 'spirit' = ceremony, sound, devotional practice; 'living' = lifestyle, food, slow-living; 'local_culture' = Balinese arts, traditions, language. Pick 0-2 best matches; leave empty if none clearly fit.",
+    },
+    archetype_tags: {
+      type: SchemaType.ARRAY as const,
+      items: { type: SchemaType.STRING as const, enum: [...ARCHETYPE_IDS] },
+      description:
+        "1-3 archetype IDs whose vibe best fits this event. 'seeker' = spiritual depth (ceremony, breath, shadow, tantra, meditation); 'explorer' = edge/threshold (ecstatic dance, contact improv, men's/women's circles, embodiment edges); 'creative' = art/music/making (art-as-practice, performance, sound-craft); 'connector' = community/belonging (circles, shared gatherings, cohort retreats); 'epicurean' = sensory pleasure (sound bath, cacao, bodywork, food, lived beauty). Pick 1-3.",
+    },
+    vibe_tags: {
+      type: SchemaType.ARRAY as const,
+      items: { type: SchemaType.STRING as const, enum: [...VIBE_TAGS] },
+      description:
+        "0-4 fine-grained facets from the controlled list that precisely describe the practice (used for event-to-event similarity). Choose only ones that clearly apply; leave empty if none fit.",
     },
   },
   required: ["title", "description", "category", "start_date", "quality_score", "content_flags"] ,

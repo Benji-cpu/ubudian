@@ -177,6 +177,8 @@ For each accepted event, set:
 - `category`: exactly one — core: `"Dance & Movement"` | `"Tantra & Intimacy"` | `"Ceremony & Sound"`; discovery: `"Art & Culture"` | `"Music & Performance"` | `"Food & Makers"` (or `"Dance & Movement"` for a festival movement session).
 - `event_tier`: `"discovery"` for discovery-universe events; omit (defaults `"core"`) for the three conscious categories. **Never set `is_spotlight`** — not a curator field.
 - `intent_tags`: per the playbook tagging rules
+- `archetype_tags`: 1–3 of `seeker | explorer | creative | connector | epicurean` (see playbook "Tagging rules"). These bridge events to quiz results — set them.
+- `vibe_tags`: 0–4 facets from the controlled vocabulary in `src/lib/vibe-tags.ts` (empty is fine). Power event-to-event similarity. Never include an embedding — the nightly sweep computes that.
 - `quality_score`: the integer / 10, as a float (e.g. 7 → 0.7)
 - `content_flags`: `[]` unless something warrants a flag
 
@@ -219,7 +221,9 @@ Schema (matches `ParsedEvent` in `src/lib/ingestion/types.ts`):
       "cover_image_url": "string | null",
       "quality_score": 0.0,
       "content_flags": [],
-      "intent_tags": []
+      "intent_tags": [],
+      "archetype_tags": ["seeker | explorer | creative | connector | epicurean (1-3)"],
+      "vibe_tags": ["0-4 from src/lib/vibe-tags.ts; omit/empty if none fit"]
     }
   ]
 }

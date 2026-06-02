@@ -172,6 +172,7 @@ The commit is the audit trail. Vercel auto-deploys but no app code changed, so t
 - Does **not** apply code fixes. Ubudian's review queue items typically need editorial judgement (was this event a duplicate? is this venue real?), not code changes.
 - Does **not** modify Supabase data. The autonomous cleanups in the route already did that — you are reading after-the-fact counts.
 - Does **not** call any external HTTP service. GitHub via `git` is the only network you need.
+- Does **not** run the personalisation tag/embedding sweep. That's a separate GH Actions workflow (`.github/workflows/tag-embed-sweep.yml`, 18:40 UTC) — it has the Gemini + Supabase egress and secrets this sandbox lacks. New events are already tagged at ingestion by the LLM parser; the workflow only embeds new rows + catches stragglers.
 
 ## Failure modes
 

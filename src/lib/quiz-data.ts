@@ -70,7 +70,17 @@ export const ARCHETYPES: Record<ArchetypeId, ArchetypeResult> = {
     hero_image: "/images/archetypes/epicurean.jpg",
     color: "brand-terracotta",
     content_keywords: {
-      event_categories: ["Ceremony & Sound", "Healing & Bodywork", "Tantra & Intimacy"],
+      // Embedding-cluster analysis (2026-06) showed epicurean is under-supplied
+      // by the core conscious feed and its real matches live in the sensory
+      // discovery tier — communal food and live performance. Added so the quiz
+      // spread surfaces those for epicurean-leaning takers.
+      event_categories: [
+        "Ceremony & Sound",
+        "Healing & Bodywork",
+        "Tantra & Intimacy",
+        "Food & Makers",
+        "Music & Performance",
+      ],
       tour_themes: ["Food & Culinary"],
       story_theme_tags: ["Chef & Food", "Bodyworker", "Healer"],
     },

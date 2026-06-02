@@ -1,0 +1,58 @@
+name: tag-embed-sweep
+
+# Going-forward safety net for the personalisation engine. New events are tagged
+# (archetype_tags + vibe_tags) at ingestion by the LLM parser, but their EMBEDDING
+# is deferred (kept off the Vercel 10s ingest budget). This workflow embeds any
+# event still missing a vector and backfills any straggler that slipped through
+# without tags. The sandboxed nightly Claude agent can't reach Gemini/Supabase
+# (egress allowlist), and Vercel Hobby is capped at 2 crons — GH Actions is the
+# right executor: unrestricted egress + holds the secrets, no cron-count cost.
+#
+# REQUIRES repo secrets (not yet set — add via `gh secret set` or the GH UI):
+#   NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, GEMINI_API_KEY
+# Until they exist the run no-ops/fails fast and nothing is harmed; the existing
+# corpus is already fully embedded + tagged.
+
+on:
+  schedule:
+    # 18:40 UTC ≈ 02:40 WITA — ahead of the maintenance (19:02) + curator (19:47)
+    # jobs, off the quarter-hour to dodge GH cron pile-up.
+    - cron: "40 18 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tag-embed-sweep
+  cancel-in-progress: false
+
+jobs:
+  sweep:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Embed + tag any new / untagged events
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          set -euo pipefail
+          # Bounded each night — the corpus is already fully processed, so these
+          # only touch the day's new approved events. Caps keep a Gemini hiccup
+          # from running long; anything missed is retried tomorrow.
+          npx tsx scripts/embed-events-backfill.ts --limit 100 --concurrency 5
+          npx tsx scripts/backfill-archetype-tags.ts --limit 60 --concurrency 4
+          npx tsx scripts/backfill-vibe-tags.ts --limit 60 --concurrency 4

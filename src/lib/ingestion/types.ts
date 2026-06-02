@@ -32,6 +32,12 @@ export interface ParsedEvent {
   content_flags?: string[];
   // Guide intent tagging (set by LLM)
   intent_tags?: string[];
+  // Archetype + vibe tagging (set by LLM). archetype_tags bridges events to quiz
+  // results (1–3 of the 5 archetype IDs); vibe_tags is the finer behind-the-
+  // scenes facet layer (0–4 from the controlled VIBE_TAGS vocabulary) used for
+  // similarity. The embedding itself is computed async (nightly sweep), not here.
+  archetype_tags?: string[];
+  vibe_tags?: string[];
   // Feed tier. `discovery` routes the event into the "More happenings in Ubud"
   // section (festivals, gallery openings, markets, food, performance) instead of
   // the core conscious-community agenda. Defaults to `core` when unset. Note:
