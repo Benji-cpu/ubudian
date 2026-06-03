@@ -39,6 +39,8 @@ function chainMock(data: unknown, error: unknown = null) {
   // Every chainable method returns self
   self.select = vi.fn().mockReturnValue(self);
   self.eq = vi.fn().mockReturnValue(self);
+  self.in = vi.fn().mockReturnValue(self);
+  self.ilike = vi.fn().mockReturnValue(self);
   self.gte = vi.fn().mockReturnValue(self);
   self.lte = vi.fn().mockReturnValue(self);
   self.limit = vi.fn().mockReturnValue(self);
@@ -140,6 +142,74 @@ describe("findDuplicates", () => {
     expect(fuzzy).toBeDefined();
     expect(fuzzy!.confidence).toBeLessThanOrEqual(0.9);
     expect(fuzzy!.confidence).toBeGreaterThanOrEqual(0.7);
+  });
+
+  it("auto-skips a recurring venue-suffix title variant on the same weekday (Layer 2.5)", async () => {
+    // Cross-source variant: "FRIDAY Ecstatic Dance" (megatix, no rule → weekday
+    // derived from the Friday seed) vs the canonical "Friday Ecstatic Dance —
+    // The Yoga Barn" (rule BYDAY=FR). Token overlap = 1.0 (subset) + same
+    // weekday → confidence >= 0.9 so the route auto-skips instead of flagging.
+    let callCount = 0;
+    mockFrom.mockImplementation(() => {
+      callCount++;
+      if (callCount === 1) return chainMock([]); // Layer 2 fingerprint: no match
+      // Layer 2.5 recurring scan
+      return chainMock([
+        {
+          id: "evt-fri",
+          title: "Friday Ecstatic Dance — The Yoga Barn",
+          venue_name: "The Yoga Barn",
+          recurrence_rule: "FREQ=WEEKLY;BYDAY=FR",
+          is_recurring: true,
+          start_date: "2026-05-29",
+          status: "approved",
+        },
+      ]);
+    });
+
+    const result = await findDuplicates({
+      title: "FRIDAY Ecstatic Dance",
+      start_date: "2026-06-05", // Friday
+      venue_name: "The Yoga Barn",
+      is_recurring: true,
+    });
+
+    expect(result.length).toBeGreaterThanOrEqual(1);
+    expect(result[0].eventId).toBe("evt-fri");
+    expect(result[0].confidence).toBeGreaterThanOrEqual(0.9);
+    expect(result[0].metadata.recurring_cross_date).toBe(true);
+  });
+
+  it("does NOT merge same-modality recurring events on different weekdays (Layer 2.5 weekday guard)", async () => {
+    // "Sunday Ecstatic Dance" must never collapse into "Friday Ecstatic Dance"
+    // even at the same venue with identical core tokens — different weekday.
+    let callCount = 0;
+    mockFrom.mockImplementation(() => {
+      callCount++;
+      if (callCount === 1) return chainMock([]); // Layer 2 fingerprint
+      if (callCount === 2)
+        return chainMock([
+          {
+            id: "evt-fri",
+            title: "Friday Ecstatic Dance — The Yoga Barn",
+            venue_name: "The Yoga Barn",
+            recurrence_rule: "FREQ=WEEKLY;BYDAY=FR",
+            is_recurring: true,
+            start_date: "2026-05-29",
+            status: "approved",
+          },
+        ]);
+      return chainMock([]); // Layer 3 same-date: nothing
+    });
+
+    const result = await findDuplicates({
+      title: "Sunday Ecstatic Dance",
+      start_date: "2026-06-07", // Sunday
+      venue_name: "The Yoga Barn",
+      is_recurring: true,
+    });
+
+    expect(result.find((c) => c.eventId === "evt-fri")).toBeUndefined();
   });
 
   it("uses precomputed venue and fingerprint when provided", async () => {

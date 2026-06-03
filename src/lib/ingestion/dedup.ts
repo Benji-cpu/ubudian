@@ -12,10 +12,25 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { generateFingerprint } from "./fingerprint";
 import { normalizeVenue } from "./venue-normalizer";
-import { eventSimilarityScore, normalizeForComparison, titlesMatch } from "./similarity";
+import { eventSimilarityScore, normalizeForComparison, titlesMatch, tokenOverlap } from "./similarity";
 import { compareEventsSemantically } from "./llm-parser";
-import { parseRecurrenceRule } from "@/lib/recurrence";
+import { parseRecurrenceRule, daysOfWeekArray, type RecurrenceRule } from "@/lib/recurrence";
 import type { DedupMatchType } from "@/types";
+
+/**
+ * The set of weekdays (0=Sun..6=Sat) a recurring event lands on — from its
+ * recurrence rule's `day_of_week` when present, else derived from the seed
+ * `start_date`. Used to tell apart same-modality, same-venue events that differ
+ * only by day (Friday Ecstatic Dance vs Sunday Ecstatic Dance).
+ */
+function weekdaysOf(rule: RecurrenceRule | null, startDate: string): number[] {
+  if (rule) {
+    const days = daysOfWeekArray(rule);
+    if (days.length > 0) return days;
+  }
+  const d = new Date(`${startDate}T00:00:00Z`);
+  return Number.isNaN(d.getTime()) ? [] : [d.getUTCDay()];
+}
 
 export interface DedupCandidate {
   eventId: string;
@@ -143,28 +158,54 @@ export async function findDuplicates(input: DedupInput, precomputed?: DedupPreco
     }
 
     const { data: recurringMatches } = await recurringQuery;
+    const inputWeekdays = weekdaysOf(inputRule, input.start_date);
 
     for (const existing of recurringMatches ?? []) {
-      if (!titlesMatch(input.title, existing.title, 0.85)) continue;
       const existingRule = parseRecurrenceRule(existing.recurrence_rule);
       // If both have a frequency, require it to match. If either is missing
       // a rule entirely, still consider it a match — same-titled recurring
       // rows at the same venue are almost certainly the same event.
       if (inputRule && existingRule && inputRule.frequency !== existingRule.frequency) continue;
 
+      // Weekday guard. Same-modality events at one venue on DIFFERENT weekdays
+      // (Friday Ecstatic Dance vs Sunday Ecstatic Dance) are distinct — never
+      // merge them. Only when their weekdays overlap (or one is unknown) can a
+      // venue-suffix / word-order title variant be the same event. This guard is
+      // what makes it safe to push past the 0.9 auto-skip threshold below.
+      const existingWeekdays = weekdaysOf(existingRule, existing.start_date);
+      const weekdayKnown = inputWeekdays.length > 0 && existingWeekdays.length > 0;
+      const weekdayShared = inputWeekdays.some((d) => existingWeekdays.includes(d));
+      if (weekdayKnown && !weekdayShared) continue;
+
       const existingNorm = normalizeForComparison(existing.title);
-      const titleConfidence = existingNorm === normalisedInputTitle ? 0.95 : 0.88;
+      const exactTitle = existingNorm === normalisedInputTitle;
+      // titlesMatch = Levenshtein >= 0.85 OR token-overlap >= 0.9 (one title's
+      // significant tokens are a subset of the other — the venue-suffix /
+      // extra-facilitators pattern). Partial = shares >= half the shorter
+      // title's tokens (looser word-order/abbreviation variants).
+      const strongTitle = titlesMatch(input.title, existing.title, 0.85);
+      const partialTitle = tokenOverlap(input.title, existing.title) >= 0.5;
+
+      let confidence: number;
+      if (exactTitle) confidence = 0.95;
+      else if (strongTitle) confidence = weekdayKnown && weekdayShared ? 0.92 : 0.88;
+      // Partial overlap only counts when the weekday is confirmed; route it to
+      // the Layer-4 semantic (LLM) check (0.6–0.85 band) rather than auto-merge.
+      else if (partialTitle && weekdayKnown && weekdayShared) confidence = 0.78;
+      else continue;
 
       candidates.push({
         eventId: existing.id,
         matchType: "fuzzy_title",
-        confidence: titleConfidence,
+        confidence,
         metadata: {
           recurring_cross_date: true,
           inputTitle: normalisedInputTitle,
           existingTitle: existingNorm,
           inputSeed: input.start_date,
           existingSeed: existing.start_date,
+          tokenOverlap: tokenOverlap(input.title, existing.title),
+          weekdayShared: weekdayKnown ? weekdayShared : null,
         },
       });
     }
