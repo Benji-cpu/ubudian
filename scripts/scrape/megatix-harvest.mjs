@@ -35,7 +35,20 @@ const JUNK = /\b(deposit payment|gift voucher|gift card|seating reservation|drin
 // noise. Drop it at the source so it never reaches the pending queue. (The route's
 // matchOffTopicKeywords also catches ATV/rafting/pub-crawl/monkey-forest, but not the
 // private-experience / gimmick patterns below.)
-const NEGATIVE = /\b(pub crawl|bar crawl|nightlife|monkey forest|\batv\b|rafting|zipline|jet ?ski|day ?trip|day pass|day out|sightseeing|swing\b|waterfall tour|private (session|experience|djembe|guitar|acoustic)|1[- ]?on[- ]?1|one[- ]?on[- ]?one|puppy (painting|yoga)|cooking class|food tour|wine tasting|language class|comedy night|silver ?(&|and)? ?gold|silversmith)\b/i;
+// Negative filter. Tourist + private-booking noise (top line) PLUS the venue
+// retail/training/beauty/self-help/comedy noise that the "yoga barn"/"sayuri"
+// searches drag in (bottom lines — these recurred daily in the 2026-06-03
+// triage and are not conscious-community gatherings).
+const NEGATIVE = new RegExp([
+  "\\b(pub crawl|bar crawl|nightlife|monkey forest|\\batv\\b|rafting|zipline|jet ?ski|day ?trip|day pass|day out|sightseeing|swing\\b|waterfall tour",
+  "private (session|experience|djembe|guitar|acoustic)|1[- ]?on[- ]?1|one[- ]?on[- ]?one|puppy (painting|yoga)|cooking class|food tour|wine tasting",
+  // venue retail / clinical wellness / beauty
+  "face yoga|gua sha|facial anatomy|lymphatic|osteopath|biodynamic|abdominal release|hormone|cycle (health|wisdom|harmony)|spine\\b",
+  // trainings / courses (professional, not community)
+  "teacher training|masterclass|\\b\\d{2,3} ?(h|hr|hour)\\b|\\d+-day .*(training|course)|facilitator training|foundations training|certification",
+  // comedy / open-mic-comedy / language / self-help
+  "comedy|stand[- ]?up|impostor|overthinking|reinventing yourself|making life meaningful|language class|live music (tuesday|wednesday|thursday|friday|monday) night)\\b",
+].join("|"), "i");
 const CATEGORY_RULES = [
   [/ecstatic dance|dance class|conscious dance|5rhythms|contact improv|movement/i, "Dance & Movement"],
   [/tantra|intimacy|sensual/i, "Tantra & Intimacy"],

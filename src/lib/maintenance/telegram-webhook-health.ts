@@ -26,9 +26,13 @@ export type TelegramWebhookHealth = {
 };
 
 export async function ensureTelegramWebhook(): Promise<TelegramWebhookHealth> {
-  const token = process.env.TELEGRAM_BOT_TOKEN;
-  const secret = process.env.TELEGRAM_WEBHOOK_SECRET;
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+  // .trim() is load-bearing: Vercel env vars frequently carry a trailing newline
+  // (see MEMORY.md "Trailing Newlines"). Without it, NEXT_PUBLIC_SITE_URL="...life\n"
+  // produced the webhook URL "https://theubudian.life\n/api/webhooks/telegram", which
+  // Telegram rejects ("invalid webhook URL") — re-breaking the webhook every night.
+  const token = process.env.TELEGRAM_BOT_TOKEN?.trim();
+  const secret = process.env.TELEGRAM_WEBHOOK_SECRET?.trim();
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim();
 
   if (!token) {
     return { checked: false, action: "skipped", reason: "TELEGRAM_BOT_TOKEN not set" };
