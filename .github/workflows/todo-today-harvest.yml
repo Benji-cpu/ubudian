@@ -48,19 +48,27 @@ jobs:
           echo "count=$COUNT" >> "$GITHUB_OUTPUT"
           echo "::notice::ToDo.Today harvested $COUNT ICP events for $DATE"
 
-      - name: POST to curator-ingest
+      - name: POST to curator-ingest (chunked)
         if: steps.harvest.outputs.count != '0'
         env:
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          INGEST_URL: https://theubudian.life/api/cron/curator-ingest
         run: |
-          set -euo pipefail
-          RESPONSE=$(curl -fsS -X POST \
-            -H "Authorization: Bearer $CRON_SECRET" \
-            -H "Content-Type: application/json" \
-            -d @/tmp/payload.json \
-            "https://theubudian.life/api/cron/curator-ingest")
-          echo "$RESPONSE" | jq .
-          ING=$(echo "$RESPONSE" | jq -r '.ingested // 0')
-          DUP=$(echo "$RESPONSE" | jq -r '.duplicates // 0')
-          FAIL=$(echo "$RESPONSE" | jq -r '.failed // 0')
-          echo "::notice::ToDo.Today ingested $ING ($DUP duplicates, $FAIL failed)"
+          set -uo pipefail
+          # Chunk into batches of 10: a single all-events POST 504s the route's 60s
+          # per-event geocode budget once the approved set is large.
+          TOTAL=$(jq '.events | length' /tmp/payload.json)
+          DATE=$(jq -r '.date' /tmp/payload.json)
+          ING=0; DUP=0; FAIL=0; i=0
+          while [ "$i" -lt "$TOTAL" ]; do
+            jq -c --argjson i "$i" --arg d "$DATE" \
+              '{date:$d, source:"todo-today", events:(.events[$i:($i+10)])}' /tmp/payload.json > /tmp/chunk.json
+            RESP=$(curl -fsS --max-time 90 -X POST \
+              -H "Authorization: Bearer $CRON_SECRET" -H "Content-Type: application/json" \
+              -d @/tmp/chunk.json "$INGEST_URL" || echo '{}')
+            ING=$((ING + $(echo "$RESP" | jq -r '.ingested // 0')))
+            DUP=$((DUP + $(echo "$RESP" | jq -r '.duplicates // 0')))
+            FAIL=$((FAIL + $(echo "$RESP" | jq -r '.failed // 0')))
+            i=$((i + 10))
+          done
+          echo "::notice::ToDo.Today ingested $ING ($DUP duplicates, $FAIL failed) of $TOTAL"

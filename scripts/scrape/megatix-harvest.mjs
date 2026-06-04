@@ -62,7 +62,33 @@ const CATEGORY_RULES = [
 ];
 
 const delay = (ms) => new Promise((r) => setTimeout(r, ms));
-const localityMatch = (text, locs) => { const l = (text || "").toLowerCase(); return locs.some((x) => l.includes(x.toLowerCase())); };
+// Word-boundary match — NOT substring. The locality "Mas" must not match inside
+// "massage" / "Christmas", which let Lombok ("Kuta Lombok") venues slip through.
+const localityMatch = (text, locs) => {
+  const l = (text || "").toLowerCase();
+  return locs.some((x) => new RegExp(`\\b${x.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`).test(l));
+};
+
+// Extract a start time from free text. Prefers the start of a range ("5–6:30 PM"
+// → 17:00, "10AM-1PM" → 10:00, where only the end may carry am/pm), else the first
+// single clock time ("6 PM" → 18:00, "2:30pm" → 14:30). Returns HH:MM or null.
+export function timeFromText(text) {
+  if (!text) return null;
+  const to24 = (hStr, minStr, ap) => {
+    let h = parseInt(hStr, 10);
+    if (!ap || h < 1 || h > 12) return null;
+    const min = minStr || "00";
+    ap = ap.toLowerCase();
+    if (ap === "pm" && h !== 12) h += 12;
+    if (ap === "am" && h === 12) h = 0;
+    return `${String(h).padStart(2, "0")}:${min}`;
+  };
+  const range = text.match(/\b(\d{1,2})(?:[:.](\d{2}))?\s*(am|pm)?\s*[–—\-]\s*\d{1,2}(?:[:.]\d{2})?\s*(am|pm)\b/i);
+  if (range) return to24(range[1], range[2], range[3] || range[4]);
+  const single = text.match(/\b(\d{1,2})(?:[:.](\d{2}))?\s?(am|pm)\b/i);
+  if (single) return to24(single[1], single[2], single[3]);
+  return null;
+}
 const isUbudArea = (venue, locs) => [venue?.name, venue?.suburb, venue?.full_address].filter(Boolean).some((f) => localityMatch(f, locs));
 function mapCategory(title, description) {
   const text = `${title} ${description}`;
@@ -132,7 +158,10 @@ async function harvest() {
 
     const startDate = ev.start_datetime ? ev.start_datetime.split("T")[0] : "";
     if (!startDate) { dropped++; continue; }
-    const startTime = ev.start_datetime ? (ev.start_datetime.split("T")[1]?.slice(0, 5) || null) : null;
+    // Megatix's start_datetime is usually date-only — the real time lives in the
+    // description ("Every Thursday | 6 PM", "Saturdays • 5–6:30 PM"). Fall back to
+    // parsing it so events don't land timeless.
+    const startTime = (ev.start_datetime ? (ev.start_datetime.split("T")[1]?.slice(0, 5) || null) : null) || timeFromText(description);
     const endDate = ev.end_datetime ? ev.end_datetime.split("T")[0] : null;
     const endTime = ev.end_datetime ? (ev.end_datetime.split("T")[1]?.slice(0, 5) || null) : null;
     const eventUrl = `https://megatix.co.id/events/${ev.slug}`;
