@@ -23,6 +23,7 @@ export type AdminNavItem =
 
 export const ADMIN_NAV_LINKS: AdminNavItem[] = [
   { type: "link", label: "Dashboard", href: "/admin", icon: "LayoutDashboard" },
+  { type: "link", label: "Analytics", href: "/admin/analytics", icon: "BarChart3" },
   { type: "link", label: "Events", href: "/admin/events", icon: "Calendar" },
   { type: "link", label: "Sources", href: "/admin/sources", icon: "Zap" },
   { type: "divider" },
@@ -172,6 +173,16 @@ export const CATEGORY_BRAND_GRADIENTS: Record<string, string> = {
   "Retreat & Training": "from-[#2C4A3E] via-[#253D33] to-[#2D2D2D]",
   "Other": "from-[#2D2D2D] via-[#2C4A3E] to-[#3A5A4A]",
 };
+
+/**
+ * Ubudian Insider membership prices, in cents USD. Mirrors the Stripe prices
+ * (`STRIPE_PRICE_INSIDER_MONTHLY` / `_YEARLY`) and the displayed $9.99/mo,
+ * $99/yr. Used to derive an MRR estimate on the admin analytics dashboard —
+ * `subscriptions` stores no amount column, so MRR is computed from the count
+ * of active subs per billing interval. Keep in sync if the Stripe prices change.
+ */
+export const MEMBERSHIP_MONTHLY_CENTS = 999;
+export const MEMBERSHIP_YEARLY_CENTS = 9900;
 
 export const TOUR_THEMES = [
   "Cultural & Heritage",

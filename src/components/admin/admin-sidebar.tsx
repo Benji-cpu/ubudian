@@ -8,6 +8,7 @@ import { ADMIN_NAV_LINKS, ADMIN_GROUPED_ROUTES } from "@/lib/constants";
 import type { AdminNavItem } from "@/lib/constants";
 import {
   LayoutDashboard,
+  BarChart3,
   Calendar,
   Users,
   FileText,
@@ -30,6 +31,7 @@ import { Button } from "@/components/ui/button";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   LayoutDashboard,
+  BarChart3,
   Calendar,
   Users,
   FileText,

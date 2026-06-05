@@ -3,6 +3,13 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { EventSubmissionForm } from "../event-submission-form";
 
+// EventSubmissionForm is a heavy RHF form (many fields + Radix primitives) whose
+// initial jsdom render can exceed the 5s default when the forks pool is under
+// load — causing non-deterministic "Test timed out in 5000ms" flakes in the
+// full suite while passing in isolation. Give this file headroom. File-scoped
+// on purpose: a global bump would mask genuinely-hung tests elsewhere.
+vi.setConfig({ testTimeout: 20000 });
+
 // Mock the date/time pickers since they rely on complex UI primitives
 vi.mock("@/components/admin/date-picker", () => ({
   DatePicker: ({ onChange }: { value?: Date; onChange: (d: Date) => void; placeholder?: string }) => (
