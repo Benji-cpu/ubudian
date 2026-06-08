@@ -156,14 +156,15 @@ async function harvest() {
       description = ev.name;
     }
 
-    const startDate = ev.start_datetime ? ev.start_datetime.split("T")[0] : "";
+    // Megatix's start_datetime is SPACE-separated ("2026-06-09 09:00:00"), not ISO
+    // "T"-separated — splitting on "T" alone silently dropped every time (the date
+    // only survived by Postgres DATE-column truncation). Split on T-or-space. Fall
+    // back to timeFromText only when start_datetime genuinely carries no time.
+    const startDate = ev.start_datetime ? ev.start_datetime.split(/[T ]/)[0] : "";
     if (!startDate) { dropped++; continue; }
-    // Megatix's start_datetime is usually date-only — the real time lives in the
-    // description ("Every Thursday | 6 PM", "Saturdays • 5–6:30 PM"). Fall back to
-    // parsing it so events don't land timeless.
-    const startTime = (ev.start_datetime ? (ev.start_datetime.split("T")[1]?.slice(0, 5) || null) : null) || timeFromText(description);
-    const endDate = ev.end_datetime ? ev.end_datetime.split("T")[0] : null;
-    const endTime = ev.end_datetime ? (ev.end_datetime.split("T")[1]?.slice(0, 5) || null) : null;
+    const startTime = (ev.start_datetime ? (ev.start_datetime.split(/[T ]/)[1]?.slice(0, 5) || null) : null) || timeFromText(description);
+    const endDate = ev.end_datetime ? ev.end_datetime.split(/[T ]/)[0] : null;
+    const endTime = ev.end_datetime ? (ev.end_datetime.split(/[T ]/)[1]?.slice(0, 5) || null) : null;
     const eventUrl = `https://megatix.co.id/events/${ev.slug}`;
 
     events.push({
