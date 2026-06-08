@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 };
 
 const LAST_UPDATED = "2 June 2026";
-const CONTACT_EMAIL = "hello@theubudian.life";
+const CONTACT_EMAIL = "mystechcards@gmail.com";
 
 export default function PrivacyPage() {
   return (
