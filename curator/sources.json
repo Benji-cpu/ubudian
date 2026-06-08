@@ -282,7 +282,7 @@
       "url": "https://megatix.co.id/events/purnama-a-fullmoon-dance-ritual",
       "first_seen": "2026-05-24",
       "themes": ["dance", "ceremony", "sound"],
-      "note": "Monthly full moon event (Purnama = Balinese full moon). Format: Cacao Ceremony with Shiva → Ecstatic Dance with Todjon → Sound & Movement closing with YINTELLIGENCE (Chris Fox). 5:30–8 PM format. Venue unconfirmed (Megatix 403). Astronomical full moons: Jun 29 and Jul 29 2026 (corrected 2026-05-27 — earlier note of Jun 11/Jul 10 was wrong). Check Megatix directly when their blocks ease. Would score ~7–8 if dates confirmed."
+      "note": "Monthly full moon event (Purnama = Balinese full moon). Format: Cacao Ceremony with Shiva → Ecstatic Dance with Todjon → Sound & Movement closing with YINTELLIGENCE (Chris Fox). 5:30–8 PM format. Venue unconfirmed (Megatix 403). Astronomical full moons: Jun 29 and Jul 29 2026 (corrected 2026-05-27 — earlier note of Jun 11/Jul 10 was wrong). Check Megatix directly when their blocks ease. Would score ~7–8 if dates confirmed. **⚠ PROBABLE GEO-REJECT (flagged 2026-06-09):** after 19 consecutive skips without Ubud venue confirmation, one search snippet placed this event at 'Jl. Pura Kramat, Cemagi' — Cemagi is the Seminyak/Canggu coast (~30km west of Ubud), not greater-Ubud. If confirmed by admin, move to rejected_permanent."
     },
     {
       "name": "Om Ham Retreat & Resort",
@@ -500,15 +500,15 @@
       "name": "Steven Light & Valentina",
       "instagram": null,
       "first_seen": "2026-05-21",
-      "events_seen": ["New Moon Bhakti Kirtan — School of Unified Healing (Jul 6)", "New Moon Bhakti Kirtan — School of Unified Healing (Jun, date unconfirmed)"],
-      "note": "Run New Moon Bhakti Kirtan at School of Unified Healing, Jl. Subak Sok Wayah, Ubud, Kec. Tegallalang (confirmed 2026-06-04). Format: Bhakti Kirtan 5:30pm → dinner buffet 7pm → fire circle 8pm → close 9:30pm. IDR 220k presale / IDR 320k door. Harmonising masculine/feminine through Kali/Shiva, Radha/Krishna, Sita/Rama. Two confirmed 2026 editions (Jul 6 in DB; Jun slug active, date pending). Monthly cadence confirmed."
+      "events_seen": ["New Moon Bhakti Kirtan — School of Unified Healing (Jul 6)"],
+      "note": "Run New Moon Bhakti Kirtan at School of Unified Healing, Jl. Subak Sok Wayah, Ubud, Kec. Tegallalang (confirmed 2026-06-04). Format: Bhakti Kirtan 5:30pm → dinner buffet 7pm → fire circle 8pm → close 9:30pm. IDR 220k presale / IDR 320k door. Harmonising masculine/feminine through Kali/Shiva, Radha/Krishna, Sita/Rama. Jul 6 edition in DB. June edition: Megatix slug `new-moon-bhakti-kirtan-june` has rolled to the Jul 6 page — June ran without public trace, no evidence of a separate June ingestion needed. Track for August new moon (~Aug 18, nearest Sat = Aug 15 or 22)."
     },
     {
       "name": "Tuluvi Arts",
       "instagram": null,
       "first_seen": "2026-05-21",
       "events_seen": ["Kintsugi — Dragon Tea Temple (Jun 5)", "Kintsugi — Dragon Tea Temple (Jun 26)"],
-      "note": "Ceremonial performance arts collective presenting Kintsugi at Dragon Tea Temple. Multi-lineage format: Japanese dance, African-diaspora movement, Chinese internal arts, contemporary movement, mystical poetry, Indonesian experimental music. Presented by / in association with Zest Ubud. Past performers: Nanaka Abayomi, Kamau Abayomi, Aryo Pratomo Suy. Distinctive voice — worth tracking."
+      "note": "Ceremonial performance arts collective presenting Kintsugi at Dragon Tea Temple. Multi-lineage format: Japanese dance, African-diaspora movement, Chinese internal arts, contemporary movement, mystical poetry, Indonesian experimental music. Presented by / in association with Zest Ubud. Past performers: Nanaka Abayomi, Kamau Abayomi, Aryo Pratomo Suy. **2026 editions confirmed active**: Jun 5 (past) and Jun 26 (ingested 2026-06-09). Prior Jun 1 'stale' classification was based on happeningnext.com 2022 archive — current Megatix snippets show Friday dates consistent only with 2026; resolved. Track for Jul/Aug 2026 slugs."
     },
     {
       "name": "Levi Banner",
@@ -614,6 +614,20 @@
       "first_seen": "2026-06-07",
       "events_seen": ["Solstice Ceremony (Prayerformance) — Ubud — Jun 21 (year unconfirmed)"],
       "note": "Ceremony collective presenting Prayerformances in Ubud. Format: Sacred Live Music, Storytelling, Ancient Teas, Gong Meditation, Yawanawa songs, Vocal Activation, Rituals and Offerings. Open to men and women. Register: 'Between Death & Rebirth and the Wheel of Time' — firmly Ceremony & Sound category. Megatix slug: solstice-ceremony (Prayerformance by ShakTea). June 21 solstice is their likely anchor date; specific 2026 date not confirmed (Megatix 403-blocked, no IG handle found). Expect confirmation Jun 9–12. Would score ~8 if confirmed at a known Ubud venue. At 0 qualifying logs — track."
+    },
+    {
+      "name": "Giom Aeon",
+      "instagram": null,
+      "first_seen": "2026-06-09",
+      "events_seen": ["Coming Home with Giom Aeon & Friends — Dragon Tea Temple (Jan 2026)", "Coming Home with Giom Aeon & Friends — Dragon Tea Temple (Mar 2026)"],
+      "note": "Leads the 'Coming Home with Giom Aeon & Friends' recurring sacred song + dance series at Dragon Tea Temple. Confirmed Jan 2026 and Mar 2026 editions. Format: candlelit ceremony, 6:30 PM, 250–350K IDR. Ticketing via SEE Events (org 80076829) and Megatix. Slug pattern: `coming-home-with-giom-aeon-friends-{month}{year}`. Also listed as 'Three Rivers' on SEE Events. No June 2026 date found. SEE Events series page does not embed per-instance dates without browser rendering (Playwright required). Track for next announcement; would score ~7–8 at Dragon Tea Temple if confirmed."
+    },
+    {
+      "name": "Hanuman Project",
+      "instagram": "@hanumanproject",
+      "first_seen": "2026-06-09",
+      "events_seen": ["BaliSpirit Festival (Apr 2026)", "Dragon Tea Temple — Apr 2024", "Dragon Tea Temple — Jun 2024 (farewell)"],
+      "note": "Bali-based kirtan / medicine music collective. Performed BaliSpirit Festival April 2026. Confirmed off-island for European summer 2026 (Essentia Italy, Colibri Greece, Conscious Celebration Germany, Healing Festival Czech Republic). Historical Dragon Tea Temple appearances: Apr 2024 + Jun 2024 (farewell). No 2026 Ubud dates expected until European season ends. Track from Aug–Sep 2026. IG: @hanumanproject. High potential — DTT anchor + devotional kirtan format squarely in our universe."
     }
   ]
 }
