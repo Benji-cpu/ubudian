@@ -181,3 +181,11 @@ Executed the next-builds plan. Pending queue went **0 → 76** (Megatix 53, ToDo
 - **Updated the routine prompt** (`docs/daily-routine.md` step 6b): added the standing mandate to MANUALLY RUN both harvesters every routine, eyeball times/images/ICP, and **fix breakage on the spot** (scraper/parser/workflow/migration/backfill) rather than escalate — with the 3 real bugs found this way as examples.
 - Feedback: none new.
 - Followups: (1) **Agenda is now 150 approved** — very dense; worth a curation/design check (is /events still scannable, or a firehose? the user praised "beautifully curated" at ~80). (2) Non-recurring single-editions of recurring events still need a recurring-parent dedup (Dissolve::Play/Entropic/Resonanz keep arriving as separate dated rows). (3) 1 megatix event still timeless (no longer listed on megatix to backfill).
+
+## 2026-06-10 (~routine, "push all events live, none in pending")
+
+- **Overnight healthy.** todo + aggregator workflows green (06-08, 06-09). Pending only **21** (todo 10, telegram 7, megatix 3, curator 1) — dedup keeping it small. Megatix timeless ≈0 (separator fix holding). Telegram webhook `action: none`, 0 queued. Digest: 6 broken megatix links (stale/403, the chronic pattern) + 7 timeless (mostly todo/telegram edge cases).
+- **Drove pending 21 → 0 (per Benji: nothing left sitting).** Approved 17, archived 4 (3 dups: Dissolve Play ×2 + Yoga Beyond The Mat — single-editions of recurring events that escape recurring-parent dedup; 1 off-ICP: Indonesia Language Class). Migration `20260610030000`. **Approved 147 → 164.**
+- **Manually ran both harvesters (standing step) — both healthy, no breakage:** Megatix 60/60 with time+image (separator fix holding), ToDo 14/14 with time+image. Pipeline solid.
+- Feedback: none new.
+- Followups (carried): (1) **Recurring-parent dedup** still owed — Dissolve::Play / Yoga Beyond The Mat keep arriving as separate dated single-edition rows. (2) **Agenda at 164 approved** — dense; the "curated highlights vs firehose" curation/design question still open. (3) 6 chronic stale/403 megatix links in the digest — the auto-archive handles non-recurring; the recurring ones just keep flagging.
