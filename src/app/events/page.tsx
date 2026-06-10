@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import Link from "next/link";
+import { HUBS } from "@/lib/hubs";
 import { createClient } from "@/lib/supabase/server";
 import { queryWithRetry } from "@/lib/supabase/retry";
 import { getCurrentProfile } from "@/lib/auth";
@@ -415,6 +416,24 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
             )}
           </>
         )}
+      </section>
+
+      {/* SEO hub cross-links — evergreen practice pages */}
+      <section className="mx-auto max-w-7xl px-4 pb-12 sm:px-6 lg:px-8">
+        <p className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+          Go deeper
+        </p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {HUBS.map((h) => (
+            <Link
+              key={h.slug}
+              href={`/${h.slug}`}
+              className="rounded-full border border-brand-gold/30 px-4 py-1.5 text-sm text-foreground transition-colors hover:border-brand-gold hover:bg-brand-gold/10"
+            >
+              {h.title}
+            </Link>
+          ))}
+        </div>
       </section>
 
       <CrossSectionRibbon

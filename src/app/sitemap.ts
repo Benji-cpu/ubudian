@@ -1,6 +1,7 @@
 import { MetadataRoute } from "next";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { SITE_URL } from "@/lib/constants";
+import { HUBS } from "@/lib/hubs";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const supabase = createAdminClient();
@@ -57,6 +58,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticPages: MetadataRoute.Sitemap = [
     { url: SITE_URL, changeFrequency: "daily", priority: 1.0 },
     { url: `${SITE_URL}/events`, changeFrequency: "daily", priority: 0.9 },
+    ...HUBS.map((h) => ({
+      url: `${SITE_URL}/${h.slug}`,
+      changeFrequency: "weekly" as const,
+      priority: 0.8,
+    })),
     { url: `${SITE_URL}/guides`, changeFrequency: "weekly", priority: 0.8 },
     { url: `${SITE_URL}/stories`, changeFrequency: "weekly", priority: 0.8 },
     { url: `${SITE_URL}/tours`, changeFrequency: "weekly", priority: 0.8 },
