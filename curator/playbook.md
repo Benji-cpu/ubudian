@@ -12,15 +12,16 @@ This playbook is the agent's prescriptive guide. Edit it directly when patterns 
 
 ## Universe — what we ingest
 
-Three categories only, mapping 1:1 to `EVENT_CATEGORIES` in `src/lib/constants.ts`:
+Three DB categories only, mapping to `EVENT_CATEGORIES` in `src/lib/constants.ts`:
 
 | Curator universe | DB `category` |
 |------------------|---------------|
 | Ecstatic dance, 5Rhythms, contact improv, conscious dance, movement medicine | `Dance & Movement` |
+| Partner-dance socials — Brazilian zouk, salsa/bachata, Latin socials, fusion (tag `partner-dance`) | `Dance & Movement` |
 | Tantra, conscious sexuality, embodied intimacy, sacred sexuality | `Tantra & Intimacy` |
 | Cacao ceremony, sound bath, gong/bowl journey, breathwork-as-ceremony, moon ceremony | `Ceremony & Sound` |
 
-These three are the **core** tier (`event_tier='core'` — the default). They render first in the conscious-community agenda.
+This is the **core** tier (`event_tier='core'` — the default). It renders first in the conscious-community agenda. Partner-dance socials must be actual social/community dance gatherings (a social, a jam, a práctica) — a bar running "salsa night" as drinks-promo entertainment is still a reject.
 
 ## Discovery tier — the second universe (`event_tier='discovery'`)
 
@@ -151,3 +152,5 @@ Facilitators are first-class: if you see the same name organising 3+ events acro
 - 2026-05-25 — **NEVER year-roll a stale Megatix slug.** Megatix archives every past edition under its original slug ("supermoon-suara-semesta-001", "ayni-new-moon-cacao-ceremony-june"). If a Megatix listing shows "This event has already taken place" or "Sales Closed", **skip it**. Do not assume the same event runs next year on the same calendar date and infer a 2026 date — new editions get new slugs (-002, -2026, etc.). Four stale 2021/2023/2024/2025 listings reached `pending` this week (AYNI, MAGDALENA, Solstice Kirtan, New Moon Cacao w/ Levi Banner, Ecstatic Dance in the Dark, SUPERMOON, West African Tribal Dance) — all archived in the morning routine. Verification rule: before adding any Megatix slug to inbox, fetch the page and confirm the listed date is ≥ today; if Megatix is bot-blocking (403), fall back to the venue's own site or IG to confirm a current edition exists.
 - 2026-06-01 — **Discovery tier launched.** The curator now feeds a second universe (`event_tier='discovery'`): festivals, gallery/studio openings, markets, food, performance — sourced from `sources.json.discovery_sources` (14 first-party sources seeded). Lands in the "More happenings in Ubud" section below the core feed. Hard rules: first-party only (never an aggregator URL), greater-Ubud only (no Nuanu/Sanur/Denpasar), festival = one parent card (not N sub-events), suppress pure-recurring bulk, NOT ceremony-focused, never set `is_spotlight` (banner is editorial). Pipeline already carries `event_tier` end-to-end (route → createEventFromParsed → events row); events still land `pending` for the approver.
 - 2026-06-07 (Sunday maintenance) — **Announcement clusters, not a steady trickle.** Ubud organizers (Dragon Tea Temple, Yoga Barn, School of Unified Healing, PURNAMA, AYNI) post per-edition Megatix slugs 10–14 days before their events. For lunar-aligned events (new moon, full moon) and the June solstice, this means all organizers announce in the same narrow window. An empty scout week is not a failure — it means the ticketing window hasn't opened yet. When the window arrives, expect 3–6 new slugs in 2–3 days. Plan for this cluster rather than treating each empty day as a gap in coverage.
+
+- 2026-06-10 — **Partner-dance socials promoted from borderline to core** per Benji (user request, Celina 2026-06-01; CREMOSO zouk precedent). Brazilian zouk, salsa/bachata, Latin socials and fusion now ingest as `Dance & Movement` + `partner-dance` vibe tag. The zouk/Latin WhatsApp scout in sources.json is active intent — still blocked on Benji joining the group from his phone (same blocker as ShambAllah + CI Telegram).
