@@ -30,6 +30,9 @@ import { DatePicker } from "@/components/admin/date-picker";
 import { TimePicker } from "@/components/admin/time-picker";
 import { Loader2, CheckCircle2 } from "lucide-react";
 import { AiDumpBlock, type AiDumpResult } from "./ai-dump-block";
+import { formatRecurrenceRule } from "@/lib/recurrence";
+import Link from "next/link";
+import type { Event } from "@/types";
 
 const submissionSchema = z.object({
   title: z.string().min(1, "Event title is required").max(200),
@@ -56,33 +59,62 @@ const submissionSchema = z.object({
 
 type SubmissionFormValues = z.infer<typeof submissionSchema>;
 
-export function EventSubmissionForm() {
+interface EventSubmissionFormProps {
+  /** When set, the form edits this existing event (organizer self-serve)
+      instead of creating a new one. */
+  initialEvent?: Event;
+}
+
+export function EventSubmissionForm({ initialEvent }: EventSubmissionFormProps = {}) {
+  const isEdit = !!initialEvent;
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
 
   const form = useForm<SubmissionFormValues>({
     resolver: zodResolver(submissionSchema),
-    defaultValues: {
-      title: "",
-      description: "",
-      short_description: "",
-      category: "",
-      start_date: undefined,
-      end_date: null,
-      start_time: "",
-      end_time: "",
-      venue_name: "",
-      venue_address: "",
-      price_info: "",
-      external_ticket_url: "",
-      organizer_name: "",
-      organizer_contact: "",
-      organizer_instagram: "",
-      submitted_by_email: "",
-      is_recurring: false,
-      recurrence_rule: "",
-      website: "",
-    },
+    defaultValues: initialEvent
+      ? {
+          title: initialEvent.title,
+          description: initialEvent.description ?? "",
+          short_description: initialEvent.short_description ?? "",
+          category: initialEvent.category ?? "",
+          start_date: initialEvent.start_date ? new Date(initialEvent.start_date) : undefined,
+          end_date: initialEvent.end_date ? new Date(initialEvent.end_date) : null,
+          start_time: initialEvent.start_time ?? "",
+          end_time: initialEvent.end_time ?? "",
+          venue_name: initialEvent.venue_name ?? "",
+          venue_address: initialEvent.venue_address ?? "",
+          price_info: initialEvent.price_info ?? "",
+          external_ticket_url: initialEvent.external_ticket_url ?? "",
+          organizer_name: initialEvent.organizer_name ?? "",
+          organizer_contact: initialEvent.organizer_contact ?? "",
+          organizer_instagram: initialEvent.organizer_instagram ?? "",
+          submitted_by_email: initialEvent.submitted_by_email ?? "",
+          is_recurring: !!initialEvent.is_recurring,
+          recurrence_rule: initialEvent.recurrence_rule ?? "",
+          website: "",
+        }
+      : {
+          title: "",
+          description: "",
+          short_description: "",
+          category: "",
+          start_date: undefined,
+          end_date: null,
+          start_time: "",
+          end_time: "",
+          venue_name: "",
+          venue_address: "",
+          price_info: "",
+          external_ticket_url: "",
+          organizer_name: "",
+          organizer_contact: "",
+          organizer_instagram: "",
+          submitted_by_email: "",
+          is_recurring: false,
+          recurrence_rule: "",
+          website: "",
+        },
   });
 
   const isRecurring = form.watch("is_recurring");
@@ -126,17 +158,24 @@ export function EventSubmissionForm() {
     setStatus("loading");
 
     try {
-      const res = await fetch("/api/events/submit", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...data,
-          start_date: data.start_date.toISOString().split("T")[0],
-          end_date: data.end_date ? data.end_date.toISOString().split("T")[0] : null,
-          is_recurring: data.is_recurring,
-          recurrence_rule: data.is_recurring && data.recurrence_rule ? data.recurrence_rule : null,
-        }),
-      });
+      const payload = {
+        ...data,
+        start_date: data.start_date.toISOString().split("T")[0],
+        end_date: data.end_date ? data.end_date.toISOString().split("T")[0] : null,
+        is_recurring: data.is_recurring,
+        recurrence_rule: data.is_recurring && data.recurrence_rule ? data.recurrence_rule : null,
+      };
+      const res = isEdit
+        ? await fetch(`/api/events/${initialEvent!.id}/update`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          })
+        : await fetch("/api/events/submit", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
 
       const result = await res.json();
 
@@ -158,11 +197,23 @@ export function EventSubmissionForm() {
       <div className="rounded-md border border-brand-deep-green/20 bg-brand-pale-green p-8 text-center">
         <CheckCircle2 className="mx-auto h-12 w-12 text-brand-deep-green" />
         <h3 className="mt-4 font-serif text-xl font-semibold text-brand-deep-green">
-          Event Submitted!
+          {isEdit ? "Changes saved" : "Event Submitted!"}
         </h3>
         <p className="mt-2 text-muted-foreground">
-          Thank you! Your event has been submitted for review. We&apos;ll publish it shortly.
+          {isEdit
+            ? "Your event is updated and live."
+            : "Thank you! Your event has been submitted for review. We'll publish it shortly."}
         </p>
+        {isEdit && (
+          <p className="mt-4">
+            <Link
+              href="/dashboard/events"
+              className="font-medium text-brand-deep-green underline underline-offset-4"
+            >
+              Back to your events
+            </Link>
+          </p>
+        )}
       </div>
     );
   }
@@ -170,7 +221,7 @@ export function EventSubmissionForm() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <AiDumpBlock onParsed={applyAiDraft} />
+        {!isEdit && <AiDumpBlock onParsed={applyAiDraft} />}
 
         {status === "error" && (
           <div className="rounded-md border border-destructive bg-destructive/10 p-3 text-sm text-destructive">
@@ -355,6 +406,11 @@ export function EventSubmissionForm() {
                     <SelectItem value='{"frequency":"monthly"}'>Monthly</SelectItem>
                   </SelectContent>
                 </Select>
+                {field.value && formatRecurrenceRule(field.value) && (
+                  <FormDescription>
+                    Shows as &ldquo;{formatRecurrenceRule(field.value)}&rdquo; on the agenda.
+                  </FormDescription>
+                )}
                 <FormMessage />
               </FormItem>
             )}
@@ -439,10 +495,10 @@ export function EventSubmissionForm() {
               control={form.control}
               name="submitted_by_email"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className={isEdit ? "hidden" : undefined}>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input type="email" placeholder="your@email.com" {...field} />
+                    <Input type="email" placeholder="your@email.com" {...field} readOnly={isEdit} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -481,7 +537,7 @@ export function EventSubmissionForm() {
 
         <Button type="submit" size="lg" disabled={status === "loading"} className="w-full">
           {status === "loading" && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          Submit Event for Review
+          {isEdit ? "Save changes" : "Submit Event for Review"}
         </Button>
       </form>
     </Form>

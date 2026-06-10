@@ -20,7 +20,7 @@ export default async function DashboardEventsPage() {
   const today = new Date().toISOString().split("T")[0];
 
   // Fetch submitted events + saved upcoming events + ICS token in parallel
-  const [submittedRes, savedRes, icsToken] = await Promise.all([
+  const [submittedRes, savedRes, icsToken, trustedRes] = await Promise.all([
     supabase
       .from("events")
       .select("*")
@@ -31,6 +31,11 @@ export default async function DashboardEventsPage() {
       .select("event_id, events(*)")
       .eq("profile_id", profile.id),
     getOrCreateIcsToken(profile.id),
+    supabase
+      .from("trusted_submitters")
+      .select("auto_approve")
+      .eq("email", profile.email.toLowerCase())
+      .maybeSingle(),
   ]);
 
   const submittedEvents = stripEmbeddings((submittedRes.data ?? []) as Event[]);
@@ -52,12 +57,23 @@ export default async function DashboardEventsPage() {
 
   const icsUrl = `${SITE_URL.replace(/\/$/, "")}/api/events/ics?token=${icsToken}`;
 
+  const publishedCount = submittedEvents.filter((e) => e.status === "approved").length;
+  const organizer =
+    submittedEvents.length > 0
+      ? {
+          publishedCount,
+          isTrusted:
+            (trustedRes.data as { auto_approve: boolean } | null)?.auto_approve ?? false,
+        }
+      : null;
+
   return (
     <DashboardEventsTabs
       submittedEvents={submittedEvents}
       savedEvents={savedEvents}
       profileId={profile.id}
       icsUrl={icsUrl}
+      organizer={organizer}
     />
   );
 }
