@@ -37,6 +37,8 @@ npm run test:e2e   # Playwright E2E tests
   - `/api/cron/daily-maintenance` — Claude remote trigger `trig_01CnuNJSs8m8wdVyeVrDHrKq` at `17 19 * * *` UTC (≈03:17 WITA). Agent: `.claude/agents/nightly-routine.md`.
   - **Daily curator** — Claude trigger `trig_01637DsCbz5qGn6r5RTP4hhi` at `47 19 * * *` UTC (≈03:47 WITA). Agent: `.claude/agents/daily-curator.md`. Discovers + ingests dance/tantra events into `pending`.
   - ~~**Daily event approver** — Claude trigger `trig_015VbLdAh4G8Wpz1hscSvRtC`~~ — **disabled 2026-05-20** in favour of the interactive daily routine (`docs/daily-routine.md`). The trigger still exists (set `enabled: true` to revive); the GH Actions workflows `approver-fetch.yml` + `approver-apply.yml` still run, but with no Opus trigger in between they're effectively dormant. Pending queue is now drained interactively each morning via Supabase MCP.
+  - `/api/cron/event-reminders` — GH Actions `event-reminders.yml`, daily `4 9 * * *` UTC (17:04 WITA). Emails savers whose saved event occurs tomorrow (Bali). Idempotent via `transactional_sends` ledger; `?only=<email>` test param.
+  - `/api/cron/weekly-digest` — GH Actions `weekly-digest.yml`, `6 23 * * 2` UTC (Wed 07:06 WITA). Personalised "This week in your Ubud" email (archetype spread or saved-only top picks). Idempotent per ISO week; `?only=` test param.
 - **Images**: `unoptimized: true` (no Next.js Image Optimization)
 - **Remote image hosts**: Unsplash, `*.supabase.co`, `api.telegram.org`
 
@@ -131,7 +133,9 @@ Automated event ingestion from multiple sources into pending events for admin re
 **Required (Cron):** `CRON_SECRET`
 
 **Optional (Ingestion adapters):** `TELEGRAM_BOT_TOKEN`, `TELEGRAM_WEBHOOK_SECRET`, `WAHA_API_URL`, `WAHA_API_KEY`, `WAHA_WEBHOOK_SECRET`, `EVENTBRITE_API_KEY`, `MEETUP_API_KEY`, `SERPAPI_API_KEY`, `META_PAGE_ACCESS_TOKEN`, `INSTAGRAM_ACCESS_TOKEN`, `RETREAT_GURU_API_KEY`, `RAPIDAPI_KEY`, `ALLEVENTS_API_KEY`, `APIFY_API_TOKEN`
-**Optional (Other):** `STABILITY_AI_API_KEY`, `BEEHIIV_API_KEY`, `BEEHIIV_PUBLICATION_ID`, `NEXT_PUBLIC_SITE_URL`, `ADMIN_EMAIL`
+**Optional (Other):** `STABILITY_AI_API_KEY`, `BEEHIIV_API_KEY`, `BEEHIIV_PUBLICATION_ID`, `NEXT_PUBLIC_SITE_URL`, `ADMIN_EMAIL`, `EMAIL_UNSUB_SECRET` (HMAC key for one-click unsubscribe links; falls back to `CRON_SECRET`)
+
+**Email sending:** Resend from-address is `hello@theubudian.life` — the only Resend-verified domain (verified 2026-06-10 via DKIM/SPF records in Vercel DNS). Never switch the from-address to an unverified domain: Resend silently rejects every send and `sendTransactionalEmail` only logs it.
 
 ## Testing
 
