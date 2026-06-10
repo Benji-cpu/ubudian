@@ -9,17 +9,8 @@ import { sendTransactionalEmail } from "@/lib/email";
 import { SITE_URL } from "@/lib/constants";
 import { ARCHETYPE_IDS } from "@/lib/quiz-data";
 import { NextResponse, after } from "next/server";
-import { z } from "zod";
+import { quizSubmitSchema } from "@/lib/quiz/submit-schema";
 import type { ArchetypeId, Event, Experience } from "@/types";
-
-const quizSubmitSchema = z.object({
-  primary_archetype: z.string().min(1).max(100),
-  secondary_archetype: z.string().max(100).nullable().optional(),
-  scores: z.record(z.string(), z.number()),
-  answers: z.record(z.string(), z.string()),
-  email: z.string().email().optional().or(z.literal("")),
-  user_segment: z.enum(["curious", "visiting", "local"]).optional(),
-});
 
 export async function POST(request: Request) {
   const ip = getClientIp(request);
@@ -33,6 +24,7 @@ export async function POST(request: Request) {
     const parsed = quizSubmitSchema.safeParse(body);
 
     if (!parsed.success) {
+      console.warn("[quiz-submit] payload failed validation:", parsed.error.flatten().fieldErrors);
       return NextResponse.json(
         { error: "Invalid quiz data" },
         { status: 400 }

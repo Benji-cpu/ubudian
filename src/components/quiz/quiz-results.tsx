@@ -23,6 +23,7 @@ interface QuizResultsProps {
   experiences: Experience[];
   onRetake: () => void;
   userSegment?: UserSegment | null;
+  submitFailed?: boolean;
 }
 
 export function QuizResults({
@@ -35,6 +36,7 @@ export function QuizResults({
   experiences,
   onRetake,
   userSegment,
+  submitFailed,
 }: QuizResultsProps) {
   const archetype = ARCHETYPES[primary];
   const secondaryArchetype = ARCHETYPES[secondary];
@@ -57,7 +59,7 @@ export function QuizResults({
               Get your personalized Ubud guide
             </Link>
           </Button>
-          <p className="text-sm text-brand-charcoal-light">
+          <p className="text-sm text-muted-foreground">
             Or{" "}
             <Link
               href="/login?redirect=/dashboard"
@@ -89,7 +91,7 @@ export function QuizResults({
             Sign in to see your full event feed
           </Link>
         </Button>
-        <p className="text-sm text-brand-charcoal-light">
+        <p className="text-sm text-muted-foreground">
           We also send a weekly email with events matched to your spirit.
         </p>
       </div>
@@ -125,19 +127,19 @@ export function QuizResults({
       </div>
 
       {/* Description */}
-      <p className="text-lg leading-relaxed text-brand-charcoal-light">
+      <p className="text-lg leading-relaxed text-muted-foreground">
         {archetype.description}
       </p>
 
       {/* Secondary archetype */}
-      <p className="mt-4 text-base text-brand-charcoal-light/80">
-        With a touch of <strong className="text-brand-charcoal">{secondaryArchetype.name}</strong>{" "}
+      <p className="mt-4 text-base text-muted-foreground/80">
+        With a touch of <strong className="text-foreground">{secondaryArchetype.name}</strong>{" "}
         — {secondaryArchetype.tagline.toLowerCase()}.
       </p>
 
       {/* Score bars */}
       <div className="mt-8 space-y-3">
-        <h3 className="text-sm font-semibold uppercase tracking-wider text-brand-charcoal-light">
+        <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
           Your Spirit Breakdown
         </h3>
         {ARCHETYPE_IDS.map((id) => {
@@ -145,9 +147,9 @@ export function QuizResults({
           const pct = maxScore > 0 ? (scores[id] / maxScore) * 100 : 0;
           return (
             <div key={id} className="flex items-center gap-3">
-              <span className="w-28 text-sm text-brand-charcoal-light">{a.name}</span>
+              <span className="w-28 text-sm text-muted-foreground">{a.name}</span>
               <div className="flex-1">
-                <div className="h-2 w-full overflow-hidden rounded-full bg-brand-cream">
+                <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
                   <div
                     className={`h-full rounded-full transition-all duration-700 ${
                       id === primary ? "bg-brand-gold" : "bg-brand-deep-green/40"
@@ -156,7 +158,7 @@ export function QuizResults({
                   />
                 </div>
               </div>
-              <span className="w-8 text-right text-sm font-medium text-brand-charcoal">
+              <span className="w-8 text-right text-sm font-medium text-foreground">
                 {scores[id]}
               </span>
             </div>
@@ -166,15 +168,21 @@ export function QuizResults({
 
       {/* Conversion block — matched events preview + gated CTA */}
       <div className="mt-10">
-        <h3 className="font-serif text-2xl font-medium text-brand-deep-green">
+        <h3 className="font-serif text-2xl font-medium text-brand-deep-green dark:text-brand-gold">
           Your custom spread
         </h3>
-        <p className="mt-2 text-brand-charcoal-light">
+        <p className="mt-2 text-muted-foreground">
           A handful of gatherings — and the journeys further down — picked for{" "}
           {archetype.name}. Sign in to keep this spread on your profile and
           we&apos;ll keep tuning it; if you left your email, it&apos;s already on
           its way to your inbox.
         </p>
+        {submitFailed && (
+          <p className="mt-2 text-sm italic text-muted-foreground/70">
+            We couldn&apos;t sync your result just now — it&apos;s saved on this
+            device.
+          </p>
+        )}
 
         {/* Show first 3 event cards */}
         {matchedEvents.length > 0 && (
@@ -186,8 +194,8 @@ export function QuizResults({
         )}
 
         {/* Gated card — blurred preview with lock */}
-        <div className="relative mt-3 overflow-hidden rounded-xl border border-brand-cream bg-white p-4">
-          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm">
+        <div className="relative mt-3 overflow-hidden rounded-xl border border-border bg-card p-4">
+          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-card/80 backdrop-blur-sm">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-deep-green/10">
               <svg
                 className="h-5 w-5 text-brand-deep-green"
@@ -203,7 +211,7 @@ export function QuizResults({
                 />
               </svg>
             </div>
-            <p className="mt-2 text-center text-sm font-medium text-brand-charcoal">
+            <p className="mt-2 text-center text-sm font-medium text-foreground">
               {matchedEvents.length > 3
                 ? `${matchedEvents.length - 3} more events matched to your spirit`
                 : "More events matched weekly to your spirit"}
@@ -211,9 +219,9 @@ export function QuizResults({
           </div>
           {/* Blurred placeholder content */}
           <div className="select-none opacity-30" aria-hidden="true">
-            <div className="h-4 w-3/4 rounded bg-brand-cream" />
-            <div className="mt-2 h-3 w-1/2 rounded bg-brand-cream" />
-            <div className="mt-2 h-3 w-2/3 rounded bg-brand-cream" />
+            <div className="h-4 w-3/4 rounded bg-muted" />
+            <div className="mt-2 h-3 w-1/2 rounded bg-muted" />
+            <div className="mt-2 h-3 w-2/3 rounded bg-muted" />
           </div>
         </div>
 
@@ -224,18 +232,18 @@ export function QuizResults({
       </div>
 
       {/* Share */}
-      <div className="mt-8 rounded-xl border border-brand-cream bg-card p-6 text-center">
-        <p className="mb-4 font-serif text-lg text-brand-charcoal">Share your Ubud Spirit</p>
+      <div className="mt-8 rounded-xl border border-border bg-card p-6 text-center">
+        <p className="mb-4 font-serif text-lg text-foreground">Share your Ubud Spirit</p>
         <QuizShareButtons archetypeName={archetype.name} url={shareUrl} />
       </div>
 
       {/* Recommended experiences */}
       {matchedExperiences.length > 0 && (
         <div className="mt-12">
-          <h3 className="font-serif text-2xl font-medium text-brand-deep-green">
+          <h3 className="font-serif text-2xl font-medium text-brand-deep-green dark:text-brand-gold">
             Experiences for {archetype.name}
           </h3>
-          <p className="mt-2 text-brand-charcoal-light">
+          <p className="mt-2 text-muted-foreground">
             Based on your archetype — the practices, ceremonies, and gatherings that&apos;ll feel like home.
           </p>
           <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -249,10 +257,10 @@ export function QuizResults({
       {/* Recommended tours */}
       {matchedTours.length > 0 && (
         <div className="mt-12">
-          <h3 className="font-serif text-2xl font-medium text-brand-deep-green">
+          <h3 className="font-serif text-2xl font-medium text-brand-deep-green dark:text-brand-gold">
             Tours for {archetype.name}
           </h3>
-          <p className="mt-2 text-brand-charcoal-light">
+          <p className="mt-2 text-muted-foreground">
             Get out of the ceremony and into the landscape.
           </p>
           <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -266,10 +274,10 @@ export function QuizResults({
       {/* Recommended stories */}
       {matchedStories.length > 0 && (
         <div className="mt-12">
-          <h3 className="font-serif text-2xl font-medium text-brand-deep-green">
+          <h3 className="font-serif text-2xl font-medium text-brand-deep-green dark:text-brand-gold">
             Humans of Ubud for {archetype.name}
           </h3>
-          <p className="mt-2 text-brand-charcoal-light">
+          <p className="mt-2 text-muted-foreground">
             The humans behind the events you&apos;ll love.
           </p>
           <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

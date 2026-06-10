@@ -47,7 +47,7 @@ export default async function QuizPage() {
   const experiences = (experiencesRes.data ?? []) as Experience[];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-brand-off-white to-brand-cream">
+    <div className="min-h-screen bg-gradient-to-b from-brand-off-white to-brand-cream dark:from-background dark:to-background">
       <QuizContainer events={events} tours={tours} stories={stories} experiences={experiences} />
     </div>
   );

@@ -38,6 +38,7 @@ export function QuizContainer({ events, tours, stories, experiences }: QuizConta
   const [answers, setAnswers] = useState<{ question_id: number; answer_id: string }[]>([]);
   const [result, setResult] = useState<{ primary: ArchetypeId; secondary: ArchetypeId; scores: QuizScores } | null>(null);
   const [userSegment, setUserSegment] = useState<UserSegment | null>(null);
+  const [submitFailed, setSubmitFailed] = useState(false);
 
   // Check for stored result on mount
   useEffect(() => {
@@ -68,7 +69,7 @@ export function QuizContainer({ events, tours, stories, experiences }: QuizConta
       email?: string
     ) => {
       try {
-        await fetch("/api/quiz/submit", {
+        const res = await fetch("/api/quiz/submit", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -80,8 +81,13 @@ export function QuizContainer({ events, tours, stories, experiences }: QuizConta
             user_segment: userSegment,
           }),
         });
+        if (!res.ok) {
+          console.warn(`[quiz] submit failed with status ${res.status}`);
+          setSubmitFailed(true);
+        }
       } catch {
         // graceful fallback — results are in localStorage
+        setSubmitFailed(true);
       }
     },
     [userSegment]
@@ -138,6 +144,7 @@ export function QuizContainer({ events, tours, stories, experiences }: QuizConta
     setAnswers([]);
     setResult(null);
     setUserSegment(null);
+    setSubmitFailed(false);
   }
 
   // ---- Render ----
@@ -154,6 +161,7 @@ export function QuizContainer({ events, tours, stories, experiences }: QuizConta
         experiences={experiences}
         onRetake={handleRetake}
         userSegment={userSegment}
+        submitFailed={submitFailed}
       />
     );
   }
