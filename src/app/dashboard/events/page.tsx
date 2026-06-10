@@ -14,7 +14,8 @@ export const metadata: Metadata = {
 
 export default async function DashboardEventsPage() {
   const profile = await getCurrentProfile();
-  if (!profile) redirect("/login");
+  if (!profile?.email) redirect("/login");
+  const profileEmail = profile.email;
 
   const supabase = await createClient();
   const today = new Date().toISOString().split("T")[0];
@@ -34,7 +35,7 @@ export default async function DashboardEventsPage() {
     supabase
       .from("trusted_submitters")
       .select("auto_approve")
-      .eq("email", profile.email.toLowerCase())
+      .eq("email", profileEmail.toLowerCase())
       .maybeSingle(),
   ]);
 

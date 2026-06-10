@@ -17,7 +17,7 @@ export default async function EditEventPage({
   params: Promise<{ id: string }>;
 }) {
   const profile = await getCurrentProfile();
-  if (!profile) redirect("/login?redirect=/dashboard/events");
+  if (!profile?.email) redirect("/login?redirect=/dashboard/events");
 
   const { id } = await params;
   const supabase = createAdminClient();
