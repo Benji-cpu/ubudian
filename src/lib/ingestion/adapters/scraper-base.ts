@@ -11,7 +11,7 @@
 import * as cheerio from "cheerio";
 
 const DEFAULT_USER_AGENT =
-  "TheUbudianBot/1.0 (+https://theubudian.com/bot; community events aggregator)";
+  "TheUbudianBot/1.0 (+https://theubudian.life/bot; community events aggregator)";
 
 // Rate limit: minimum delay between requests to the same domain
 const domainLastFetch = new Map<string, number>();

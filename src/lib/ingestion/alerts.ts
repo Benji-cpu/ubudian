@@ -411,7 +411,7 @@ async function sendHealthAlert(issues: string[]): Promise<void> {
   try {
     const r = getResend();
     await r.emails.send({
-      from: "The Ubudian <alerts@theubudian.com>",
+      from: "The Ubudian <alerts@theubudian.life>",
       to: ADMIN_EMAIL,
       subject: `[Ingestion Alert] ${issues.length} issue${issues.length > 1 ? "s" : ""} detected`,
       html: `
@@ -509,7 +509,7 @@ async function sendWeeklyDigest(supabase: ReturnType<typeof createAdminClient>):
     const { weeklyIngestionDigest } = await import("@/lib/email-templates");
 
     await r.emails.send({
-      from: "The Ubudian <alerts@theubudian.com>",
+      from: "The Ubudian <alerts@theubudian.life>",
       to: ADMIN_EMAIL,
       subject: `[Ingestion Weekly] ${eventCount} events created, ${errorCount} errors`,
       html: weeklyIngestionDigest({

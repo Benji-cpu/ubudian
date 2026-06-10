@@ -33,7 +33,7 @@ function layout(body: string): string {
           <!-- Footer -->
           <tr>
             <td style="padding:16px 24px;text-align:center;font-size:13px;color:#888;">
-              <a href="${SITE_URL}" style="color:${COLORS.deepGreen};text-decoration:none;">theubudian.com</a>
+              <a href="${SITE_URL}" style="color:${COLORS.deepGreen};text-decoration:none;">theubudian.life</a>
             </td>
           </tr>
         </table>

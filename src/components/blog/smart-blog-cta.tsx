@@ -60,7 +60,7 @@ export function SmartBlogCta() {
   // State C: Quiz taken AND subscribed
   if (quizResult && subscribed) {
     const archetype = ARCHETYPES[quizResult.primary];
-    const shareUrl = encodeURIComponent("https://theubudian.com");
+    const shareUrl = encodeURIComponent("https://theubudian.life");
     const shareText = encodeURIComponent(
       "Discover Ubud's events, stories, and community — The Ubudian"
     );
