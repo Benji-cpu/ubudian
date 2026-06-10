@@ -313,7 +313,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
             inside the Filters sheet, hidden by default. */}
       <section
         id="events"
-        className="mx-auto min-w-0 max-w-7xl px-4 py-8 sm:px-6 lg:px-8"
+        className="mx-auto min-w-0 max-w-7xl px-4 pt-4 pb-5 sm:px-6 sm:py-8 lg:px-8"
       >
         <div className="flex min-w-0 flex-col gap-3">
           <Suspense>
@@ -360,7 +360,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
           personalised and this nudge would be noise. Kept slim so the agenda
           stays close to the fold. */}
       {!viewerArchetypes && !params.archetype && !useOwnViewport && (
-        <section className="mx-auto max-w-7xl px-4 pb-8 sm:px-6 lg:px-8">
+        <section className="mx-auto max-w-7xl px-4 pb-5 sm:px-6 sm:pb-8 lg:px-8">
           <ArchetypeExplainer variant="strip" />
         </section>
       )}

@@ -13,7 +13,7 @@ export function TimeSection({ label, subtitle, events, renderSaveButton }: TimeS
 
   return (
     <section className="mx-auto max-w-7xl">
-      <div className="mb-4 flex items-end justify-between px-4 sm:px-0">
+      <div className="mb-3 flex items-end justify-between px-4 sm:mb-4 sm:px-0">
         <div>
           <h3 className="font-serif text-xl font-medium text-brand-deep-green sm:text-2xl dark:text-brand-gold">
             {label}
@@ -27,7 +27,7 @@ export function TimeSection({ label, subtitle, events, renderSaveButton }: TimeS
         </span>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
         {events.map((event) => (
           <EventGridCard
             key={event.id}

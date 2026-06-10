@@ -18,7 +18,7 @@ export function EventsHero({ totalCount }: EventsHeroProps) {
   const hasCount = typeof totalCount === "number" && totalCount > 0;
 
   return (
-    <section className="relative overflow-hidden border-b border-brand-gold/15 bg-[#2C4A3E] py-8 dark:bg-[#0D1A14] sm:py-10">
+    <section className="relative overflow-hidden border-b border-brand-gold/15 bg-[#2C4A3E] py-5 dark:bg-[#0D1A14] sm:py-10">
       <BotanicalSvg id="events-hero-botanical" />
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <h1 className="font-serif text-3xl font-normal tracking-wide text-brand-gold sm:text-4xl">

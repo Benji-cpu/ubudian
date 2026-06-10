@@ -97,7 +97,7 @@ export function EventGridCard({
         </div>
 
         {/* Content */}
-        <div className="p-5">
+        <div className="p-4 sm:p-5">
           <h3 className="font-serif text-xl font-medium leading-snug tracking-tight text-brand-deep-green line-clamp-2 transition-colors group-hover:text-brand-deep-green">
             {event.title}
           </h3>

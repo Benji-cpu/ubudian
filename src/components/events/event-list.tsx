@@ -43,7 +43,7 @@ export function EventList({
     <PaginatedEvents
       items={rows}
       pageSize={32}
-      containerClassName="space-y-3"
+      containerClassName="space-y-2.5"
       emptyState={<EventListEmptyState />}
       renderSkeleton={() => <EventRowSkeleton />}
       renderItem={(row) => {
@@ -51,7 +51,7 @@ export function EventList({
           return (
             <h2
               key={row.id}
-              className="mt-8 mb-2 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.18em] text-brand-deep-green first:mt-1 dark:text-brand-gold"
+              className="mt-6 mb-2 flex items-center gap-3 sm:mt-8 text-xs font-semibold uppercase tracking-[0.18em] text-brand-deep-green first:mt-1 dark:text-brand-gold"
             >
               <span className="whitespace-nowrap">{row.label}</span>
               <span

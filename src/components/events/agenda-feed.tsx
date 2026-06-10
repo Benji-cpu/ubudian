@@ -135,7 +135,7 @@ export function AgendaFeed({
   const buckets = bucketEventsByTime(remainder, now, boostedEventIds);
 
   return (
-    <div className="space-y-12">
+    <div className="space-y-8 sm:space-y-12">
       {hero && <HeroEvent event={hero} label={heroLabel} saveButton={renderSave(hero)} />}
 
       {hasSignal && forYouCandidates.length > 0 && (
