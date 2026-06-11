@@ -318,6 +318,13 @@
       "first_seen": "2026-05-28",
       "themes": ["ceremony", "sound"],
       "note": "Established Ubud plant-based restaurant + event space (Jl. Sukma Kesuma No. 2, Peliatan, Kecamatan Ubud). Founded by Sayuri Tanaka (49K IG @sayuri_healing_food, BaliSpirit Festival presenter). Hosts weekly Thursday Kirtan: Mantra Medicine & Sacred Cacao (18:00) and weekly Sunday Kirtan with Vasudev (18:00) — called 'Ubud's most favourite Kirtan' by the community. Also hosts occasional ecstatic kirtan evenings and other ceremonies. Events page 403-blocked — walk in or check IG. At 1 qualifying log (May 28) — needs 2 more for priority_b. Events website also 403-blocked."
+    },
+    {
+      "name": "Wu Wei Tea Temple",
+      "url": "https://www.wuweiteatemple.com/",
+      "first_seen": "2026-06-12",
+      "themes": ["sound", "ceremony"],
+      "note": "Tea temple / cultural center at Jl. Sriwedari, Ubud. Squarespace website at wuweiteatemple.com publishes per-event URLs (format: /events/YYYY/M/DD/event-slug). Hosts world music concerts, live performance, and likely tea ceremony / devotional events. Donation-based pricing (no Megatix). First seen hosting Fula Brothers live music (kora + guitar) June 13, 2026. High discovery-tier signal for Music & Performance and Ceremony & Sound. Walk weekly via WebFetch for upcoming events. At 1 qualifying event — needs 2 more for promotion."
     }
   ],
   "competitor_harvest": [
@@ -628,6 +635,13 @@
       "first_seen": "2026-06-09",
       "events_seen": ["BaliSpirit Festival (Apr 2026)", "Dragon Tea Temple — Apr 2024", "Dragon Tea Temple — Jun 2024 (farewell)"],
       "note": "Bali-based kirtan / medicine music collective. Performed BaliSpirit Festival April 2026. Confirmed off-island for European summer 2026 (Essentia Italy, Colibri Greece, Conscious Celebration Germany, Healing Festival Czech Republic). Historical Dragon Tea Temple appearances: Apr 2024 + Jun 2024 (farewell). No 2026 Ubud dates expected until European season ends. Track from Aug–Sep 2026. IG: @hanumanproject. High potential — DTT anchor + devotional kirtan format squarely in our universe."
+    },
+    {
+      "name": "Euphoria Movement",
+      "instagram": "@euphoria_movement",
+      "first_seen": "2026-06-12",
+      "events_seen": ["Confidence and Grace: 2-Day Beginner CI Workshop — Ubud (Jun 24-25, 2026)"],
+      "note": "Contact Improvisation workshop organizer in Ubud. Megatix-ticketed. First confirmed event: beginner CI workshop Jun 24-25 (megatix.co.id/events/confidence-and-grace-beginner-june23). Not recurring weekly — intensive workshop format. Track for intermediate / advanced CI workshops and other CI events in Ubud."
     }
   ]
 }
