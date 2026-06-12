@@ -282,7 +282,7 @@
       "url": "https://megatix.co.id/events/purnama-a-fullmoon-dance-ritual",
       "first_seen": "2026-05-24",
       "themes": ["dance", "ceremony", "sound"],
-      "note": "Monthly full moon event (Purnama = Balinese full moon). Format: Cacao Ceremony with Shiva → Ecstatic Dance with Todjon → Sound & Movement closing with YINTELLIGENCE (Chris Fox). 5:30–8 PM format. Venue unconfirmed (Megatix 403). Astronomical full moons: Jun 29 and Jul 29 2026 (corrected 2026-05-27 — earlier note of Jun 11/Jul 10 was wrong). Check Megatix directly when their blocks ease. Would score ~7–8 if dates confirmed. **⚠ PROBABLE GEO-REJECT (flagged 2026-06-09):** after 19 consecutive skips without Ubud venue confirmation, one search snippet placed this event at 'Jl. Pura Kramat, Cemagi' — Cemagi is the Seminyak/Canggu coast (~30km west of Ubud), not greater-Ubud. If confirmed by admin, move to rejected_permanent."
+      "note": "Monthly full moon event (Purnama = Balinese full moon). Format: Cacao Ceremony with Shiva → Ecstatic Dance with Todjon → Sound & Movement closing with YINTELLIGENCE (Chris Fox). 5:30–8 PM format. Venue unconfirmed (Megatix 403). Astronomical full moons: Jun 29 and Jul 29 2026 (corrected 2026-05-27 — earlier note of Jun 11/Jul 10 was wrong). **⚠ PROBABLE GEO-REJECT (flagged 2026-06-09, 21 consecutive skips as of 2026-06-13):** multiple search agents confirm venue snippet 'Jl. Pura Kramat, Cemagi' — Cemagi is the Seminyak/Canggu coast (~30km west of Ubud), not greater-Ubud. Stop re-investigating until admin confirms geo or moves to rejected_permanent."
     },
     {
       "name": "Om Ham Retreat & Resort",
@@ -324,7 +324,7 @@
       "url": "https://www.wuweiteatemple.com/",
       "first_seen": "2026-06-12",
       "themes": ["sound", "ceremony"],
-      "note": "Tea temple / cultural center at Jl. Sriwedari, Ubud. Squarespace website at wuweiteatemple.com publishes per-event URLs (format: /events/YYYY/M/DD/event-slug). Hosts world music concerts, live performance, and likely tea ceremony / devotional events. Donation-based pricing (no Megatix). First seen hosting Fula Brothers live music (kora + guitar) June 13, 2026. High discovery-tier signal for Music & Performance and Ceremony & Sound. Walk weekly via WebFetch for upcoming events. At 1 qualifying event — needs 2 more for promotion."
+      "note": "**⚠ GEO-UNCONFIRMED (flagged 2026-06-13):** The domain wuweiteatemple.com was identified June 12 as a Ubud venue at 'Jl. Sriwedari, Ubud' hosting Fula Brothers June 13. However, multiple search agents on June 13 report this domain is owned by Wu Wei Tea Temple in Fairfax, California (1820 Sir Francis Drake Blvd, CA 94930). The Fula Brothers event in the approvals queue (source_url: wuweiteatemple.com/events/2026/6/13/fula-brothers) may be a California event misidentified as Ubud. Admin should geo-verify and potentially archive that pending event. If a legitimate Ubud tea venue named Wu Wei exists at Jl. Sriwedari, it is not indexed at this domain — investigate via IG or on-the-ground. Pause weekly walks of this URL until geo-identity is confirmed."
     }
   ],
   "competitor_harvest": [
@@ -642,6 +642,13 @@
       "first_seen": "2026-06-12",
       "events_seen": ["Confidence and Grace: 2-Day Beginner CI Workshop — Ubud (Jun 24-25, 2026)"],
       "note": "Contact Improvisation workshop organizer in Ubud. Megatix-ticketed. First confirmed event: beginner CI workshop Jun 24-25 (megatix.co.id/events/confidence-and-grace-beginner-june23). Not recurring weekly — intensive workshop format. Track for intermediate / advanced CI workshops and other CI events in Ubud."
+    },
+    {
+      "name": "Shambala at Dragon Tea Temple (DJ Aleceo)",
+      "url": "https://megatix.co.id/events/shambala-at-dragon-tea-temple-with-aleceo",
+      "first_seen": "2026-06-13",
+      "themes": ["dance", "ceremony"],
+      "note": "Recurring 'every second Saturday' series at Dragon Tea Temple (Jl. Penestanan No.8, Sayan, Ubud). Format: 5:30pm doors → tea ceremony with live DJ (6pm) → bonfire jam (9:30pm). DJ Aleceo has Cafe De Anatolia / Kosa / Pipe & Pochet credentials — world/ethnic electronic, not generic club EDM. Described as 'free-flow tea ceremony mixed with groovy electronic music, dance party in the garden.' Strong venue (priority_b), biweekly recurring. Could score ~7 if description confirms ceremonial framing. June 14 is the next 'second Saturday' by calendar logic but no confirmed date extracted from Megatix page (403-blocked). Check megatix page for next confirmed upcoming date; if format holds up under full description review, candidate for priority_b promotion after 2 more qualifying logs."
     }
   ]
 }
