@@ -278,13 +278,6 @@
       "note": "Ubud area. Hosts recurring Saturday Afrobeats and tribal rhythm dance events with DJ Zaia Lynn. No confirmed June/July 2026 date surfaced — site blocks direct fetch. Venue identity (Casa Curandera = 'healer's house') suggests ceremony-adjacent space. Track for specific dates before promoting."
     },
     {
-      "name": "PURNAMA Full Moon Dance Ritual",
-      "url": "https://megatix.co.id/events/purnama-a-fullmoon-dance-ritual",
-      "first_seen": "2026-05-24",
-      "themes": ["dance", "ceremony", "sound"],
-      "note": "Monthly full moon event (Purnama = Balinese full moon). Format: Cacao Ceremony with Shiva → Ecstatic Dance with Todjon → Sound & Movement closing with YINTELLIGENCE (Chris Fox). 5:30–8 PM format. Venue unconfirmed (Megatix 403). Astronomical full moons: Jun 29 and Jul 29 2026 (corrected 2026-05-27 — earlier note of Jun 11/Jul 10 was wrong). **⚠ PROBABLE GEO-REJECT (flagged 2026-06-09, 21 consecutive skips as of 2026-06-13):** multiple search agents confirm venue snippet 'Jl. Pura Kramat, Cemagi' — Cemagi is the Seminyak/Canggu coast (~30km west of Ubud), not greater-Ubud. Stop re-investigating until admin confirms geo or moves to rejected_permanent."
-    },
-    {
       "name": "Om Ham Retreat & Resort",
       "url": "https://omhamretreat.com/sound-healing-kirtan-with-sawitri/",
       "first_seen": "2026-05-26",
@@ -441,7 +434,15 @@
       "note": "**User-reported (Celina, 2026-06-01). Promoted to CORE ICP by Benji 2026-06-10** — partner-dance socials (Brazilian zouk, salsa/bachata, Latin, fusion) now ingest as core `Dance & Movement` with the `partner-dance` vibe tag (CREMOSO at Bara precedent). Route via the WAHA WhatsApp adapter once joined — **still blocked on Benji joining the group from his phone** (same blocker as ShambAllah + CI Telegram). Until then, watch for zouk/Latin socials surfacing via ToDo.Today and venue scouts. **Attribution rules apply**."
     }
   ],
-  "rejected_permanent": [],
+  "rejected_permanent": [
+    {
+      "name": "PURNAMA Full Moon Dance Ritual",
+      "url": "https://megatix.co.id/events/purnama-a-fullmoon-dance-ritual",
+      "reason": "geo-reject",
+      "confirmed": "2026-06-14",
+      "note": "Venue confirmed as Jl. Pura Kramat, Cemagi, Kec. Mengwi, Bali 80351 — the southwest Bali coast near Canggu/Seseh, ~25km from Ubud. Definitively outside greater-Ubud. 22 consecutive curator skips (first flagged 2026-06-09). Format was compelling (cacao+dance+sound by Shiva/Todjon/Chris Fox) but venue disqualifies. Admin should archive any pending PURNAMA events in DB."
+    }
+  ],
   "facilitators_pending": [
     {
       "name": "Raio (Rob Weber)",
@@ -648,7 +649,14 @@
       "url": "https://megatix.co.id/events/shambala-at-dragon-tea-temple-with-aleceo",
       "first_seen": "2026-06-13",
       "themes": ["dance", "ceremony"],
-      "note": "Recurring 'every second Saturday' series at Dragon Tea Temple (Jl. Penestanan No.8, Sayan, Ubud). Format: 5:30pm doors → tea ceremony with live DJ (6pm) → bonfire jam (9:30pm). DJ Aleceo has Cafe De Anatolia / Kosa / Pipe & Pochet credentials — world/ethnic electronic, not generic club EDM. Described as 'free-flow tea ceremony mixed with groovy electronic music, dance party in the garden.' Strong venue (priority_b), biweekly recurring. Could score ~7 if description confirms ceremonial framing. June 14 is the next 'second Saturday' by calendar logic but no confirmed date extracted from Megatix page (403-blocked). Check megatix page for next confirmed upcoming date; if format holds up under full description review, candidate for priority_b promotion after 2 more qualifying logs."
+      "note": "Recurring 'every second Saturday' series at Dragon Tea Temple (Jl. Penestanan No.8, Sayan, Ubud). Format: 5:30pm doors → tea ceremony with live DJ (6pm) → bonfire jam (9:30pm). DJ Aleceo has Cafe De Anatolia / Kosa / Pipe & Pochet credentials — world/ethnic electronic, not generic club EDM. Described as 'free-flow tea ceremony mixed with groovy electronic music, dance party in the garden.' Strong venue (priority_b), biweekly recurring. Could score ~7 if description confirms ceremonial framing. June 13 was likely the most recent occurrence (second Saturday of June); June 27 would be the next. No confirmed date extracted from Megatix page (403-blocked). Check megatix page for next confirmed upcoming date; if format holds up under full description review, candidate for priority_b promotion after 2 more qualifying logs."
+    },
+    {
+      "name": "Onanya Nicho (Rey Rao)",
+      "instagram": null,
+      "first_seen": "2026-06-14",
+      "events_seen": ["Onanya Icaros — Dragon Tea Temple (Jun 26, 2026)"],
+      "note": "Amazonian plant medicine artist and musician. Decade-long apprenticeship in traditional Amazonian plant medicine; initiated as an Onanya (Shipibo: 'one who knows the plants') by Maestra Estela Pangoza and her family at Aya Madre Healing Center. Also received transmissions from Lakota Sundancers and Navajo Diné Roadmen. Prior Dragon Tea Temple appearances confirmed: `onanya-temple-of-sound` and `onanya-sound-ceremony` slugs exist, making Jun 26 at least his 3rd DTT appearance — reliable returning visiting artist. Website: onanyanicho.com. No IG handle confirmed yet. Format: live-looping icaros ceremony — unrepeatable soundscape shaped by the moment and energy in the space."
     }
   ]
 }
