@@ -215,6 +215,15 @@
       "note": "Ubud. Chef collabs, six-hands dinners, guest-chef takeovers — structurally one-off (the pairing never reassembles). Sharpest time-sensitivity in the discovery tier. First-party booking only."
     },
     {
+      "name": "Bhakti Bliss Festival of Lights (Jeremy Sol)",
+      "url": "https://megatix.co.id/events/bhakti-bliss-festival-of-lights",
+      "instagram": "bhaktiblissbali",
+      "type": "website",
+      "tier": "discovery",
+      "category_hint": "Music & Performance",
+      "note": "Annual 3-day bhakti festival at Kenran Resort, Tegallalang (~15min north of Ubud). Typically runs early August (2026 edition: Aug 7-9). Megatix-ticketed. BaliSpirit Festival sister event, running since 2022. Programme: Maha Bhakti Bliss Kirtan, ecstatic dance, cacao ceremony, sacred transmission satsang. Past headliners include Margot Anand. Early-bird tickets drop ~2 months out; lineup announced ~1 month out. ONE PARENT CARD — do not create per-session sub-events. First ingested 2026-06-15."
+    },
+    {
       "name": "Paradiso Ubud (performance / salons — NOT cinema)",
       "url": "https://www.instagram.com/paradisoubud/",
       "instagram": "paradisoubud",
@@ -230,7 +239,7 @@
     "blossom.ubud",
     "thesanctuaryubud",
     "dragonflyvillageubud",
-    "barastudio.ubud",
+    "barabalistudio",
     "happypuppyubud",
     "pyramidsofchi"
   ],
@@ -254,7 +263,7 @@
       "url": "https://www.anandasarita.com/events/essence-of-love",
       "first_seen": "2026-05-20",
       "themes": ["tantra"],
-      "note": "Penestanan, Ubud (above Karma House Chai and Tattoo). Weekly Saturday Tantra Essence couples workshop ('Essence of Love') in Ananda Sarita lineage. 500k IDR/couple. Ticket Tailor: tickettailor.com/events/barastudio/1755020. At 1 qualifying log (May 25) — needs 2 more to promote to priority_b. Note: Bara Studio also hosts non-tantra Bachata workshops — filter those out."
+      "note": "Penestanan, Ubud (above Karma House Chai and Tattoo). Weekly Saturday Tantra Essence couples workshop ('Essence of Love') in Ananda Sarita lineage. 500k IDR/couple. Ticket Tailor: tickettailor.com/events/barastudio/1755020. At 2 qualifying logs (May 25 + Jun 15) — needs 1 more to promote to priority_b. Note: Bara Studio also hosts non-tantra Bachata workshops — filter those out. IG handle confirmed: @barabalistudio (sources.json instagram_handles corrected Jun 15)."
     },
     {
       "name": "School of Unified Healing",
