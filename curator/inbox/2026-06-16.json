@@ -1,0 +1,30 @@
+{
+  "date": "2026-06-16",
+  "events": [
+    {
+      "title": "Walker Ji — Sacred Evening at The Yoga Barn",
+      "description": "Walker Ji brings his particular blend of electronic music and sacred world-sound to The Yoga Barn for a Sunday evening ceremony. A Bali-based artist since 2012, he works at the intersection of the rave tradition and indigenous sound cultures — layering organic instruments, field recordings, and ceremonial music under driving rhythms that carry the room from stillness into movement. His prior Ubud appearances include the THREE RIVERS sacred song and dance ceremony at Dragon Tea Temple alongside Kita Ram and Rob Recker (January 2026), and the Hanuman Project kirtan and medicine music celebration. Expect a full ceremonial arc built from live electronic-sacred sound.",
+      "short_description": "Bali-based sacred electronic music artist Walker Ji at The Yoga Barn — a Sunday evening ceremony weaving indigenous sounds and electronic music into a live ceremonial arc.",
+      "category": "Ceremony & Sound",
+      "venue_name": "The Yoga Barn",
+      "venue_address": "Jl. Hanoman No. 44, Ubud, Bali",
+      "start_date": "2026-06-28",
+      "end_date": null,
+      "start_time": null,
+      "end_time": null,
+      "is_recurring": false,
+      "recurrence_rule": null,
+      "price_info": null,
+      "external_ticket_url": null,
+      "source_url": null,
+      "organizer_name": "Walker Ji",
+      "organizer_instagram": null,
+      "cover_image_url": null,
+      "quality_score": 0.7,
+      "content_flags": [],
+      "intent_tags": ["spirit", "community"],
+      "archetype_tags": ["seeker", "creative", "connector"],
+      "vibe_tags": ["live-music", "conscious-movement"]
+    }
+  ]
+}
