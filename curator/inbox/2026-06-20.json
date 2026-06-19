@@ -1,0 +1,31 @@
+{
+  "date": "2026-06-20",
+  "events": [
+    {
+      "title": "Ubud Folk Festival 2026 — Half a Decade of Harmony",
+      "description": "The fifth edition of Ubud's signature outdoor music festival returns to Biji World for two days of folk, indie and world music alongside live art performances, drum circles, a lantern parade, artist-led workshops, an art market and family programming. Founded in 2022, the festival has gathered Indonesian and international artists in the open-air jungle gardens of Mas village, south of central Ubud — an annual community gathering that resists the resort circuit and keeps its feet on the ground.",
+      "short_description": "Five years of Ubud's folk and world-music festival: live music, art, drum circles and a lantern parade at Biji World, Mas.",
+      "category": "Music & Performance",
+      "event_tier": "discovery",
+      "venue_name": "Biji World Ubud",
+      "venue_address": "Mas, Gianyar, Bali",
+      "start_date": "2026-08-14",
+      "end_date": "2026-08-15",
+      "start_time": null,
+      "end_time": null,
+      "is_recurring": false,
+      "recurrence_rule": null,
+      "price_info": null,
+      "external_ticket_url": "https://megatix.co.id/events/ubud-folk-festival-2026",
+      "source_url": "https://megatix.co.id/events/ubud-folk-festival-2026",
+      "organizer_name": "Ubud Folk Festival",
+      "organizer_instagram": "ubudfolkfest",
+      "cover_image_url": null,
+      "quality_score": 0.8,
+      "content_flags": [],
+      "intent_tags": ["community", "local_culture"],
+      "archetype_tags": ["creative", "connector", "explorer"],
+      "vibe_tags": ["live-music", "art-exhibition"]
+    }
+  ]
+}

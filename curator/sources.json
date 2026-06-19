@@ -140,7 +140,7 @@
       "type": "instagram",
       "tier": "discovery",
       "category_hint": "Music & Performance",
-      "note": "Annual, ~April, Biji World (Mas, greater-Ubud). Folk/indie/world music + live art + vinyl market. One parent card."
+      "note": "Annual, Biji World (Mas, greater-Ubud). Folk/indie/world music + live art + vinyl market. One parent card. 2026 edition: Aug 14-15 (timing shifted from usual ~April; confirmed Megatix 2026-06-20). Check @ubudfolkfest IG in Mar-Apr each year for annual announcement."
     },
     {
       "name": "Komaneka Fine Art Gallery",
@@ -327,6 +327,13 @@
       "first_seen": "2026-06-12",
       "themes": ["sound", "ceremony"],
       "note": "**⚠ GEO-UNCONFIRMED (flagged 2026-06-13):** The domain wuweiteatemple.com was identified June 12 as a Ubud venue at 'Jl. Sriwedari, Ubud' hosting Fula Brothers June 13. However, multiple search agents on June 13 report this domain is owned by Wu Wei Tea Temple in Fairfax, California (1820 Sir Francis Drake Blvd, CA 94930). The Fula Brothers event in the approvals queue (source_url: wuweiteatemple.com/events/2026/6/13/fula-brothers) may be a California event misidentified as Ubud. Admin should geo-verify and potentially archive that pending event. If a legitimate Ubud tea venue named Wu Wei exists at Jl. Sriwedari, it is not indexed at this domain — investigate via IG or on-the-ground. Pause weekly walks of this URL until geo-identity is confirmed."
+    },
+    {
+      "name": "Naya Veda Vastu",
+      "url": null,
+      "first_seen": "2026-06-20",
+      "themes": ["dance", "ceremony"],
+      "note": "Jungle sanctuary on the outskirts of Ubud. Hosted NON-DUAL (Awakened Dreamers × Dance Through Dimensions) — sacred electronic temple format: cacao ceremony + community flow + DJ sets in a 360-degree sound system dome. Megatix slug: megatix.co.id/events/non-dual (live but no confirmed 2026 date yet). Track for confirmed upcoming dates; if date surfaces for NON-DUAL or another event here, would score ~7."
     }
   ],
   "competitor_harvest": [
@@ -677,6 +684,13 @@
         "Walker Ji — Sacred Evening at The Yoga Barn (Jun 28, 2026, ingested)"
       ],
       "note": "Bali-based since ~2012 (real name Walker Barnard). Electronic music (psychedelic minimal funk, house, techno) with deep spiritual roots — grew up on an ashram, co-founded Air Festival Bali (2015), BaliSpirit Festival community figure. Prior Dragon Tea Temple appearances: THREE RIVERS (Jan 29, 2026, with Kita Ram + Rob Recker, 300-400k IDR, megatix.co.id/events/three-rivers-prayers-woven-in-sound) and Hanuman Project Kirtan (Apr 2024). SoundCloud: soundcloud.com/walkerji. RA: ra.co/dj/walkerbarnard. Genre is conscious/ceremonial electronic — not kirtan specifically, but firmly in the conscious-community universe. Watch for DTT and Yoga Barn repeat appearances."
+    },
+    {
+      "name": "Eva Aourah",
+      "instagram": null,
+      "first_seen": "2026-06-20",
+      "events_seen": ["Bhakti Kirtan & Cacao — Bhakti Bliss Family (date unconfirmed, July 2026)"],
+      "note": "Bhakti kirtan facilitator in Jeremy Sol's Bhakti Bliss Family network. Megatix slug `bhaktikirtanwitheva` is live — 'Soulful chanting, dancing, celebration, mantra singing.' No Instagram found. Venue and date unconfirmed. Track for confirmation."
     }
   ]
 }
