@@ -1,0 +1,30 @@
+{
+  "date": "2026-06-21",
+  "events": [
+    {
+      "title": "Sunday Bhakti Kirtan with Vasudev",
+      "description": "Ubud's long-running Sunday kirtan gathering at Sayuri Healing Food's studio space in Peliatan. Described by the community as 'Ubud's most favourite Kirtan', the evening is a devotional circle of mantra, call-and-response chanting, and sacred song led by Vasudev — a resident kirtan facilitator with years of presence at this address. Walk-in, by donation. No pre-registration needed; the kirtan begins at 6 PM. Special editions (ticketed via Megatix, IDR 150–200k) occur when guest facilitators or themed formats are added.",
+      "short_description": "Ubud's weekly Sunday kirtan by donation at Sayuri Healing Food's studio in Peliatan — devotional chanting led by resident facilitator Vasudev.",
+      "category": "Ceremony & Sound",
+      "venue_name": "Sayuri Healing Food",
+      "venue_address": "Jl. Sukma Kesuma No. 2, Peliatan, Ubud, Bali",
+      "start_date": "2026-06-21",
+      "end_date": null,
+      "start_time": "18:00",
+      "end_time": null,
+      "is_recurring": true,
+      "recurrence_rule": "FREQ=WEEKLY;BYDAY=SU",
+      "price_info": "By donation",
+      "external_ticket_url": null,
+      "source_url": null,
+      "organizer_name": "Vasudev",
+      "organizer_instagram": "@vasudevmusic",
+      "cover_image_url": null,
+      "quality_score": 0.7,
+      "content_flags": [],
+      "intent_tags": ["spirit", "community"],
+      "archetype_tags": ["seeker", "connector"],
+      "vibe_tags": ["kirtan-mantra"]
+    }
+  ]
+}
