@@ -237,7 +237,7 @@
       "type": "instagram",
       "tier": "discovery",
       "category_hint": "Art & Culture",
-      "note": "Sayan (greater-Ubud). Monthly artist talks + ceramic exhibitions + residency showcases. Non-profit gallery register — on-brand."
+      "note": "Sayan (greater-Ubud). Monthly artist talks + ceramic exhibitions + residency showcases. Non-profit gallery register — on-brand. ⚠ 2026 = final chapter per @gayacac IG post (confirmed 2026-06-22) — only ingest events confirmed for 2026 H2. Professional artist residency workshops (multi-day, ~$2,500, enrollment-based) are hard-rejects regardless."
     },
     {
       "name": "Purga Artspace",
@@ -332,7 +332,7 @@
         "ceremony",
         "sound"
       ],
-      "note": "Confirmed venue: Jl. Subak Sok Wayah, Ubud, Kec. Tegallalang, Bali 80571 (confirmed 2026-06-04). Format: Bhakti Kirtan 5:30pm → dinner buffet 7pm (organic/local) → fire circle 8pm → close 9:30pm. IDR 220k presale / IDR 320k door. Two editions confirmed in DB: Jul 6 (New Moon Bhakti Kirtan, in DB). New slug discovered 2026-06-21: `full-moon-ceremony-july` — features West African tribal dance/djembe/kora/kalimba + ceremony, address matches this venue. Likely Jul 29 (full moon Wed). Distinct from New Moon Jul 6. Check Jul 1–15. At 2 qualifying logs — needs 1 more for priority_b."
+      "note": "Confirmed venue: Jl. Subak Sok Wayah, Ubud, Kec. Tegallalang, Bali 80571 (confirmed 2026-06-04). Format: Bhakti Kirtan 5:30pm → dinner buffet 7pm (organic/local) → fire circle 8pm → close 9:30pm. IDR 220k presale / IDR 320k door. Two editions confirmed in DB: Jul 6 (New Moon Bhakti Kirtan, in DB) + Jul 29 (Full Moon Ceremony — West African Tribal Dance, ingested 2026-06-22). Slug `full-moon-ceremony-july` confirmed (West African tribal dance/djembe/kora/kalimba + ceremony). At 3 qualifying logs — promotion to priority_b eligible Jun 28 (Sunday maintenance only)."
     },
     {
       "name": "Akasha New Earth Haven",
