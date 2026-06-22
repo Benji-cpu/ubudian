@@ -135,7 +135,7 @@
         "ceremony",
         "sound"
       ],
-      "note": "Restaurant/café at Jl. Goutama Selatan No. 22, central Ubud. Intimate event space 'The Cobra Room' hosts the weekly Thursday 'Shakti Bhakti: Kirtan & Cacao' (18:00) led by Anu Karoliina, plus 'The Red Tent' bi-weekly Friday women's circle (no confirmed facilitator yet). Promoted from discovered_pending 2026-05-31 (2 curator logs May 28+29 + web-confirmed live weekly, approved 2026-05-31). Megatix posts dated per-edition slugs that rot weekly (mudra-kirtan + kirtanwithanu both return 'already taken place') — do NOT trust those as ticket CTAs; the recurring card runs without one."
+      "note": "Restaurant/café at Jl. Goutama Selatan No. 22, central Ubud. Intimate event space 'The Cobra Room' hosts the weekly Thursday 'Shakti Bhakti: Kirtan & Cacao' (18:00) led by Anu Karoliina. Promoted from discovered_pending 2026-05-31 (2 curator logs May 28+29 + web-confirmed live weekly, approved 2026-05-31). Megatix posts dated per-edition slugs that rot weekly (mudra-kirtan + kirtanwithanu both return 'already taken place') — do NOT trust those as ticket CTAs; the recurring card runs without one. NOTE 2026-06-23: 'The Red Tent' bi-weekly women's circle was previously attributed here in error — Megatix slug `the-red-tent` confirms venue is Dragon Tea Temple (Jl. Raya Penestanan Kelod no.77), not Mudra Cafe. Monthly Wednesday pattern: Mar 18, Apr 15, May 13, Jun 10, Jul 8, Aug 12. No named facilitator confirmed yet."
     },
     {
       "name": "Sayuri Healing Food",
@@ -145,7 +145,7 @@
         "ceremony",
         "sound"
       ],
-      "note": "Plant-based restaurant + event studio, Jl. Sukma Kesuma No. 2, Peliatan, Ubud. Founded by Sayuri Tanaka (49K IG @sayuri_healing_food, BaliSpirit Festival presenter). Hosts weekly Sunday Bhakti Kirtan with Vasudev (18:00, by donation — walk-in) and occasional ticketed special editions via Megatix (~IDR 150–200k). Also hosts Jeremy Sol's Bhakti Kirtan specials (`sundaykirtanspecial`, IDR 200k/250k, date TBC July). Events page 403-blocked — use IG (@sayuri_healing_food) or WebSearch for specific dates. Promoted from discovered_pending 2026-06-21 (3 qualifying logs: May 28, Jun 18, Jun 21)."
+      "note": "Plant-based restaurant + event studio, Jl. Sukma Kesuma No. 2, Peliatan, Ubud. Founded by Sayuri Tanaka (49K IG @sayuri_healing_food, BaliSpirit Festival presenter). Hosts multiple Sunday kirtan series: (1) Vasudev Sunday Bhakti Kirtan (18:00, by donation — walk-in, in DB); (2) Diana Beauty 'Kirtan & Cacao with Diana Beauty & Friends' (18:00–20:00, ticketed IDR 150k/200k, slug `kirtanwithDiana`, ingested 2026-06-23); (3) Jeremy Sol's `sundaykirtanspecial` (ticketed IDR 200k/250k, date TBC July — likely Jul 27). Events page 403-blocked — use IG (@sayuri_healing_food) or WebSearch for specific dates. Promoted from discovered_pending 2026-06-21 (3 qualifying logs: May 28, Jun 18, Jun 21)."
     }
   ],
   "discovery_sources": [
@@ -897,7 +897,16 @@
       "events_seen": [
         "Bhakti Kirtan & Cacao — Bhakti Bliss Family (date unconfirmed, July 2026)"
       ],
-      "note": "Bhakti kirtan facilitator in Jeremy Sol's Bhakti Bliss Family network. Megatix slug `bhaktikirtanwitheva` is live — 'Soulful chanting, dancing, celebration, mantra singing.' No Instagram found. Venue and date unconfirmed. Track for confirmation."
+      "note": "Bhakti kirtan facilitator in Jeremy Sol's Bhakti Bliss Family network. Megatix slug `bhaktikirtanwitheva` confirmed as May 18, 2026 past edition — no future date announced as of 2026-06-23. No Instagram found. Watchlist item CLOSED. Track for future announcement."
+    },
+    {
+      "name": "Diana Beauty",
+      "instagram": null,
+      "first_seen": "2026-06-23",
+      "events_seen": [
+        "Kirtan & Cacao with Diana Beauty & Friends — Sayuri Healing Food, Sundays 18:00–20:00 (ingested 2026-06-23)"
+      ],
+      "note": "Bhakti singer and yoga teacher (Hatha + aerial), Singapore-born, Bali-based since 2020. Runs 'Kirtan & Cacao with Diana Beauty & Friends' Sunday series at Sayuri Healing Food (Jl. Sukma Kesuma No. 2, Peliatan) — ticketed IDR 150k presale / IDR 200k door, Megatix slug `kirtanwithDiana`. Also has `kirtan-with-diana-beauty` slug (possibly earlier edition). Has performed at Yoga Barn, Alchemy, Udara, The Path, Radiantly Alive. Spotify artist profile: open.spotify.com/artist/2k6rBHLgpE00d3hgbi315M. Distinct from Vasudev's walk-in donation series at the same venue. Instagram handle unknown — track."
     }
   ]
 }
