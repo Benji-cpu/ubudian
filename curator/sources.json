@@ -343,7 +343,7 @@
         "ceremony",
         "sound"
       ],
-      "note": "Eco-dome and bamboo pavilion retreat at Ubud's jungle edge, with organic gardens and natural swimming pool. Weekly Saturday Ecstatic Dance & Cacao Ceremony (6–10 PM) led by Karunika — opens with Vital Cacao Ceremony by fire, flows into ecstatic dance, closes with sound healing. SuperMoon editions add breathwork. On-site vegan restaurant. Fills the Saturday gap in our calendar. Candidate for priority_b after 2 more qualifying logs. Instagram handle not yet confirmed."
+      "note": "Eco-dome and bamboo pavilion retreat at Ubud's jungle edge, with organic gardens and natural swimming pool. Weekly Saturday Ecstatic Dance & Cacao Ceremony (6–10 PM) led by Karunika — opens with Vital Cacao Ceremony by fire, flows into ecstatic dance, closes with sound healing. SuperMoon editions add breathwork. On-site vegan restaurant. Fills the Saturday gap in our calendar. Candidate for priority_b after 2 more qualifying logs. IG handle confirmed: @akashanewearthbali (2026-06-24)."
     },
     {
       "name": "Casa Curandera Bali",
@@ -856,9 +856,10 @@
       "instagram": "@euphoria_movement",
       "first_seen": "2026-06-12",
       "events_seen": [
-        "Confidence and Grace: 2-Day Beginner CI Workshop — Ubud (Jun 24-25, 2026)"
+        "Confidence and Grace: 2-Day Beginner CI Workshop — Ubud (Jun 24-25, 2026)",
+        "Confidence and Grace: 2-Day Beginner CI Workshop — The Space, Penestanan (Aug 5-6, 2026, ingested 2026-06-24)"
       ],
-      "note": "Contact Improvisation workshop organizer in Ubud. Megatix-ticketed. First confirmed event: beginner CI workshop Jun 24-25 (megatix.co.id/events/confidence-and-grace-beginner-june23). Not recurring weekly — intensive workshop format. Track for intermediate / advanced CI workshops and other CI events in Ubud."
+      "note": "Contact Improvisation workshop organizer in Ubud. Megatix-ticketed. Jun 24-25 beginner CI workshop (slug `confidence-and-grace-beginner-june23`) already in DB. Aug 5-6 beginner CI workshop (slug `confidence-and-grace-beginner-august23`) ingested 2026-06-24. Not recurring weekly — intensive workshop format. Track for intermediate / advanced CI workshops and other CI events."
     },
     {
       "name": "Shambala at Dragon Tea Temple (DJ Aleceo)",
@@ -907,6 +908,16 @@
         "Kirtan & Cacao with Diana Beauty & Friends — Sayuri Healing Food, Sundays 18:00–20:00 (ingested 2026-06-23)"
       ],
       "note": "Bhakti singer and yoga teacher (Hatha + aerial), Singapore-born, Bali-based since 2020. Runs 'Kirtan & Cacao with Diana Beauty & Friends' Sunday series at Sayuri Healing Food (Jl. Sukma Kesuma No. 2, Peliatan) — ticketed IDR 150k presale / IDR 200k door, Megatix slug `kirtanwithDiana`. Also has `kirtan-with-diana-beauty` slug (possibly earlier edition). Has performed at Yoga Barn, Alchemy, Udara, The Path, Radiantly Alive. Spotify artist profile: open.spotify.com/artist/2k6rBHLgpE00d3hgbi315M. Distinct from Vasudev's walk-in donation series at the same venue. Instagram handle unknown — track."
+    },
+    {
+      "name": "Tara Li",
+      "instagram": null,
+      "first_seen": "2026-06-24",
+      "events_seen": [
+        "Dissolve :: Eros — Paradiso Ubud (weekly Tue 18:00–20:00, ingested 2026-06-22)",
+        "Dissolve :: Play — Paradiso Ubud (weekly Sat 11:00–13:00, likely in DB via ToDo.Today pipeline)"
+      ],
+      "note": "Contact Improvisation and ecstatic dance facilitator, Bali-based, CI practice since 2015. Leads two distinct series at Paradiso Ubud: Dissolve :: Eros (Tue 6–8pm, contact to ecstatic dance, ingested Jun 22) and Dissolve :: Play (Sat 11am–1pm, Megatix: `dissolve-play`). Dissolve :: Play likely already in DB via ToDo.Today pipeline (theubudian.com/event/dissolve-play/2030-03-23/ URL found — 2030 placeholder = scraped and ingested). No Instagram handle confirmed yet."
     }
   ]
 }
