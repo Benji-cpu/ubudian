@@ -1,0 +1,30 @@
+{
+  "date": "2026-06-26",
+  "events": [
+    {
+      "title": "Sunday Bhakti Kirtan with Akari Tamura",
+      "description": "Akari Tamura — kirtan leader, multi-instrumentalist, and mantra teacher who relocated from Koh Phangan to Ubud — holds an intimate evening of devotional chanting at Sayuri Healing Food in Peliatan. The format is classic bhakti: live Sanskrit mantra chanting, sacred cacao, Bhakti stories, and community gathering. No singing experience needed — only an open heart. Distinct from Akari's bi-weekly Wednesday Kirtan: Songs of Love at Dragon Tea Temple, this is her Sunday anchor at one of Ubud's most beloved wellness venues.",
+      "short_description": "Devotional chanting and sacred cacao with kirtan leader Akari Tamura, every Sunday at Sayuri Healing Food.",
+      "category": "Ceremony & Sound",
+      "venue_name": "Sayuri Healing Food",
+      "venue_address": "Jl. Sukma Kesuma No. 2, Peliatan, Ubud, Bali 80571",
+      "start_date": "2026-06-28",
+      "end_date": null,
+      "start_time": "18:00",
+      "end_time": null,
+      "is_recurring": true,
+      "recurrence_rule": "FREQ=WEEKLY;BYDAY=SU",
+      "price_info": "IDR 150,000 presale / IDR 180,000–200,000 at the door",
+      "external_ticket_url": "https://megatix.co.id/events/sunday-bhakti-kirtan-with-akari1",
+      "source_url": "https://megatix.co.id/events/sunday-bhakti-kirtan-with-akari1",
+      "organizer_name": "Akari Tamura",
+      "organizer_instagram": "@akaritamura_bhakti",
+      "cover_image_url": null,
+      "quality_score": 0.7,
+      "content_flags": [],
+      "intent_tags": ["spirit", "community"],
+      "archetype_tags": ["seeker", "connector"],
+      "vibe_tags": ["kirtan-mantra", "cacao-ceremony"]
+    }
+  ]
+}
