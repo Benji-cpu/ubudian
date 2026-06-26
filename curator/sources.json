@@ -29,7 +29,7 @@
       "themes": [
         "tantra"
       ],
-      "note": "Tantra intensives and embodied workshops. Their site sometimes hides dates inside booking flows — follow through if needed. No indexed web presence found for June/July 2026 — check Instagram before assuming no events."
+      "note": "Tantra intensives and embodied workshops. Their site sometimes hides dates inside booking flows — follow through if needed. No indexed web presence found for June/July 2026 — check Instagram before assuming no events. DNS failure (ENOTFOUND) confirmed Jun 27 2026 — domain does not resolve; reach only via Instagram (@thesanctuaryubud)."
     },
     {
       "name": "Blossom Space Ubud",
@@ -39,7 +39,7 @@
         "tantra",
         "dance"
       ],
-      "note": "Tantra, conscious sexuality, embodied dance. New venue, growing programme. Note: no indexed web presence found as of May 2026 — may be operating primarily via Instagram/WhatsApp. Verify the venue name spelling before each run."
+      "note": "Tantra, conscious sexuality, embodied dance. New venue, growing programme. Note: no indexed web presence found as of May 2026 — may be operating primarily via Instagram/WhatsApp. Verify the venue name spelling before each run. DNS failure (ENOTFOUND) confirmed Jun 27 2026 — domain does not resolve; reach only via Instagram (@blossom.ubud)."
     },
     {
       "name": "Pyramids of Chi",
@@ -145,7 +145,7 @@
         "ceremony",
         "sound"
       ],
-      "note": "Plant-based restaurant + event studio, Jl. Sukma Kesuma No. 2, Peliatan, Ubud. Founded by Sayuri Tanaka (49K IG @sayuri_healing_food, BaliSpirit Festival presenter). Hosts multiple Sunday kirtan series: (1) Vasudev Sunday Bhakti Kirtan (18:00, by donation — walk-in, in DB); (2) Diana Beauty 'Kirtan & Cacao with Diana Beauty & Friends' (18:00–20:00, ticketed IDR 150k/200k, slug `kirtanwithDiana`, ingested 2026-06-23); (3) Jeremy Sol's `sundaykirtanspecial` (ticketed IDR 200k/250k, date TBC July — likely Jul 27). Events page 403-blocked — use IG (@sayuri_healing_food) or WebSearch for specific dates. Promoted from discovered_pending 2026-06-21 (3 qualifying logs: May 28, Jun 18, Jun 21)."
+      "note": "Plant-based restaurant + event studio, Jl. Sukma Kesuma No. 2, Peliatan, Ubud. Founded by Sayuri Tanaka (49K IG @sayuri_healing_food, BaliSpirit Festival presenter). Hosts multiple Sunday kirtan series: (1) Vasudev Sunday Bhakti Kirtan (18:00, by donation — walk-in, in DB); (2) Diana Beauty 'Kirtan & Cacao with Diana Beauty & Friends' (18:00–20:00, ticketed IDR 150k/200k, slug `kirtanwithDiana`, ingested 2026-06-23); (3) Akari Tamura 'Sunday Bhakti Kirtan' (18:00, ticketed IDR 150k presale/180k–200k door, slug `sunday-bhakti-kirtan-with-akari1`, ingested 2026-06-26); (4) Jeremy Sol's `sundaykirtanspecial` (ticketed IDR 200k/250k, date TBC July — likely Jul 27). Events page 403-blocked — use IG (@sayuri_healing_food) or WebSearch for specific dates. Promoted from discovered_pending 2026-06-21 (3 qualifying logs: May 28, Jun 18, Jun 21)."
     }
   ],
   "discovery_sources": [
@@ -790,7 +790,7 @@
         "Ceremonial Breathwork (weekly Fri 2-4pm, IDR 225k) — AYMC Ubud",
         "Ceremonial Breathwork 2-Day Immersion — Dragonfly Village Ubud (confirmed Jul 27-28 2025; 2026 edition expected)"
       ],
-      "note": "Ceremonial breathwork facilitator, 30+ years experience. WhaleDreaming practitioner. Holds weekly Friday sessions at AYMC Ubud and an annual 2-day WhaleDreaming immersion at Dragonfly Village (Jul 27-28, 2025 slug 'ceremonial-breathwork-immersion' confirmed past; 2026 slug expected in early July). Website: heartofbreath.life. Megatix slugs: 'ceremonial-breathwork-with-kim-kindersley-at-dragonfly-village' (standing), 'ceremonial-breathwork-immersion' (2025 past). When 2026 Dragonfly slug appears, it would score ~8 — immediate inbox."
+      "note": "Ceremonial breathwork facilitator, 30+ years experience. WhaleDreaming practitioner. Holds weekly Friday sessions at AYMC Ubud and an annual 2-day WhaleDreaming immersion at Dragonfly Village (Jul 27-28, 2025 slug 'ceremonial-breathwork-immersion' confirmed past; 2026 slug expected in early July). Website: heartofbreath.life. Megatix slugs: 'ceremonial-breathwork-with-kim-kindersley-at-dragonfly-village' (standing — confirmed active in search results Jun 27 2026, date TBC; watch Jul 1-10; immediate inbox when date confirmed, ~score 8), 'ceremonial-breathwork-immersion' (2025 past — stale, do not re-investigate)."
     },
     {
       "name": "Akari Tamura (Anandamoyi Dasi)",
@@ -870,7 +870,7 @@
         "dance",
         "ceremony"
       ],
-      "note": "Recurring 'every second Saturday' series at Dragon Tea Temple (Jl. Penestanan No.8, Sayan, Ubud). Format: 5:30pm doors → tea ceremony with live DJ (6pm) → bonfire jam (9:30pm). DJ Aleceo has Cafe De Anatolia / Kosa / Pipe & Pochet credentials — world/ethnic electronic, not generic club EDM. Described as 'free-flow tea ceremony mixed with groovy electronic music, dance party in the garden.' Strong venue (priority_b), biweekly recurring. At 2 qualifying logs (Jun 13 + Jun 17) — ingested Jun 27 edition today; needs 1 more qualifying log to promote to priority_b. Next occurrence: Sat Jul 11 (biweekly from Jun 27). Check Megatix slug for confirmed Jul 11 date in the Jul 3–9 window."
+      "note": "Recurring 'every second Saturday' series at Dragon Tea Temple (Jl. Penestanan No.8, Sayan, Ubud). Format: 5:30pm doors → tea ceremony with live DJ (6pm) → bonfire jam (9:30pm). DJ Aleceo has Cafe De Anatolia / Kosa / Pipe & Pochet credentials — world/ethnic electronic, not generic club EDM. Described as 'free-flow tea ceremony mixed with groovy electronic music, dance party in the garden.' Strong venue (priority_b), biweekly recurring. At 3 qualifying logs (Jun 13, Jun 17, Jun 27) — eligible for priority_b promotion Jun 28 (Sunday maintenance). Next occurrence: Sat Jul 11 (biweekly from Jun 27). Watch Megatix Jul 3-9 for confirmed slug/date. Evergreen slug: `shambala-at-dragon-tea-temple-with-aleceo`."
     },
     {
       "name": "Onanya Nicho (Rey Rao)",
