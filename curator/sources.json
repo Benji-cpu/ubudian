@@ -115,7 +115,7 @@
         "dance",
         "sound"
       ],
-      "note": "Jl. Penestanan No.8, Sayan, Ubud. Candlelit ceremonial garden. Monthly New Moon Kirtan & Sacred Tea + Full Moon Kirtan (Bhakti Bliss Bali / Jeremy Sol) — format: kirtan + sacred tea + ecstatic dance by fire + cosmic sound healing. Also hosts Kintsugi (Tuluvi Arts) and annual MAGDALENA ceremony (Jul 22). Tickets via Megatix. Promoted from discovered_pending 2026-05-24 (3 qualifying logs: May 20, May 21, May 24). Linktree: linktr.ee/dragonteatemple."
+      "note": "Jl. Penestanan No.8, Sayan, Ubud. Candlelit ceremonial garden. Monthly New Moon Kirtan & Sacred Tea + Full Moon Kirtan (Bhakti Bliss Bali / Jeremy Sol) — format: kirtan + sacred tea + ecstatic dance by fire + cosmic sound healing. Also hosts Kintsugi (Tuluvi Arts), annual MAGDALENA ceremony (Jul 22), Onanya Nicho icaros ceremonies, bi-weekly Wednesday Kirtan: Songs of Love (Akari Tamura), and bi-weekly Saturday Shambala tea ceremony + dance (DJ Aleceo — every 2nd Sat from Jun 27; next = Jul 11; Megatix slug `shambala-at-dragon-tea-temple-with-aleceo`, confirmed recurring after 3 qualifying logs Jun 13/17/27). Tickets via Megatix. Promoted from discovered_pending 2026-05-24 (3 qualifying logs: May 20, May 21, May 24). Linktree: linktr.ee/dragonteatemple."
     },
     {
       "name": "Heart Space Bali",
@@ -145,7 +145,18 @@
         "ceremony",
         "sound"
       ],
-      "note": "Plant-based restaurant + event studio, Jl. Sukma Kesuma No. 2, Peliatan, Ubud. Founded by Sayuri Tanaka (49K IG @sayuri_healing_food, BaliSpirit Festival presenter). Hosts multiple Sunday kirtan series: (1) Vasudev Sunday Bhakti Kirtan (18:00, by donation — walk-in, in DB); (2) Diana Beauty 'Kirtan & Cacao with Diana Beauty & Friends' (18:00–20:00, ticketed IDR 150k/200k, slug `kirtanwithDiana`, ingested 2026-06-23); (3) Akari Tamura 'Sunday Bhakti Kirtan' (18:00, ticketed IDR 150k presale/180k–200k door, slug `sunday-bhakti-kirtan-with-akari1`, ingested 2026-06-26); (4) Jeremy Sol's `sundaykirtanspecial` (ticketed IDR 200k/250k, date TBC July — likely Jul 27). Events page 403-blocked — use IG (@sayuri_healing_food) or WebSearch for specific dates. Promoted from discovered_pending 2026-06-21 (3 qualifying logs: May 28, Jun 18, Jun 21)."
+      "note": "Plant-based restaurant + event studio, Jl. Sukma Kesuma No. 2, Peliatan, Ubud. Founded by Sayuri Tanaka (49K IG @sayuri_healing_food, BaliSpirit Festival presenter). Hosts multiple Sunday kirtan series: (1) Vasudev Sunday Bhakti Kirtan (18:00, by donation — walk-in, in DB); (2) Diana Beauty 'Kirtan & Cacao with Diana Beauty & Friends' (18:00–20:00, ticketed IDR 150k/200k, slug `kirtanwithDiana`, ingested 2026-06-23); (3) Akari Tamura 'Sunday Bhakti Kirtan' (18:00, ticketed IDR 150k presale/180k–200k door, slug `sunday-bhakti-kirtan-with-akari1`, ingested 2026-06-26); (4) Jeremy Sol's `sundaykirtanspecial` (ticketed IDR 200k/250k, date TBC July — Jul 27=Monday so July Sundays are Jul 5/12/19/26). Events page 403-blocked — use IG (@sayuri_healing_food) or WebSearch for specific dates. Promoted from discovered_pending 2026-06-21 (3 qualifying logs: May 28, Jun 18, Jun 21)."
+    },
+    {
+      "name": "School of Unified Healing",
+      "url": "https://megatix.co.id/events/new-moon-bhakti-kirtan-june",
+      "type": "website",
+      "themes": [
+        "ceremony",
+        "sound",
+        "dance"
+      ],
+      "note": "Confirmed venue: Jl. Subak Sok Wayah, Ubud, Kec. Tegallalang, Bali 80571. Hosts lunar-aligned ceremonies led by Steven Light & Valentina: (1) New Moon Bhakti Kirtan (format: Bhakti Kirtan 5:30pm → dinner buffet 7pm → fire circle 8pm → close 9:30pm, IDR 220k presale / IDR 320k door) — Jul 6 in DB; (2) Full Moon Ceremony — West African Tribal Dance (djembe/kora/kalimba + ceremony, Jul 29 in DB). Promoted from discovered_pending 2026-06-28 (3 qualifying logs: Jun 04, Jun 22, Jun 27). Watch for August new moon (~Aug 18, nearest Sat = Aug 15 or 22) and full moon (~Aug 27, nearest Sat = Aug 22 or 29) slugs from Jul 2026 onwards."
     }
   ],
   "discovery_sources": [
@@ -323,16 +334,6 @@
         "tantra"
       ],
       "note": "Penestanan, Ubud (above Karma House Chai and Tattoo). Weekly Saturday Tantra Essence couples workshop ('Essence of Love') in Ananda Sarita lineage. 500k IDR/couple. Ticket Tailor: tickettailor.com/events/barastudio/1755020. At 2 qualifying logs (May 25 + Jun 15) — needs 1 more to promote to priority_b. Note: Bara Studio also hosts non-tantra Bachata workshops — filter those out. IG handle confirmed: @barabalistudio (sources.json instagram_handles corrected Jun 15)."
-    },
-    {
-      "name": "School of Unified Healing",
-      "url": "https://megatix.co.id/events/new-moon-bhakti-kirtan-june",
-      "first_seen": "2026-05-21",
-      "themes": [
-        "ceremony",
-        "sound"
-      ],
-      "note": "Confirmed venue: Jl. Subak Sok Wayah, Ubud, Kec. Tegallalang, Bali 80571 (confirmed 2026-06-04). Format: Bhakti Kirtan 5:30pm → dinner buffet 7pm (organic/local) → fire circle 8pm → close 9:30pm. IDR 220k presale / IDR 320k door. Two editions confirmed in DB: Jul 6 (New Moon Bhakti Kirtan, in DB) + Jul 29 (Full Moon Ceremony — West African Tribal Dance, ingested 2026-06-22). Slug `full-moon-ceremony-july` confirmed (West African tribal dance/djembe/kora/kalimba + ceremony). At 3 qualifying logs — promotion to priority_b eligible Jun 28 (Sunday maintenance only)."
     },
     {
       "name": "Akasha New Earth Haven",
@@ -697,7 +698,7 @@
       "events_seen": [
         "New Moon Cacao Ceremony & Ecstatic Dance — Jl. Penestanan Kelod, Ubud (Jun 12)"
       ],
-      "note": "Ubud-based cacao ceremonialist, ecstatic dance DJ, and certified Shamanic Astrologer. Offering cacao ceremonies and ecstatic dance since 2011; based in Bali since 2013. Former breakdancer and hip-hop dance instructor from Oregon. Yoga Barn collaborator. Runs monthly new moon cacao + ecstatic dance events. Megatix: megatix.co.id/events/new-moon-cacao-ceremony-ecstatic-dance. No personal IG found."
+      "note": "Ubud-based cacao ceremonialist, ecstatic dance DJ, and certified Shamanic Astrologer. Offering cacao ceremonies and ecstatic dance since 2011; based in Bali since 2013. Former breakdancer and hip-hop dance instructor from Oregon. Yoga Barn collaborator. Runs monthly new moon cacao + ecstatic dance events. ACTIVE SLUG (discovered 2026-06-28): megatix.co.id/events/cacao-ceremony-elemental-ecstatic-dance-with-levi-banner-3 (Yoga Barn; -3 suffix = 3rd iteration of current series). STALE/CLOSED: megatix.co.id/events/new-moon-cacao-ceremony-ecstatic-dance (2021, permanent). No personal IG found. No confirmed July 2026 date yet — watch Jul 1-10 for new moon event (~Jul 14-15)."
     },
     {
       "name": "Juan (AYNI Ceremonies)",
@@ -870,7 +871,7 @@
         "dance",
         "ceremony"
       ],
-      "note": "Recurring 'every second Saturday' series at Dragon Tea Temple (Jl. Penestanan No.8, Sayan, Ubud). Format: 5:30pm doors → tea ceremony with live DJ (6pm) → bonfire jam (9:30pm). DJ Aleceo has Cafe De Anatolia / Kosa / Pipe & Pochet credentials — world/ethnic electronic, not generic club EDM. Described as 'free-flow tea ceremony mixed with groovy electronic music, dance party in the garden.' Strong venue (priority_b), biweekly recurring. At 3 qualifying logs (Jun 13, Jun 17, Jun 27) — eligible for priority_b promotion Jun 28 (Sunday maintenance). Next occurrence: Sat Jul 11 (biweekly from Jun 27). Watch Megatix Jul 3-9 for confirmed slug/date. Evergreen slug: `shambala-at-dragon-tea-temple-with-aleceo`."
+      "note": "✅ CONFIRMED RECURRING (promoted Jun 28 Sunday maintenance). Biweekly Saturday series at Dragon Tea Temple (Jl. Penestanan No.8, Sayan, Ubud). Format: 5:30pm doors → tea ceremony with live DJ (6pm) → bonfire jam (9:30pm). DJ Aleceo: Cafe De Anatolia / Kosa / Pipe & Pochet credentials — world/ethnic electronic. 3 qualifying logs: Jun 13, Jun 17, Jun 27. DTT already in priority_b; Shambala added to DTT note in priority_b. Evergreen slug: `shambala-at-dragon-tea-temple-with-aleceo`. Next occurrence: Sat Jul 11. Watch Megatix Jul 3-9 for Jul 11 slug/date confirmation."
     },
     {
       "name": "Onanya Nicho (Rey Rao)",
