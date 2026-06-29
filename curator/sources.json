@@ -415,6 +415,16 @@
         "ceremony"
       ],
       "note": "Jungle sanctuary on the outskirts of Ubud. Hosted NON-DUAL (Awakened Dreamers × Dance Through Dimensions) — sacred electronic temple format: cacao ceremony + community flow + DJ sets in a 360-degree sound system dome. Megatix slug: megatix.co.id/events/non-dual (live but no confirmed 2026 date yet). Track for confirmed upcoming dates; if date surfaces for NON-DUAL or another event here, would score ~7."
+    },
+    {
+      "name": "Ecstatic Heaven at Dragon Tea Temple",
+      "url": "https://megatix.co.id/events/ecstatic-heaven",
+      "first_seen": "2026-06-30",
+      "themes": [
+        "dance",
+        "ceremony"
+      ],
+      "note": "Ecstatic ceremony night series at Dragon Tea Temple (Jl. Penestanan No.8, Sayan, Ubud). Facilitators: Edu (ecstatic dance), Dany Rud (handpan + multi-instrument), Ritual Frequencies (DJ — Burning Man / BaliSpirit circuit). Megatix slug `ecstatic-heaven` confirmed live. Last confirmed occurrence: May 9, 2026 (past). No July 2026 date yet — watch DTT IG and Megatix for announcement. High vibe alignment: ceremonial ecstatic dance format at our strongest priority_b venue. Score would be ~7-8 when date confirmed."
     }
   ],
   "competitor_harvest": [
@@ -920,6 +930,51 @@
         "Dissolve :: Play — Paradiso Ubud (weekly Sat 11:00–13:00, likely in DB via ToDo.Today pipeline)"
       ],
       "note": "Contact Improvisation and ecstatic dance facilitator, Bali-based, CI practice since 2015. Leads two distinct series at Paradiso Ubud: Dissolve :: Eros (Tue 6–8pm, contact to ecstatic dance, ingested Jun 22) and Dissolve :: Play (Sat 11am–1pm, Megatix: `dissolve-play`). Dissolve :: Play likely already in DB via ToDo.Today pipeline (theubudian.com/event/dissolve-play/2030-03-23/ URL found — 2030 placeholder = scraped and ingested). No Instagram handle confirmed yet."
+    },
+    {
+      "name": "Monaxi",
+      "instagram": null,
+      "first_seen": "2026-06-30",
+      "events_seen": [
+        "Beauty Way — The Yoga Barn (special event, lineup includes live tribal/African music)"
+      ],
+      "note": "Portuguese vocalist performing live tribal rhythms and African chants at Yoga Barn special events (confirmed as performer in the `beauty-way-july` 2023 Megatix lineup and presumably future Beauty Way editions). Ceremonial-music specialist. Visiting artist, not Ubud-resident. No Instagram or full name confirmed yet. Watch for Yoga Barn special event announcements featuring Monaxi."
+    },
+    {
+      "name": "Purnama (ceremonial)",
+      "instagram": null,
+      "first_seen": "2026-06-30",
+      "events_seen": [
+        "Beauty Way — The Yoga Barn (cacao ceremony lead)"
+      ],
+      "note": "Balinese-Swiss lineage ceremonialist. Leads cacao ceremony at Yoga Barn special events (confirmed as cacao facilitator in `beauty-way-july` 2023 Megatix lineup and presumably future editions). Format: opens events with ceremonial cacao offering from Ubud Raw Cacao. Distinct from 'PURNAMA Full Moon Dance Ritual' (geo-rejected, Cemagi). No full name or Instagram confirmed yet. Watch for future Yoga Barn special event announcements."
+    },
+    {
+      "name": "Mana Mei",
+      "instagram": null,
+      "first_seen": "2026-06-30",
+      "events_seen": [
+        "Beauty Way — The Yoga Barn (prayerformance dancer)"
+      ],
+      "note": "Dancer and prayerformance artist. Performs at Yoga Barn special events (confirmed as dancer in `beauty-way-july` 2023 lineup). Prayerformance = movement-as-prayer, dance-as-ritual format. No Instagram or full name confirmed. Watch for Yoga Barn special event announcements."
+    },
+    {
+      "name": "Dany Rud",
+      "instagram": null,
+      "first_seen": "2026-06-30",
+      "events_seen": [
+        "Ecstatic Heaven — Dragon Tea Temple (handpan / multi-instrument)"
+      ],
+      "note": "Handpan and multi-instrument musician performing at Dragon Tea Temple. Confirmed as core performer in the Ecstatic Heaven series (Megatix slug `ecstatic-heaven`). No Instagram or full name confirmed yet. Track for DTT event announcements."
+    },
+    {
+      "name": "Ritual Frequencies",
+      "instagram": null,
+      "first_seen": "2026-06-30",
+      "events_seen": [
+        "Ecstatic Heaven — Dragon Tea Temple (DJ / ecstatic soundscape)"
+      ],
+      "note": "Ecstatic DJ performing at Dragon Tea Temple's Ecstatic Heaven series (Megatix slug `ecstatic-heaven`). Burning Man / BaliSpirit circuit artist. No Instagram or real name confirmed yet. Track for DTT event announcements and other ecstatic dance nights in Ubud."
     }
   ]
 }
