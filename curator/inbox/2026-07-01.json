@@ -1,0 +1,30 @@
+{
+  "date": "2026-07-01",
+  "events": [
+    {
+      "title": "Shambala at Dragon Tea Temple with Aleceo",
+      "description": "A biweekly Saturday gathering in Dragon Tea Temple's candlelit garden — DJ Aleceo (Cafe De Anatolia / Kosa / Pipe & Pochet circuit) weaves world and ethnic electronic music through a ceremonial arc. Doors at 5:30pm, free-flow tea ceremony begins at 6pm, the set builds into a bonfire jam from 9:30pm. Alcohol-free, barefoot, collective. Aleceo is one of Ubud's most trusted conscious-electronic selectors.",
+      "short_description": "Biweekly Saturday ritual gathering at Dragon Tea Temple — tea ceremony, DJ Aleceo, bonfire into the night.",
+      "category": "Dance & Movement",
+      "venue_name": "Dragon Tea Temple",
+      "venue_address": "Jl. Penestanan No.8, Sayan, Ubud, Bali",
+      "start_date": "2026-07-11",
+      "end_date": null,
+      "start_time": "17:30",
+      "end_time": null,
+      "is_recurring": true,
+      "recurrence_rule": "FREQ=WEEKLY;INTERVAL=2;BYDAY=SA",
+      "price_info": "IDR 200,000 early bird / IDR 250,000 presale / IDR 300,000 door",
+      "external_ticket_url": "https://megatix.co.id/events/shambala-at-dragon-tea-temple-with-aleceo",
+      "source_url": "https://megatix.co.id/events/shambala-at-dragon-tea-temple-with-aleceo",
+      "organizer_name": "DJ Aleceo",
+      "organizer_instagram": null,
+      "cover_image_url": null,
+      "quality_score": 0.8,
+      "content_flags": [],
+      "intent_tags": ["community", "spirit"],
+      "archetype_tags": ["explorer", "connector", "creative"],
+      "vibe_tags": ["live-music", "conscious-movement"]
+    }
+  ]
+}
