@@ -425,6 +425,26 @@
         "ceremony"
       ],
       "note": "Ecstatic ceremony night series at Dragon Tea Temple (Jl. Penestanan No.8, Sayan, Ubud). Facilitators: Edu (ecstatic dance), Dany Rud (handpan + multi-instrument), Ritual Frequencies (DJ — Burning Man / BaliSpirit circuit). Megatix slug `ecstatic-heaven` confirmed live. Last confirmed occurrence: May 9, 2026 (past). No July 2026 date yet — watch DTT IG and Megatix for announcement. High vibe alignment: ceremonial ecstatic dance format at our strongest priority_b venue. Score would be ~7-8 when date confirmed."
+    },
+    {
+      "name": "THE ANTIDOTE by Amenti (Paradiso Ubud)",
+      "megatix_slug": "https://megatix.co.id/events/antidote",
+      "note": "Conscious movement / dark ecstatic dance. DJ Gil Gomes Leal (@gilthegrid, 348K IG) + Amenti collective. Wed 6-9pm at Paradiso. Mar 11 2026 = 2nd edition confirmed (350k IDR). \"THE ANTIDOTE IS BACK\" FB post announced next special edition — date not confirmed. Score ~8.5 when confirmed. Watch @paradisoubud IG + Megatix slug antidote."
+    },
+    {
+      "name": "Resonanz X Temple Step at Paradiso (ecstatic-dance-x-temple-step)",
+      "megatix_slug": "https://megatix.co.id/events/ecstatic-dance-x-temple-step",
+      "note": "Special edition of the Thursday Resonanz ecstatic dance series at Paradiso Ubud. Guest: Temple Step = Benjamin Last (Melbourne, 20+ years, BaliSpirit/Beloved/Earth Frequency/Rainbow Serpent circuit, former Yoga Barn resident). Tribal Ethnic Electronic. Active on Megatix .co.id and .com.au. Date unconfirmed. Score ~8.25 when confirmed."
+    },
+    {
+      "name": "Temple Step Project Live at Akasha",
+      "megatix_slug": "https://megatix.co.id/events/templestep",
+      "note": "Separate event from Resonanz X Temple Step. Villa Akasha Ubud. Afternoon workshops + sound bath + DJ/live set by Temple Step (Benjamin Last). Active Megatix slug, date unconfirmed. Score ~7.75 when confirmed. May occur same Ubud visit as Resonanz X Temple Step."
+    },
+    {
+      "name": "Jeremy Sol Full Moon Kirtan at Yoga Barn (monthly)",
+      "url": "https://theyogabarn.com/event/fullmoon-kirtan-celebration/",
+      "note": "Monthly Full Moon Kirtan Celebration at Yoga Barn led by Jeremy Sol (Bhakti Bliss Bali, @bhaktiblissbali). Distinct from his AYMC events and his DTT events. Next full moon Jul 29 2026 (Wed). July edition may not fall on an ideal night (Wed). Watch Yoga Barn events page Jul 10-25 for confirmation."
     }
   ],
   "competitor_harvest": [
@@ -975,6 +995,14 @@
         "Ecstatic Heaven — Dragon Tea Temple (DJ / ecstatic soundscape)"
       ],
       "note": "Ecstatic DJ performing at Dragon Tea Temple's Ecstatic Heaven series (Megatix slug `ecstatic-heaven`). Burning Man / BaliSpirit circuit artist. No Instagram or real name confirmed yet. Track for DTT event announcements and other ecstatic dance nights in Ubud."
+    },
+    {
+      "name": "Temple Step (Benjamin Last)",
+      "note": "Australian DJ/producer, 20+ years. Former Yoga Barn Ubud resident. BaliSpirit, Beloved, Earth Frequency, Rainbow Serpent circuit. Tribal Ethnic Electronic. Psych-acoustic conscious DJ. Instagram unknown — search @templestep. Two Ubud events in play: Resonanz X Temple Step (Paradiso Thu) + Temple Step Project Live at Akasha (Villa Akasha)."
+    },
+    {
+      "name": "Gil Gomes Leal (Amenti)",
+      "note": "Founder of Amenti (MOVEMEANT & THEATRE), psyche-somatic movement school. Instagram @gilthegrid (348K followers). Also @amenti.world. Runs THE ANTIDOTE at Paradiso Ubud — dark ecstatic dance, somatic movement, Jungian psychology, embodied self-expression. Wed 6-9pm format."
     }
   ]
 }
