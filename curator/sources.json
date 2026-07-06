@@ -314,7 +314,7 @@
       "themes": [
         "dance"
       ],
-      "note": "User-reported (Mieka + Celina, 2026-06-01): informal contact-improv jams run at Nuanu on days Moksa Dojo / Paradiso aren't on. No fixed public schedule — announced in the Ubud CI Telegram (see competitor_harvest). Track for a concrete recurring slot once that Telegram scout is joined. Distinct from 'ASH at Nuanu', which we already track separately."
+      "note": "GEO-REJECT (confirmed 2026-07-07): Nuanu Creative City is in Tabanan, near Canggu — ~30-45 min west of Ubud, not greater-Ubud. All Nuanu events are permanent geo-rejects. The CI jams here (user-reported by Mieka + Celina) are out of our catchment. CI jams at Paradiso, Moksa Dojo, or other Ubud-proper venues remain valid — source is the Ubud CI Telegram, not Nuanu specifically."
     },
     {
       "name": "Azadi Retreat",
@@ -374,7 +374,7 @@
         "dance",
         "sound"
       ],
-      "note": "Performance / ritual space inside Nuanu Creative City (just south of Ubud). Hosted Mariama Del Mar's Five Temples of Her live ritual-dance performance (May 27). Surfaced via Blissbase competitor-harvest. Format leans concert/performance rather than participatory circle — verify each booking. At 1 qualifying log; needs 2 more."
+      "note": "GEO-REJECT (confirmed 2026-07-07): Nuanu Creative City is in Tabanan regency, near Canggu/Tanah Lot on the west coast of Bali — ~30-45 min drive west of Ubud. It is NOT 'just south of Ubud' (that was a prior geo error). Nuanu is explicitly excluded from greater-Ubud in the playbook alongside Denpasar, Sanur, and Canggu. All ASH at Nuanu events are permanent geo-rejects. Do not qualify or promote. Hosted Mariama Del Mar's Five Temples of Her (May 27, 2026) — that event would also be a geo-reject if re-submitted."
     },
     {
       "name": "La Portal to Shamballah",
@@ -415,6 +415,16 @@
         "ceremony"
       ],
       "note": "Jungle sanctuary on the outskirts of Ubud. Hosted NON-DUAL (Awakened Dreamers × Dance Through Dimensions) — sacred electronic temple format: cacao ceremony + community flow + DJ sets in a 360-degree sound system dome. Megatix slug: megatix.co.id/events/non-dual (live but no confirmed 2026 date yet). Track for confirmed upcoming dates; if date surfaces for NON-DUAL or another event here, would score ~7."
+    },
+    {
+      "name": "The Bali Eden (GDAS Wellness Resort)",
+      "url": "https://gdas.co/the-bali-eden",
+      "first_seen": "2026-07-07",
+      "themes": [
+        "dance",
+        "ceremony"
+      ],
+      "note": "Jl. Cempaka, Banjar Kumbuh, Mas village, Kecamatan Ubud — confirmed within greater Ubud geo zone (~5 min south of central Ubud, Mas village). Hosting the Supermoon brand (supermoonbali.com) for 'Supermoon ~ A Wellness Celebration' on Aug 10, 2026 (ecstatic dance DJs Hoda Fadel + Paracetamol LIVE, yoga nidra, breathwork, art workshop). Megatix slug: supermoon-a-wellness-celebration. Aug 10 event scored below threshold in Jul 4 log (5.75 — facilitator avg ~5, commercial setting). Track for future non-hotel conscious programming announcements here. First seen via competitor harvest (general Megatix search)."
     },
     {
       "name": "Ecstatic Heaven at Dragon Tea Temple",
@@ -981,6 +991,15 @@
         "Beauty Way — The Yoga Barn (prayerformance dancer)"
       ],
       "note": "Dancer and prayerformance artist. Performs at Yoga Barn special events (confirmed as dancer in `beauty-way-july` 2023 lineup). Prayerformance = movement-as-prayer, dance-as-ritual format. No Instagram or full name confirmed. Watch for Yoga Barn special event announcements."
+    },
+    {
+      "name": "Vesper Collective",
+      "instagram": null,
+      "first_seen": "2026-07-07",
+      "events_seen": [
+        "Mystic Moon — The Yoga Barn (recurring format, Megatix slug: vesper-collective)"
+      ],
+      "note": "Ceremonial live-hybrid ensemble performing at Yoga Barn's Mystic Moon format. Members: Pao Pamaki (vocals), Brian Canatsey (violin), Alex Acharya (beats), Dmitry Soul, Andrew Axenov. Active Megatix slug: megatix.co.id/events/vesper-collective. Surfaced via competitor harvest Jul 7. No confirmed upcoming date. Format is ceremonial live music — distinct from kirtan, closer to ambient/devotional concert. Track for Megatix slug updates and @yogabarnbali IG announcements."
     },
     {
       "name": "Dany Rud",
