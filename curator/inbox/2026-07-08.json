@@ -1,0 +1,31 @@
+{
+  "date": "2026-07-08",
+  "events": [
+    {
+      "title": "COCA Creative Complex Opening — Titik Dua",
+      "description": "Titik Dua boutique hotel unveils the COCA Creative Complex on 16 July 2026: four spaces launching simultaneously — Coca Artspace (rotating gallery in dialogue with contemporary Indonesian voices, curated by Non Frasa), Coca Selekta (Ubud's first dedicated vinyl listening bar), Coca Theater (home to Ubud: Cinecurious — indoor screenings, masterclasses, and film culture panels launched in partnership with international film figure John Badalu), and Coca Dining. A new multi-format cultural anchor for the upper Sanggingan creative corridor.",
+      "short_description": "Titik Dua unveils four new cultural spaces on July 16: gallery (Non Frasa), vinyl listening bar, film theatre (John Badalu), and dining.",
+      "category": "Art & Culture",
+      "event_tier": "discovery",
+      "venue_name": "Titik Dua / COCA Creative Complex",
+      "venue_address": "Jl. Raya Sanggingan, Kedewatan, Ubud",
+      "start_date": "2026-07-16",
+      "end_date": null,
+      "start_time": null,
+      "end_time": null,
+      "is_recurring": false,
+      "recurrence_rule": null,
+      "price_info": null,
+      "external_ticket_url": null,
+      "source_url": null,
+      "organizer_name": "Titik Dua",
+      "organizer_instagram": "titikduaubud",
+      "cover_image_url": null,
+      "quality_score": 0.78,
+      "content_flags": [],
+      "intent_tags": ["local_culture", "community"],
+      "archetype_tags": ["creative", "explorer"],
+      "vibe_tags": ["art-exhibition", "live-music"]
+    }
+  ]
+}

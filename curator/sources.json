@@ -409,12 +409,13 @@
     {
       "name": "Naya Veda Vastu",
       "url": null,
+      "megatix_slug": "https://megatix.co.id/events/non-dual",
       "first_seen": "2026-06-20",
       "themes": [
         "dance",
         "ceremony"
       ],
-      "note": "Jungle sanctuary on the outskirts of Ubud. Hosted NON-DUAL (Awakened Dreamers × Dance Through Dimensions) — sacred electronic temple format: cacao ceremony + community flow + DJ sets in a 360-degree sound system dome. Megatix slug: megatix.co.id/events/non-dual (live but no confirmed 2026 date yet). Track for confirmed upcoming dates; if date surfaces for NON-DUAL or another event here, would score ~7."
+      "note": "Jl. Raya Sayan, Desa Sayan, Ubud 80571 — geo-confirmed within greater-Ubud zone (Sayan/Kedewatan corridor, 2026-07-08). Also known as Dance Through Dimensions (DTD-Naya). Jungle sanctuary format: 360-degree sound system dome. Hosted NON-DUAL (Awakened Dreamers × Dance Through Dimensions) — sacred electronic temple format: cacao ceremony + community flow + DJ sets. Megatix slug: non-dual (live but no confirmed 2026 date yet). Track for confirmed upcoming dates; if date surfaces for NON-DUAL or another event here, would score ~7."
     },
     {
       "name": "The Bali Eden (GDAS Wellness Resort)",
@@ -459,6 +460,15 @@
     {
       "name": "Bunyi Bumi — The Sounds of Earth (Jul 18, Zest Garden Temple)",
       "note": "Acoustic world-music immersive event at Zest Garden Temple (Zest Ubud, Jl. Penestanan No.7, Sayan) — organic instruments (seeds, bamboo, wood, steel, clay). Organizer: Dragon Tea Temple (next door at No.8). Megatix slug: bunyi-bumi-the-sounds-of-earth-jul2026. Sat Jul 18, 2026. No named performers in any indexed source — score drops to 5.75 (below threshold). DEFER: if performer names surface on @dragon.tea.temple IG before Jul 18, re-evaluate — format and venue both pass, only facilitator axis fails. Score would jump to ~7 with named performers."
+    },
+    {
+      "name": "!GASM (explosive ecstatic dance)",
+      "megatix_slug": "https://megatix.com.au/events/explosive-ecstatic-dance",
+      "first_seen": "2026-07-08",
+      "themes": [
+        "dance"
+      ],
+      "note": "First seen 2026-07-08 via Megatix WebSearch snippet. Facilitators: Steven J Todd, Aim Hannah, Arthur. Format: 'explosive ecstatic dance'. Venue unconfirmed — WebSearch snippet did not surface a Ubud-specific location. Megatix .com.au slug (Australia-origin platform) suggests facilitators may be AU-based visiting Bali. Score pending geo + facilitator verification. If confirmed at a known Ubud venue, score ~7."
     }
   ],
   "competitor_harvest": [
