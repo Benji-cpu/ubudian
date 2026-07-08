@@ -1,0 +1,31 @@
+{
+  "date": "2026-07-09",
+  "events": [
+    {
+      "title": "Ecstantric Dance",
+      "description": "A curated evening at the intersection of tantra and ecstatic dance. Katya Reihan opens with somatic tantra practice — inviting participants into breath, body, and relational presence — before DJ Goldie (Sean Goldberg) takes the arc into high-energy ecstatic dance. The progression from intimate somatic ground into full-body movement creates a rare bridge between two traditions that rarely share the same floor. Ubud-based facilitators, Lodtunduh area venue. Ticket holders receive address details. Drop-in welcome.",
+      "short_description": "Katya Reihan leads somatic tantra practice before DJ Goldie takes the arc into ecstatic dance — two traditions, one curated evening.",
+      "category": "Tantra & Intimacy",
+      "event_tier": null,
+      "venue_name": "Private venue — Lodtunduh, Ubud",
+      "venue_address": "Lodtunduh area, Ubud (address shared with ticket holders)",
+      "start_date": "2026-09-07",
+      "end_date": null,
+      "start_time": null,
+      "end_time": null,
+      "is_recurring": false,
+      "recurrence_rule": null,
+      "price_info": null,
+      "external_ticket_url": "https://megatix.co.id/events/ecstantric-dance",
+      "source_url": "https://megatix.co.id/events/ecstantric-dance",
+      "organizer_name": "Ecstantric Dance — Katya Reihan & DJ Goldie",
+      "organizer_instagram": "ecstantric_dance",
+      "cover_image_url": null,
+      "quality_score": 0.65,
+      "content_flags": [],
+      "intent_tags": ["romance", "community"],
+      "archetype_tags": ["seeker", "explorer"],
+      "vibe_tags": ["tantra", "ecstatic-dance"]
+    }
+  ]
+}
