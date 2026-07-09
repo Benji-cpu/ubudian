@@ -26,6 +26,32 @@
       "intent_tags": ["romance", "community"],
       "archetype_tags": ["seeker", "explorer"],
       "vibe_tags": ["tantra", "ecstatic-dance"]
+    },
+    {
+      "title": "Kirtan with Diana Beauty at Dragon Tea Temple",
+      "description": "Diana Beauty brings her bhakti voice to Dragon Tea Temple for an evening of devotional kirtan — harmonium, guitar, mridanga, and karatals woven through the candlelit garden setting. Sacred chants, call-and-response singing, and mantra to reconnect to compassion, courage, and love. No singing experience required. One of Ubud's warmest kirtan facilitators steps into one of its most atmospheric ceremonial spaces.",
+      "short_description": "Diana Beauty leads devotional kirtan at Dragon Tea Temple — harmonium, mridanga, and community chanting by firelight.",
+      "category": "Ceremony & Sound",
+      "event_tier": null,
+      "venue_name": "Dragon Tea Temple",
+      "venue_address": "Jl. Penestanan Kelod No.8, Sayan, Ubud",
+      "start_date": "2026-07-16",
+      "end_date": null,
+      "start_time": "19:00",
+      "end_time": null,
+      "is_recurring": false,
+      "recurrence_rule": null,
+      "price_info": "200,000 IDR / 150,000 IDR locals",
+      "external_ticket_url": "https://megatix.co.id/events/kirtan-with-diana-beauty",
+      "source_url": "https://megatix.co.id/events/kirtan-with-diana-beauty",
+      "organizer_name": "Diana Beauty",
+      "organizer_instagram": null,
+      "cover_image_url": null,
+      "quality_score": 0.73,
+      "content_flags": [],
+      "intent_tags": ["spirit", "community"],
+      "archetype_tags": ["seeker", "connector"],
+      "vibe_tags": ["kirtan-mantra", "live-music"]
     }
   ]
 }
