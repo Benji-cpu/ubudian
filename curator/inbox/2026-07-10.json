@@ -1,0 +1,31 @@
+{
+  "date": "2026-07-10",
+  "events": [
+    {
+      "title": "Full Moon Kirtan & Sacred Tea",
+      "description": "Bhakti Bliss Bali's monthly full moon edition at Dragon Tea Temple — the September gathering in their ongoing Kirtan & Sacred Tea series. The evening opens at 5:45 PM with sacred space-setting, moves into BhakTea Kirtan at 6 PM (devotional chanting woven with ceremonial tea), arcs into ecstatic dance by fire at 8 PM, and closes with Cosmic Sound Healing at 9:15 PM. Capacity is capped at 55. Dress: white or colourful. Dance-only entry available from 8 PM.",
+      "short_description": "Bhakti Bliss Bali's monthly full moon gathering at Dragon Tea Temple — kirtan, sacred tea, ecstatic dance by fire, and sound healing under the September moon.",
+      "category": "Ceremony & Sound",
+      "event_tier": null,
+      "venue_name": "Dragon Tea Temple",
+      "venue_address": "Jl. Penestanan No.8, Sayan, Ubud",
+      "start_date": "2026-09-08",
+      "end_date": null,
+      "start_time": "17:45",
+      "end_time": "21:30",
+      "is_recurring": false,
+      "recurrence_rule": null,
+      "price_info": "IDR 300,000 early bird / IDR 350,000 presale / IDR 400,000 door; dance-only from 8 PM: IDR 150,000",
+      "external_ticket_url": "https://megatix.co.id/events/full-moon-kirtan-sacred-tea-sep-8",
+      "source_url": "https://megatix.co.id/events/full-moon-kirtan-sacred-tea-sep-8",
+      "organizer_name": "Bhakti Bliss Bali",
+      "organizer_instagram": "bhaktiblissbali",
+      "cover_image_url": null,
+      "quality_score": 0.7,
+      "content_flags": [],
+      "intent_tags": ["spirit", "community"],
+      "archetype_tags": ["seeker", "connector"],
+      "vibe_tags": ["kirtan-mantra", "ecstatic-dance", "sound-bath"]
+    }
+  ]
+}
