@@ -148,6 +148,17 @@
       "note": "Plant-based restaurant + event studio, Jl. Sukma Kesuma No. 2, Peliatan, Ubud. Founded by Sayuri Tanaka (49K IG @sayuri_healing_food, BaliSpirit Festival presenter). Hosts multiple Sunday kirtan series: (1) Vasudev Sunday Bhakti Kirtan (18:00, by donation — walk-in, in DB); (2) Diana Beauty 'Kirtan & Cacao with Diana Beauty & Friends' (18:00–20:00, ticketed IDR 150k/200k, slug `kirtanwithDiana`, ingested 2026-06-23); (3) Akari Tamura 'Sunday Bhakti Kirtan' (18:00, ticketed IDR 150k presale/180k–200k door, slug `sunday-bhakti-kirtan-with-akari1`, ingested 2026-06-26); (4) Jeremy Sol's `sundaykirtanspecial` (ticketed IDR 200k/250k, date TBC July — Jul 27=Monday so July Sundays are Jul 5/12/19/26). Events page 403-blocked — use IG (@sayuri_healing_food) or WebSearch for specific dates. Promoted from discovered_pending 2026-06-21 (3 qualifying logs: May 28, Jun 18, Jun 21)."
     },
     {
+      "name": "Akasha New Earth Haven",
+      "url": "https://www.newearthhavenbali.com/events",
+      "type": "website",
+      "themes": [
+        "dance",
+        "ceremony",
+        "sound"
+      ],
+      "note": "Eco-dome and bamboo pavilion retreat at Ubud's jungle edge, with organic gardens and natural swimming pool. Weekly Saturday Ecstatic Dance & Cacao Ceremony (6–10 PM) led by Karunika — opens with Vital Cacao Ceremony by fire, flows into ecstatic dance, closes with sound healing. SuperMoon editions add breathwork. On-site vegan restaurant. Fills the Saturday gap in our calendar. Promoted from discovered_pending to priority_b 2026-07-13 (7 qualifying logs: May 24, Jun 3, Jun 12, Jun 24, Jul 8, Jul 10, Jul 12). IG: @akashanewearthbali. Known Megatix slug patterns: SuperMoon edition = `supermoon-conscious-party-purnama-x-villa-akasha` (watch ~Jul 25-26 for full moon Jul 29 edition), New Moon edition = `new-moon-with-karunika` (watch ~2 days before each new moon). ⚠ Note: CELESTIA zodiac series has used this venue for some editions but rotates — never assume Akasha for a CELESTIA event without explicit slug/venue confirmation."
+    },
+    {
       "name": "School of Unified Healing",
       "url": "https://megatix.co.id/events/new-moon-bhakti-kirtan-june",
       "type": "website",
@@ -212,7 +223,7 @@
       "type": "website",
       "tier": "discovery",
       "category_hint": "Art & Culture",
-      "note": "Monkey Forest Rd, Ubud. 4-6 short-run exhibitions/year + vernissages. Opening nights are one-off discovery events (often the only time the artist is present). First-party site posts full curatorial text + dates."
+      "note": "Monkey Forest Rd, Ubud. 4-6 short-run exhibitions/year + vernissages. Opening nights are one-off discovery events (often the only time the artist is present). First-party site posts full curatorial text + dates. 'What Remains in Water' exhibition confirmed closed Jun 19-22, 2026 (past). Next exhibition: watch gallery.komaneka.com from Aug 2026."
     },
     {
       "name": "Titik Dua / W Barwa Gallery",
@@ -239,7 +250,7 @@
       "type": "website",
       "tier": "discovery",
       "category_hint": "Art & Culture",
-      "note": "Pengosekan, Ubud. Museum exhibitions + annual ARMA Fest (Sept). Ingest exhibitions + the festival; SKIP the nightly tourist dance shows (Kecak/Legong as standalone admission) unless a distinct special edition."
+      "note": "Pengosekan, Ubud. Museum exhibitions + annual ARMA Fest (Sept). Ingest exhibitions + the festival; SKIP the nightly tourist dance shows (Kecak/Legong as standalone admission) unless a distinct special edition. ARMA Fest 2025 pattern: Sep 27-28. Begin active watch for 2026 edition from Aug 2026."
     },
     {
       "name": "Gaya Art Space / Gaya Ceramic Arts Centre",
@@ -334,17 +345,6 @@
         "tantra"
       ],
       "note": "Penestanan, Ubud (above Karma House Chai and Tattoo). Weekly Saturday Tantra Essence couples workshop ('Essence of Love') in Ananda Sarita lineage. 500k IDR/couple. Ticket Tailor: tickettailor.com/events/barastudio/1755020. At 2 qualifying logs (May 25 + Jun 15) — needs 1 more to promote to priority_b. Note: Bara Studio also hosts non-tantra Bachata workshops — filter those out. IG handle confirmed: @barabalistudio (sources.json instagram_handles corrected Jun 15)."
-    },
-    {
-      "name": "Akasha New Earth Haven",
-      "url": "https://www.newearthhavenbali.com/events",
-      "first_seen": "2026-05-24",
-      "themes": [
-        "dance",
-        "ceremony",
-        "sound"
-      ],
-      "note": "Eco-dome and bamboo pavilion retreat at Ubud's jungle edge, with organic gardens and natural swimming pool. Weekly Saturday Ecstatic Dance & Cacao Ceremony (6–10 PM) led by Karunika — opens with Vital Cacao Ceremony by fire, flows into ecstatic dance, closes with sound healing. SuperMoon editions add breathwork. On-site vegan restaurant. Fills the Saturday gap in our calendar. Candidate for priority_b after 2 more qualifying logs. IG handle confirmed: @akashanewearthbali (2026-06-24). Known Megatix slug patterns: SuperMoon edition = `supermoon-conscious-party-purnama-x-villa-akasha` (watch Jul 25-26 for full moon Jul 29 edition), New Moon edition = `new-moon-with-karunika` (watch Jul 12-13 for new moon Jul 14 edition)."
     },
     {
       "name": "Casa Curandera Bali",
@@ -484,7 +484,7 @@
       "megatix_slug": "https://megatix.co.id/events/celestia-cancer",
       "first_seen": "2026-07-12",
       "themes": ["dance", "ceremony"],
-      "note": "Zodiac micro-festival series at Akasha New Earth Haven, Ubud. Alcohol-free format: cacao + breathwork + DJs + fire + sound healing. Scale confirmed ~450 attendees (May 2024 Taurus edition). Series moved from Nuanu/Stone Stage to Akasha. Cancer season 2026 closes Jul 22 → event likely Sat Jul 11 or Jul 18. celestia-leo slug also live confirming series continues. Score ~7.5 when date confirmed. Watch megatix.co.id/events/celestia-cancer and @echo.bali IG urgently before Jul 22."
+      "note": "Zodiac micro-festival series. Alcohol-free format: cacao + breathwork + DJs + fire + sound healing. Scale confirmed ~450 attendees (May 2024 Taurus edition). ⚠ VENUE ROTATES by edition: Gemini 2026 = Nuanu/ASH (GEO-REJECT); Cancer 2026 venue unknown — megatix slug venue field unconfirmed. NEVER assume Akasha — must verify venue before ingesting any CELESTIA edition. Cancer season 2026 closes Jul 22 → last possible date = Sat Jul 18. celestia-leo slug also live confirming series continues. Score ~7.5 when date + in-zone venue confirmed. Watch megatix.co.id/events/celestia-cancer and @echo.bali IG before Jul 18 (URGENT — final window)."
     }
   ],
   "competitor_harvest": [
@@ -861,7 +861,7 @@
         "Ceremonial Breathwork (weekly Fri 2-4pm, IDR 225k) — AYMC Ubud",
         "Ceremonial Breathwork 2-Day Immersion — Dragonfly Village Ubud (confirmed Jul 27-28 2025; 2026 edition expected)"
       ],
-      "note": "Ceremonial breathwork facilitator, 30+ years experience. WhaleDreaming practitioner. Holds weekly Friday sessions at AYMC Ubud and an annual 2-day WhaleDreaming immersion at Dragonfly Village (Jul 27-28, 2025 slug 'ceremonial-breathwork-immersion' confirmed past; 2026 slug expected in early July). Website: heartofbreath.life. Megatix slugs: 'ceremonial-breathwork-with-kim-kindersley-at-dragonfly-village' (standing — confirmed active in search results Jun 27 2026, date TBC; watch Jul 1-10; immediate inbox when date confirmed, ~score 8), 'ceremonial-breathwork-immersion' (2025 past — stale, do not re-investigate)."
+      "note": "Ceremonial breathwork facilitator, 30+ years experience. WhaleDreaming practitioner. Holds weekly Friday sessions at AYMC Ubud and an annual 2-day WhaleDreaming immersion at Dragonfly Village. Website: heartofbreath.life. Megatix slugs: 'ceremonial-breathwork-with-kim-kindersley-at-dragonfly-village' (standing — confirmed active in search results Jun 27 2026, date TBC; watch Jul 14-Aug 1; immediate inbox when date confirmed, ~score 8). ✅ PERMANENTLY CLOSED 2026-07-13: 'ceremonial-breathwork-immersion' = 2025 past slug (Jul 27-28, 2025; slug says 'Sunday July 27th and Monday July 28th' — Jul 27 2026 = Monday ✗; WebSearch confirms 'This event has already taken place'). Day-of-week kill confirmed. Never reinvestigate this slug."
     },
     {
       "name": "Akari Tamura (Anandamoyi Dasi)",

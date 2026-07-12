@@ -1,0 +1,30 @@
+{
+  "date": "2026-07-13",
+  "events": [
+    {
+      "title": "Full Moon & Lion's Gate Celebration with Jeremy Sol",
+      "description": "Jeremy Sol's monthly Full Moon Bhakti gathering takes on rare elevation this August — the 8/8 Lion's Gate Portal and the Full Moon converge at Alchemy Yoga's rice-field sanctuary in Sayan. The evening opens with devotional singing and mantra, moves into Nataraja Ecstatic Dance, weaves through Sound Healing, and closes with a Fire Ritual at the edge of the jungle. Hosted by Bhakti Bliss Bali. Community capacity at AYMC — arrive early.",
+      "short_description": "Jeremy Sol's Full Moon Bhakti at AYMC on the 8/8 Lion's Gate — devotional singing, Nataraja Ecstatic Dance, Sound Healing, and Fire Ritual in the rice fields of Sayan.",
+      "category": "Ceremony & Sound",
+      "venue_name": "Alchemy Yoga & Meditation Center",
+      "venue_address": "Jl. Raya Sayan, Sayan, Ubud, Bali",
+      "start_date": "2026-08-08",
+      "end_date": null,
+      "start_time": null,
+      "end_time": null,
+      "is_recurring": false,
+      "recurrence_rule": null,
+      "price_info": null,
+      "external_ticket_url": null,
+      "source_url": null,
+      "organizer_name": "Jeremy Sol / Bhakti Bliss Bali",
+      "organizer_instagram": "@bhaktiblissbali",
+      "cover_image_url": null,
+      "quality_score": 0.85,
+      "content_flags": [],
+      "intent_tags": ["spirit", "community"],
+      "archetype_tags": ["seeker", "connector"],
+      "vibe_tags": ["kirtan-mantra", "ecstatic-dance", "sound-bath"]
+    }
+  ]
+}
