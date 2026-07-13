@@ -1,0 +1,30 @@
+{
+  "date": "2026-07-14",
+  "events": [
+    {
+      "title": "Cacao & Sound Meditation with The Gypsy Wolf",
+      "description": "The Gypsy Wolf (Adán V) returns to the Yoga Barn for his resident cacao and sound healing session — an immersive evening weaving ceremonial cacao with a sweeping idioelectric soundscape of gongs, Himalayan singing bowls, medicinal herbs, honey, seeds, and a continuous ambient medicinal music set. Certified to Level IV in gong and bowl work, The Gypsy Wolf guides listeners into deep liminal space where sound becomes medicine. These sessions regularly sell out at the Yoga Barn.",
+      "short_description": "Ceremonial cacao and multi-instrument sound bath with The Gypsy Wolf — sold-out Yoga Barn resident weaving gongs, bowls, medicinal herbs, and ambient medicine music.",
+      "category": "Ceremony & Sound",
+      "venue_name": "The Yoga Barn",
+      "venue_address": "Jl. Hanoman No.44, Ubud, Gianyar, Bali",
+      "start_date": "2026-07-20",
+      "end_date": null,
+      "start_time": null,
+      "end_time": null,
+      "is_recurring": false,
+      "recurrence_rule": null,
+      "price_info": null,
+      "external_ticket_url": "https://megatix.co.id/events/cacao-and-sound-meditation-20july",
+      "source_url": "https://megatix.co.id/events/cacao-and-sound-meditation-20july",
+      "organizer_name": "The Gypsy Wolf",
+      "organizer_instagram": null,
+      "cover_image_url": null,
+      "quality_score": 0.75,
+      "content_flags": [],
+      "intent_tags": ["spirit", "healing"],
+      "archetype_tags": ["seeker", "healer"],
+      "vibe_tags": ["cacao-ceremony", "sound-bath", "gongs"]
+    }
+  ]
+}
