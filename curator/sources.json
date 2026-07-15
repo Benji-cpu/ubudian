@@ -470,10 +470,10 @@
     },
     {
       "name": "Resonanz x EL-TOPO (Zhenya Topov) at Paradiso",
-      "megatix_slug": "https://megatix.co.id/events/resonanz-ecstatic-dance-x-el-topo-copy",
+      "megatix_slug": "https://megatix.co.id/events/resonanz-ecstatic-dance-x-el-topox",
       "first_seen": "2026-07-15",
       "themes": ["dance"],
-      "note": "Special edition of the Thursday Resonanz ecstatic dance series at Paradiso Ubud. EL-TOPO confirmed 2026-07-15 = Zhenya Topov (@zhenyatopov), Ubud-based handpan musician/DJ (Cafe De Anatolia / BaliSpirit circuit). Also appears as handpan at MAGDALENA ceremony (DTT Jul 22) and other Ubud conscious-circuit events. Current Megatix slug `resonanz-ecstatic-dance-x-el-topo-copy` carries a stale date ('Thursday, August 31st' = Aug 31, 2026 is a Monday — day-of-week kill; slug is a 2023 copy, original Thu Aug 3, 2023). Watch @paradisoubud and Megatix for a fresh slug (without `-copy`) for the 2026 edition. Score ~7.5 when confirmed: Zhenya Topov = handpan + conscious electronic circuit, Paradiso = top-tier dance venue."
+      "note": "Special edition of the Thursday Resonanz ecstatic dance series at Paradiso Ubud. EL-TOPO confirmed 2026-07-15 = Zhenya Topov (@zhenyatopov), Ubud-based handpan musician/DJ (Cafe De Anatolia / BaliSpirit circuit). Also appears as handpan at MAGDALENA ceremony (DTT Jul 22, ingested 2026-07-16). Fresh 2026 slug confirmed 2026-07-16: `resonanz-ecstatic-dance-x-el-topox` (extra X suffix — distinct from stale `-copy` slug, which carries 'Thursday August 31st' = Aug 31 2026 is a Monday, day-of-week kill, permanently closed). Watch @paradisoubud and Megatix slug `resonanz-ecstatic-dance-x-el-topox` for date confirmation. Score ~7.5 when confirmed: Zhenya Topov = handpan + conscious electronic circuit, Paradiso = top-tier dance venue."
     },
     {
       "name": "Ubud Art Ground",
@@ -798,9 +798,9 @@
       "instagram": null,
       "first_seen": "2026-05-24",
       "events_seen": [
-        "MAGDALENA — Dragon Tea Temple (Jul 22)"
+        "MAGDALENA — Dragon Tea Temple (Jul 22, 2026) — ✅ INGESTED 2026-07-16"
       ],
-      "note": "Feminine Healer, Magdalene Priestess & Channel. Leads the annual MAGDALENA ceremony at Dragon Tea Temple on Mary Magdalene's feast day (July 22). Event format: sacred story + devotional dance + Blue Lotus tea ceremony, with Gigi Courau (harp/harmonium) and Zhenya Topov (handpan/crystal bowls). No Instagram found yet."
+      "note": "Feminine Healer, Magdalene Priestess & Channel. Leads the annual MAGDALENA ceremony at Dragon Tea Temple on Mary Magdalene's feast day (July 22). Event format: sacred story + devotional dance + Blue Lotus tea ceremony, with Gigi Courau (vocals/harp/harmonium) and Zhenya Topov (handpan/percussion/crystal bowls). Megatix slug: magdalena. ✅ INGESTED 2026-07-16 (quality_score 0.9). No Instagram found yet."
     },
     {
       "name": "Karunika",

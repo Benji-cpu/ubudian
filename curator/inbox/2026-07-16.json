@@ -1,0 +1,30 @@
+{
+  "date": "2026-07-16",
+  "events": [
+    {
+      "title": "MAGDALENA — A Sacred Ceremony Honouring Mary Magdalene",
+      "description": "Each year on the feast day of Mary Magdalene, Dragon Tea Temple opens its garden for MAGDALENA — a sacred ceremony weaving threads of ancient devotion into a living night of sound and story. Amia Rosa, Feminine Healer and Magdalene Priestess, holds the ceremonial container, guiding participants through sacred storytelling and devotional dance honouring the Magdalene lineage. Gigi Courau lends her voice and the honey tones of harp and harmonium; Zhenya Topov (EL-TOPO) moves through handpan, percussion, and crystal bowls — building a sonic landscape that carries the Blue Lotus tea ceremony deeper into the body. Aramaic and Egyptian mantras thread through the evening, invoking traditions that predate organised religion. This is not a concert — it is a living transmission, held once a year, at the threshold of Sayan's candlelit garden.",
+      "short_description": "Annual feast-day ceremony at Dragon Tea Temple: Amia Rosa (Magdalene Priestess) leads sacred story, devotional dance, and Blue Lotus tea, with Gigi Courau on harp and Zhenya Topov on handpan.",
+      "category": "Ceremony & Sound",
+      "venue_name": "Dragon Tea Temple",
+      "venue_address": "Jl. Penestanan Kelod No.8, Sayan, Ubud",
+      "start_date": "2026-07-22",
+      "end_date": null,
+      "start_time": null,
+      "end_time": null,
+      "is_recurring": false,
+      "recurrence_rule": null,
+      "price_info": null,
+      "external_ticket_url": "https://megatix.co.id/events/magdalena",
+      "source_url": "https://megatix.co.id/events/magdalena",
+      "organizer_name": "Amia Rosa",
+      "organizer_instagram": null,
+      "cover_image_url": null,
+      "quality_score": 0.9,
+      "content_flags": [],
+      "intent_tags": ["spirit", "community"],
+      "archetype_tags": ["seeker", "creative", "connector"],
+      "vibe_tags": ["kirtan-mantra", "live-music", "sound-healing"]
+    }
+  ]
+}
