@@ -232,7 +232,7 @@
       "type": "instagram",
       "tier": "discovery",
       "category_hint": "Art & Culture",
-      "note": "Peliatan (greater-Ubud). Highest-reach Ubud gallery IG (~25k). Monthly exhibitions + artist talks + book launches. Strongest single signal for openings in the design/architecture-adjacent space."
+      "note": "Peliatan (greater-Ubud). Highest-reach Ubud gallery IG (~25k). Monthly exhibitions + artist talks + book launches. Strongest single signal for openings in the design/architecture-adjacent space. NOTE 2026-07-19: COCA Creative Complex (Coca Selekta vinyl bar + Coca Artspace) opened Jul 16 within this compound. Watch @titikduaubud and @cocaselekta for vinyl/live-music nights and artspace exhibitions — these may be distinct from the main W Barwa Gallery programme."
     },
     {
       "name": "Tonyraka Art Gallery",
@@ -473,7 +473,7 @@
       "megatix_slug": "https://megatix.co.id/events/resonanz-ecstatic-dance-x-el-topox",
       "first_seen": "2026-07-15",
       "themes": ["dance"],
-      "note": "Special edition of the Thursday Resonanz ecstatic dance series at Paradiso Ubud. EL-TOPO confirmed 2026-07-15 = Zhenya Topov (@zhenyatopov), Ubud-based handpan musician/DJ (Cafe De Anatolia / BaliSpirit circuit). Also appears as handpan at MAGDALENA ceremony (DTT Jul 22, ingested 2026-07-16). Fresh 2026 slug confirmed 2026-07-16: `resonanz-ecstatic-dance-x-el-topox` (extra X suffix — distinct from stale `-copy` slug, which carries 'Thursday August 31st' = Aug 31 2026 is a Monday, day-of-week kill, permanently closed). Watch @paradisoubud and Megatix slug `resonanz-ecstatic-dance-x-el-topox` for date confirmation. Score ~7.5 when confirmed: Zhenya Topov = handpan + conscious electronic circuit, Paradiso = top-tier dance venue."
+      "note": "Special edition of the Thursday Resonanz ecstatic dance series at Paradiso Ubud. EL-TOPO confirmed 2026-07-15 = Zhenya Topov (@zhenyatopov), Ubud-based handpan musician/DJ (Cafe De Anatolia / BaliSpirit circuit). Also appears as handpan at MAGDALENA ceremony (DTT Jul 22, ingested 2026-07-16). Fresh 2026 slug confirmed 2026-07-16: `resonanz-ecstatic-dance-x-el-topox` (extra X suffix — distinct from stale `-copy` slug, which carries 'Thursday August 31st' = Aug 31 2026 is a Monday, day-of-week kill, permanently closed). Price confirmed 2026-07-19: IDR 150k presale / 200k door. Capacity: 50-person hard cap. Watch @paradisoubud and Megatix slug `resonanz-ecstatic-dance-x-el-topox` for date — narrow sell-out window expected once date drops. Score ~7.5 when confirmed: Zhenya Topov = handpan + conscious electronic circuit, Paradiso = top-tier dance venue."
     },
     {
       "name": "Ubud Art Ground",
@@ -499,6 +499,20 @@
       "first_seen": "2026-07-12",
       "themes": ["dance", "ceremony"],
       "note": "Zodiac micro-festival series by AUMARA (formerly @echo.bali — rebranded 2026-07). Alcohol-free format: cacao + breathwork + DJs + fire + sound healing. Scale confirmed ~450 attendees. VENUE CLARIFICATION (2026-07-14): Regular series home = Akasha New Earth Haven, Ubud. Future editions default to Akasha unless a snippet explicitly names a different venue. ✅ PERMANENTLY CLOSED 2026-07-17: No date confirmed across 6 search rounds (Jul 12–17). Cancer season closes Jul 22; last viable Saturday Jul 18 passed without any date announced. Window closed permanently. Shift full focus to CELESTIA Leo: slug `celestia-leo` confirmed live on megatix.co.id, Leo season Jul 22–Aug 22, venue default Akasha. Begin watching @aumara.xyz + megatix.co.id/events/celestia-leo from Jul 22."
+    },
+    {
+      "name": "CELESTIA Leo (AUMARA zodiac micro-festival)",
+      "megatix_slug": "https://megatix.co.id/events/celestia-leo",
+      "first_seen": "2026-07-17",
+      "themes": ["dance", "ceremony"],
+      "note": "Zodiac micro-festival series by AUMARA (formerly @echo.bali). Leo season Jul 22–Aug 22. Slug `celestia-leo` confirmed live on megatix.co.id from Jul 17. Venue default = Akasha New Earth Haven (confirmed regular series home — see CELESTIA Cancer entry). Alcohol-free format: cacao + breathwork + DJs + fire + sound healing, ~450 attendees. Watch @aumara.xyz IG + megatix.co.id/events/celestia-leo from Jul 22. Score ~7.5–8 when date confirmed. IMPORTANT: confirm venue in snippet before ingesting — CELESTIA series has used non-Akasha venues for some editions (Gemini was at Nuanu, a geo-reject). Never assume venue."
+    },
+    {
+      "name": "COCA Creative Complex (Titik Dua compound, Peliatan)",
+      "url": "https://www.instagram.com/titikduaubud/",
+      "first_seen": "2026-07-19",
+      "themes": ["art", "music"],
+      "note": "Coca Selekta (vinyl bar) + Coca Artspace opened Jul 16, 2026 within the Titik Dua / W Barwa Gallery compound in Peliatan, Ubud. Discovery-tier venue. Opening concert Jul 16 — day-of discovery, too late to ingest. Watch @titikduaubud and @cocaselekta IG for vinyl/jazz nights, gallery openings, and artspace events. Address: same compound as Titik Dua / W Barwa Gallery, Peliatan. Category hint: Music & Performance (vinyl/live music events), Art & Culture (artspace exhibitions). No Megatix slug found yet."
     }
   ],
   "competitor_harvest": [
@@ -688,7 +702,7 @@
       "events_seen": [
         "Full Moon Cacao Ceremony — The Yoga Barn"
       ],
-      "note": "Medicine man, sound healer, musician. Runs monthly full moon (Abuela Luna) ceremonies at Yoga Barn. Well-known in Ubud scene. BaliSpirit Festival presenter. July slug: `full-moon-cacao-ceremony-in-july` on megatix.com.au (403-blocked, no date confirmed). Full moon Jul 29 (Wed) → event likely Fri Jul 25 or Sat Jul 26. Watch Jul 14-22. August slug confirmed 2026-07-14: `full-moon-cacao-ceremony-august` on megatix.co.id AND `full-moon-cacao-ceremony-in-august` on megatix.com.au — both live. Full moon Aug 8 → event likely Fri Aug 7 or Sat Aug 9 (note: Aug 8 conflicts with Jeremy Sol Lion's Gate at AYMC). Watch Jul 20-Aug 3 for August date/venue confirmation. Score when confirmed: ~8."
+      "note": "Medicine man, sound healer, musician. Runs monthly full moon (Abuela Luna) ceremonies at Yoga Barn. Well-known in Ubud scene. BaliSpirit Festival presenter. ✅ INGESTED 2026-07-19: 'ABUELA LUNA — Full Moon Cacao Ceremony with Raio' — Yoga Barn, Jul 29, 2026, 19:30–21:15, IDR 350,000. Source: megatix.co.id/events/full-moon-cacao-ceremony-in-july. quality_score 0.80. Ensemble: Carlos Romero, Ryan Narayan, Rob Recker, Sky (guitar). NOTE: Event confirmed on Jul 29 itself (the full moon) — prior predictions of Fri Jul 25 or Sat Jul 26 were wrong. Raio aligns ABUELA LUNA precisely with the moon it's named for. Apply moon-date-first assumption to future editions. August slug confirmed 2026-07-14: `full-moon-cacao-ceremony-august` on megatix.co.id AND `full-moon-cacao-ceremony-in-august` on megatix.com.au — both live. Full moon Aug 8 → watch Aug 8 itself first; Aug 7 as fallback. Watch Jul 20–Aug 3 for August date/venue confirmation. Score when confirmed: ~8."
     },
     {
       "name": "Jada Jane Boh",
@@ -727,7 +741,7 @@
         "Full Moon Kirtan & Sacred Tea — Dragon Tea Temple (Jun 15)",
         "Solstice Kirtan, Cacao & Fire Ritual — AYMC (Jun 21)"
       ],
-      "note": "Confirmed anchor facilitator in the Ubud devotional scene — 3 events across Dragon Tea Temple and AYMC (weekly maintenance 2026-05-24). Format: kirtan + ecstatic dance + sound healing + fire ritual. Founder of Bhakti Bliss Bali. Also runs recurring monthly Full Moon Bhakti Celebration at AYMC (no confirmed July date yet). Track for AYMC full moon editions. NEW 2026-07-15: Confirmed as facilitator of `sundaykirtanspecial` at Sayuri Healing Food (Jl. Sukma Kesuma No.2, Peliatan) via Instagram reel DBoISNfS21T (@bhaktiblissbali). Title: 'Sunday Bhakti 7 Chakras Expansion Kirtan.' Price: IDR 200k/250k. July Sundays remaining: Jul 19, Jul 26. Watch for date announcement."
+      "note": "Confirmed anchor facilitator in the Ubud devotional scene — 3 events across Dragon Tea Temple and AYMC (weekly maintenance 2026-05-24). Format: kirtan + ecstatic dance + sound healing + fire ritual. Founder of Bhakti Bliss Bali. Also runs recurring monthly Full Moon Bhakti Celebration at AYMC (no confirmed July date yet). Track for AYMC full moon editions. NEW 2026-07-15: Confirmed as facilitator of `sundaykirtanspecial` at Sayuri Healing Food (Jl. Sukma Kesuma No.2, Peliatan) via Instagram reel DBoISNfS21T (@bhaktiblissbali). Title: 'Sunday Bhakti 7 Chakras Expansion Kirtan.' Price: IDR 200k/250k. UPDATE 2026-07-19: Jul 19 passed with no date confirmation for today. Jul 26 = FINAL possible slot. Watch @bhaktiblissbali IG through Jul 25. If no date by then, close permanently."
     },
     {
       "name": "YUJOY",
@@ -1095,6 +1109,15 @@
         "art-of-sound-medicine-with-agustian-supriatna-1"
       ],
       "notes": "Confirmed 2026-07-05 via Mantraman/Diana verification agent. Separate from Diana Beauty."
+    },
+    {
+      "name": "Raffa Martinez",
+      "instagram": null,
+      "first_seen": "2026-07-19",
+      "events_seen": [
+        "LA LUZ — Sacred Chants for the Soul — The Yoga Barn (after Jul 16, 2026, date TBC)"
+      ],
+      "note": "Vocal and sacred chants facilitator. Event: 'LA LUZ — Sacred Chants for the Soul' at Yoga Barn. Price: IDR 300k/350k. Date confirmed as after Jul 16 2026 but exact date unknown. Surfaced via Yoga Barn WebSearch sweep 2026-07-19. No Instagram handle found yet. Watch @yogabarnbali for date announcement. Score ~7 when date confirmed: Yoga Barn venue + named facilitator + sacred chants format. No prior Ubud presence confirmed — first appearance."
     },
     {
       "name": "Dion (Soulfire Afro-Latin)",

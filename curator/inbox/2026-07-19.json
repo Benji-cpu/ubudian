@@ -1,0 +1,31 @@
+{
+  "run_date": "2026-07-19",
+  "events": [
+    {
+      "title": "ABUELA LUNA — Full Moon Cacao Ceremony with Raio",
+      "description": "Raio — Rob Weber — has been holding the ABUELA LUNA ceremony at The Yoga Barn for years: a full moon cacao ritual that has become one of the steadiest anchors in Ubud's conscious-ceremony calendar. The July edition lands on the full moon itself (July 29), the way it always does — the name Abuela Luna is not decoration, the timing is the point. His ensemble brings live medicine music into the ceremony: Carlos Romero, Ryan Narayan, Rob Recker, and Sky on guitar weave an arc that carries the cacao opening through to integration close. Format: ceremonial welcome → organic cacao → live medicine-music journey → integration. Ceremony runs 19:30–21:15. IDR 350,000. Tickets via Megatix.",
+      "short_description": "Raio's monthly ABUELA LUNA lands on the full moon itself — Jul 29 at Yoga Barn. Ceremonial cacao + live medicine music with Carlos Romero, Ryan Narayan, Rob Recker & Sky.",
+      "category": "Ceremony & Sound",
+      "event_tier": "core",
+      "venue_name": "The Yoga Barn",
+      "venue_address": "Jl. Hanoman, Padangtegal, Ubud, Gianyar, Bali 80571",
+      "start_date": "2026-07-29",
+      "end_date": null,
+      "start_time": "19:30",
+      "end_time": "21:15",
+      "is_recurring": false,
+      "recurrence_rule": null,
+      "price_info": "IDR 350,000",
+      "external_ticket_url": "https://megatix.co.id/events/full-moon-cacao-ceremony-in-july",
+      "source_url": "https://megatix.co.id/events/full-moon-cacao-ceremony-in-july",
+      "organizer_name": "Raio (Rob Weber)",
+      "organizer_instagram": null,
+      "cover_image_url": null,
+      "quality_score": 0.80,
+      "content_flags": [],
+      "intent_tags": ["spirit", "community"],
+      "archetype_tags": ["seeker", "connector"],
+      "vibe_tags": ["cacao-ceremony", "live-music", "sound-bath"]
+    }
+  ]
+}
