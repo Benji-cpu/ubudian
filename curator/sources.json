@@ -49,7 +49,7 @@
         "sound",
         "ceremony"
       ],
-      "note": "Sound healing — gong, bowl, breath journeys. Own ticketing system. Two distinct tiers: (1) daily tourist sessions 350k IDR — reject; (2) monthly community ceremonies (Full Moon, Into the Heart Cacao, solstice specials) — ingest. Into the Heart Cacao date only available on full-calendar page (403 blocked); contact events@pyramidsofchi.com if needed."
+      "note": "Sound healing — gong, bowl, breath journeys. Own ticketing system. Two distinct tiers: (1) daily tourist sessions 350k IDR — reject; (2) monthly community ceremonies (Full Moon, Into the Heart Cacao, solstice specials) — ingest. Into the Heart Cacao date only available on full-calendar page (403 blocked); contact events@pyramidsofchi.com if needed. ✅ INGESTED 2026-07-20: Full Moon Ceremony Jul 29 (Guru Purnima / Buck Moon), per-edition slug `full-moon-ceremony-july`, quality_score 0.75. Signal: per-edition slug = community tier; evergreen slugs = tourist product."
     },
     {
       "name": "Dragonfly Village Ubud",
@@ -415,7 +415,7 @@
         "dance",
         "ceremony"
       ],
-      "note": "Jl. Raya Sayan, Desa Sayan, Ubud 80571 — geo-confirmed within greater-Ubud zone (Sayan/Kedewatan corridor, 2026-07-08). Also known as Dance Through Dimensions (DTD-Naya). Jungle sanctuary format: 360-degree sound system dome. Hosted NON-DUAL (Awakened Dreamers × Dance Through Dimensions) — sacred electronic temple format: cacao ceremony + community flow + DJ sets. Megatix slug: non-dual (live but no confirmed 2026 date yet). Facilitators confirmed 2026-07-15: SEKALA (DJ), Manish (co-host), Ritual Frequencies (DJ/ecstatic soundscape). Track for confirmed upcoming dates — score ~7 when date confirmed."
+      "note": "Jl. Raya Sayan, Desa Sayan, Ubud 80571 — geo-confirmed within greater-Ubud zone (Sayan/Kedewatan corridor, 2026-07-08). Also known as Dance Through Dimensions (DTD-Naya). Jungle sanctuary format: 360-degree sound system dome. Hosted NON-DUAL (Awakened Dreamers × Dance Through Dimensions) — sacred electronic temple format: cacao ceremony + community flow + DJ sets. Megatix slug: non-dual (live but no confirmed 2026 date yet). Facilitators confirmed 2026-07-15: SEKALA (DJ), Manish (co-host), Ritual Frequencies (DJ/ecstatic soundscape). Track for confirmed upcoming dates — score ~7 when date confirmed. NOTE 2026-07-20: Naya Veda Vastu / DTD venue also confirmed as host for the Pangaea Festival — a multi-day conscious-arts gathering. Specific 2026 Pangaea dates not confirmed yet; watch Megatix + @nayavedavastu for announcement. Score ~7.5 when dates + programme confirmed."
     },
     {
       "name": "The Bali Eden (GDAS Wellness Resort)",
@@ -513,6 +513,13 @@
       "first_seen": "2026-07-19",
       "themes": ["art", "music"],
       "note": "Coca Selekta (vinyl bar) + Coca Artspace opened Jul 16, 2026 within the Titik Dua / W Barwa Gallery compound in Peliatan, Ubud. Discovery-tier venue. Opening concert Jul 16 — day-of discovery, too late to ingest. Watch @titikduaubud and @cocaselekta IG for vinyl/jazz nights, gallery openings, and artspace events. Address: same compound as Titik Dua / W Barwa Gallery, Peliatan. Category hint: Music & Performance (vinyl/live music events), Art & Culture (artspace exhibitions). No Megatix slug found yet."
+    },
+    {
+      "name": "Samyama / Nataraja Shala (Ubud)",
+      "url": null,
+      "first_seen": "2026-07-20",
+      "themes": ["dance", "ceremony"],
+      "note": "Sacred movement and embodiment space in Ubud. Format: soma yoga, sacred dance, and somatic embodiment practices. Surfaced via Megatix WebSearch sweep 2026-07-20. Exact address TBC — snippet confirms Ubud geo. Watch for event slugs with named facilitators before promoting. At 0 qualifying logs — track."
     }
   ],
   "competitor_harvest": [
@@ -1115,9 +1122,9 @@
       "instagram": null,
       "first_seen": "2026-07-19",
       "events_seen": [
-        "LA LUZ — Sacred Chants for the Soul — The Yoga Barn (after Jul 16, 2026, date TBC)"
+        "LA LUZ — Sacred Chants for the Soul — The Yoga Barn (Jul 18, 2026 — PAST)"
       ],
-      "note": "Vocal and sacred chants facilitator. Event: 'LA LUZ — Sacred Chants for the Soul' at Yoga Barn. Price: IDR 300k/350k. Date confirmed as after Jul 16 2026 but exact date unknown. Surfaced via Yoga Barn WebSearch sweep 2026-07-19. No Instagram handle found yet. Watch @yogabarnbali for date announcement. Score ~7 when date confirmed: Yoga Barn venue + named facilitator + sacred chants format. No prior Ubud presence confirmed — first appearance."
+      "note": "Vocal and sacred chants facilitator. Event: 'LA LUZ — Sacred Chants for the Soul' at Yoga Barn. Price: IDR 300k/350k. ✅ DATE CONFIRMED PAST (2026-07-20): confirmed as Jul 18, 2026 via Yoga Barn WebSearch — first surfaced on Jul 19, one day after the event. Window closed. Could not ingest. Surfaced via Yoga Barn WebSearch sweep 2026-07-19. No Instagram handle found yet. Watch @yogabarnbali for next Raffa Martinez event. Lesson: check Megatix 3–5 days before any new Yoga Barn facilitator's announced date window — don't wait for the weekly source walk."
     },
     {
       "name": "Dion (Soulfire Afro-Latin)",
@@ -1127,6 +1134,24 @@
         "Soulfire Afro-Latin — The Yoga Barn (Sep 28, 2026, outside 60-day window as of Jul 15)"
       ],
       "note": "Afro-Latin dance and movement facilitator at Yoga Barn. Megatix slug confirmed 2026-07-15: `soulfire-dion-sept28` (Sep 28, 2026 = 75 days from Jul 15, outside 60-day window). Score ~7 when within window: Yoga Barn venue + named facilitator + Afro-Latin format. Reactivate from ~Jul 29 when Sep 28 enters the 60-day window. No Instagram or full name confirmed yet."
+    },
+    {
+      "name": "Sacred Breath & Sound (Thi & Anna)",
+      "instagram": null,
+      "first_seen": "2026-07-20",
+      "events_seen": [
+        "Sacred Breath & Sound ceremony — Ubud (no confirmed upcoming date)"
+      ],
+      "note": "Facilitator duo running Sacred Breath & Sound ceremony format: breathwork activation + sound healing. Surfaced via Megatix snippet sweep 2026-07-20. Ubud-area confirmed; exact venue TBC. No specific upcoming date found on first discovery. Score ~7 when date + venue confirmed. Watch for Megatix slug or IG announcement. No Instagram handles confirmed yet."
+    },
+    {
+      "name": "Emil (Kirtan & Cacao)",
+      "instagram": null,
+      "first_seen": "2026-07-20",
+      "events_seen": [
+        "Kirtan & Cacao with Emil — Ubud (no confirmed upcoming date)"
+      ],
+      "note": "Kirtan and cacao ceremony facilitator. Title pattern: 'Kirtan & Cacao with Emil.' Surfaced via competitor-harvest sweep 2026-07-20. Ubud-area confirmed; venue TBC. No specific upcoming date found on first discovery. Score ~7 when date + venue confirmed at a known Ubud space. Watch for Megatix slug or IG announcement. Full name and Instagram handle not yet confirmed."
     }
   ]
 }

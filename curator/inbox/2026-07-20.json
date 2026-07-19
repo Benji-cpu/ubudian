@@ -1,0 +1,30 @@
+{
+  "date": "2026-07-20",
+  "events": [
+    {
+      "title": "Full Moon Ceremony at Pyramids of Chi",
+      "description": "On the night of the July Buck Moon — which also falls on Guru Purnima, the most auspicious purnima in the Hindu calendar — Pyramids of Chi opens its temple grounds for its monthly community ceremony. The ritual moves through three chapters: a shamanic fire ceremony calling in the four directions and burning intentions into the flame, followed by an Ancient Sound Healing session inside the Pyramid of the Sun with Tibetan singing bowls and sacred instruments, and closing with a three-course vegan dinner at Pyramids Cafe by Malaika. Guru Purnima honours the lineage of teachers and marks one of the most potent full moons of the year across Balinese, Hindu, and Tibetan traditions simultaneously.",
+      "short_description": "Buck Moon meets Guru Purnima: shamanic fire ceremony, pyramid sound healing, and vegan dinner at Pyramids of Chi.",
+      "category": "Ceremony & Sound",
+      "venue_name": "Pyramids of Chi",
+      "venue_address": "Jl. Nyuh Bojog, Penestanan, Ubud, Bali",
+      "start_date": "2026-07-29",
+      "end_date": null,
+      "start_time": null,
+      "end_time": null,
+      "is_recurring": false,
+      "recurrence_rule": null,
+      "price_info": "IDR 400,000–750,000 (ceremony-only or ceremony + dinner packages — confirm on Megatix)",
+      "external_ticket_url": "https://megatix.co.id/events/full-moon-ceremony-july",
+      "source_url": "https://megatix.co.id/events/full-moon-ceremony-july",
+      "organizer_name": "Pyramids of Chi",
+      "organizer_instagram": "@pyramidsofchi",
+      "cover_image_url": null,
+      "quality_score": 0.75,
+      "content_flags": [],
+      "intent_tags": ["spirit", "community"],
+      "archetype_tags": ["seeker", "connector"],
+      "vibe_tags": ["sound-bath"]
+    }
+  ]
+}
