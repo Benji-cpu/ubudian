@@ -461,7 +461,10 @@
       "name": "Vibración~ Ecstatic Dance Thursdays (Paradiso Ubud)",
       "megatix_slug": "https://megatix.co.id/events/vibracion-ecstatic-dance-thursdays-at-paradiso-ubud",
       "first_seen": "2026-07-14",
-      "themes": ["dance", "ceremony"],
+      "themes": [
+        "dance",
+        "ceremony"
+      ],
       "note": "Recurring Thursday ecstatic dance series at Paradiso Ubud. Format: electro-Andean shamanic grooves, potent cacao shots, rotating guest DJs. Price: IDR 100k presale (at Sayuri, Paradiso, Mudra Cafe) / 120k at door. Confirmed Apr 23 + Apr 30 2026 editions. Below threshold without named facilitators (score ~5.75). Watch for facilitator names on any specific edition — if named DJ with conscious circuit credentials surfaces, score jumps to ~7+ and would ingest. Upcoming Thursdays: Jul 17, Jul 24, Jul 31, Aug 7, Aug 14."
     },
     {
@@ -472,7 +475,9 @@
       "name": "Resonanz x EL-TOPO (Zhenya Topov) at Paradiso",
       "megatix_slug": "https://megatix.co.id/events/resonanz-ecstatic-dance-x-el-topox",
       "first_seen": "2026-07-15",
-      "themes": ["dance"],
+      "themes": [
+        "dance"
+      ],
       "note": "Special edition of the Thursday Resonanz ecstatic dance series at Paradiso Ubud. EL-TOPO confirmed 2026-07-15 = Zhenya Topov (@zhenyatopov), Ubud-based handpan musician/DJ (Cafe De Anatolia / BaliSpirit circuit). Also appears as handpan at MAGDALENA ceremony (DTT Jul 22, ingested 2026-07-16). Fresh 2026 slug confirmed 2026-07-16: `resonanz-ecstatic-dance-x-el-topox` (extra X suffix — distinct from stale `-copy` slug, which carries 'Thursday August 31st' = Aug 31 2026 is a Monday, day-of-week kill, permanently closed). Price confirmed 2026-07-19: IDR 150k presale / 200k door. Capacity: 50-person hard cap. Watch @paradisoubud and Megatix slug `resonanz-ecstatic-dance-x-el-topox` for date — narrow sell-out window expected once date drops. Score ~7.5 when confirmed: Zhenya Topov = handpan + conscious electronic circuit, Paradiso = top-tier dance venue."
     },
     {
@@ -497,28 +502,40 @@
       "name": "CELESTIA Cancer (Akasha New Earth Haven)",
       "megatix_slug": "https://megatix.co.id/events/celestia-cancer",
       "first_seen": "2026-07-12",
-      "themes": ["dance", "ceremony"],
+      "themes": [
+        "dance",
+        "ceremony"
+      ],
       "note": "Zodiac micro-festival series by AUMARA (formerly @echo.bali — rebranded 2026-07). Alcohol-free format: cacao + breathwork + DJs + fire + sound healing. Scale confirmed ~450 attendees. VENUE CLARIFICATION (2026-07-14): Regular series home = Akasha New Earth Haven, Ubud. Future editions default to Akasha unless a snippet explicitly names a different venue. ✅ PERMANENTLY CLOSED 2026-07-17: No date confirmed across 6 search rounds (Jul 12–17). Cancer season closes Jul 22; last viable Saturday Jul 18 passed without any date announced. Window closed permanently. Shift full focus to CELESTIA Leo: slug `celestia-leo` confirmed live on megatix.co.id, Leo season Jul 22–Aug 22, venue default Akasha. Begin watching @aumara.xyz + megatix.co.id/events/celestia-leo from Jul 22."
     },
     {
       "name": "CELESTIA Leo (AUMARA zodiac micro-festival)",
       "megatix_slug": "https://megatix.co.id/events/celestia-leo",
       "first_seen": "2026-07-17",
-      "themes": ["dance", "ceremony"],
+      "themes": [
+        "dance",
+        "ceremony"
+      ],
       "note": "Zodiac micro-festival series by AUMARA (formerly @echo.bali). Leo season Jul 22–Aug 22. Slug `celestia-leo` confirmed live on megatix.co.id from Jul 17. ✅ PERMANENTLY GEO-REJECTED 2026-07-21: Venue confirmed as The Istana, Uluwatu (~40km from Ubud) across multiple independent sources — theistana.com/events/celestia-leo-micro-festival-by-echo/ + Megatix snippet explicitly states 'The Istana in Uluwatu.' No connection to Akasha New Earth Haven or any Ubud venue found. The Jul 14 note ('series home = Akasha') was incorrect — CELESTIA series rotates venues per edition and the Leo edition is Uluwatu. Do not watch or ingest any future CELESTIA Leo edition unless venue explicitly changes to Ubud. If CELESTIA Virgo appears, confirm venue from snippet before assigning any default."
     },
     {
       "name": "COCA Creative Complex (Titik Dua compound, Peliatan)",
       "url": "https://www.instagram.com/titikduaubud/",
       "first_seen": "2026-07-19",
-      "themes": ["art", "music"],
+      "themes": [
+        "art",
+        "music"
+      ],
       "note": "Coca Selekta (vinyl bar) + Coca Artspace opened Jul 16, 2026 within the Titik Dua / W Barwa Gallery compound in Peliatan, Ubud. Discovery-tier venue. Opening concert Jul 16 — day-of discovery, too late to ingest. Watch @titikduaubud and @cocaselekta IG for vinyl/jazz nights, gallery openings, and artspace events. Address: same compound as Titik Dua / W Barwa Gallery, Peliatan. Category hint: Music & Performance (vinyl/live music events), Art & Culture (artspace exhibitions). No Megatix slug found yet."
     },
     {
       "name": "Samyama / Nataraja Shala (Ubud)",
       "url": null,
       "first_seen": "2026-07-20",
-      "themes": ["dance", "ceremony"],
+      "themes": [
+        "dance",
+        "ceremony"
+      ],
       "note": "Sacred movement and embodiment space in Ubud. Format: soma yoga, sacred dance, and somatic embodiment practices. Surfaced via Megatix WebSearch sweep 2026-07-20. Exact address TBC — snippet confirms Ubud geo. Watch for event slugs with named facilitators before promoting. At 0 qualifying logs — track."
     }
   ],
@@ -907,7 +924,7 @@
         "Wednesday Kirtan: Songs of Love — Dragon Tea Temple (bi-weekly Wed)",
         "Sunday Bhakti Kirtan — Sayuri Healing Food (weekly Sun 18:00, IDR 150k presale, ingested 2026-06-26)"
       ],
-      "note": "Experienced kirtan leader since 2013, multi-instrumentalist, author of 'Mantra Song Book', professional vocal & music coach. Leads two distinct recurring series: (1) bi-weekly Wednesday Kirtan: Songs of Love at Dragon Tea Temple (Jl. Penestanan No.8, Sayan, Ubud) — ancient Sanskrit mantras + Bhakti stories + uplifting tea; Megatix slug: wednesday-kirtan-songs-of-love-with-akari-tamura-and-friends. (2) Weekly Sunday Bhakti Kirtan at Sayuri Healing Food (Jl. Sukma Kesuma No. 2, Peliatan) — mantra chanting + sacred cacao + community; Megatix slug: sunday-bhakti-kirtan-with-akari1; IDR 150k presale / 180k–200k door; ingested 2026-06-26 as recurring anchor. IG: @akaritamura_bhakti (confirmed 2026-06-26). Promoted by Zest Ubud on Facebook."
+      "note": "Experienced kirtan leader since 2013, multi-instrumentalist, author of 'Mantra Song Book', professional vocal & music coach. Leads two distinct recurring series: (1) bi-weekly Wednesday Kirtan: Songs of Love at Dragon Tea Temple (Jl. Penestanan No.8, Sayan, Ubud) — ancient Sanskrit mantras + Bhakti stories + uplifting tea; Megatix slug: wednesday-kirtan-songs-of-love-with-akari-tamura-and-friends. (2) Weekly Sunday Bhakti Kirtan at Sayuri Healing Food (Jl. Sukma Kesuma No. 2, Peliatan) — mantra chanting + sacred cacao + community; Megatix slug: sunday-bhakti-kirtan-with-akari1; IDR 150k presale / 180k–200k door; ingested 2026-06-26 as recurring anchor. IG: @akaritamura_bhakti (confirmed 2026-06-26). Promoted by Zest Ubud on Facebook. ✅ INGESTED 2026-07-22: Wednesday Kirtan: Songs of Love at Dragon Tea Temple (biweekly Wed Jul 23–Sep 17, score 0.70, slug: wednesday-kirtan-songs-of-love-with-akari-tamura-and-friends)."
     },
     {
       "name": "Anand Revati",
@@ -1114,9 +1131,10 @@
       "megatix_slugs": [
         "mantraman-agustian-supriatna",
         "sound-medicine-journey-with-agustian-supriatna",
-        "art-of-sound-medicine-with-agustian-supriatna-1"
+        "art-of-sound-medicine-with-agustian-supriatna-1",
+        "the-art-of-sound-healing-AUG"
       ],
-      "notes": "Confirmed 2026-07-05 via Mantraman/Diana verification agent. Separate from Diana Beauty."
+      "notes": "Confirmed 2026-07-05 via Mantraman/Diana verification agent. Separate from Diana Beauty. ✅ INGESTED 2026-07-22: The Art of Sound Healing (Yoga Barn, Aug 16, score 0.80, slug: the-art-of-sound-healing-AUG)."
     },
     {
       "name": "Raffa Martinez",
@@ -1153,6 +1171,16 @@
         "Kirtan & Cacao with Emil — Ubud (no confirmed upcoming date)"
       ],
       "note": "Kirtan and cacao ceremony facilitator. Title pattern: 'Kirtan & Cacao with Emil.' Surfaced via competitor-harvest sweep 2026-07-20. Ubud-area confirmed; venue TBC. No specific upcoming date found on first discovery. Score ~7 when date + venue confirmed at a known Ubud space. Watch for Megatix slug or IG announcement. Full name and Instagram handle not yet confirmed."
+    },
+    {
+      "name": "Snow Raven",
+      "instagram": "@snowravenofficial",
+      "website": "snowraven.com",
+      "first_seen": "2026-07-22",
+      "events_seen": [
+        "Arctic Beats — Zest Ubud, Jl. Raya Penestanan Kelod 8, Ubud (Sep 20, 2026) ✅ INGESTED 2026-07-22, score 0.90"
+      ],
+      "note": "Siberian-Yakut vocalist and shaman from Yakutia, Russia. NPR-featured, Esalen Institute faculty, Yale University listing, Shambhala Music Festival 2025, Burning Man circuit, America's Got Talent 2020. Sakha shamanic vocal technique (language of birds/animals), khomus (mouth harp), live looping, deep bass. Format: vocal ceremony + guided breathwork + embodiment movement. Based internationally; Bali appears to be a touring stop. Watch for future Bali/Ubud events."
     }
   ]
 }
