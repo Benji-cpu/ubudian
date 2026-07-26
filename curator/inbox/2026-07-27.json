@@ -1,0 +1,30 @@
+{
+  "date": "2026-07-27",
+  "events": [
+    {
+      "title": "House of Mantra",
+      "description": "An evening of soulful Kirtans and Bhajans at The Yoga Barn, featuring the Ilahi Sufi Qawwali ensemble: Tahir Qawwal, Alexandra Amïe, Jamuna Luna, and Rāma on classical percussion. Qawwali is the ancient Sufi devotional tradition of heart-opening, trance-inducing sacred song — voices layered over tabla and harmonium until the room forgets its edges. Bhajans weave Hindu devotional melody into the same thread. Rare to hear this genre performed at this level in Ubud. The kind of evening that stills the nervous system and opens the chest.",
+      "short_description": "Qawwali and Bhajan devotional music evening at The Yoga Barn with Tahir Qawwal and the Ilahi ensemble.",
+      "category": "Ceremony & Sound",
+      "venue_name": "The Yoga Barn",
+      "venue_address": "Jl. Hanoman, Ubud, Bali",
+      "start_date": "2026-09-21",
+      "end_date": null,
+      "start_time": null,
+      "end_time": null,
+      "is_recurring": false,
+      "recurrence_rule": null,
+      "price_info": "Tickets via Megatix — pricing not yet confirmed",
+      "external_ticket_url": "https://megatix.co.id/events/house-of-mantra-sept21",
+      "source_url": "https://megatix.co.id/events/house-of-mantra-sept21",
+      "organizer_name": "House of Mantra",
+      "organizer_instagram": null,
+      "cover_image_url": null,
+      "quality_score": 0.80,
+      "content_flags": [],
+      "intent_tags": ["devotion", "culture", "presence"],
+      "archetype_tags": ["seeker", "explorer"],
+      "vibe_tags": ["kirtan", "qawwali", "devotional-music", "live-music", "sufi"]
+    }
+  ]
+}

@@ -594,6 +594,25 @@
         "dance"
       ],
       "note": "September edition of the regular Resonanz weekly Thursday ecstatic dance series at Paradiso Ubud. Slug `resonanz-september` confirmed active via WebSearch 2026-07-24. Format: Contact Improv Jam 18:00–19:00 → Ecstatic Dance 19:00–20:30 → Sonic Savasana 20:30–20:45. Price: IDR 150k presale / 200k door. Capacity: 50-person hard cap. September Thursdays in window: Sep 3, Sep 10, Sep 17 (Sep 24 = 2 days past Sep 22 cutoff — borderline, evaluate if date confirmed). Named guest artist = score ~7.5; anonymous weekly edition without named guest = ~6.5. Watch for named-guest announcements."
+    },
+    {
+      "name": "Resonanz x YUJOY (Paradiso Ubud)",
+      "megatix_slug": "https://megatix.com.sg/events/resonanz-dance-x-yujoyvc",
+      "first_seen": "2026-07-27",
+      "themes": [
+        "dance"
+      ],
+      "note": "Special edition of the Resonanz ecstatic dance series at Paradiso Ubud with guest artist YUJOY. Slug `resonanz-dance-x-yujoyvc` found on megatix.com.sg (Singapore TLD — fourth Megatix country TLD confirmed 2026-07-27 alongside co.id, com.au, in.th). YUJOY already in facilitators_pending (ecstatic dance DJ, touring artist, multi-genre; visited Azadi Retreat Jun 8 2026; site: yujoy.io). No date confirmed, no price/capacity found. Score ~7 when date confirmed at a Thursday Paradiso slot. Watch @paradisoubud IG + slug."
+    },
+    {
+      "name": "Jeremy Sol Ganesha Spirit Celebration (AYMC)",
+      "url": "https://www.alchemyyogacenter.com/ganesha-spirit-celebration-with-jeremy-sol",
+      "first_seen": "2026-07-27",
+      "themes": [
+        "ceremony",
+        "sound"
+      ],
+      "note": "Annual Ganesha Chaturthi celebration at AYMC Ubud led by Jeremy Sol (Bhakti Bliss Bali). AYMC event page confirmed live 2026-07-27. Ganesh Chaturthi 2026 falls on Sep 14 (Monday). Based on prior-year pattern the celebration runs on the closest weekend — likely Sat Sep 12 or Sun Sep 13. No date confirmed, no Megatix slug found yet. Score ~7.5 when confirmed: Jeremy Sol = anchor AYMC facilitator, AYMC = priority_a, celebration format aligns with kirtan/devotional tier. Watch alchemyyogacenter.com/ganesha-spirit-celebration + @alchemyyogacenterubud from ~Aug 22."
     }
   ],
   "competitor_harvest": [
@@ -915,9 +934,10 @@
       "first_seen": "2026-05-26",
       "events_seen": [
         "Ilahi Sufi Qawwali — Ceremonial Ecstasy — The Yoga Barn (Jun 17)",
-        "Ecstatic Rose Temple: Sufi Music Night — The Yoga Barn (recurring, past editions Jul 2025, Mar 2026)"
+        "Ecstatic Rose Temple: Sufi Music Night — The Yoga Barn (recurring, past editions Jul 2025, Mar 2026)",
+        "House of Mantra — The Yoga Barn (Sep 21, 2026) — ✅ INGESTED 2026-07-27 (quality_score 0.80)"
       ],
-      "note": "World's first all-women's Qawwali ensemble. Founded by Tahir Qawwal and Alexandra Amïe. BaliSpirit Festival presenter. Performs globally; Ubud appearances at Yoga Barn and The Rose Temple. Recurring Ubud presence. Site: ilahiqawwali.com. The Jun 17 Ceremonial Ecstasy edition is confirmed 2026 via Google snippet; the Ecstatic Rose Temple series has a separate Megatix slug (Jul26) but AllEvents dates that series to Mar 2026 (past)."
+      "note": "World's first all-women's Qawwali ensemble. Founded by Tahir Qawwal and Alexandra Amïe. BaliSpirit Festival presenter. Performs globally; Ubud appearances at Yoga Barn and The Rose Temple. Recurring Ubud presence. Site: ilahiqawwali.com. The Jun 17 Ceremonial Ecstasy edition is confirmed 2026 via Google snippet; the Ecstatic Rose Temple series has a separate Megatix slug (Jul26) but AllEvents dates that series to Mar 2026 (past). ✅ INGESTED 2026-07-27: 'House of Mantra' — The Yoga Barn, Sep 21, 2026. Ensemble: Tahir Qawwal, Alexandra Amïe, Jamuna Luna, Rāma (classical percussion). Megatix slug: house-of-mantra-sept21. quality_score 0.80. New event series name — distinct from the Jun 17 ingestion. No price/time confirmed (Megatix 403)."
     },
     {
       "name": "Sawitri",
@@ -973,7 +993,7 @@
         "Ceremonial Breathwork (weekly Fri 2-4pm, IDR 225k) — AYMC Ubud",
         "Ceremonial Breathwork 2-Day Immersion — Dragonfly Village Ubud (confirmed Jul 27-28 2025; 2026 edition expected)"
       ],
-      "note": "Ceremonial breathwork facilitator, 30+ years experience. WhaleDreaming practitioner. Holds weekly Friday sessions at AYMC Ubud and an annual 2-day WhaleDreaming immersion at Dragonfly Village. Website: heartofbreath.life. Megatix slugs: 'ceremonial-breathwork-with-kim-kindersley-at-dragonfly-village' (standing — confirmed active in search results Jun 27 2026, date TBC; watch through Aug 1; immediate inbox when date confirmed, ~score 8). Third slug discovered 2026-07-24: 'a-ceremony-of-breath-light-stillness-by-kim-kindersley' (Labyrinth Dome, different venue; June 2025 date in snippets; no 2026 date confirmed — watch separately). ✅ PERMANENTLY CLOSED 2026-07-13: 'ceremonial-breathwork-immersion' = 2025 past slug (Jul 27-28, 2025; slug says 'Sunday July 27th and Monday July 28th' — Jul 27 2026 = Monday ✗; WebSearch confirms 'This event has already taken place'). Day-of-week kill confirmed. Never reinvestigate this slug. NOTE 2026-07-24: agents re-surfaced this slug twice in 2 weeks — the PERMANENTLY CLOSED order is absolute. NOTE 2026-07-25: A newer Momence listing (ID 121119361, vs. prior ID 116829352) appeared in search results — may signal an upcoming 2026 Dragonfly Village booking not yet publicly indexed. Watch heartofbreath.life/events + Megatix slug `ceremonial-breathwork-with-kim-kindersley-at-dragonfly-village`."
+      "note": "Ceremonial breathwork facilitator, 30+ years experience. WhaleDreaming practitioner. Holds weekly Friday sessions at AYMC Ubud and an annual 2-day WhaleDreaming immersion at Dragonfly Village. Website: heartofbreath.life. Megatix slugs: 'ceremonial-breathwork-with-kim-kindersley-at-dragonfly-village' (standing — confirmed active in search results Jun 27 2026, date TBC; watch through Aug 1; immediate inbox when date confirmed, ~score 8). Third slug discovered 2026-07-24: 'a-ceremony-of-breath-light-stillness-by-kim-kindersley' (Labyrinth Dome, different venue; June 2025 date in snippets; no 2026 date confirmed — watch separately). ✅ PERMANENTLY CLOSED 2026-07-13: 'ceremonial-breathwork-immersion' = 2025 past slug (Jul 27-28, 2025; slug says 'Sunday July 27th and Monday July 28th' — Jul 27 2026 = Monday ✗; WebSearch confirms 'This event has already taken place'). Day-of-week kill confirmed. ⛔ IGNORE FOREVER — DO NOT REINVESTIGATE THIS SLUG: re-surfaced Jul 13, Jul 24, Jul 25, Jul 27 by search agents. Permanently closed order is absolute. NOTE 2026-07-25: A newer Momence listing (ID 121119361, vs. prior ID 116829352) appeared in search results — may signal an upcoming 2026 Dragonfly Village booking not yet publicly indexed. Watch heartofbreath.life/events + Megatix slug `ceremonial-breathwork-with-kim-kindersley-at-dragonfly-village`."
     },
     {
       "name": "Akari Tamura (Anandamoyi Dasi)",
