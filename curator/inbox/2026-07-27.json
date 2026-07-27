@@ -22,9 +22,34 @@
       "cover_image_url": null,
       "quality_score": 0.80,
       "content_flags": [],
-      "intent_tags": ["devotion", "culture", "presence"],
+      "intent_tags": ["spirit", "community"],
       "archetype_tags": ["seeker", "explorer"],
-      "vibe_tags": ["kirtan", "qawwali", "devotional-music", "live-music", "sufi"]
+      "vibe_tags": ["kirtan-mantra", "live-music"]
+    },
+    {
+      "title": "SuperMoon Conscious Party — Purnama at Akasha",
+      "description": "Akasha New Earth Haven's monthly full-moon ceremony — held on the purnama itself. Opens at sunset with a sacred Vital Cacao Ceremony by fire, flows through ecstatic dance led by resident facilitator Karunika, and closes with sound healing under the stars. The eco-dome pavilion, organic gardens, and natural swimming pool at Akasha form one of Ubud's most immersive night settings for this kind of gathering. Alcohol-free. Arrive from 17:00.",
+      "short_description": "Full-moon cacao ceremony, ecstatic dance, and sound healing at Akasha New Earth Haven on the July purnama.",
+      "category": "Ceremony & Sound",
+      "venue_name": "Akasha New Earth Haven",
+      "venue_address": "Ubud, Bali",
+      "start_date": "2026-07-29",
+      "end_date": null,
+      "start_time": "17:00",
+      "end_time": null,
+      "is_recurring": false,
+      "recurrence_rule": null,
+      "price_info": "IDR 150,000 presale / IDR 200,000 at door",
+      "external_ticket_url": "https://megatix.co.id/events/supermoon-conscious-party-purnama-x-villa-akasha",
+      "source_url": "https://megatix.co.id/events/supermoon-conscious-party-purnama-x-villa-akasha",
+      "organizer_name": "Akasha New Earth Haven",
+      "organizer_instagram": "@akashanewearthbali",
+      "cover_image_url": null,
+      "quality_score": 0.65,
+      "content_flags": [],
+      "intent_tags": ["spirit", "community"],
+      "archetype_tags": ["seeker", "explorer", "connector"],
+      "vibe_tags": ["cacao-ceremony", "ecstatic-dance", "sound-bath"]
     }
   ]
 }
