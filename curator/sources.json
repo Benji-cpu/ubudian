@@ -605,6 +605,15 @@
       "note": "Special edition of the Resonanz ecstatic dance series at Paradiso Ubud with guest artist YUJOY. Slug `resonanz-dance-x-yujoyvc` found on megatix.com.sg (Singapore TLD — fourth Megatix country TLD confirmed 2026-07-27 alongside co.id, com.au, in.th). YUJOY already in facilitators_pending (ecstatic dance DJ, touring artist, multi-genre; visited Azadi Retreat Jun 8 2026; site: yujoy.io). No date confirmed, no price/capacity found. Score ~7 when date confirmed at a Thursday Paradiso slot. Watch @paradisoubud IG + slug."
     },
     {
+      "name": "Resonanz x UtaraMata x Tanaman Liar x Pakcik (Paradiso Ubud)",
+      "megatix_slug": "https://megatix.co.id/resonanz",
+      "first_seen": "2026-07-28",
+      "themes": [
+        "dance"
+      ],
+      "note": "Multi-act special edition of the Resonanz ecstatic dance series at Paradiso Ubud. Active listing confirmed via WebSearch 2026-07-28. Four-act collab: UtaraMata + Tanaman Liar + Pakcik (artists/acts unverified). Date not confirmed in indexed content — Megatix returns 403 on direct fetch. Watch megatix.co.id/resonanz hub for per-edition slug and date. Score ~7.5 when date confirmed (Paradiso venue + multi-act format + Resonanz brand)."
+    },
+    {
       "name": "Jeremy Sol Ganesha Spirit Celebration (AYMC)",
       "url": "https://www.alchemyyogacenter.com/ganesha-spirit-celebration-with-jeremy-sol",
       "first_seen": "2026-07-27",
@@ -1231,7 +1240,7 @@
       "events_seen": [
         "Soulfire Afro-Latin — The Yoga Barn (Sep 28, 2026, outside 60-day window as of Jul 15)"
       ],
-      "note": "Afro-Latin dance and movement facilitator at Yoga Barn. Megatix slug confirmed 2026-07-15: `soulfire-dion-sept28` (Sep 28, 2026 = 75 days from Jul 15, outside 60-day window). Score ~7 when within window: Yoga Barn venue + named facilitator + Afro-Latin format. Reactivate from Jul 30 when Sep 28 enters the 60-day window. ⚠ DAY-OF-WEEK FLAG 2026-07-27: Sep 28 2026 = Monday — unusual day for a dance event. Sep 28 2025 = Sunday (more typical). Verify year on Megatix page before ingesting — slug may be a 2025 stale re-use. Score ~7 if confirmed 2026. No Instagram or full name confirmed yet."
+      "note": "Afro-Latin dance and movement facilitator at Yoga Barn. Megatix slug `soulfire-dion-sept28`. ✅ STALE 2025 CONFIRMED 2026-07-28: Sep 28 2026 = Monday; Yoga Barn runs ecstatic dance Fri/Sun only. Sep 28 2025 = Sunday (fits recurring pattern). No 2026 promotion found across five search vectors. Slug is a year-agnostic stale page (same pattern as `soulfire-JANUARY`). Watchlist CLOSED. Watch for a new Megatix slug when Dion announces a 2026 autumn date. No Instagram or full name confirmed yet."
     },
     {
       "name": "Sacred Breath & Sound (Thi & Anna)",

@@ -1,0 +1,11 @@
+{
+  "date": "2026-07-28",
+  "events": [],
+  "meta": {
+    "sources_walked": "A:7, B:9, IG:3, discovery:5",
+    "candidates_surfaced": 8,
+    "filtered_out": 8,
+    "inbox_count": 0,
+    "agent_run": "2026-07-28T03:47:00+08:00"
+  }
+}
