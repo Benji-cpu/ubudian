@@ -1,0 +1,30 @@
+{
+  "date": "2026-08-02",
+  "events": [
+    {
+      "title": "Brazil Dance Night — Forró Workshop & Live Music with Anderson Rocha",
+      "description": "A full evening of Brazilian culture at The Yoga Barn: Anderson Rocha opens with a forró fundamentals workshop — footwork, connection, and the lightness of the Northeast Brazilian folk rhythm — before Luz do Sol & Band take the stage for live Brazilian music and an open social dance floor. The format moves from guided learning into free social dancing with a live band, making it accessible to newcomers while rewarding experienced dancers. Forró is one of Brazil's most communal couple dances; this edition brings an authentic slice of it to Ubud's movement community.",
+      "short_description": "Forró workshop with Anderson Rocha, then live Brazilian music by Luz do Sol & Band and open social dance floor at The Yoga Barn.",
+      "category": "Dance & Movement",
+      "venue_name": "The Yoga Barn",
+      "venue_address": "Jl. Hanoman No.56, Ubud, Bali 80571",
+      "start_date": "2026-08-22",
+      "end_date": null,
+      "start_time": "18:00",
+      "end_time": "21:00",
+      "is_recurring": false,
+      "recurrence_rule": null,
+      "price_info": "Verify at Megatix — direct fetch blocked (403); typical Yoga Barn social range IDR 150k–350k",
+      "external_ticket_url": "https://megatix.co.id/events/brazil-dance-night",
+      "source_url": "https://megatix.co.id/events/brazil-dance-night",
+      "organizer_name": "Anderson Rocha",
+      "organizer_instagram": null,
+      "cover_image_url": null,
+      "quality_score": 0.73,
+      "content_flags": [],
+      "intent_tags": ["community"],
+      "archetype_tags": ["connector", "epicurean"],
+      "vibe_tags": ["partner-dance", "live-music"]
+    }
+  ]
+}
