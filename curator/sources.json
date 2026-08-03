@@ -793,6 +793,26 @@
         "dance"
       ],
       "note": "**User-reported (Celina, 2026-06-01). Promoted to CORE ICP by Benji 2026-06-10** — partner-dance socials (Brazilian zouk, salsa/bachata, Latin, fusion) now ingest as core `Dance & Movement` with the `partner-dance` vibe tag (CREMOSO at Bara precedent). Route via the WAHA WhatsApp adapter once joined — **still blocked on Benji joining the group from his phone** (same blocker as ShambAllah + CI Telegram). Until then, watch for zouk/Latin socials surfacing via ToDo.Today and venue scouts. **Attribution rules apply**."
+    },
+    {
+      "name": "Radiantly Alive Yoga",
+      "url": "https://www.radiantlyalive.com/studio-workshops-events-ubud",
+      "first_seen": "2026-08-04",
+      "themes": [
+        "ceremony",
+        "dance",
+        "sound"
+      ],
+      "note": "Central Ubud yoga/movement studio, Jl. Jembawan No. 3, Padang Tegal, Ubud, Bali 80571. Confirmed active event host: (1) Akari Tamura Monday Kirtan (weekly Mon 19:00, ingested 2026-08-04) and (2) MANTRA DANZA biweekly Wednesday ecstatic dance (SAVABORSA). Also hosts visiting artists and workshops. Previously unnamed gap in our source list — we ingested two distinct series before adding the venue record. Direct fetch confirmed accessible (events page). 1 qualifying log — needs 2 more to promote to priority_b. High potential: central location, multi-format, confirmed active programming."
+    },
+    {
+      "name": "MANTRA DANZA (SAVABORSA)",
+      "url": "https://www.instagram.com/savaborsa/",
+      "first_seen": "2026-08-04",
+      "themes": [
+        "dance"
+      ],
+      "note": "Biweekly Wednesday ecstatic dance series at Radiantly Alive Yoga (Jl. Jembawan No. 3, Padang Tegal, Ubud). SAVABORSA = Gábor (Ubud-resident Hungarian) + Feri (Budapest). Active since Dec 2024. IG: @savaborsa. Gábor is also resident DJ at Yoga Barn Sunday and AYMC RISE Ecstatic Dance. Announces 7–10 days ahead on IG. No per-edition Megatix page found — check @savaborsa and radiantlyalive.com events page. Previous confirmed edition: Jul 23 (Wednesday). August Wednesdays: 6, 13, 20, 27. Watch @savaborsa Aug 5–8 for August date. Format: ecstatic dance, 90+ min, community floor. High potential — biweekly ecstatic dance at known Ubud studio, resident facilitator. 1 qualifying log — needs 2 more to promote to priority_b."
     }
   ],
   "rejected_permanent": [
@@ -888,7 +908,7 @@
       "events_seen": [
         "New Moon Bhakti Kirtan — School of Unified Healing (Jul 6)"
       ],
-      "note": "Run New Moon Bhakti Kirtan at School of Unified Healing, Jl. Subak Sok Wayah, Ubud, Kec. Tegallalang (confirmed 2026-06-04). Format: Bhakti Kirtan 5:30pm → dinner buffet 7pm → fire circle 8pm → close 9:30pm. IDR 220k presale / IDR 320k door. Harmonising masculine/feminine through Kali/Shiva, Radha/Krishna, Sita/Rama. Jul 6 edition in DB. June edition: Megatix slug `new-moon-bhakti-kirtan-june` has rolled to the Jul 6 page — June ran without public trace, no evidence of a separate June ingestion needed. Track for August new moon (~Aug 18, nearest Sat = Aug 15 or 22)."
+      "note": "Run New Moon Bhakti Kirtan at School of Unified Healing, Jl. Subak Sok Wayah, Ubud, Kec. Tegallalang (confirmed 2026-06-04). Format: Bhakti Kirtan 5:30pm → dinner buffet 7pm → fire circle 8pm → close 9:30pm. IDR 220k presale / IDR 320k door. Harmonising masculine/feminine through Kali/Shiva, Radha/Krishna, Sita/Rama. Jul 6 edition in DB. June edition: Megatix slug `new-moon-bhakti-kirtan-june` has rolled to the Jul 6 page — June ran without public trace, no evidence of a separate June ingestion needed. Track for August new moon (Aug 12, total solar eclipse — nearest Sat = Aug 8 or Aug 15). Expect announcement Aug 8–10 at Megatix slug new-moon-bhakti-kirtan."
     },
     {
       "name": "Tuluvi Arts",
@@ -1010,10 +1030,11 @@
       "instagram": "@akaritamura_bhakti",
       "first_seen": "2026-05-27",
       "events_seen": [
+        "Monday Kirtan — Radiantly Alive Yoga (weekly Mon 19:00, ~IDR 150k–250k drop-in, ingested 2026-08-04)",
         "Wednesday Kirtan: Songs of Love — Dragon Tea Temple (bi-weekly Wed)",
         "Sunday Bhakti Kirtan — Sayuri Healing Food (weekly Sun 18:00, IDR 150k presale, ingested 2026-06-26)"
       ],
-      "note": "Experienced kirtan leader since 2013, multi-instrumentalist, author of 'Mantra Song Book', professional vocal & music coach. Leads two distinct recurring series: (1) bi-weekly Wednesday Kirtan: Songs of Love at Dragon Tea Temple (Jl. Penestanan No.8, Sayan, Ubud) — ancient Sanskrit mantras + Bhakti stories + uplifting tea; Megatix slug: wednesday-kirtan-songs-of-love-with-akari-tamura-and-friends. (2) Weekly Sunday Bhakti Kirtan at Sayuri Healing Food (Jl. Sukma Kesuma No. 2, Peliatan) — mantra chanting + sacred cacao + community; Megatix slug: sunday-bhakti-kirtan-with-akari1; IDR 150k presale / 180k–200k door; ingested 2026-06-26 as recurring anchor. IG: @akaritamura_bhakti (confirmed 2026-06-26). Promoted by Zest Ubud on Facebook. ✅ INGESTED 2026-07-22: Wednesday Kirtan: Songs of Love at Dragon Tea Temple (biweekly Wed Jul 23–Sep 17, score 0.70, slug: wednesday-kirtan-songs-of-love-with-akari-tamura-and-friends)."
+      "note": "Experienced kirtan leader since 2013, multi-instrumentalist, author of 'Mantra Song Book', professional vocal & music coach. Leads THREE distinct recurring series in Ubud: (1) Weekly Monday Kirtan — Radiantly Alive Yoga, Jl. Jembawan No. 3, Padang Tegal (19:00, 90 min, ~IDR 150k–250k drop-in); IG bio confirmed: 'Monday Kirtan at 7pm @radiantlyalive.ubud'; ✅ INGESTED 2026-08-04 (score 0.73). (2) Bi-weekly Wednesday Kirtan: Songs of Love at Dragon Tea Temple (Jl. Penestanan No.8, Sayan, Ubud) — ancient Sanskrit mantras + Bhakti stories + uplifting tea; Megatix slug: wednesday-kirtan-songs-of-love-with-akari-tamura-and-friends; ✅ INGESTED 2026-07-22 (score 0.70). (3) Weekly Sunday Bhakti Kirtan at Sayuri Healing Food (Jl. Sukma Kesuma No. 2, Peliatan) — mantra chanting + sacred cacao + community; Megatix slug: sunday-bhakti-kirtan-with-akari1; IDR 150k presale / 180k–200k door; ✅ INGESTED 2026-06-26 as recurring anchor. IG: @akaritamura_bhakti (confirmed 2026-06-26). Promoted by Zest Ubud on Facebook."
     },
     {
       "name": "Anand Revati",

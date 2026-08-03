@@ -1,0 +1,31 @@
+{
+  "date": "2026-08-04",
+  "events": [
+    {
+      "title": "Monday Kirtan with Akari Tamura",
+      "description": "A weekly kirtan residency at Radiantly Alive Yoga with Ubud's Bhakti musician Akari Tamura (Anandamoyi Dasi). Call-and-response Sanskrit mantra chanting with harmonium and percussion, woven through with storytelling from the Bhakti tradition. Tamura holds three active residencies in Ubud — this Monday slot at Radiantly Alive adds an early-week anchor to her bi-weekly Dragon Tea Temple Wednesday and Sayuri Sunday series. Sessions run 90 minutes.",
+      "short_description": "Weekly Monday kirtan residency with Akari Tamura at Radiantly Alive — Sanskrit mantra, harmonium, Bhakti storytelling.",
+      "category": "Ceremony & Sound",
+      "event_tier": null,
+      "venue_name": "Radiantly Alive Yoga",
+      "venue_address": "Jl. Jembawan No. 3, Padang Tegal, Ubud, Bali 80571",
+      "start_date": "2026-08-10",
+      "end_date": null,
+      "start_time": "19:00",
+      "end_time": "20:30",
+      "is_recurring": true,
+      "recurrence_rule": "FREQ=WEEKLY;BYDAY=MO",
+      "price_info": "Approx IDR 150,000–250,000 (venue drop-in rate; confirm at door)",
+      "external_ticket_url": "https://www.radiantlyalive.com/studio-workshops-events-ubud",
+      "source_url": "https://www.radiantlyalive.com/studio-workshops-events-ubud",
+      "organizer_name": "Akari Tamura",
+      "organizer_instagram": "@akaritamura_bhakti",
+      "cover_image_url": null,
+      "quality_score": 0.73,
+      "content_flags": [],
+      "intent_tags": ["spirit", "community"],
+      "archetype_tags": ["seeker", "connector"],
+      "vibe_tags": ["kirtan-mantra"]
+    }
+  ]
+}
