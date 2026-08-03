@@ -11,7 +11,7 @@ import { EventsHero } from "@/components/events/events-hero";
 export default function EventsLoading() {
   return (
     <div>
-      <EventsHero />
+      <EventsHero asHeading={false} />
       <section className="mx-auto min-w-0 max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="space-y-3">
           {Array.from({ length: 6 }).map((_, i) => (

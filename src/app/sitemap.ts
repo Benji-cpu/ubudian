@@ -2,9 +2,20 @@ import { MetadataRoute } from "next";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { SITE_URL } from "@/lib/constants";
 import { HUBS } from "@/lib/hubs";
+import { getSiteSettings } from "@/lib/site-settings";
 
+/**
+ * The sitemap must agree with `site_settings`. A flagged-off section renders
+ * `notFound()`, so listing its URLs here submits soft 404s to Google — which is
+ * exactly what was happening: with stories/tours/blog/newsletter switched off
+ * in production, this file was still advertising ~17 URLs that served an empty
+ * shell under a rich <title> and <meta description>. That matters more here
+ * than in most apps, because the events directory *is* the distribution
+ * strategy; poisoning the sitemap undercuts the one thing that works.
+ */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const supabase = createAdminClient();
+  const settings = await getSiteSettings();
 
   const [
     blogRes,
@@ -63,14 +74,30 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "weekly" as const,
       priority: 0.8,
     })),
-    { url: `${SITE_URL}/guides`, changeFrequency: "weekly", priority: 0.8 },
-    { url: `${SITE_URL}/stories`, changeFrequency: "weekly", priority: 0.8 },
-    { url: `${SITE_URL}/tours`, changeFrequency: "weekly", priority: 0.8 },
-    { url: `${SITE_URL}/blog`, changeFrequency: "weekly", priority: 0.7 },
-    { url: `${SITE_URL}/newsletter`, changeFrequency: "weekly", priority: 0.7 },
+    // The retreat product and the quiz were both missing entirely. /experiences
+    // is the highest-value conversion surface on the site; the five archetype
+    // result pages are static and built to be shared.
+    { url: `${SITE_URL}/experiences`, changeFrequency: "weekly", priority: 0.8 },
+    { url: `${SITE_URL}/quiz`, changeFrequency: "monthly", priority: 0.7 },
+    ...(settings.guides_enabled
+      ? [{ url: `${SITE_URL}/guides`, changeFrequency: "weekly" as const, priority: 0.8 }]
+      : []),
+    ...(settings.stories_enabled
+      ? [{ url: `${SITE_URL}/stories`, changeFrequency: "weekly" as const, priority: 0.8 }]
+      : []),
+    ...(settings.tours_enabled
+      ? [{ url: `${SITE_URL}/tours`, changeFrequency: "weekly" as const, priority: 0.8 }]
+      : []),
+    ...(settings.blog_enabled
+      ? [{ url: `${SITE_URL}/blog`, changeFrequency: "weekly" as const, priority: 0.7 }]
+      : []),
+    ...(settings.newsletter_archive_enabled
+      ? [{ url: `${SITE_URL}/newsletter`, changeFrequency: "weekly" as const, priority: 0.7 }]
+      : []),
     { url: `${SITE_URL}/practitioners`, changeFrequency: "weekly", priority: 0.7 },
     { url: `${SITE_URL}/places`, changeFrequency: "weekly", priority: 0.7 },
-    { url: `${SITE_URL}/partners`, changeFrequency: "monthly", priority: 0.5 },
+    { url: `${SITE_URL}/community/partners`, changeFrequency: "monthly", priority: 0.5 },
+    { url: `${SITE_URL}/membership`, changeFrequency: "monthly", priority: 0.5 },
     { url: `${SITE_URL}/about`, changeFrequency: "monthly", priority: 0.5 },
     { url: `${SITE_URL}/events/submit`, changeFrequency: "monthly", priority: 0.4 },
   ];
@@ -142,12 +169,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   return [
     ...staticPages,
-    ...blogPages,
-    ...storyPages,
+    ...(settings.blog_enabled ? blogPages : []),
+    ...(settings.stories_enabled ? storyPages : []),
     ...eventPages,
-    ...tourPages,
-    ...newsletterPages,
-    ...guidePages,
+    ...(settings.tours_enabled ? tourPages : []),
+    ...(settings.newsletter_archive_enabled ? newsletterPages : []),
+    ...(settings.guides_enabled ? guidePages : []),
     ...practitionerPages,
     ...placePages,
     ...partnerPages,

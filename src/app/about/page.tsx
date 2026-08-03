@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { NewsletterSignup } from "@/components/layout/newsletter-signup";
 import { PageHero } from "@/components/layout/page-hero";
+import { getSiteSettings, type SiteSettings } from "@/lib/site-settings";
 import {
   Sparkles,
   Calendar,
@@ -15,10 +16,19 @@ import {
 export const metadata: Metadata = {
   title: "About",
   description:
-    "One place for everything happening in Ubud's conscious community — events, stories, tours, and a weekly newsletter.",
+    "One place for everything happening in Ubud's conscious community — ceremonies, dance, breathwork and sound, gathered daily and sent out once a week.",
 };
 
-const WHAT_WE_DO = [
+// Cards advertising a flag-gated section have to be gated too, or the page
+// promises "Meet the community" and hands the reader a 404.
+const WHAT_WE_DO: {
+  title: string;
+  description: string;
+  href: string;
+  icon: typeof Sparkles;
+  iconColor: string;
+  flag?: keyof SiteSettings;
+}[] = [
   {
     title: "Discover your Ubud Spirit",
     description:
@@ -36,12 +46,22 @@ const WHAT_WE_DO = [
     iconColor: "text-brand-terracotta",
   },
   {
+    title: "Go deeper",
+    description:
+      "Practical guides to living in Ubud, and multi-day retreats hosted by people who live here.",
+    href: "/guides",
+    icon: Map,
+    iconColor: "text-brand-deep-green",
+    flag: "guides_enabled",
+  },
+  {
     title: "Meet the community",
     description:
       "Read the stories of facilitators, healers, and creators who make Ubud what it is.",
     href: "/stories",
     icon: Users,
     iconColor: "text-brand-deep-green",
+    flag: "stories_enabled",
   },
   {
     title: "Explore the land",
@@ -50,17 +70,21 @@ const WHAT_WE_DO = [
     href: "/tours",
     icon: Map,
     iconColor: "text-brand-deep-green",
+    flag: "tours_enabled",
   },
-] as const;
+];
 
 const SOLUTION_POINTS = [
-  "Events aggregated from community sources and submitted by organizers — reviewed and published daily",
+  "Events aggregated from community sources and submitted by organizers — screened and published daily",
   "The Ubud Spirit Quiz matches you to one of five archetypes for personalized recommendations",
-  "Humans of Ubud profiles the facilitators, healers, and creators behind the events",
-  "A weekly newsletter keeps you in the loop with what's happening this week",
+  "Practical guides to arriving, staying, and finding your people",
+  "A weekly email that picks out what's worth your evening",
 ] as const;
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const settings = await getSiteSettings();
+  const whatWeDo = WHAT_WE_DO.filter((item) => !item.flag || settings[item.flag]);
+
   return (
     <div>
       {/* Hero */}
@@ -113,7 +137,7 @@ export default function AboutPage() {
             What We Do
           </h2>
           <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {WHAT_WE_DO.map((item) => (
+            {whatWeDo.map((item) => (
               <Link key={item.href} href={item.href}>
                 <Card className="h-full transition-shadow hover:shadow-md">
                   <CardHeader>
@@ -140,9 +164,9 @@ export default function AboutPage() {
           </h2>
           <p className="mt-6 text-lg leading-relaxed text-muted-foreground">
             Run a workshop, ceremony, or class in Ubud? Submit your event for
-            free. We review submissions within 24 hours. After 5 approved
-            events, you become a trusted submitter — your events go live
-            automatically.
+            free. Submissions are screened nightly — give it a real description
+            and a venue we can find, and it goes live. After 5 approved events
+            you become a trusted submitter and skip the queue entirely.
           </p>
           <Link
             href="/events/submit"

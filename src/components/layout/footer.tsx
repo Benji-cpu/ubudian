@@ -4,10 +4,15 @@ import { NAV_LINKS, SITE_NAME } from "@/lib/constants";
 import { getSiteSettings, type SiteSettings } from "@/lib/site-settings";
 import { NewsletterSignup } from "./newsletter-signup";
 
+// Must stay in sync with the same map in `mobile-menu.tsx`. `/guides` was
+// missing here, so the footer could render a Guides link straight into
+// `guides/layout.tsx`'s notFound() whenever the flag was off.
 const HREF_TO_FLAG: Record<string, keyof SiteSettings> = {
   "/stories": "stories_enabled",
   "/tours": "tours_enabled",
   "/newsletter": "newsletter_archive_enabled",
+  "/guides": "guides_enabled",
+  "/blog": "blog_enabled",
 };
 
 export async function Footer() {

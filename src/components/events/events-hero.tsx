@@ -1,5 +1,11 @@
 interface EventsHeroProps {
   totalCount?: number;
+  /**
+   * Render the title as a plain element instead of `<h1>`. The streaming
+   * skeleton renders this same hero, and both copies end up in the raw HTML
+   * that crawlers read — so the fallback must not also claim the page heading.
+   */
+  asHeading?: boolean;
 }
 
 /**
@@ -14,16 +20,17 @@ interface EventsHeroProps {
  * would turn this band into sage-on-charcoal. Gold (`brand-gold`) does not
  * invert. See memory `project_brand_var_inversion_on_locked_hero.md`.
  */
-export function EventsHero({ totalCount }: EventsHeroProps) {
+export function EventsHero({ totalCount, asHeading = true }: EventsHeroProps) {
   const hasCount = typeof totalCount === "number" && totalCount > 0;
+  const Title = asHeading ? "h1" : "div";
 
   return (
     <section className="relative overflow-hidden border-b border-brand-gold/15 bg-[#2C4A3E] py-5 dark:bg-[#0D1A14] sm:py-10">
       <BotanicalSvg id="events-hero-botanical" />
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <h1 className="font-serif text-3xl font-normal tracking-wide text-brand-gold sm:text-4xl">
+        <Title className="font-serif text-3xl font-normal tracking-wide text-brand-gold sm:text-4xl">
           What&apos;s happening <span className="italic">in Ubud</span>
-        </h1>
+        </Title>
         <p className="mt-2 max-w-xl text-sm text-[#FAF5EC]/80 sm:text-base">
           The pulse of the valley
           {hasCount ? ` — ${totalCount} gatherings on the agenda right now.` : "."}
