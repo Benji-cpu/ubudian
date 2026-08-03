@@ -889,8 +889,12 @@ export async function createEventFromParsed(
     }
   }
 
-  // Always pending — the daily Claude approver routine is the editorial gate.
-  const eventStatus: "pending" = "pending";
+  // Always pending. The editorial gate is src/lib/maintenance/auto-approve.ts,
+  // run nightly by /api/cron/daily-maintenance — it screens the pending pool
+  // and publishes what clears it. (It replaced a daily Claude approver trigger
+  // disabled 2026-05-20, then a human routine that stopped 2026-06-10; for the
+  // eight weeks in between, everything inserted here expired unpublished.)
+  const eventStatus = "pending" as const;
   const moderationReason: string | null = null;
   const aiApprovedAt: string | null = null;
   const mergedFlags = contentFlags;

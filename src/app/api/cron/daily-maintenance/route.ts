@@ -24,8 +24,13 @@ import {
 import { garbageCollectArchivedEventImages, type ImageGcResult } from "@/lib/maintenance/image-gc";
 import { ensureTelegramWebhook, type TelegramWebhookHealth } from "@/lib/maintenance/telegram-webhook-health";
 import { buildReviewQueue } from "@/lib/maintenance/review-queue";
+import { autoApprovePending, type AutoApproveResult } from "@/lib/maintenance/auto-approve";
 import { sendTransactionalEmail } from "@/lib/email";
 import { dailyMaintenanceDigest } from "@/lib/email-templates";
+
+// The gate makes up to AUTO_APPROVE_MAX_PER_RUN Gemini calls on top of the
+// link-health sweep, so this route needs more than the platform default.
+export const maxDuration = 60;
 
 export async function GET(request: Request) {
   const authHeader = request.headers.get("authorization");
@@ -33,8 +38,43 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const url = new URL(request.url);
+  // ?dryRun=true screens the pending backlog and reports what it *would*
+  // publish without writing anything. Use it to sanity-check the gate's taste
+  // before trusting it, and after any change to the screening rules.
+  const dryRun = url.searchParams.get("dryRun") === "true";
+
   const startedAt = new Date().toISOString();
   const errors: string[] = [];
+
+  // Runs before archivePastPendingEvents so an event that is publishable today
+  // gets its chance ahead of the sweep that would archive it tomorrow.
+  const autoApprove: AutoApproveResult = await autoApprovePending({ dryRun }).catch((err) => {
+    errors.push(`autoApprovePending: ${err?.message ?? String(err)}`);
+    return {
+      dryRun,
+      scanned: 0,
+      approved: 0,
+      rejected: 0,
+      held: 0,
+      decisions: [],
+      heldReasons: {},
+      errors: [],
+    };
+  });
+  if (autoApprove.errors.length) errors.push(...autoApprove.errors.map((e) => `autoApprove: ${e}`));
+
+  // A dry run must not mutate anything, so it stops here rather than falling
+  // through to the archive/purge/GC sweeps below — those have no dry mode.
+  if (dryRun) {
+    return NextResponse.json({
+      startedAt,
+      finishedAt: new Date().toISOString(),
+      dryRun: true,
+      autoApprove,
+      errors,
+    });
+  }
 
   const archivedPending = await archivePastPendingEvents().catch((err) => {
     errors.push(`archivePastPendingEvents: ${err?.message ?? String(err)}`);
@@ -95,7 +135,11 @@ export async function GET(request: Request) {
   const payload = {
     startedAt,
     finishedAt: new Date().toISOString(),
+    autoApprove,
     autonomous: {
+      autoApprovedEvents: autoApprove.approved,
+      autoRejectedEvents: autoApprove.rejected,
+      heldPendingEvents: autoApprove.held,
       archivedPendingEvents: archivedPending,
       archivedApprovedEvents: archivedApproved,
       purgedFailedMessages: purgedMessages,
@@ -113,7 +157,6 @@ export async function GET(request: Request) {
 
   // Optional: ?digest=true sends an email digest to ADMIN_EMAIL. Used by the
   // GitHub Actions nightly workflow so CI doesn't need its own Resend creds.
-  const url = new URL(request.url);
   if (url.searchParams.get("digest") === "true" && process.env.ADMIN_EMAIL) {
     try {
       await sendTransactionalEmail(

@@ -146,8 +146,12 @@ export async function POST(request: Request) {
       });
 
       if (result.status === "created" && result.eventId) {
-        // Force status='pending' regardless of moderation outcome — the curator
-        // surfaces, admin confirms. We don't auto-publish until taste is calibrated.
+        // Force status='pending' regardless of moderation outcome. Ingest never
+        // publishes directly; the autonomous editorial gate
+        // (src/lib/maintenance/auto-approve.ts, run nightly by
+        // /api/cron/daily-maintenance) is the only thing that moves an event to
+        // 'approved'. Keeping the two steps separate means the screening rules
+        // live in one place and apply to every source identically.
         await supabase
           .from("events")
           .update({ status: "pending", ai_approved_at: null })
