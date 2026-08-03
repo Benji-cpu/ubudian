@@ -1,3 +1,5 @@
+import { escapeHtml } from "@/lib/utils";
+
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://theubudian.life";
 
 const COLORS = {
@@ -352,10 +354,3 @@ export function dailyMaintenanceDigest(p: DailyMaintenancePayload): string {
   `);
 }
 
-function escapeHtml(str: string): string {
-  return str
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
-}

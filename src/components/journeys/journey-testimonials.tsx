@@ -68,7 +68,7 @@ export function JourneyTestimonials({ testimonials, journeyTitle }: JourneyTesti
 
 function Avatar({ name, url, alt }: { name: string; url: string | null; alt: string }) {
   if (url) {
-    // eslint-disable-next-line @next/next/no-img-element
+     
     return (
       <img
         src={url}

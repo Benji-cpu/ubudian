@@ -1,5 +1,7 @@
+import { escapeHtml as esc } from "@/lib/utils";
+import { fmtEmailDate } from "@/lib/email/brand";
 import { ARCHETYPES } from "@/lib/quiz-data";
-import type { ArchetypeId, Event, Experience } from "@/types";
+import type { ArchetypeId, Event } from "@/types";
 
 /**
  * Branded HTML for the post-quiz "custom spread" email — the safety net so a
@@ -13,39 +15,18 @@ const GOLD = "#C9A84C";
 const CREAM = "#FAF5EC";
 const CHARCOAL = "#2D2D2D";
 
-function fmtDate(ymd: string | null): string {
-  if (!ymd) return "";
-  const [y, m, d] = ymd.split("-").map(Number);
-  if (!y || !m || !d) return "";
-  const dt = new Date(Date.UTC(y, m - 1, d));
-  return dt.toLocaleDateString("en-GB", {
-    weekday: "short",
-    day: "numeric",
-    month: "short",
-    timeZone: "UTC",
-  });
-}
-
-function esc(s: string): string {
-  return s
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
-}
-
 export function buildSpreadEmailHtml(opts: {
   primary: ArchetypeId;
   events: Event[];
-  experiences: Experience[];
   siteUrl: string;
 }): string {
-  const { primary, events, experiences, siteUrl } = opts;
+  const { primary, events, siteUrl } = opts;
   const base = siteUrl.replace(/\/$/, "");
   const a = ARCHETYPES[primary];
 
   const eventRows = events
     .map((e) => {
-      const when = fmtDate(e.start_date);
+      const when = fmtEmailDate(e.start_date);
       const meta = [when, e.venue_name]
         .filter((v): v is string => !!v)
         .map(esc)
@@ -57,25 +38,6 @@ export function buildSpreadEmailHtml(opts: {
         </td></tr>`;
     })
     .join("");
-
-  const expRows = experiences
-    .map(
-      (x) => `
-        <tr><td style="padding:0 0 16px;">
-          <a href="${base}/experiences/${x.slug}" style="color:${GREEN};text-decoration:none;font-weight:600;font-size:16px;">${esc(x.title)}</a>
-          ${x.short_description ? `<div style="color:#6b6b6b;font-size:13px;margin-top:2px;">${esc(x.short_description)}</div>` : ""}
-        </td></tr>`
-    )
-    .join("");
-
-  const expSection = experiences.length
-    ? `
-      <tr><td style="padding:28px 0 10px;">
-        <div style="font-size:12px;letter-spacing:2px;text-transform:uppercase;color:${GOLD};">Curated journeys</div>
-        <div style="font-family:Georgia,serif;font-size:20px;color:${GREEN};margin-top:4px;">Multi-day threads for you</div>
-      </td></tr>
-      <tr><td><table role="presentation" width="100%" cellpadding="0" cellspacing="0">${expRows}</table></td></tr>`
-    : "";
 
   return `<!doctype html>
 <html><body style="margin:0;padding:0;background:${CREAM};">
@@ -100,7 +62,7 @@ export function buildSpreadEmailHtml(opts: {
         </td></tr>
         <tr><td style="padding:14px 32px 0;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0">${eventRows || `<tr><td style="color:#6b6b6b;font-size:14px;padding-bottom:12px;">Fresh events land daily — your feed will fill in fast.</td></tr>`}</table></td></tr>
 
-        <tr><td style="padding:0 32px;">${expSection}</td></tr>
+        <tr><td style="padding:0 32px;"></td></tr>
 
         <tr><td align="center" style="padding:28px 32px 32px;">
           <a href="${base}/login?redirect=/dashboard" style="display:inline-block;background:${GOLD};color:${GREEN};text-decoration:none;font-weight:700;padding:13px 28px;border-radius:999px;font-size:15px;">Save my spread &amp; see my full feed</a>

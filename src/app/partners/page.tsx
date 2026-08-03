@@ -101,7 +101,7 @@ export default async function PartnersPitchPage() {
           The Ubudian is the editorial home for Ubud&apos;s tantra, ceremony,
           ecstatic dance and embodiment scene. Community Partners help sustain
           the platform in exchange for editorial-grade placements — never
-          banner ads, never "Sponsored" tags. If your work belongs in this
+          banner ads, never &ldquo;Sponsored&rdquo; tags. If your work belongs in this
           field, we&apos;d love to hold it with you.
         </p>
       </header>

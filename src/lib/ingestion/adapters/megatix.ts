@@ -83,9 +83,9 @@ const megatixAdapter: SourceAdapter = {
     const searchTerms = (config.search_terms as string[]) || ["ubud"];
     const localities =
       (config.ubud_localities as string[]) || DEFAULT_UBUD_LOCALITIES;
-    const fetchDelayMs = (config.fetch_delay_ms as number) || 500;
-    const maxEvents = (config.max_events_per_run as number) || 50;
-    const maxListPages = (config.max_list_pages as number) || 20;
+    const fetchDelayMs = (config.fetch_delay_ms as number) ?? 500;
+    const maxEvents = (config.max_events_per_run as number) ?? 50;
+    const maxListPages = (config.max_list_pages as number) ?? 20;
     const knownVenues = (config.known_ubud_venues as string[]) || [];
 
     // Collect events from search, dedup by id

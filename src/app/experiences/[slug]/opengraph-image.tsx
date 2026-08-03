@@ -74,7 +74,7 @@ export default async function JourneyOgImage({
       >
         {/* Background image */}
         {journey.cover_image_url && (
-          // eslint-disable-next-line @next/next/no-img-element
+           
           <img
             src={journey.cover_image_url}
             alt=""

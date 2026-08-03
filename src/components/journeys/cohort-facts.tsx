@@ -4,7 +4,6 @@ import type { Journey } from "@/types";
 
 interface CohortFactsProps {
   journey: Journey;
-  applyHref?: string;
 }
 
 const STATUS_LABEL: Record<NonNullable<Journey["next_cohort_status"]>, string> = {
@@ -60,8 +59,14 @@ function formatCohortSize(min: number | null, max: number | null): string | null
  * Cohort facts panel — surfaces the *who, when, where, how many, what cost*
  * a visitor needs to see without scrolling. Sits high on the detail page.
  * If a journey has no scheduled cohort, the panel doesn't render.
+ *
+ * This used to end in an "Apply for a place" button pointing at
+ * /experiences/[slug]/apply — a route that has never existed — under the line
+ * "We read every application. We'll come back within three days." Removed
+ * rather than built: an application inbox is a standing commitment, and the
+ * page already carries the newsletter and enquiry paths.
  */
-export function CohortFacts({ journey, applyHref }: CohortFactsProps) {
+export function CohortFacts({ journey }: CohortFactsProps) {
   const dateRange = formatDateRange(journey.next_cohort_starts_at, journey.next_cohort_ends_at);
   const price = formatPrice(journey.price_per_person_cents);
   const size = formatCohortSize(journey.cohort_size_min, journey.cohort_size_max);
@@ -120,19 +125,6 @@ export function CohortFacts({ journey, applyHref }: CohortFactsProps) {
           </dl>
         )}
 
-        {applyHref && (
-          <div className="mt-7 flex flex-col items-start gap-3 border-t border-brand-gold/20 pt-6 sm:flex-row sm:items-center sm:justify-between">
-            <p className="font-serif text-sm italic text-foreground/70">
-              We read every application. We&apos;ll come back within three days.
-            </p>
-            <a
-              href={applyHref}
-              className="inline-flex items-center justify-center rounded-sm bg-brand-deep-green px-6 py-2.5 text-sm font-medium uppercase tracking-wider text-brand-cream transition-colors hover:bg-brand-deep-green/90"
-            >
-              Apply for a place
-            </a>
-          </div>
-        )}
       </div>
     </aside>
   );

@@ -7,28 +7,24 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Plus, MapPin, Compass, Sparkles, Users, Building } from "lucide-react";
+import { Plus, MapPin, Sparkles, Users, Building } from "lucide-react";
 import { ToursTabs } from "@/components/admin/tours/tours-tabs";
-import type { Tour, Experience } from "@/types";
+import type { Tour } from "@/types";
 
 export default async function AdminToursPage() {
   const supabase = await createClient();
 
-  const [toursRes, expRes] = await Promise.all([
-    supabase.from("tours").select("*").order("created_at", { ascending: false }),
-    supabase
-      .from("experiences")
-      .select("*")
-      .order("sort_order", { ascending: true }),
-  ]);
+  const toursRes = await supabase
+    .from("tours")
+    .select("*")
+    .order("created_at", { ascending: false });
 
   const tours = (toursRes.data ?? []) as Tour[];
-  const experiences = (expRes.data ?? []) as Experience[];
 
   return (
     <div>
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Tours &amp; Experiences</h1>
+        <h1 className="text-3xl font-bold">Tours</h1>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button>
@@ -61,18 +57,12 @@ export default async function AdminToursPage() {
                 Tour
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link href="/admin/experiences/new">
-                <Compass className="mr-2 h-4 w-4" />
-                Legacy Experience
-              </Link>
-            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
 
       <div className="mt-6">
-        <ToursTabs tours={tours} experiences={experiences} />
+        <ToursTabs tours={tours} />
       </div>
     </div>
   );

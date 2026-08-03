@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Loader2, X } from "lucide-react";
 import type { Sponsor, SponsorshipEntityType } from "@/types";
+import Link from "next/link";
 
 interface SponsorshipAttachProps {
   entityType: SponsorshipEntityType;
@@ -130,7 +131,7 @@ export function SponsorshipAttach({
 
       {sponsors.length === 0 ? (
         <p className="text-xs text-muted-foreground">
-          No active partners yet. Add one in <a href="/admin/sponsors" className="underline">Partners</a>.
+          No active partners yet. Add one in <Link href="/admin/sponsors" className="underline">Partners</Link>.
         </p>
       ) : (
         <div className="flex items-center gap-2">

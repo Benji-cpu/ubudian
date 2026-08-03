@@ -93,7 +93,7 @@ export async function POST(request: Request) {
       : null;
 
     const picks = archetype
-      ? buildSpread(archetype, weekEvents, [], { eventLimit: 5 }).events
+      ? buildSpread(archetype, weekEvents, { eventLimit: 5 }).events
       : weekEvents.slice(0, 5);
 
     if (picks.length === 0) {

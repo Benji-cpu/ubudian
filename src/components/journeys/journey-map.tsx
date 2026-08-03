@@ -15,6 +15,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import "leaflet/dist/leaflet.css";
 import type { JourneyAtom, JourneyAtomKind } from "@/types";
+import { escapeHtml } from "@/lib/utils";
 
 interface JourneyMapProps {
   atoms: JourneyAtom[];
@@ -143,11 +144,3 @@ function KindLegend({ colour, label }: { colour: string; label: string }) {
   );
 }
 
-function escapeHtml(s: string) {
-  return s
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-}

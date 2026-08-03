@@ -31,6 +31,8 @@ function makeEvent(overrides: Partial<Event> = {}): Event {
     rejection_reason: null,
     is_placeholder: false,
     is_core: false,
+    event_tier: "core",
+    is_spotlight: false,
     is_members_only: false,
     members_only_teaser: null,
     archetype_tags: [],

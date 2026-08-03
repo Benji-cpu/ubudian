@@ -97,7 +97,7 @@ describe("normalizeVenue", () => {
 
     // from("venue_aliases") should only be called once (cache hit on second call)
     const venueCalls = mockFrom.mock.calls.filter(
-      ([table]: [string]) => table === "venue_aliases"
+      (call) => (call as unknown as [string])[0] === "venue_aliases"
     );
     expect(venueCalls).toHaveLength(1);
   });

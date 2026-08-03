@@ -22,7 +22,7 @@ const retreatGuruAdapter: SourceAdapter = {
     }
 
     const centerId = (config.center_id as string) || "";
-    const limit = (config.limit as number) || 20;
+    const limit = (config.limit as number) ?? 20;
 
     const params = new URLSearchParams({
       api_key: apiKey,

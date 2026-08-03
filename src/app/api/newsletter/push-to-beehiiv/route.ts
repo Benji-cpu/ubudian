@@ -4,15 +4,8 @@ import { createPost } from "@/lib/beehiiv";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
 import { SITE_URL } from "@/lib/constants";
 import { NextResponse } from "next/server";
+import { escapeHtml } from "@/lib/utils";
 
-function escapeHtml(str: string): string {
-  return str
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}
 
 export async function POST(request: Request) {
   const admin = await isAdmin();

@@ -10,7 +10,6 @@ import { AgendaFeed } from "@/components/events/agenda-feed";
 import { PriceFilteredEvents } from "@/components/events/price-filtered-events";
 import { EventFilters } from "@/components/events/event-filters";
 import { EventSearch } from "@/components/events/event-search";
-import { CategoryGuideLink } from "@/components/events/category-guide-link";
 import { MapView } from "@/components/events/map-view";
 import { EventsHero } from "@/components/events/events-hero";
 import { ArchetypeExplainer } from "@/components/quiz/archetype-explainer";
@@ -25,7 +24,7 @@ import { splitByTier, pickSpotlight, bannerEyebrow } from "@/lib/events/discover
 import { stripEmbeddings } from "@/lib/events/strip-embedding";
 import { FestivalBanner } from "@/components/events/festival-banner";
 import { MoreHappenings } from "@/components/events/more-happenings";
-import type { ArchetypeId, Event, Experience, QuizResultRecord, Sponsor } from "@/types";
+import type { ArchetypeId, Event, QuizResultRecord, Sponsor } from "@/types";
 
 const VIEWS_USING_OWN_VIEWPORT = new Set(["calendar", "week"]);
 
@@ -69,7 +68,6 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
   const view = params.view || "list";
 
   let allEvents: Event[] = [];
-  let categoryGuide: Experience | null = null;
   let currentProfileId: string | null = null;
   let savedEventIds: string[] = [];
   let viewerArchetypes: ArchetypeId[] | null = null;
@@ -110,19 +108,6 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
         ];
         archetypeLabel = ARCHETYPES[quiz.primary_archetype]?.name ?? null;
       }
-    }
-
-    // Fetch matching guide for the active category
-    if (params.category) {
-      const { data: guide } = await supabase
-        .from("experiences")
-        .select("*")
-        .eq("category", params.category)
-        .eq("is_active", true)
-        .order("sort_order", { ascending: true })
-        .limit(1)
-        .single();
-      categoryGuide = (guide as Experience) ?? null;
     }
 
     const { data: events, error } = await queryWithRetry(() => {
@@ -332,9 +317,6 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
               verb={`${params.category}, brought to you by`}
               className="mt-4"
             />
-          )}
-          {params.category && categoryGuide && (
-            <CategoryGuideLink category={params.category} guide={categoryGuide} />
           )}
         </div>
 

@@ -116,7 +116,7 @@ export function expandRecurrence(
   if (rule.frequency === "weekly" && rule.day_of_week !== undefined) {
     const days = daysOfWeekArray(rule);
     const dates: Date[] = [];
-    let cursor = seed;
+    const cursor = seed;
     const safeStart = cursor < start ? start : cursor;
     let probe = startOfDay(safeStart);
     let count = 0;

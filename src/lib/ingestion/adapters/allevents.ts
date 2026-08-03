@@ -23,8 +23,8 @@ const allEventsAdapter: SourceAdapter = {
       throw new Error("ALLEVENTS_API_KEY is not configured");
     }
 
-    const radius = (config.radius_km as number) || 20;
-    const limit = (config.limit as number) || 50;
+    const radius = (config.radius_km as number) ?? 20;
+    const limit = (config.limit as number) ?? 50;
 
     const res = await fetch(ALLEVENTS_BASE_URL, {
       method: "POST",

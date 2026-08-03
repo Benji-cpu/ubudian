@@ -23,7 +23,7 @@ const bookretreatAdapter: SourceAdapter = {
     }
 
     const location = (config.location as string) || "ubud-bali";
-    const limit = (config.limit as number) || 20;
+    const limit = (config.limit as number) ?? 20;
 
     const res = await fetch(
       `https://${BOOKRETREATS_HOST}/retreats?location=${encodeURIComponent(location)}&limit=${limit}`,

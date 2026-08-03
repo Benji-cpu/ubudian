@@ -97,7 +97,7 @@ describe("PATCH /api/events/[id]/update", () => {
   it("updates whitelisted fields, stamps the edit, never touches status", async () => {
     const res = await PATCH(makeRequest(validBody), { params });
     expect(res.status).toBe(200);
-    const payload = mockUpdate.mock.calls[0][0] as Record<string, unknown>;
+    const payload = (mockUpdate.mock.calls as unknown as unknown[][])[0][0] as Record<string, unknown>;
     expect(payload.title).toBe("Edited Title");
     expect(payload.last_edited_by_submitter_at).toBeTruthy();
     expect(payload).not.toHaveProperty("status");

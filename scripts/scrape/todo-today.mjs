@@ -39,7 +39,7 @@ const TARGET = process.argv[2] || "https://todo.today/ubud/";
     Object.defineProperty(navigator, "webdriver", { get: () => undefined });
     Object.defineProperty(navigator, "languages", { get: () => ["en-US", "en"] });
     Object.defineProperty(navigator, "plugins", { get: () => [1, 2, 3, 4, 5] });
-    // @ts-ignore
+    // @ts-expect-error — stealth shim: window.chrome isn't in the DOM lib types
     window.chrome = window.chrome || { runtime: {} };
   });
 

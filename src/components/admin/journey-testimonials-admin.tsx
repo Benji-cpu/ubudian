@@ -145,7 +145,7 @@ export function JourneyTestimonialsAdmin({
 
 function Avatar({ name, url }: { name: string; url: string | null }) {
   if (url) {
-    // eslint-disable-next-line @next/next/no-img-element
+     
     return (
       <img
         src={url}

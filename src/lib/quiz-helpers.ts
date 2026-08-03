@@ -3,7 +3,6 @@ import type {
   Event,
   Tour,
   Story,
-  Experience,
   Practitioner,
 } from "@/types";
 import { ARCHETYPES } from "./quiz-data";
@@ -49,29 +48,6 @@ export function getToursForArchetype(tours: Tour[], archetype: ArchetypeId, limi
 
   if (combined.length < limit) {
     const remaining = tours.filter((t) => !combined.includes(t));
-    combined.push(...remaining.slice(0, limit - combined.length));
-  }
-
-  return combined.slice(0, limit);
-}
-
-export function getExperiencesForArchetype(
-  experiences: Experience[], archetype: ArchetypeId, limit = 3
-): Experience[] {
-  const config = ARCHETYPES[archetype].content_keywords;
-
-  // Tier 1: explicit archetype_tags
-  const tagged = experiences.filter((e) => e.archetype_tags?.includes(archetype));
-
-  // Tier 2: category match
-  const categoryMatch = experiences.filter(
-    (e) => !tagged.includes(e) && config.event_categories.includes(e.category)
-  );
-
-  const combined = [...tagged, ...categoryMatch];
-
-  if (combined.length < limit) {
-    const remaining = experiences.filter((e) => !combined.includes(e));
     combined.push(...remaining.slice(0, limit - combined.length));
   }
 

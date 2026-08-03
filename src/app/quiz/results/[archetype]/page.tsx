@@ -7,7 +7,6 @@ import {
   getEventsForArchetype,
   getToursForArchetype,
   getStoriesForArchetype,
-  getExperiencesForArchetype,
   getPractitionersForArchetype,
 } from "@/lib/quiz-helpers";
 import { getGuidesForArchetype } from "@/lib/guides/match-archetype";
@@ -18,13 +17,12 @@ import { QuizArchetypeCard } from "@/components/quiz/quiz-archetype-card";
 import { EventCard } from "@/components/events/event-card";
 import { TourCard } from "@/components/tours/tour-card";
 import { StoryCard } from "@/components/stories/story-card";
-import { ExperienceCard } from "@/components/experiences/experience-card";
 import { GuideCard } from "@/components/guides/guide-card";
 import { PractitionerCard } from "@/components/practitioners/practitioner-card";
 import { RecommendedRetreatCta } from "@/components/journeys/recommended-retreat-cta";
 import { Button } from "@/components/ui/button";
 import { SITE_URL } from "@/lib/constants";
-import type { ArchetypeId, Event, Tour, Story, Experience, Guide, Practitioner } from "@/types";
+import type { ArchetypeId, Event, Tour, Story, Guide, Practitioner } from "@/types";
 import type { Metadata } from "next";
 
 interface PageProps {
@@ -72,7 +70,6 @@ export default async function ArchetypeResultPage({ params }: PageProps) {
   let events: Event[] = [];
   let tours: Tour[] = [];
   let stories: Story[] = [];
-  let experiences: Experience[] = [];
   let guides: Guide[] = [];
   let practitioners: Practitioner[] = [];
 
@@ -82,7 +79,7 @@ export default async function ArchetypeResultPage({ params }: PageProps) {
     const supabase = await createClient();
     const today = new Date().toISOString().split("T")[0];
 
-    const [eventsRes, toursRes, storiesRes, experiencesRes, guidesRes, practitionersRes] = await Promise.all([
+    const [eventsRes, toursRes, storiesRes, guidesRes, practitionersRes] = await Promise.all([
       supabase
         .from("events")
         .select("*")
@@ -100,12 +97,6 @@ export default async function ArchetypeResultPage({ params }: PageProps) {
         .select("*")
         .eq("status", "published")
         .order("published_at", { ascending: false })
-        .limit(12),
-      supabase
-        .from("experiences")
-        .select("*")
-        .eq("is_active", true)
-        .order("sort_order", { ascending: true })
         .limit(12),
       settings.guides_enabled
         ? supabase
@@ -125,14 +116,11 @@ export default async function ArchetypeResultPage({ params }: PageProps) {
     events = (eventsRes.data ?? []) as Event[];
     tours = (toursRes.data ?? []) as Tour[];
     stories = (storiesRes.data ?? []) as Story[];
-    experiences = (experiencesRes.data ?? []) as Experience[];
     guides = (guidesRes.data ?? []) as Guide[];
     practitioners = (practitionersRes.data ?? []) as Practitioner[];
   } catch {
     // Supabase unreachable — render with empty recommendations
   }
-
-  const matchedExperiences = getExperiencesForArchetype(experiences, archetype.id);
   const matchedEvents = getEventsForArchetype(events, archetype.id);
   const matchedTours = getToursForArchetype(tours, archetype.id);
   const matchedStories = getStoriesForArchetype(stories, archetype.id);
@@ -264,23 +252,6 @@ export default async function ArchetypeResultPage({ params }: PageProps) {
                   Browse all guides for {archetype.name} &rarr;
                 </Link>
               </Button>
-            </div>
-          </div>
-        )}
-
-        {/* Recommended experiences */}
-        {matchedExperiences.length > 0 && (
-          <div className="mt-12">
-            <h2 className="font-serif text-2xl font-medium text-brand-deep-green">
-              Experiences for {archetype.name}
-            </h2>
-            <p className="mt-2 text-brand-charcoal-light">
-              Based on your archetype — the practices and gatherings that&apos;ll feel like home.
-            </p>
-            <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {matchedExperiences.map((experience) => (
-                <ExperienceCard key={experience.id} experience={experience} />
-              ))}
             </div>
           </div>
         )}

@@ -40,7 +40,7 @@ export default async function DashboardEventsPage() {
   ]);
 
   const submittedEvents = stripEmbeddings((submittedRes.data ?? []) as Event[]);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   const savedAll = stripEmbeddings(
     (savedRes.data ?? [])
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

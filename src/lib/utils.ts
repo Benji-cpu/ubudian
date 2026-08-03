@@ -62,3 +62,24 @@ export function formatEventTime(startTime?: string | null, endTime?: string | nu
   return `${formatTime(startTime)} – ${formatTime(endTime)}`
 }
 
+
+/**
+ * Escape a string for interpolation into HTML.
+ *
+ * There were six copies of this across the codebase with three different
+ * escape sets. The two on the outbound email path (`lib/email/brand.ts` and
+ * `lib/email/spread-email.ts`) escaped neither `"` nor `'`, which is exactly
+ * where it matters: those builders interpolate user-derived event titles into
+ * `href="..."` and inline `style="..."` attributes. One definition, the full
+ * set, everywhere.
+ *
+ * XML needs `&apos;` rather than `&#39;`, so `feed.xml` keeps its own.
+ */
+export function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}

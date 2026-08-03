@@ -6,7 +6,6 @@ function makeEvent(
   partial: Partial<Event> & { id: string; start_date: string }
 ): Event {
   return {
-    id: partial.id,
     title: partial.title ?? "Untitled",
     slug: partial.id,
     description: "",
@@ -16,7 +15,6 @@ function makeEvent(
     venue_name: null,
     venue_address: null,
     venue_map_url: null,
-    start_date: partial.start_date,
     end_date: partial.end_date ?? null,
     start_time: partial.start_time ?? null,
     end_time: partial.end_time ?? null,

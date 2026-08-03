@@ -6,6 +6,7 @@ import { MapPin, ExternalLink } from "lucide-react";
 import { isSafeUrl } from "@/lib/url-validation";
 import "leaflet/dist/leaflet.css";
 import type { Event } from "@/types";
+import { escapeHtml } from "@/lib/utils";
 
 interface EventMapProps {
   event: Event;
@@ -125,11 +126,3 @@ export function EventMap({ event }: EventMapProps) {
   );
 }
 
-function escapeHtml(s: string): string {
-  return s
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}

@@ -7,12 +7,12 @@ export const GOLD = "#C9A84C";
 export const CREAM = "#FAF5EC";
 export const CHARCOAL = "#2D2D2D";
 
-export function esc(s: string): string {
-  return s
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
-}
+/**
+ * Re-exported so email builders keep their short local name. The shared
+ * implementation also escapes `"` and `'` — this one did not, and these
+ * builders interpolate event titles straight into href="..." attributes.
+ */
+export { escapeHtml as esc } from "@/lib/utils";
 
 export function fmtEmailDate(ymd: string | null): string {
   if (!ymd) return "";

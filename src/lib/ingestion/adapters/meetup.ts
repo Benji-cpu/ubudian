@@ -65,8 +65,8 @@ const meetupAdapter: SourceAdapter = {
       throw new Error("MEETUP_API_KEY is not configured");
     }
 
-    const radius = (config.radius_miles as number) || 15; // Meetup uses miles
-    const limit = (config.limit as number) || 50;
+    const radius = (config.radius_miles as number) ?? 15; // Meetup uses miles
+    const limit = (config.limit as number) ?? 50;
 
     const res = await fetch(MEETUP_GRAPHQL_URL, {
       method: "POST",

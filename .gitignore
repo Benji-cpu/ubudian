@@ -70,3 +70,8 @@ supabase/.temp/
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Playwright screenshot output. 83 of these (71 MB, 80% of the tracked repo)
+# were committed before the *.png rule above existed; they are test artifacts,
+# regenerated on every run, and nothing reads them back.
+e2e/screenshots/

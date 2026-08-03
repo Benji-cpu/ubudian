@@ -5,6 +5,7 @@ import { SITE_URL } from "@/lib/constants";
 import { MarkdownContent } from "@/components/blog/markdown-content";
 import { ShareButtons } from "@/components/blog/share-buttons";
 import { EventJsonLd } from "@/components/events/event-json-ld";
+import { AddToCalendarButton } from "@/components/events/add-to-calendar-button";
 import { EventCard } from "@/components/events/event-card";
 import { EventHero } from "@/components/events/event-hero";
 import { rolledForward } from "@/lib/events/buckets";
@@ -285,9 +286,10 @@ export default async function EventPage({ params }: EventPageProps) {
           </div>
         )}
 
-        {/* Share Buttons */}
-        <div className="mx-auto max-w-3xl border-t px-4 py-8 sm:px-6">
+        {/* Share + add to calendar */}
+        <div className="mx-auto flex max-w-3xl flex-wrap items-center justify-between gap-4 border-t px-4 py-8 sm:px-6">
           <ShareButtons title={e.title} url={eventUrl} />
+          <AddToCalendarButton event={e} />
         </div>
 
         {/* Sticky mobile ticket CTA */}

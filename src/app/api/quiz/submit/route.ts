@@ -10,7 +10,7 @@ import { SITE_URL } from "@/lib/constants";
 import { ARCHETYPE_IDS } from "@/lib/quiz-data";
 import { NextResponse, after } from "next/server";
 import { quizSubmitSchema } from "@/lib/quiz/submit-schema";
-import type { ArchetypeId, Event, Experience } from "@/types";
+import type { ArchetypeId, Event } from "@/types";
 
 export async function POST(request: Request) {
   const ip = getClientIp(request);
@@ -130,27 +130,15 @@ export async function POST(request: Request) {
         try {
           const admin = createAdminClient();
           const today = new Date().toISOString().split("T")[0];
-          const [evRes, expRes] = await Promise.all([
-            admin
-              .from("events")
-              .select("*")
-              .eq("status", "approved")
-              .gte("start_date", today)
-              .order("start_date", { ascending: true })
-              .limit(60),
-            admin
-              .from("experiences")
-              .select("*")
-              .eq("is_active", true)
-              .order("sort_order", { ascending: true })
-              .limit(20),
-          ]);
-          const spread = buildSpread(
-            primary,
-            (evRes.data ?? []) as Event[],
-            (expRes.data ?? []) as Experience[]
-          );
-          if (spread.events.length === 0 && spread.experiences.length === 0) return;
+          const evRes = await admin
+            .from("events")
+            .select("*")
+            .eq("status", "approved")
+            .gte("start_date", today)
+            .order("start_date", { ascending: true })
+            .limit(60);
+          const spread = buildSpread(primary, (evRes.data ?? []) as Event[]);
+          if (spread.events.length === 0) return;
 
           if (profileId) {
             await admin.from("saved_spreads").insert({
@@ -159,7 +147,6 @@ export async function POST(request: Request) {
               primary_archetype,
               secondary_archetype: secondary_archetype ?? null,
               event_ids: spread.events.map((e) => e.id),
-              experience_ids: spread.experiences.map((x) => x.id),
             });
           }
 
@@ -167,7 +154,6 @@ export async function POST(request: Request) {
             const html = buildSpreadEmailHtml({
               primary,
               events: spread.events,
-              experiences: spread.experiences,
               siteUrl: SITE_URL,
             });
             await sendTransactionalEmail(

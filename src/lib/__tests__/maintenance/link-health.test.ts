@@ -242,7 +242,9 @@ describe("archiveStaleTicketedEvents", () => {
     for (const m of ["select", "update", "in", "eq"]) c[m] = vi.fn(() => c);
     c.then = (res: (v: unknown) => unknown, rej: (e: unknown) => unknown) =>
       Promise.resolve(result).then(res, rej);
-    return c;
+    // Cast at the seam: the mock is structurally a query builder but
+    // TypeScript can't see that through the string-keyed loop above.
+    return c as never;
   }
 
   beforeEach(() => {

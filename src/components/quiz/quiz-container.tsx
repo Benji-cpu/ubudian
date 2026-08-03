@@ -9,7 +9,7 @@ import { QuizResults } from "./quiz-results";
 import { QuizImmersiveShell } from "./quiz-immersive-shell";
 import { QuizRouterQuestion } from "./quiz-router-question";
 import { Button } from "@/components/ui/button";
-import type { ArchetypeId, QuizScores, Event, Tour, Story, Experience, UserSegment } from "@/types";
+import type { ArchetypeId, QuizScores, Event, Tour, Story, UserSegment } from "@/types";
 
 const STORAGE_KEY = "ubudian_quiz_result";
 
@@ -29,10 +29,9 @@ interface QuizContainerProps {
   events: Event[];
   tours: Tour[];
   stories: Story[];
-  experiences: Experience[];
 }
 
-export function QuizContainer({ events, tours, stories, experiences }: QuizContainerProps) {
+export function QuizContainer({ events, tours, stories }: QuizContainerProps) {
   const [step, setStep] = useState<Step>("intro");
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<{ question_id: number; answer_id: string }[]>([]);
@@ -158,7 +157,6 @@ export function QuizContainer({ events, tours, stories, experiences }: QuizConta
         events={events}
         tours={tours}
         stories={stories}
-        experiences={experiences}
         onRetake={handleRetake}
         userSegment={userSegment}
         submitFailed={submitFailed}

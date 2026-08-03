@@ -400,7 +400,7 @@ export default async function JourneyPage({ params }: JourneyPageProps) {
         </p>
 
         {/* Cohort facts — who, when, where, how many, what cost */}
-        <CohortFacts journey={journey} applyHref={`/experiences/${journey.slug}/apply`} />
+        <CohortFacts journey={journey} />
 
         {/* What this retreat holds — icon row */}
         <section className="mt-12">
