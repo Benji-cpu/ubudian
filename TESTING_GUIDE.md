@@ -8,7 +8,7 @@ A click-by-click walkthrough of every page and feature. Start from the homepage 
 
 1. Make sure the dev server is running (`npm run dev` in your terminal)
 2. Open the site in your browser at **localhost:4000**
-3. Run the seed SQL in the Supabase SQL Editor (Dashboard > SQL Editor > paste contents of `supabase/seed.sql` > Run)
+3. Apply the migrations in `supabase/migrations/`. (There is no `supabase/seed.sql` — the demo rows it used to create were deleted 2026-08-03.)
 4. Make sure `http://localhost:4000/auth/callback` is listed in your Supabase dashboard under Authentication > URL Configuration > Redirect URLs
 
 ---
@@ -20,9 +20,9 @@ A click-by-click walkthrough of every page and feature. Start from the homepage 
 - The page loads without errors
 - Scroll down through each section:
   - **Hero section** at the top with a headline and call-to-action
-  - **Stories section** — should show story cards with names, photos, and taglines (Wayan Sukerta, Sarah Chen, etc.)
+  - **Stories section** — only when `stories_enabled` is on in `site_settings`. The seed stories (Wayan Sukerta, Sarah Chen…) were deleted 2026-08-03; expect nothing until real stories exist.
   - **Events section** — should show upcoming event cards with dates, venues, and categories
-  - **Tours section** — should show tour cards with photos, durations, and prices
+  - **Tours section** — only when `tours_enabled` is on. Seed tours deleted 2026-08-03.
   - **Newsletter signup** — enter a test email and submit. You should see a success message.
 - All images should load (they come from Unsplash)
 - The page should not have any empty sections
@@ -247,7 +247,7 @@ Click into the Admin area and check each section:
 
 **Pages are empty (no events, stories, or tours):**
 
-- Make sure you ran the `supabase/seed.sql` script in the Supabase SQL Editor
+- Make sure the migrations in `supabase/migrations/` have been applied
 - Check the Supabase Table Editor to verify data exists in the tables
 - Check that events have `status = 'approved'`, stories have `status = 'published'`, and tours have `is_active = true`
 

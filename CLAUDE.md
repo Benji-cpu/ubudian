@@ -1,6 +1,8 @@
 # The Ubudian
 
-Community media platform for Ubud, Bali — events, stories, tours, and a weekly newsletter.
+The calendar for Ubud's conscious community — ceremonies, dance, breathwork and sound, harvested and screened nightly without a human in the loop.
+
+**Stories, tours, blog and the newsletter archive are switched off** in `site_settings` and their seed content was deleted 2026-08-03. Guides and events are live. Any surface that links to a flagged section must gate on `getSiteSettings()` — sitemap, RSS, footer, 404 page and the About cards all do.
 
 ## Tech Stack
 
@@ -8,7 +10,7 @@ Community media platform for Ubud, Bali — events, stories, tours, and a weekly
 - **Database**: Supabase (Postgres + Auth + Storage)
 - **Styling**: Tailwind CSS 4 + shadcn/ui
 - **Payments**: Stripe (tour bookings + membership subscriptions)
-- **AI**: Gemini (`@google/generative-ai`) for event parsing, Stability AI for image generation
+- **AI**: Gemini for event parsing + moderation, Stability AI for image generation. NOTE: still on **`@google/generative-ai`**, Google's deprecated SDK — the current package is `@google/genai`. Five import sites incl. the safety gate (`src/lib/events/moderation.ts`, pinned to `gemini-2.5-flash-lite`).
 - **Newsletter**: Beehiiv (distribution), Resend (transactional email + ingestion alerts)
 - **Scraping**: Cheerio (HTML parsing for web scrapers)
 - **Forms**: Zod + React Hook Form + zodResolver
@@ -31,35 +33,68 @@ npm run test:e2e   # Playwright E2E tests
 - **Platform**: Vercel (Hobby plan)
 - **Project**: `ubudian-v1`
 - **Production URL**: https://theubudian.life (canonical apex; old `ubudian-v1.vercel.app` and `www.theubudian.life` 308-redirect to it via `src/middleware.ts` host-canonicalization — webhooks and `/api/cron/*` are exempt). Always reference `theubudian.life` in copy, env vars (`NEXT_PUBLIC_SITE_URL`), screenshots, and docs.
-- **Cron jobs**:
-  - `/api/cron/ingest-events` — Vercel Cron, daily at 6 AM UTC. Lands events as `pending`.
-  - `/api/cron/ingestion-health` — Vercel Cron, daily at 9 AM UTC
-  - `/api/cron/daily-maintenance` — Claude remote trigger `trig_01CnuNJSs8m8wdVyeVrDHrKq` at `17 19 * * *` UTC (≈03:17 WITA). Agent: `.claude/agents/nightly-routine.md`.
-  - **Daily curator** — Claude trigger `trig_01637DsCbz5qGn6r5RTP4hhi` at `47 19 * * *` UTC (≈03:47 WITA). Agent: `.claude/agents/daily-curator.md`. Discovers + ingests dance/tantra events into `pending`.
-  - ~~**Daily event approver** — Claude trigger `trig_015VbLdAh4G8Wpz1hscSvRtC`~~ — **disabled 2026-05-20** in favour of the interactive daily routine (`docs/daily-routine.md`). The trigger still exists (set `enabled: true` to revive); the GH Actions workflows `approver-fetch.yml` + `approver-apply.yml` still run, but with no Opus trigger in between they're effectively dormant. Pending queue is now drained interactively each morning via Supabase MCP.
-  - `/api/cron/event-reminders` — GH Actions `event-reminders.yml`, daily `4 9 * * *` UTC (17:04 WITA). Emails savers whose saved event occurs tomorrow (Bali). Idempotent via `transactional_sends` ledger; `?only=<email>` test param.
-  - `/api/cron/weekly-digest` — GH Actions `weekly-digest.yml`, `6 23 * * 2` UTC (Wed 07:06 WITA). Personalised "This week in your Ubud" email (archetype spread or saved-only top picks). Idempotent per ISO week; `?only=` test param.
 - **Images**: `unoptimized: true` (no Next.js Image Optimization)
-- **Remote image hosts**: Unsplash, `*.supabase.co`, `api.telegram.org`
+- **Remote image hosts**: Unsplash, `*.supabase.co`, `api.telegram.org`, `media.megatix.com.au`
+
+## Scheduled Jobs
+
+Three backbones. Vercel Cron is capped at **2 jobs on Hobby and both slots are used** — that constraint is why everything else lives in GitHub Actions or a Claude trigger.
+
+| Job | Backend | Schedule (UTC) | Does |
+|---|---|---|---|
+| `ingest-events` | Vercel Cron | `0 17 * * *` | Retries stuck messages, runs due enabled sources, refreshes linked events. `maxDuration = 60` |
+| `ingestion-health` | Vercel Cron | `0 9 * * *` | Health check + second-pass archive sweeps + smart metrics |
+| `todo-today-harvest` | GH Actions | `30 18 * * *` | Stealth Chromium → todo.today → ICP filter → POST `curator-ingest` |
+| `aggregator-harvest` | GH Actions | `40 18 * * *` | Megatix scrape → POST `curator-ingest` |
+| `tag-embed-sweep` | GH Actions | `40 18 * * *` | Embeddings + archetype/vibe tag backfill |
+| `daily-maintenance-fetch` | GH Actions | `2 19 * * *` | Curls `/api/cron/daily-maintenance?digest=true`, commits `digests/$TODAY.json` |
+| `event-reminders` | GH Actions | `4 9 * * *` | "Starts tomorrow" mail to savers. Idempotent via `transactional_sends`; `?only=<email>` to test |
+| `weekly-digest` | GH Actions | `6 23 * * 2` | Personalised weekly mail. Idempotent per ISO week; `?only=` to test |
+| `curator-ingest` | GH Actions | on push to `curator/inbox/**` | POSTs the curator's inbox to `/api/cron/curator-ingest` |
+| **daily curator** | Claude trigger `trig_01637DsCbz5qGn6r5RTP4hhi` | `47 19 * * *` | Walks curated sources, writes `curator/inbox/$TODAY.json`. Agent: `.claude/agents/daily-curator.md` |
+| **nightly digest** | Claude trigger `trig_01CnuNJSs8m8wdVyeVrDHrKq` | `17 21 * * *` | Reads the newest unreported payload, commits `digests/*.md`. Agent: `.claude/agents/nightly-routine.md` |
+
+**`aggregator-harvest` and `tag-embed-sweep` collide on `40 18`** — they were written independently and nobody noticed. Not currently causing failures (different work, no shared lock), but if either starts flaking, stagger them first.
+
+**GitHub's scheduled-cron queue runs 60–95 minutes late, consistently.** Measured over 20 consecutive `daily-maintenance-fetch` runs: scheduled `19:02`, actually fired `20:09`–`20:37`, all green. Any design that assumes a GH cron fires near its stated minute will break. This one did: the nightly digest agent used to fire 15 minutes after the workflow and produced **34 false "payload missing" stubs in 51 days** before the trigger moved to `21:17` and the agent learned to read the newest payload rather than today's.
+
+**There is no event approver.** The `daily-event-approver` trigger was disabled 2026-05-20 and the human routine that replaced it stopped 2026-06-10; between then and 2026-08-03, ~19 events/night landed in `pending` and 649 of them expired unpublished. The editorial gate is now `src/lib/maintenance/auto-approve.ts`, run nightly inside `daily-maintenance` — see "Editorial Gate" below.
+
+## Editorial Gate
+
+`src/lib/maintenance/auto-approve.ts` is the only thing that moves an event to `approved`. Ingest never publishes directly, so the screening rules live in one place and apply to every source identically.
+
+- **Structural screen first** (free, deterministic, unit-tested): venue ≥3 chars, category in `EVENT_CATEGORIES` and not the `Other` fallback, body ≥40 chars (`short_description` counts), no `content_flags`, `quality_score` ≥0.4 when present, live recurrence, future date. Then `moderateEvent()` on the survivors — this is the **only** place ingested content is moderated; `pipeline.ts` applies just the keyword ICP filter.
+- **Bounded**: `AUTO_APPROVE_MAX_PER_RUN = 25`, 25s budget, 5 moderation calls in flight.
+- **Reversible**: every auto-publish stamps `events.auto_approved_at`. Undo the lot with `UPDATE events SET status='pending', auto_approved_at=NULL WHERE auto_approved_at IS NOT NULL`.
+- **No review queue, deliberately.** Anything declined stays `pending` and expires as it always has. Do not add a "needs review" surface — an unstaffed queue is what broke this system the first time.
+- **Ordering is one-offs first, then by date.** Sorting by `start_date` alone puts every recurring event's months-old seed date ahead of the one-off happening on Friday, which is the event about to expire.
+- **Dedup lookup fails closed** — if `dedup_matches` can't be read, the whole batch is held rather than published unverified. Chunk ids at 50; PostgREST rejects filter URLs over ~16KB.
+
+Dry run before trusting a rule change: `npx tsx scripts/auto-approve.ts --limit=250` (add `--apply` to publish), or `GET /api/cron/daily-maintenance?dryRun=true` with the `CRON_SECRET` bearer.
 
 ## Architecture
 
-- `/src/app` — Pages and API routes (App Router)
-- `/src/components` — `ui/` (shadcn), `admin/`, `auth/`, `blog/`, `dashboard/`, `events/`, `homepage/`, `layout/`, `membership/`, `newsletter/`, `partners/`, `places/`, `practitioners/`, `quiz/`, `skeletons/`, `stories/`, `tours/`
+- `/src/app` — Pages and API routes (App Router). Section indexes sit in an `(index)` route group (`events/(index)/page.tsx` → `/events`) so their `loading.tsx` scopes to the index and stops wrapping the sibling `[slug]` segment. **A `loading.tsx` above a page turns its `notFound()` into a streamed 200** — a root `loading.tsx` was doing that to the entire site.
+- `/src/components` — `ui/` (shadcn), `admin/`, `auth/`, `blog/`, `cross-links/`, `dashboard/`, `events/`, `feedback/`, `guides/`, `homepage/`, `hubs/`, `journeys/`, `layout/`, `membership/`, `newsletter/`, `onboarding/`, `partners/`, `places/`, `practitioners/`, `quiz/`, `skeletons/`, `sponsors/`, `stories/`, `tours/`
 - `/src/lib` — Core libraries:
   - `supabase/` — `server.ts`, `client.ts`, `admin.ts`, `middleware.ts`
-  - `ingestion/` — Event ingestion pipeline (16+ files, see Ingestion section)
+  - `ingestion/` — Event ingestion pipeline (18 files, see Ingestion section)
+  - `maintenance/` — nightly cleanups (`cleanups.ts`, `image-gc.ts`, `review-queue.ts`) + the editorial gate (`auto-approve.ts`)
+  - `events/` — Bali-time (`bali-time.ts`), recurrence roll-forward, ranking, filtering, views
+  - `email/` — shared branded builders (`brand.ts`, `spread-email.ts`, `weekly-digest-email.ts`)
+  - `guides/`, `journeys/`, `quiz/`, `sponsors/`, `places/`, `reminders/`, `analytics/`, `og/`, `feedback/`
   - `stripe/` — `client.ts`, `server.ts`, `subscription.ts`, `helpers.ts`
   - `utils.ts`, `constants.ts`, `auth.ts`, `email.ts`, `beehiiv.ts`, `stability.ts`, `quiz-data.ts`, `quiz-helpers.ts`, `rate-limit.ts`, `recurrence.ts`
 - `/src/types` — All TypeScript interfaces in `index.ts`
-- `/supabase` — `schema.sql` (full database schema)
+- `/supabase` — `schema.sql` (**stale**: stops at 25 tables) + `migrations/` (~90 files, the real source of truth)
 - `/e2e` — Playwright E2E tests
 - `/scripts` — CLI utilities (Telegram setup, schema application, seeding)
 
 **API route groups:**
 - `webhooks/` — Stripe, Telegram, WhatsApp
-- `cron/` — `ingest-events`, `ingestion-health`
-- `checkout/` — `tour`, `subscription`
+- `cron/` — `ingest-events`, `ingestion-health`, `daily-maintenance`, `curator-ingest`, `event-reminders`, `weekly-digest` (see "Scheduled Jobs")
+- `checkout/` — `tour`, `subscription`, `sponsorship`
 - `billing/portal` — Stripe customer portal
 - `admin/ingestion/` — Sources, messages, venues, dedup, Telegram webhook management
 - `events/` — `submit`, `approve`
@@ -86,17 +121,19 @@ npm run test:e2e   # Playwright E2E tests
 
 ## Database
 
-20 tables across 4 domains. All have RLS enabled. `is_admin()` SQL function checks admin role.
+**46 tables** across 6 domains (`supabase/schema.sql` plus ~90 migrations — schema.sql alone is *not* current, it stops at 25 `CREATE TABLE`). All have RLS enabled. `is_admin()` SQL function checks admin role.
 
-**Content (9):** `profiles`, `blog_posts`, `stories`, `events`, `tours`, `newsletter_editions`, `newsletter_subscribers`, `trusted_submitters`, `places`
-**Ingestion (6):** `event_sources`, `ingestion_runs`, `raw_ingestion_messages`, `venue_aliases`, `dedup_matches`, `unresolved_venues` — admin-only RLS (except `venue_aliases` has public read)
-**Stripe (3):** `bookings`, `subscriptions`, `payments` — all amounts stored in **cents USD**
-**User (2):** `quiz_results`, `saved_events`
+**Content:** `profiles`, `blog_posts`, `stories`, `events`, `tours`, `journeys` (+ `journey_atoms`, `journey_days`, `journey_day_slots`, `journey_testimonials`), `guides` (+ `guide_entity_references`), `places`, `practitioners`, `partners`, `newsletter_editions`, `newsletter_subscribers`, `trusted_submitters`, `site_settings`
+**Ingestion:** `event_sources`, `ingestion_runs`, `raw_ingestion_messages`, `venue_aliases`, `venue_coordinates`, `dedup_matches`, `dedup_decisions`, `unresolved_venues`, `ingestion_activity_log`, `pipeline_health_logs`, `image_gc_log` — admin-only RLS (except `venue_aliases` has public read)
+**Money:** `bookings`, `subscriptions`, `payments`, `sponsors`, `sponsorships`, `sponsorship_events`, `sponsor_leads` — all amounts in **cents USD**
+**User:** `quiz_results`, `saved_events`, `saved_guides`, `saved_journeys`, `saved_spreads`, `feedback`, `transactional_sends`
 
 Key gotchas:
 - Trusted submitters auto-approve at **5 approved events** (`increment_approved_count()` SQL function)
 - Public reads filtered by `status`/`is_active` per entity type
-- `events` table has ingestion columns (`source_id`, `content_fingerprint`, `raw_message_id`, `llm_parsed`)
+- `events` carries ingestion columns (`source_id`, `content_fingerprint`, `raw_message_id`, `llm_parsed`, `quality_score`, `content_flags`), personalisation columns (`archetype_tags`, `vibe_tags`, `intent_tags`, `embedding`, `event_tier`, `is_spotlight`) and the gate's audit column (`auto_approved_at`)
+- **`commission_partners` and `commission_payouts` are dead** — created 2026-05-27, zero queries anywhere in `src`. Drop them or wire them; don't assume they work.
+- `saved_spreads` is write-only: the quiz submit route inserts, nothing reads it back.
 
 ## Ingestion Pipeline
 
@@ -198,7 +235,7 @@ npm test                                           # Full unit test suite
 npx vitest run src/lib/__tests__/ingestion/        # Ingestion tests only
 ```
 - All tests must pass. Do not skip or `.todo()` failing tests.
-- The Stop hook in `.claude/settings.json` runs `npm test` automatically — if it fails, fix the issue before continuing.
+- A Stop hook in `.claude/settings.json` runs `npx vitest run` automatically. **`.claude/*` is gitignored**, so this hook lives only on Benji's machine — it is not a repo guarantee and a fresh clone has none. Run `npm test` yourself.
 - Use Supabase MCP (`.mcp.json`) to verify database state after pipeline changes.
 
 **Front-end changes:**

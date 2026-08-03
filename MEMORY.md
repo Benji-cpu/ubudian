@@ -20,11 +20,13 @@ When changing either, consider whether the change should propagate to MysTech, W
 
 ## Daily-maintenance follow-ups
 
-The nightly route currently does: archive past pending events, purge failed messages, cancel stale bookings, archive fuzzy duplicates, build review queue. The following are planned but not implemented — extend `src/lib/maintenance/cleanups.ts` and reference from `daily-maintenance/route.ts`:
+The nightly route does: **the editorial gate** (`auto-approve.ts` — the thing that actually publishes), archive past pending/approved events, purge failed messages, cancel stale bookings, archive fuzzy duplicates, link health + stale-CTA sweep, image GC, Telegram webhook health, build review queue.
 
-- **Link health check** on `events.external_ticket_url` and `venues.map_url` — flag 4xx/5xx responses, surface in review queue.
-- **Gemini spell-check pass** on `events.description` — flag suspicious content_flags or low quality_score for re-review.
-- **Recurring event validation** — parse `recurrence_rule` (iCal RRULE), surface orphaned instances and rules expiring within 14 days.
+Link health **is implemented** (`checkExternalLinkHealth` at `cleanups.ts:170`, wired at `daily-maintenance/route.ts`, three tests) — this file claimed otherwise until 2026-08-03. Still genuinely unbuilt:
+
+- **Gemini spell-check pass** on `events.description` — flag suspicious content_flags or low quality_score.
+- **Recurring event validation** — `recurrence_rule` has no `until` field, so expiries get smuggled in as free text ("until 2026-06-09") or as an RRULE `UNTIL=`. The editorial gate parses both and holds dead series; nothing repairs or normalises the rows.
+- **Two `recurrence_rule` formats coexist in prod** — JSON (`{"frequency":"weekly"}`) and free text ("daily", "until …"). `parseRecurrenceRule` tolerates both; a normalising migration would let the gate stop guessing.
 
 ## Daily-maintenance + Supabase gotchas
 
@@ -39,3 +41,19 @@ The nightly route currently does: archive past pending events, purge failed mess
 ## Beehiiv
 
 - Distribution writes go through `lib/beehiiv.ts` (server-side); the Beehiiv MCP is read-only (analytics inspection).
+
+## The failure mode this project keeps repeating (2026-08-03)
+
+**Every automated pipeline here has, at some point, been left pointing at a human who wasn't there.**
+
+- `pipeline.ts` inserted every event as `pending` "because the daily Claude approver is the editorial gate". That trigger was disabled 2026-05-20; the human routine replacing it stopped 2026-06-10. For eight weeks ~19 events/night landed in `pending` and **649 expired unpublished**. The site was showing 90 recurring rhythms and 10 upcoming one-offs while 230 good events sat in the queue.
+- The nightly digest agent assumed GH Actions fires near its scheduled minute. It doesn't (60–95 min late, every day). 34 of 51 digests were false "payload missing" alarms, each one blaming a credential.
+- The `/experiences/[slug]` route was repointed at `journeys` and five surfaces — including an outbound email — kept generating links for the old table.
+
+When adding automation here, the test is: **if nobody looks at this for two months, what happens?** If the answer involves a queue, a review surface, or an inbox, it will silently fill and then silently expire. Prefer a gate that decides.
+
+## Machine notes
+
+- `.claude/settings.json` (the Stop hook running vitest) is **gitignored** — machine-local, not a repo guarantee.
+- `npm test` is ~25s on an idle machine. Under load (a concurrent `next build`) vitest workers time out with "Failed to start forks worker" and report phantom failures — that's contention, not a regression. Re-run on a quiet machine before believing it.
+- No `psql` on this Mac and `supabase db push` is unsafe here (the migration history is badly out of sync — ~50 local files have no remote row and vice versa). To apply one migration, run it directly with a `pg` client against `supabase/.temp/pooler-url` + `SUPABASE_DB_PASSWORD`, then insert the version into `supabase_migrations.schema_migrations` by hand.
