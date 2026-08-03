@@ -4,7 +4,8 @@
  * Background: `pipeline.ts` inserts every ingested event as `status='pending'`
  * with the comment "the daily Claude approver routine is the editorial gate."
  * That routine was disabled 2026-05-20 and its human replacement
- * (`docs/daily-routine.md`) last ran 2026-06-10. For the eight weeks after
+ * (a 60-minute-a-day checklist, since retired; its record is in
+ * `docs/daily-routine-log.md`) last ran 2026-06-10. For the eight weeks after
  * that, ~19 events landed in `pending` every night and not one was ever
  * published — `archivePastPendingEvents()` silently archived each one as its
  * date passed. The ingestion fleet was running into a void.

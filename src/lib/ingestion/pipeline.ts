@@ -47,8 +47,8 @@ type EnrichFieldName = (typeof ENRICH_ON_DUPLICATE_FIELDS)[number];
  *
  * Returns the matched phrase if the event should be rejected; null otherwise.
  * Conservative — only matches phrases that are unambiguously off-brand.
- * The daily Claude approver routine is the editorial gate for borderline
- * cases.
+ * The autonomous editorial gate (`src/lib/maintenance/auto-approve.ts`) is
+ * where borderline cases are decided.
  */
 const OFF_TOPIC_KEYWORDS: RegExp[] = [
   /\batv\b/i,
@@ -818,7 +818,7 @@ export async function createEventFromParsed(
   // the LLM and therefore can't emit `off_topic` themselves. Same keyword
   // family as the LLM prompt (llm-prompts.ts) so both paths converge.
   // Editorial judgement (ICP fit, dedup, brand voice, completeness) is
-  // still the job of the daily Claude approver — this is just the
+  // the job of the autonomous editorial gate — this is just the
   // free / fast pre-filter for obvious tourist-trap content.
   const qualityScore = parsed.quality_score ?? 0;
   const contentFlags = parsed.content_flags ?? [];

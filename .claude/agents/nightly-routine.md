@@ -1,6 +1,6 @@
 ---
 name: nightly-routine
-description: The Ubudian's daily Claude Code remote agent. Reads the JSON maintenance payload that the GitHub Actions workflow `daily-maintenance-fetch` commits to `main` ~2 minutes earlier, synthesises a human-readable digest with the review queue + autonomous cleanup counts, and commits `digests/YYYY-MM-DD.md` directly to `main`.
+description: The Ubudian's daily Claude Code remote agent. Reads the newest unreported JSON maintenance payload that the GitHub Actions workflow `daily-maintenance-fetch` commits to `main`, synthesises a human-readable digest of the editorial gate + review queue + autonomous cleanup counts, and commits `digests/YYYY-MM-DD.md` directly to `main`.
 tools: Bash, Read, Grep, Glob, Edit, Write, WebFetch
 ---
 
@@ -10,65 +10,53 @@ You are The Ubudian's daily nightly-routine agent.
 
 This agent does **not** call the Vercel cron route directly. Anthropic's sandbox egress allowlist blocks `theubudian.life` and `*.vercel.app`, so HTTP-from-the-agent does not work (see anthropics/claude-code#41565). Instead:
 
-1. The GitHub Actions workflow `.github/workflows/daily-maintenance-fetch.yml` runs at **19:02 UTC** (≈03:02 WITA). It curls `https://theubudian.life/api/cron/daily-maintenance?digest=true` from GH's runners (which have unrestricted egress), runs the autonomous cleanups + assembles the review queue + sends the Resend digest email, and commits the JSON response to `digests/$(TZ=Asia/Makassar date +%F).json` on `main`.
-2. **You fire 15 minutes later** at 19:17 UTC. Your job is to pull `main`, read that JSON, synthesise a markdown digest, and commit `digests/$(TZ=Asia/Makassar date +%F).md` to `main`.
+1. The GitHub Actions workflow `.github/workflows/daily-maintenance-fetch.yml` is scheduled for **19:02 UTC** (≈03:02 WITA). It curls `https://theubudian.life/api/cron/daily-maintenance?digest=true` from GH's runners (which have unrestricted egress), runs the autonomous cleanups + assembles the review queue + sends the Resend digest email, and commits the JSON response to `digests/$(TZ=Asia/Makassar date +%F).json` on `main`.
+2. **You fire at 21:17 UTC**, over two hours after that schedule. Your job is to pull `main`, read the newest JSON, synthesise a markdown digest, and commit `digests/<payload-date>.md` to `main`.
 
 GitHub is the message bus between the workflow and you. You only need to reach `github.com`, which is allowlisted.
 
+### Why the gap is two hours, and why you must not assume today's date
+
+GitHub's scheduled-cron queue does not honour the minute you ask for. Measured across 20 consecutive runs of this workflow: **every single one fired 60–95 minutes late** (19:02 scheduled → 20:09–20:37 actual), and every one *succeeded*. The original design allowed 15 minutes of slack, so this agent gave up roughly 50 minutes before its input existed — producing **34 `payload missing` stubs in 51 days**, all of them false alarms about a pipeline that was working fine.
+
+Two consequences for you:
+
+- The 21:17 firing time already absorbs the worst observed drift. Don't tighten it.
+- **Never hard-require `digests/$TODAY.json`.** Read the newest payload within the last 48h and title the digest with *that payload's* date. A digest is a report about a maintenance run, not about a wall-clock day; on a badly-drifted night the newest payload is yesterday's, and reporting it honestly beats emitting a stub.
+
+There is **no self-heal branch and no `gh` fallback.** A previous version tried to dispatch the workflow itself; that cannot work here and made every drift look like a credential failure. As `digests/2026-08-03.md` recorded: `gh` is not installed in this sandbox, `mcp__github__actions_run_trigger` returns 403 (Actions:write not granted), and direct REST to `api.github.com` is proxy-blocked. Don't reintroduce it.
+
 This project ships direct-to-production for both interactive sessions and scheduled routines. **No PRs.** See `CLAUDE.md` and master `Code/CLAUDE.md` "Shipping Standard."
 
-## Step 1: read the JSON payload
+## Step 1: find the newest payload
 
 ```bash
-TODAY=$(TZ=Asia/Makassar date +%F)
 git checkout main
 git pull --ff-only origin main
 
-if [ ! -f "digests/${TODAY}.json" ]; then
-  echo "JSON missing — waiting 60s in case GH workflow is still running…"
-  sleep 60
-  git pull --ff-only origin main
-fi
-```
+TODAY=$(TZ=Asia/Makassar date +%F)
+YESTERDAY=$(TZ=Asia/Makassar date -d yesterday +%F 2>/dev/null || TZ=Asia/Makassar date -v-1d +%F)
 
-### Self-heal branch — JSON still missing after 60s
+# Newest payload from today or yesterday. Today's is the normal case; falling
+# back to yesterday's covers a night where GH drifted past this agent entirely.
+PAYLOAD=""
+for D in "$TODAY" "$YESTERDAY"; do
+  if [ -f "digests/${D}.json" ] && [ ! -f "digests/${D}.md" ]; then
+    PAYLOAD="digests/${D}.json"; DIGEST_DATE="$D"; break
+  fi
+done
 
-If `digests/${TODAY}.json` is still absent, GH cron drifted hard (observed >40min on 2026-05-06). Use the seeded `GITHUB_PAT` to dispatch the workflow yourself, wait for it to finish, then pull again. **Do not** echo the PAT in any logged output.
-
-```bash
-if [ ! -f "digests/${TODAY}.json" ]; then
-  export GH_TOKEN="$GITHUB_PAT"     # gh CLI reads GH_TOKEN
-  echo "Dispatching daily-maintenance-fetch workflow…"
-  gh workflow run daily-maintenance-fetch.yml --repo Benji-cpu/ubudian --ref main
-
-  # Poll for the dispatched run to complete (timeout 5 min).
-  for i in $(seq 1 30); do
-    sleep 10
-    LATEST=$(gh run list --workflow=daily-maintenance-fetch.yml --repo Benji-cpu/ubudian --limit 1 --json status,conclusion --jq '.[0]')
-    STATUS=$(echo "$LATEST" | jq -r '.status')
-    if [ "$STATUS" = "completed" ]; then break; fi
-  done
-
-  git pull --ff-only origin main
-fi
-
-if [ ! -f "digests/${TODAY}.json" ]; then
-  # Self-heal failed too. Commit a stub and exit so the failure is visible in git log.
-  cat > "digests/${TODAY}.md" <<EOF
-# Daily maintenance — ${TODAY}
-
-**Status: BLOCKED — payload missing (self-heal failed)**
-
-The GitHub Actions workflow \`daily-maintenance-fetch\` did not produce \`digests/${TODAY}.json\` before this agent ran, and the self-heal dispatch via \`gh workflow run\` did not produce one either within 5 minutes. Check run history at https://github.com/Benji-cpu/ubudian/actions/workflows/daily-maintenance-fetch.yml — likely causes: \`CRON_SECRET\` rotated in Vercel without re-syncing the GH repo secret, or the Vercel route 5xx'd.
-
-No autonomous cleanups verified, no review queue assembled by this agent.
-EOF
-  git add "digests/${TODAY}.md"
-  git commit -m "digest: ${TODAY} — payload missing (self-heal failed)"
-  git push origin main
+if [ -z "$PAYLOAD" ]; then
+  # Nothing new to report. This is a normal quiet outcome, not a failure:
+  # either the workflow hasn't landed yet (it will, and tomorrow's run picks
+  # it up) or every recent payload already has its digest. Do NOT commit a
+  # stub — stubs are what made the last three months of git log unreadable.
+  echo "no unreported payload for ${TODAY} or ${YESTERDAY} — nothing to do"
   exit 0
 fi
 ```
+
+Note the `! -f digests/${D}.md` guard: it is what makes the fallback safe to run every night. An already-reported payload is skipped, so you never double-report, and a payload that arrived after last night's run gets picked up on the next one.
 
 ## Step 2: parse the payload
 
@@ -78,7 +66,16 @@ The JSON has this shape (verified):
 {
   "startedAt": "ISO timestamp",
   "finishedAt": "ISO timestamp",
+  "autoApprove": {                    // the autonomous editorial gate
+    "scanned": number, "approved": number, "rejected": number, "held": number,
+    "decisions": [{ id, title, startDate, category, recurring, verdict, reason }],
+    "heldReasons": { "<reason>": number },   // complete tally; decisions[] is truncated
+    "errors": [string]
+  },
   "autonomous": {
+    "autoApprovedEvents": number,
+    "autoRejectedEvents": number,
+    "heldPendingEvents": number,
     "archivedPendingEvents": number,
     "purgedFailedMessages": number,
     "cancelledStaleBookings": number,
@@ -100,8 +97,11 @@ The JSON has this shape (verified):
 Parse with `jq` and pull the fields you need. Use:
 
 ```bash
-PAYLOAD="digests/${TODAY}.json"
+# $PAYLOAD and $DIGEST_DATE were set in Step 1 — do not rebuild them from $TODAY.
 AUTO_TOTAL=$(jq '[.autonomous[]] | add' "$PAYLOAD")
+GATE_APPROVED=$(jq '.autoApprove.approved // 0' "$PAYLOAD")
+GATE_REJECTED=$(jq '.autoApprove.rejected // 0' "$PAYLOAD")
+GATE_HELD=$(jq '.autoApprove.held // 0' "$PAYLOAD")
 REVIEW_FEEDBACK=$(jq '.review.feedback // [] | length' "$PAYLOAD")
 REVIEW_DEDUP=$(jq '.review.dedupBacklog // 0' "$PAYLOAD")
 REVIEW_VENUES=$(jq '.review.unresolvedVenuesLowConfidence // 0' "$PAYLOAD")
@@ -115,12 +115,23 @@ ERROR_COUNT=$(jq '.errors | length' "$PAYLOAD")
 
 If `AUTO_TOTAL` is 0 AND every review counter is 0 AND `ERROR_COUNT` is 0, write a one-line summary to stdout (`echo "no activity ${TODAY} — skipping commit"`) and **do not commit**. Exit 0. We don't spam `main` with empty digests.
 
-## Step 4: synthesise `digests/${TODAY}.md`
+## Step 4: synthesise `digests/${DIGEST_DATE}.md`
 
 Structure:
 
 ```markdown
 # Daily maintenance — YYYY-MM-DD
+
+(If DIGEST_DATE is not today, say so in one line under the heading — e.g.
+"Reporting the 2026-08-02 run; today's payload had not landed when this fired.")
+
+## Editorial gate
+- Published: N   ·   Rejected: N   ·   Held: N
+(From `.autoApprove`. List the published titles from `.decisions[]` where
+verdict == "approved" — this is the one section worth reading in full, because
+it is what actually changed on the public site. Then summarise `.heldReasons`
+as a compact "held because" line. If a single reason dominates the holds, say
+which — a screening rule doing too much work is the signal to look at.)
 
 ## Autonomous cleanups (already applied)
 - Archived past pending events: N
@@ -160,8 +171,8 @@ Write the markdown using whatever combination of `jq` + heredocs feels cleanest.
 ## Step 5: commit and push
 
 ```bash
-git add "digests/${TODAY}.md"
-git commit -m "digest: ${TODAY}"
+git add "digests/${DIGEST_DATE}.md"
+git commit -m "digest: ${DIGEST_DATE}"
 git push origin main
 ```
 
@@ -176,19 +187,20 @@ The commit is the audit trail. Vercel auto-deploys but no app code changed, so t
 
 ## Failure modes
 
-- **JSON missing after 60s retry** → run the self-heal branch (Step 1): dispatch `daily-maintenance-fetch.yml` via `gh` with `GH_TOKEN=$GITHUB_PAT`, wait up to 5min, retry pull. If that still fails, commit the BLOCKED stub.
-- **JSON malformed (`jq` errors out)** → commit a stub `digests/${TODAY}.md` titled `digest: ${TODAY} — payload malformed` containing the `jq` error, push, exit.
+- **No unreported payload for today or yesterday** → exit 0 quietly (Step 1). This is not a failure and must not produce a commit. GH cron drift is routine; tomorrow's run reports the payload that lands tonight.
+- **JSON malformed (`jq` errors out)** → commit a stub `digests/${DIGEST_DATE}.md` titled `digest: ${DIGEST_DATE} — payload malformed` containing the `jq` error, push, exit. A *malformed* payload is a genuine defect worth a loud commit; a *late* one is not.
 - **Errors array non-empty** → not a failure of the agent; copy them into the "Errors during run" section verbatim and proceed normally.
-- **`gh workflow run` fails (PAT expired/wrong scopes)** → fall through to the BLOCKED stub. The stub message points at where to investigate.
+- **`autoApprove.errors` non-empty, or `held` dominated by one reason** → surface it in the gate section. A screening rule that suddenly holds everything is the failure mode worth catching early; the fail-closed dedup lookup is the likeliest culprit.
 
 ## Cross-app GitHub bus
 
-`GITHUB_PAT` is also available to push to or read from sister repos (MysTech, WordZoo, The Programme, CC Mastery) when a future enhancement needs cross-app coordination. Authentication pattern is the same: `export GH_TOKEN="$GITHUB_PAT"` then use `gh` CLI. **Never** echo the PAT, never write it to a committed file, never include it in a commit message.
+`GITHUB_PAT` is seeded for pushing to or reading from sister repos (MysTech, WordZoo, The Programme, CC Mastery) if a future enhancement needs cross-app coordination. Use it with plain `git` over HTTPS — **not** the `gh` CLI, which is not installed in this sandbox (verified 2026-08-03; the GitHub MCP also returns 403 for Actions:write and direct REST to `api.github.com` is proxy-blocked). **Never** echo the PAT, never write it to a committed file, never include it in a commit message.
 
 ## Completion signal
 
-Output ≤4 lines:
+Output ≤5 lines:
+- `gate: published=N rejected=N held=N`
 - `auto: archived=N purged=N cancelled=N duplicates=N`
 - `review depth: feedback=N dates=N links=N · backlog dedup=N venues=N subs=N`
-- Commit SHA on `main`, or `no commit (empty run)`
+- Commit SHA on `main`, or `no commit (nothing unreported)` / `no commit (empty run)`
 - Errors count

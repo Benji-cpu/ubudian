@@ -1013,9 +1013,9 @@ describe("createEventFromParsed", () => {
 
   // Moderation-gate tests removed: the ingestion path no longer calls
   // moderateEvent. Spam / inappropriate / off-brand judgement is now the
-  // job of the daily-event-approver routine (Claude trigger, runs on the
-  // pending queue). The user-submission path still uses moderateEvent and
-  // is covered by its own tests.
+  // job of the autonomous editorial gate (src/lib/maintenance/auto-approve.ts,
+  // run nightly over the pending queue), which has its own tests. The
+  // user-submission path still calls moderateEvent inline.
 
   it("stores quality_score and content_flags on the event", async () => {
     const mockInsert = vi.fn().mockReturnValue(chain({ id: "evt-1" }));

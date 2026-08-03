@@ -11,7 +11,7 @@
  * dedup'd + venue-normalised + geocoded) routinely needs >10s. Without this
  * the function was killed at the Hobby default of 10s mid-Megatix every day,
  * so last_fetched_at never advanced and the whole fleet went dry. 60s is the
- * Hobby ceiling and matches the sibling curator-ingest / approver-apply routes.
+ * Hobby ceiling and matches the sibling curator-ingest / daily-maintenance routes.
  */
 
 import { NextResponse } from "next/server";
