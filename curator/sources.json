@@ -250,7 +250,7 @@
       "type": "website",
       "tier": "discovery",
       "category_hint": "Art & Culture",
-      "note": "Pengosekan, Ubud. Museum exhibitions + annual ARMA Fest (Sept). Ingest exhibitions + the festival; SKIP the nightly tourist dance shows (Kecak/Legong as standalone admission) unless a distinct special edition. ARMA Fest 2025 pattern: Sep 27-28. Begin active watch for 2026 edition from Aug 2026."
+      "note": "Pengosekan, Ubud. Museum exhibitions + annual ARMA Fest (Sept). Ingest exhibitions + the festival; SKIP the nightly tourist dance shows (Kecak/Legong as standalone admission) unless a distinct special edition. ARMA Fest 2025 pattern: Sep 27-28. 2026-08-05: AllEvents snippet surfaces 'Sep 19-20, 2026' for ARMA Fest — aggregator-only signal (BaliBuddies/AllEvents not first-party; discovery hard rule #1 requires first-party confirmation before ingesting). Sep 19 = within 60-day window (< Oct 4 cutoff). Begin active watch armabali.com + @armamuseum from Aug 2026 for first-party confirmation."
     },
     {
       "name": "Gaya Art Space / Gaya Ceramic Arts Centre",
@@ -813,6 +813,27 @@
         "dance"
       ],
       "note": "Biweekly Wednesday ecstatic dance series at Radiantly Alive Yoga (Jl. Jembawan No. 3, Padang Tegal, Ubud). SAVABORSA = Gábor (Ubud-resident Hungarian) + Feri (Budapest). Active since Dec 2024. IG: @savaborsa. Gábor is also resident DJ at Yoga Barn Sunday and AYMC RISE Ecstatic Dance. Announces 7–10 days ahead on IG. No per-edition Megatix page found — check @savaborsa and radiantlyalive.com events page. Previous confirmed edition: Jul 23 (Wednesday). August Wednesdays: 6, 13, 20, 27. Watch @savaborsa Aug 5–8 for August date. Format: ecstatic dance, 90+ min, community floor. High potential — biweekly ecstatic dance at known Ubud studio, resident facilitator. 1 qualifying log — needs 2 more to promote to priority_b."
+    },
+    {
+      "name": "Unified Field (Raio + Elah & Ausierra)",
+      "url": "https://megatix.com.au/events/unifiedfield",
+      "first_seen": "2026-08-05",
+      "themes": [
+        "ceremony",
+        "sound",
+        "dance"
+      ],
+      "note": "New ceremonial format surfaced via Megatix WebSearch sweep 2026-08-05. Slug `unifiedfield` on megatix.com.au. Facilitators: Raio (Rob Weber — ABUELA LUNA anchor, cacao ceremonialist + medicine man) + Elah & Ausierra (sound healing duo). Format appears to combine Raio's cacao ceremony work with an integrated sound healing performance by Elah & Ausierra. Venue TBC — no confirmed Ubud address in any indexed snippet. Raio is already our strongest Yoga Barn facilitator (ABUELA LUNA series). If venue confirms as Yoga Barn or another priority_a/b space, score ~8 expected. Watch slug for date + venue confirmation. At 1 qualifying log — discovery phase."
+    },
+    {
+      "name": "Shambala at Zest (cacao + dance, Zest Ubud)",
+      "url": "https://megatix.co.id/events/shambala-at-zest",
+      "first_seen": "2026-08-05",
+      "themes": [
+        "ceremony",
+        "dance"
+      ],
+      "note": "Cacao ceremony + dance format at Zest Ubud, Jl. Penestanan No.7, Sayan, Ubud. Slug `shambala-at-zest` on megatix.co.id. Surfaced via Megatix WebSearch sweep 2026-08-05. Venue is the Zest Garden Temple/Zest Ubud complex (same compound as Bhakti Devi Kirtan by Tetiana Ra, confirmed within greater-Ubud Penestanan/Sayan corridor). Distinct from Shambala at Dragon Tea Temple (DJ Aleceo biweekly series at Jl. Penestanan No.8 — the adjacent venue). Facilitator(s) not yet confirmed from snippet. Format: cacao + dance, consistent with conscious-community tier. No confirmed date in any indexed snippet. Score ~7 when date + named facilitator confirmed. At 1 qualifying log — discovery phase."
     }
   ],
   "rejected_permanent": [
@@ -1104,7 +1125,7 @@
         "dance",
         "ceremony"
       ],
-      "note": "✅ CONFIRMED RECURRING (promoted Jun 28 Sunday maintenance). Biweekly Saturday series at Dragon Tea Temple (Jl. Penestanan No.8, Sayan, Ubud). Format: 5:30pm doors → tea ceremony with live DJ (6pm) → bonfire jam (9:30pm). DJ Aleceo: Cafe De Anatolia / Kosa / Pipe & Pochet credentials — world/ethnic electronic. 3 qualifying logs: Jun 13, Jun 17, Jun 27. DTT already in priority_b; Shambala added to DTT note in priority_b. Evergreen slug: `shambala-at-dragon-tea-temple-with-aleceo`. Ingested: Sat Jul 11 (inbox 2026-07-01), Sat Jul 25 (inbox 2026-07-05). Next occurrence: Sat Aug 8. Watch Megatix Jul 20-25 for Aug 8 slug/date confirmation."
+      "note": "✅ CONFIRMED RECURRING (promoted Jun 28 Sunday maintenance). Biweekly Saturday series at Dragon Tea Temple (Jl. Penestanan No.8, Sayan, Ubud). Format: 5:30pm doors → tea ceremony with live DJ (6pm) → bonfire jam (9:30pm). DJ Aleceo: Cafe De Anatolia / Kosa / Pipe & Pochet credentials — world/ethnic electronic. 3 qualifying logs: Jun 13, Jun 17, Jun 27. DTT already in priority_b; Shambala added to DTT note in priority_b. Evergreen slug: `shambala-at-dragon-tea-temple-with-aleceo`. Ingested: Sat Jul 11 (inbox 2026-07-01), Sat Jul 25 (inbox 2026-07-05). Next occurrence: Sat Aug 8. 2026-08-05: No per-edition slug found after exhaustive search (Aug 4 + Aug 5 daily runs). CLOSE PERMANENTLY if no slug surfaces by EOD Aug 7. If Aug 8 passes without a slug, mark as dormant/paused — biweekly pattern may have broken after Jul 25."
     },
     {
       "name": "Onanya Nicho (Rey Rao)",
