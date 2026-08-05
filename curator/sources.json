@@ -519,6 +519,16 @@
       "note": "Zodiac micro-festival series by AUMARA (formerly @echo.bali). Leo season Jul 22–Aug 22. Slug `celestia-leo` confirmed live on megatix.co.id from Jul 17. ✅ PERMANENTLY GEO-REJECTED 2026-07-21: Venue confirmed as The Istana, Uluwatu (~40km from Ubud) across multiple independent sources — theistana.com/events/celestia-leo-micro-festival-by-echo/ + Megatix snippet explicitly states 'The Istana in Uluwatu.' No connection to Akasha New Earth Haven or any Ubud venue found. The Jul 14 note ('series home = Akasha') was incorrect — CELESTIA series rotates venues per edition and the Leo edition is Uluwatu. Do not watch or ingest any future CELESTIA Leo edition unless venue explicitly changes to Ubud. If CELESTIA Virgo appears, confirm venue from snippet before assigning any default."
     },
     {
+      "name": "CELESTIA Virgo (AUMARA zodiac micro-festival)",
+      "megatix_slug": "https://megatix.co.id/events/celestia-virgo",
+      "first_seen": "2026-08-06",
+      "themes": [
+        "dance",
+        "ceremony"
+      ],
+      "note": "✅ PERMANENTLY GEO-REJECTED 2026-08-06: Venue confirmed as Nuanu City, Tabanan (west coast Bali, ~1.5h from Ubud) across multiple search sources. Not Uluwatu, not Ubud — a separate non-Ubud venue. Virgo season Aug 22 – Sep 22. CELESTIA series pattern confirmed: each edition rotates to a different non-Ubud venue (Leo = The Istana/Uluwatu, Virgo = Nuanu/Tabanan). Do not watch or ingest any CELESTIA Virgo edition. If CELESTIA Libra appears, confirm venue from first-party snippet before assigning any default — series does not anchor to Ubud."
+    },
+    {
       "name": "COCA Creative Complex (Titik Dua compound, Peliatan)",
       "url": "https://www.instagram.com/titikduaubud/",
       "first_seen": "2026-07-19",
@@ -812,7 +822,7 @@
       "themes": [
         "dance"
       ],
-      "note": "Biweekly Wednesday ecstatic dance series at Radiantly Alive Yoga (Jl. Jembawan No. 3, Padang Tegal, Ubud). SAVABORSA = Gábor (Ubud-resident Hungarian) + Feri (Budapest). Active since Dec 2024. IG: @savaborsa. Gábor is also resident DJ at Yoga Barn Sunday and AYMC RISE Ecstatic Dance. Announces 7–10 days ahead on IG. No per-edition Megatix page found — check @savaborsa and radiantlyalive.com events page. Previous confirmed edition: Jul 23 (Wednesday). August Wednesdays: 6, 13, 20, 27. Watch @savaborsa Aug 5–8 for August date. Format: ecstatic dance, 90+ min, community floor. High potential — biweekly ecstatic dance at known Ubud studio, resident facilitator. 1 qualifying log — needs 2 more to promote to priority_b."
+      "note": "Biweekly Wednesday ecstatic dance series at Radiantly Alive Yoga (Jl. Jembawan No. 3, Padang Tegal, Ubud). SAVABORSA = Gábor (Ubud-resident Hungarian) + Feri (Budapest). Active since Dec 2024. IG: @savaborsa. Gábor is also resident DJ at Yoga Barn Sunday and AYMC RISE Ecstatic Dance. Announces 7–10 days ahead on IG. Megatix slug confirmed 2026-08-06: `megatix.in.th/events/wednesday-ecstatic-dance-with-dj-savaborsa`. Previous confirmed edition: Jul 29 (Wednesday) — NOTE: Jul 23 was a data error (Jul 23 2026 = Thursday, not Wednesday; Jul 29 2026 is the correct confirmed Wednesday). August Wednesdays: 6, 13, 20, 27. Biweekly from Jul 29 → next expected Aug 12. Watch @savaborsa Aug 8–10 for Aug date confirmation. Format: ecstatic dance, 90+ min, community floor. High potential — biweekly ecstatic dance at known Ubud studio, resident facilitator. 1 qualifying log — needs 2 more to promote to priority_b."
     },
     {
       "name": "Unified Field (Raio + Elah & Ausierra)",
@@ -823,7 +833,7 @@
         "sound",
         "dance"
       ],
-      "note": "New ceremonial format surfaced via Megatix WebSearch sweep 2026-08-05. Slug `unifiedfield` on megatix.com.au. Facilitators: Raio (Rob Weber — ABUELA LUNA anchor, cacao ceremonialist + medicine man) + Elah & Ausierra (sound healing duo). Format appears to combine Raio's cacao ceremony work with an integrated sound healing performance by Elah & Ausierra. Venue TBC — no confirmed Ubud address in any indexed snippet. Raio is already our strongest Yoga Barn facilitator (ABUELA LUNA series). If venue confirms as Yoga Barn or another priority_a/b space, score ~8 expected. Watch slug for date + venue confirmation. At 1 qualifying log — discovery phase."
+      "note": "New ceremonial format surfaced via Megatix WebSearch sweep 2026-08-05. Slug `unifiedfield` on megatix.com.au. Facilitators: Raio (Rob Weber — ABUELA LUNA anchor, cacao ceremonialist + medicine man) + Elah & Ausierra (sound healing duo). Format appears to combine Raio's cacao ceremony work with an integrated sound healing performance by Elah & Ausierra. ✅ VENUE CONFIRMED 2026-08-06: New Earth Haven Bali (Akasha New Earth Haven), Jl. Raya Sayan, Ubud — same venue as Akasha Saturday series (priority_b source). Raio is already our strongest Yoga Barn facilitator (ABUELA LUNA series). Updated expected score: ~8 when date confirmed (priority_b venue + known facilitators). Watch slug for date announcement. At 1 qualifying log — discovery phase."
     },
     {
       "name": "Shambala at Zest (cacao + dance, Zest Ubud)",
@@ -834,6 +844,16 @@
         "dance"
       ],
       "note": "Cacao ceremony + dance format at Zest Ubud, Jl. Penestanan No.7, Sayan, Ubud. Slug `shambala-at-zest` on megatix.co.id. Surfaced via Megatix WebSearch sweep 2026-08-05. Venue is the Zest Garden Temple/Zest Ubud complex (same compound as Bhakti Devi Kirtan by Tetiana Ra, confirmed within greater-Ubud Penestanan/Sayan corridor). Distinct from Shambala at Dragon Tea Temple (DJ Aleceo biweekly series at Jl. Penestanan No.8 — the adjacent venue). Facilitator(s) not yet confirmed from snippet. Format: cacao + dance, consistent with conscious-community tier. No confirmed date in any indexed snippet. Score ~7 when date + named facilitator confirmed. At 1 qualifying log — discovery phase."
+    },
+    {
+      "name": "Breathwork with Yaima Live (Karina Kalilah + YAIMA)",
+      "url": "https://www.yogabarn.com/events/",
+      "first_seen": "2026-08-06",
+      "themes": [
+        "ceremony",
+        "sound"
+      ],
+      "note": "Breathwork ceremony format at The Yoga Barn (priority_a venue). Facilitator: Karina Kalilah (breathwork guide, Bali-based). Live music: YAIMA (sacred world music duo, internationally touring). Surfaced via Yoga Barn calendar search 2026-08-06. Format: guided breathwork with live sacred music accompaniment — high-resonance format squarely in our universe. No confirmed Aug or Sep 2026 date found in any indexed snippet. YAIMA tours internationally — confirm Bali dates from Yoga Barn events page or yaima.com tour schedule. Score ~8 expected when date confirmed (priority_a venue + YAIMA live music draws significant audience). Watch Yoga Barn events page from Aug 10 onward. At 1 qualifying log — discovery phase."
     }
   ],
   "rejected_permanent": [
@@ -1125,7 +1145,7 @@
         "dance",
         "ceremony"
       ],
-      "note": "✅ CONFIRMED RECURRING (promoted Jun 28 Sunday maintenance). Biweekly Saturday series at Dragon Tea Temple (Jl. Penestanan No.8, Sayan, Ubud). Format: 5:30pm doors → tea ceremony with live DJ (6pm) → bonfire jam (9:30pm). DJ Aleceo: Cafe De Anatolia / Kosa / Pipe & Pochet credentials — world/ethnic electronic. 3 qualifying logs: Jun 13, Jun 17, Jun 27. DTT already in priority_b; Shambala added to DTT note in priority_b. Evergreen slug: `shambala-at-dragon-tea-temple-with-aleceo`. Ingested: Sat Jul 11 (inbox 2026-07-01), Sat Jul 25 (inbox 2026-07-05). Next occurrence: Sat Aug 8. 2026-08-05: No per-edition slug found after exhaustive search (Aug 4 + Aug 5 daily runs). CLOSE PERMANENTLY if no slug surfaces by EOD Aug 7. If Aug 8 passes without a slug, mark as dormant/paused — biweekly pattern may have broken after Jul 25."
+      "note": "✅ CONFIRMED RECURRING (promoted Jun 28 Sunday maintenance). Biweekly Saturday series at Dragon Tea Temple (Jl. Penestanan No.8, Sayan, Ubud). Format: 5:30pm doors → tea ceremony with live DJ (6pm) → bonfire jam (9:30pm). DJ Aleceo: Cafe De Anatolia / Kosa / Pipe & Pochet credentials — world/ethnic electronic. 3 qualifying logs: Jun 13, Jun 17, Jun 27. DTT already in priority_b; Shambala added to DTT note in priority_b. Evergreen slug: `shambala-at-dragon-tea-temple-with-aleceo`. Ingested: Sat Jul 11 (inbox 2026-07-01), Sat Jul 25 (inbox 2026-07-05). ✅ WATCHLIST CLOSED 2026-08-06: No per-edition slug found across Aug 4–6 daily runs (3 exhaustive WebSearch sweeps). EOD Aug 7 deadline passed. Aug 8 = 2nd Saturday in biweekly pattern but no slug surfaced. Series status: dormant or paused after Jul 25. Evergreen slug still live — if a future per-edition slug appears in a WebSearch snippet, resume ingesting at that point. No further proactive searching needed; DTT remains priority_b and will catch Shambala announcements passively."
     },
     {
       "name": "Onanya Nicho (Rey Rao)",
