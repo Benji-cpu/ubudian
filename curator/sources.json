@@ -415,7 +415,7 @@
         "dance",
         "ceremony"
       ],
-      "note": "Jl. Raya Sayan, Desa Sayan, Ubud 80571 — geo-confirmed within greater-Ubud zone (Sayan/Kedewatan corridor, 2026-07-08). Also known as Dance Through Dimensions (DTD-Naya). Jungle sanctuary format: 360-degree sound system dome. Hosted NON-DUAL (Awakened Dreamers × Dance Through Dimensions) — sacred electronic temple format: cacao ceremony + community flow + DJ sets. Megatix slug: non-dual (live but no confirmed 2026 date yet). Facilitators confirmed 2026-07-15: SEKALA (DJ), Manish (co-host), Ritual Frequencies (DJ/ecstatic soundscape). Track for confirmed upcoming dates — score ~7 when date confirmed. NOTE 2026-07-20: Naya Veda Vastu / DTD venue also confirmed as host for the Pangaea Festival — a multi-day conscious-arts gathering. Specific 2026 Pangaea dates not confirmed yet; watch Megatix + @nayavedavastu for announcement. Score ~7.5 when dates + programme confirmed."
+      "note": "Jl. Raya Sayan, Desa Sayan, Ubud 80571 — geo-confirmed within greater-Ubud zone (Sayan/Kedewatan corridor, 2026-07-08). Also known as Dance Through Dimensions (DTD-Naya). Jungle sanctuary format: 360-degree sound system dome. Hosted NON-DUAL (Awakened Dreamers × Dance Through Dimensions) — sacred electronic temple format: cacao ceremony + community flow + DJ sets. Megatix slugs: `non-dual` and `DTD-Naya` (both confirmed live 2026-08-07; no confirmed 2026 date yet on either). Facilitators confirmed 2026-07-15: SEKALA (DJ), Manish (co-host), Ritual Frequencies (DJ/ecstatic soundscape). Track for confirmed upcoming dates — score ~7 when date confirmed. NOTE 2026-07-20: Naya Veda Vastu / DTD venue also confirmed as host for the Pangaea Festival — a multi-day conscious-arts gathering. Specific 2026 Pangaea dates not confirmed yet; watch Megatix + @nayavedavastu for announcement. Score ~7.5 when dates + programme confirmed."
     },
     {
       "name": "The Bali Eden (GDAS Wellness Resort)",
@@ -555,7 +555,7 @@
       "themes": [
         "dance"
       ],
-      "note": "Special edition of the Resonanz ecstatic dance series at Paradiso Ubud with guest artist PRABUMI. Surfaced via Megatix WebSearch sweep 2026-07-24. Search snippets cited 'August 29' as the date — confirmed 2026-07-27 that this is the 2024 date (Aug 29 2024 was a Thursday; Aug 29 2026 = Saturday). August 2026 Thursdays: Aug 6, 13, 20, 27. No 2026 date announced. Price: IDR 150,000. Capacity: 50-person hard cap. Score ~7.5 when date confirmed on a 2026 Thursday. Watch @paradisoubud IG + Megatix slug."
+      "note": "Special edition of the Resonanz ecstatic dance series at Paradiso Ubud with guest artist PRABUMI. Surfaced via Megatix WebSearch sweep 2026-07-24. Search snippets cited 'August 29' as the date — confirmed 2026-07-27 that this is the 2024 date (Aug 29 2024 was a Thursday; Aug 29 2026 = Saturday). August 2026 Thursdays: Aug 13, 20, 27. No 2026 date announced. Price: IDR 150,000. Capacity: 50-person hard cap. Score ~7.5 when date confirmed. NOTE 2026-08-07: Megatix resonanz hub shows a '2026 schedule' listing Apr 23 (Thu), Apr 30 (Thu), Jun 4 (Thu), Aug 29 (Sat), Oct 31 (Sat), Dec 12 (Sat) — Q3/Q4 dates are all Saturdays, suggesting the series may now run Saturday special editions alongside Thursday regulars. Day-of-week kill still applies to the specific 'Thursday August 29' framing (confirmed 2024 stale). WIDEN WATCH: if @paradisoubud IG announces Sat Aug 29 2026, ingest immediately as a legitimate Saturday edition. Watch @paradisoubud for both Thursday AND Saturday Resonanz announcements."
     },
     {
       "name": "FLOW — Ecstatic Dance Ubud",
@@ -853,7 +853,62 @@
         "ceremony",
         "sound"
       ],
-      "note": "Breathwork ceremony format at The Yoga Barn (priority_a venue). Facilitator: Karina Kalilah (breathwork guide, Bali-based). Live music: YAIMA (sacred world music duo, internationally touring). Surfaced via Yoga Barn calendar search 2026-08-06. Format: guided breathwork with live sacred music accompaniment — high-resonance format squarely in our universe. No confirmed Aug or Sep 2026 date found in any indexed snippet. YAIMA tours internationally — confirm Bali dates from Yoga Barn events page or yaima.com tour schedule. Score ~8 expected when date confirmed (priority_a venue + YAIMA live music draws significant audience). Watch Yoga Barn events page from Aug 10 onward. At 1 qualifying log — discovery phase."
+      "note": "Breathwork ceremony format at The Yoga Barn (priority_a venue). Facilitator: Karina Kalilah (certified breathworker, Global Professional Breathwork Alliance, founder of Embodied Breath Academy). Live music: YAIMA (sacred world music duo, internationally touring; name from Mapudungun + Yaeyama/Okinawa). Surfaced via Yoga Barn calendar search 2026-08-06. Format: guided breathwork with live sacred music accompaniment — high-resonance format squarely in our universe. No confirmed Aug or Sep 2026 date found in any indexed snippet. UPDATE 2026-08-07: megatix.co.id slug `breathwork-with-yaima-live` confirmed in addition to previously-known megatix.com.au mirror — same event cross-listed. YAIMA tours internationally; confirm Bali dates from Yoga Barn events page or yaima.com tour schedule. Score ~8 expected when date confirmed (priority_a venue + YAIMA live music draws significant audience). Watch Yoga Barn events page from Aug 10 onward. At 2 qualifying logs — discovery phase."
+    },
+    {
+      "name": "Supermoon 7th Anniversary x Yoga Barn",
+      "megatix_slug": "https://megatix.co.id/events/supermoon7-x-yogabarn-",
+      "first_seen": "2026-08-07",
+      "themes": [
+        "dance"
+      ],
+      "note": "Special anniversary edition of the Supermoon ecstatic dance brand at The Yoga Barn. The 'Supermoon' series has run at The Bali Eden/GDAS (megatix.co.id/events/supermoon-a-wellness-celebration) — this 7th anniversary slug at Yoga Barn is a distinct and rare pairing. Format: ecstatic dance DJ night. No date confirmed from any snippet. Score ~7.5 when date confirmed (Yoga Barn = priority_a; anniversary edition = higher novelty). Anniversary editions typically sell out. Watch slug for date announcement — confirm it is a 2026 one-off before ingesting."
+    },
+    {
+      "name": "Resonanz x Zakia Wild (Paradiso Ubud)",
+      "megatix_slug": "https://megatix.co.id/events/resonanz-dance-special-edition-x-zakia-wild-II",
+      "first_seen": "2026-08-07",
+      "themes": [
+        "dance"
+      ],
+      "note": "Special edition of the Resonanz ecstatic dance series at Paradiso Ubud with guest artist Zakia Wild. Slug found via Megatix WebSearch sweep 2026-08-07. No date confirmed. Score ~7 when date confirmed at Thursday (or Saturday per emerging pattern) Paradiso slot. Watch @paradisoubud IG."
+    },
+    {
+      "name": "Resonanz x DI-RHYTHM (Paradiso Ubud)",
+      "megatix_slug": "https://megatix.co.id/events/resonanz-ecstatic-dance-special-edition-x-di-rhythm-copy",
+      "first_seen": "2026-08-07",
+      "themes": [
+        "dance"
+      ],
+      "note": "Special edition of the Resonanz ecstatic dance series at Paradiso Ubud with guest artist DI-RHYTHM. Slug found via Megatix WebSearch sweep 2026-08-07. No date confirmed. Score ~7 when date confirmed. Watch @paradisoubud IG."
+    },
+    {
+      "name": "Resonanz x Hoda Fadel (Paradiso Ubud)",
+      "megatix_slug": "https://megatix.co.id/events/resonanz-dance-special-edition-x-hoda-fadel-x",
+      "first_seen": "2026-08-07",
+      "themes": [
+        "dance"
+      ],
+      "note": "Special edition of the Resonanz ecstatic dance series at Paradiso Ubud with guest DJ Hoda Fadel. Slug found via Megatix WebSearch sweep 2026-08-07. Hoda Fadel previously confirmed as Ubud electronic DJ (surfaced at Akasha SuperMoon Conscious Party). No date confirmed. Score ~7 when date confirmed. Watch @paradisoubud IG."
+    },
+    {
+      "name": "Resonanz x The Arahant (Paradiso Ubud)",
+      "megatix_slug": "https://megatix.co.id/events/resonanz-dance-special-edition-x-the-arahantxxxx",
+      "first_seen": "2026-08-07",
+      "themes": [
+        "dance"
+      ],
+      "note": "Special edition of the Resonanz ecstatic dance series at Paradiso Ubud with guest artist The Arahant. Slug found via Megatix WebSearch sweep 2026-08-07. No date confirmed. Score ~7 when date confirmed. Watch @paradisoubud IG."
+    },
+    {
+      "name": "Full Moon Cacao & Rebirthing Breathwork (Gita)",
+      "megatix_slug": "https://megatix.co.id/events/Full-Moon-cacao-rebirthing-breathwork",
+      "first_seen": "2026-08-07",
+      "themes": [
+        "ceremony",
+        "sound"
+      ],
+      "note": "Full moon cacao ceremony + rebirthing breathwork format at an Ubud-area venue. Facilitator: Gita (certified yoga and rebirthing breathwork facilitator). Surfaced via Megatix WebSearch broad sweep 2026-08-07. Format is squarely in our ceremony tier — rebirthing breathwork + cacao + full moon alignment. Distinct from Raio's ABUELA LUNA and Pyramids of Chi full moon ceremony. No date or venue confirmed from snippet. Score ~7 when date + venue confirmed. Watch slug for announcement."
     }
   ],
   "rejected_permanent": [
