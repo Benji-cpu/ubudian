@@ -250,7 +250,7 @@
       "type": "website",
       "tier": "discovery",
       "category_hint": "Art & Culture",
-      "note": "Pengosekan, Ubud. Museum exhibitions + annual ARMA Fest (Sept). Ingest exhibitions + the festival; SKIP the nightly tourist dance shows (Kecak/Legong as standalone admission) unless a distinct special edition. ARMA Fest 2025 pattern: Sep 27-28. 2026-08-05: AllEvents snippet surfaces 'Sep 19-20, 2026' for ARMA Fest — aggregator-only signal (BaliBuddies/AllEvents not first-party; discovery hard rule #1 requires first-party confirmation before ingesting). Sep 19 = within 60-day window (< Oct 4 cutoff). Begin active watch armabali.com + @armamuseum from Aug 2026 for first-party confirmation."
+      "note": "Pengosekan, Ubud. Museum exhibitions + annual ARMA Fest (Sept). Ingest exhibitions + the festival; SKIP the nightly tourist dance shows (Kecak/Legong as standalone admission) unless a distinct special edition. ARMA Fest 2025 pattern: Sep 27-28. 2026-08-05: AllEvents snippet surfaces 'Sep 19-20, 2026' for ARMA Fest — aggregator-only signal (BaliBuddies/AllEvents not first-party; discovery hard rule #1 requires first-party confirmation before ingesting). 2026-08-10: press-signal upgrade — Dewata News (June 2026) + Hostelworld listing both confirm 'Sep 19-20, 2026' at Jalan Raya Pengosekan, Ubud, as part of ARMA's 30th anniversary celebrations. Confidence elevated from aggregator-only to press-confirmed + aggregator, but discovery rule #1 still requires first-party armabali.com confirmation before ingesting. Sep 19 = within 60-day window (< Oct 4 cutoff). Begin active watch armabali.com + @armamuseum — expected announcement Aug 2026."
     },
     {
       "name": "Gaya Art Space / Gaya Ceramic Arts Centre",
@@ -862,7 +862,7 @@
       "themes": [
         "dance"
       ],
-      "note": "Special anniversary edition of the Supermoon ecstatic dance brand at The Yoga Barn. The 'Supermoon' series has run at The Bali Eden/GDAS (megatix.co.id/events/supermoon-a-wellness-celebration) — this 7th anniversary slug at Yoga Barn is a distinct and rare pairing. Format: ecstatic dance DJ night. No date confirmed from any snippet. Score ~7.5 when date confirmed (Yoga Barn = priority_a; anniversary edition = higher novelty). Anniversary editions typically sell out. Watch slug for date announcement — confirm it is a 2026 one-off before ingesting. Cross-TLD confirmed 2026-08-09: also found on megatix.com.au as `supermoon-anniversary-special-edition-x-the-yogabarn` — likely same event cross-listed across platforms."
+      "note": "⛔ PERMANENTLY CLOSED 2026-08-10. The slug `supermoon7-x-yogabarn-` references the Supermoon 7th Anniversary event from ~2023 (series origin ~2016; 7th year = 2023), not a 2026 event. The megatix.com.au cross-TLD slug `supermoon-anniversary-special-edition-x-the-yogabarn` (added 2026-08-09) is equally stale. The Supermoon series is now on its ~10th anniversary edition — not yet announced as of Aug 2026. Track fresh when a 10th anniversary slug appears at Yoga Barn. Do not ingest either slug."
     },
     {
       "name": "Resonanz x Zakia Wild (Paradiso Ubud)",
@@ -918,6 +918,45 @@
         "sound"
       ],
       "note": "Full moon cacao ceremony + rebirthing breathwork format at an Ubud-area venue. Facilitator: Gita (certified yoga and rebirthing breathwork facilitator). Surfaced via Megatix WebSearch broad sweep 2026-08-07. Format is squarely in our ceremony tier — rebirthing breathwork + cacao + full moon alignment. Distinct from Raio's ABUELA LUNA and Pyramids of Chi full moon ceremony. No date or venue confirmed from snippet. Score ~7 when date + venue confirmed. Watch slug for announcement."
+    },
+    {
+      "name": "HAU TAPU Breathwork & Sound Healing (Yoga Barn)",
+      "megatix_slug": "https://megatix.co.id/events/hau-tapu-breathwork-sound-healing",
+      "first_seen": "2026-08-10",
+      "themes": [
+        "ceremony",
+        "sound"
+      ],
+      "note": "Māori-tradition breathwork + sound healing ceremony at The Yoga Barn (priority_a). Facilitators: Chelita Kahutianui o-te-Rangi Zainey (breathwork, Māori tradition, founder Hau Tapu) + Kai Pūoro Dane Scott (traditional Māori instruments). Surfaced via Megatix WebSearch broad sweep 2026-08-10. Rare indigenous ceremony format — Māori breathwork tradition is not a common Ubud offering. Distinct from Western breathwork (holotropic, rebirthing) — this is ceremony-led through indigenous lineage. Score ~8 expected when date confirmed (priority_a venue + rare indigenous tradition + named multi-facilitator). Watch slug for date announcement."
+    },
+    {
+      "name": "Resonanz x Max Hanuman (Paradiso Ubud)",
+      "megatix_slug": "https://megatix.co.id/events/resonanz-ecstatic-dance-x-max-hanuman",
+      "first_seen": "2026-08-10",
+      "themes": [
+        "dance"
+      ],
+      "note": "Special edition of the Resonanz ecstatic dance series at Paradiso Ubud with guest artist Max Hanuman. Slug found via Megatix WebSearch sweep 2026-08-10. Max Hanuman: DJ/artist in the conscious dance sphere. No date confirmed. Score ~7 when date confirmed at Thursday (or Saturday) Paradiso slot. Watch @paradisoubud IG alongside all other Resonanz special edition slugs."
+    },
+    {
+      "name": "Full Moon Blue Lotus Ceremony (Dragon Tea Temple)",
+      "megatix_slug": "https://megatix.co.id/events/full-moon-blue-lotus-ceremony",
+      "first_seen": "2026-08-10",
+      "themes": [
+        "ceremony",
+        "sound"
+      ],
+      "note": "Dragon Tea Temple (Dragonfly Village) full moon ceremony format incorporating blue lotus — distinct from existing DTT full moon offerings (Shambala, New Moon Kirtan, Coming Home, Onanya). Blue lotus = traditional entheogenic/ceremonial plant used in Balinese + Egyptian ceremonial contexts. Format squarely in our ceremony tier. Slug found via Megatix WebSearch sweep 2026-08-10. No date or facilitator confirmed from snippet. Score ~7 when date + facilitator confirmed. Watch slug for announcement; DTT venue = priority source."
+    },
+    {
+      "name": "Full Moon Cacao Ceremony with Raio (Rob Weber)",
+      "megatix_slug": "https://megatix.co.id/events/full-moon-cacao-ceremony-with-raio-rob-weber",
+      "first_seen": "2026-08-10",
+      "themes": [
+        "ceremony",
+        "sound"
+      ],
+      "note": "Raio (Rob Weber) running a dedicated full moon cacao ceremony format — distinct from ABUELA LUNA (his sound+ceremony at Pyramids of Chi) and Unified Field (his collaboration with Elah & Ausierra at Akasha). Raio is a priority facilitator in our universe; this third format suggests an active Aug–Sep 2026 presence in Ubud. No date or venue confirmed from snippet. Slug found via Megatix WebSearch sweep 2026-08-10. Score ~7.5 expected when date + venue confirmed (priority facilitator + cacao ceremony + full moon alignment). Watch slug for announcement."
     }
   ],
   "rejected_permanent": [
