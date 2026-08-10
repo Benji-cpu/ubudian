@@ -853,7 +853,7 @@
         "ceremony",
         "sound"
       ],
-      "note": "Breathwork ceremony format at The Yoga Barn (priority_a venue). Facilitator: Karina Kalilah (certified breathworker, Global Professional Breathwork Alliance, founder of Embodied Breath Academy). Live music: YAIMA (sacred world music duo, internationally touring; name from Mapudungun + Yaeyama/Okinawa). Surfaced via Yoga Barn calendar search 2026-08-06. Format: guided breathwork with live sacred music accompaniment — high-resonance format squarely in our universe. No confirmed Aug or Sep 2026 date found in any indexed snippet. UPDATE 2026-08-07: megatix.co.id slug `breathwork-with-yaima-live` confirmed in addition to previously-known megatix.com.au mirror — same event cross-listed. YAIMA tours internationally; confirm Bali dates from Yoga Barn events page or yaima.com tour schedule. Score ~8 expected when date confirmed (priority_a venue + YAIMA live music draws significant audience). Watch Yoga Barn events page from Aug 10 onward. At 2 qualifying logs — discovery phase."
+      "note": "Breathwork ceremony format at The Yoga Barn (priority_a venue). Facilitator: Karina Kalilah (certified breathworker, Global Professional Breathwork Alliance, founder of Embodied Breath Academy). Live music: YAIMA (sacred world music duo, internationally touring; name from Mapudungun + Yaeyama/Okinawa). Surfaced via Yoga Barn calendar search 2026-08-06. Format: guided breathwork with live sacred music accompaniment — high-resonance format squarely in our universe. No confirmed Aug or Sep 2026 date found in any indexed snippet. UPDATE 2026-08-07: megatix.co.id slug `breathwork-with-yaima-live` confirmed in addition to previously-known megatix.com.au mirror — same event cross-listed. YAIMA tours internationally; confirm Bali dates from Yoga Barn events page or yaima.com tour schedule. Score ~8 expected when date confirmed (priority_a venue + YAIMA live music draws significant audience). Watch Yoga Barn events page from Aug 10 onward. NOTE 2026-08-11: Third slug confirmed — megatix.co.id/events/yaima-encore-the-yogabarn. Most recent confirmed YAIMA run at Yoga Barn was June 2024; no 2026 date found in any indexed snippet. Three slugs now tracked: breathwork-with-yaima-live (.co.id), breathwork-with-yaima-live (.com.au mirror), yaima-encore-the-yogabarn (.co.id). Watch whichever announces a 2026 date first. At 2 qualifying logs — discovery phase."
     },
     {
       "name": "Supermoon 7th Anniversary x Yoga Barn",
@@ -957,6 +957,46 @@
         "sound"
       ],
       "note": "Raio (Rob Weber) running a dedicated full moon cacao ceremony format — distinct from ABUELA LUNA (his sound+ceremony at Pyramids of Chi) and Unified Field (his collaboration with Elah & Ausierra at Akasha). Raio is a priority facilitator in our universe; this third format suggests an active Aug–Sep 2026 presence in Ubud. No date or venue confirmed from snippet. Slug found via Megatix WebSearch sweep 2026-08-10. Score ~7.5 expected when date + venue confirmed (priority facilitator + cacao ceremony + full moon alignment). Watch slug for announcement."
+    },
+    {
+      "name": "WOMB & VOICE ACTIVATION (Dragon Tea Temple)",
+      "megatix_slug": "https://megatix.co.id/events/womb-voice-activation",
+      "first_seen": "2026-08-11",
+      "themes": [
+        "ceremony",
+        "sound"
+      ],
+      "note": "Vocal flow, womb awakening, medicine songs, and breathwork ceremony at Jl. Penestanan No. 8, Sayan, Ubud (Dragon Tea Temple / Dragonfly Village compound address). Surfaced via Megatix WebSearch sweep 2026-08-11. Format: womb activation + vocal ceremony + breathwork — squarely in our ceremony tier. No date or named facilitator confirmed from snippet. Score ~7 when date + named facilitator confirmed. DTT compound = priority_b venue."
+    },
+    {
+      "name": "Supermoon x Yoga Barn (current series)",
+      "megatix_slug": "https://megatix.co.id/events/supermoon-x-yogabarn",
+      "first_seen": "2026-08-11",
+      "themes": [
+        "dance",
+        "ceremony"
+      ],
+      "note": "Active Megatix slug for the Supermoon series at Yoga Barn — distinct from the permanently closed 7th Anniversary slugs (`supermoon7-x-yogabarn-` and `supermoon-anniversary-special-edition-x-the-yogabarn`, both closed 2026-08-10). The Supermoon series is one of Ubud's flagship ecstatic dance + ceremony events (~10th anniversary edition expected ~Oct 2026). Slug confirmed via Agent sweep 2026-08-11. No date confirmed. Score ~8 when date confirmed (Yoga Barn priority_a + established Supermoon brand). Watch slug for date announcement."
+    },
+    {
+      "name": "Mysteries of Isis Blue Lotus Tea Ceremony (Dragon Tea Temple)",
+      "megatix_slug": "https://megatix.co.id/events/mysteries-of-isis-blue-lotus-tea-ceremony",
+      "first_seen": "2026-08-11",
+      "themes": [
+        "ceremony",
+        "sound"
+      ],
+      "note": "Egyptian mystery school ceremony format incorporating blue lotus (Nymphaea caerulea) and sacred tea at Dragon Tea Temple (priority_b). Title signals initiation-based ceremony (Mysteries of Isis = Egyptian feminine mystery tradition), not educational tea workshop. Blue lotus is a sacred entheogenic plant used in Balinese and Egyptian ceremonial contexts — distinct from DTT tea workshops (permanent hard rejects: educational/training format). Surfaced via Megatix WebSearch sweep 2026-08-11. No date or named facilitator confirmed. Score ~7 when date + facilitator confirmed — verify ceremony (not workshop) framing on Megatix page before ingesting. Watch slug for announcement."
+    },
+    {
+      "name": "Sacred Kundalini Dragon Tea Sound Ceremony",
+      "megatix_slug": "https://megatix.co.id/events/sacred-kundalini-dragon-tea-sound-ceremony",
+      "first_seen": "2026-08-11",
+      "themes": [
+        "ceremony",
+        "sound"
+      ],
+      "note": "Kundalini energy + sound ceremony format at Dragon Tea Temple (priority_b venue). 'Sacred' + 'Ceremony' title framing = ceremony tier (not educational). Surfaced via Megatix WebSearch sweep 2026-08-11. No date or named facilitator confirmed. Score ~7 when date + facilitator confirmed. Watch slug for announcement."
     }
   ],
   "rejected_permanent": [
