@@ -927,7 +927,7 @@
         "ceremony",
         "sound"
       ],
-      "note": "Māori-tradition breathwork + sound healing ceremony at The Yoga Barn (priority_a). Facilitators: Chelita Kahutianui o-te-Rangi Zainey (breathwork, Māori tradition, founder Hau Tapu) + Kai Pūoro Dane Scott (traditional Māori instruments). Surfaced via Megatix WebSearch broad sweep 2026-08-10. Rare indigenous ceremony format — Māori breathwork tradition is not a common Ubud offering. Distinct from Western breathwork (holotropic, rebirthing) — this is ceremony-led through indigenous lineage. Score ~8 expected when date confirmed (priority_a venue + rare indigenous tradition + named multi-facilitator). Watch slug for date announcement."
+      "note": "Māori-tradition breathwork + sound healing ceremony at The Yoga Barn (priority_a). Facilitators: Chelita Kahutianui o-te-Rangi Zainey (breathwork, Māori tradition, founder Hau Tapu) + Kai Pūoro Dane Scott (traditional Māori instruments). Surfaced via Megatix WebSearch broad sweep 2026-08-10. Rare indigenous ceremony format — Māori breathwork tradition is not a common Ubud offering. Distinct from Western breathwork (holotropic, rebirthing) — this is ceremony-led through indigenous lineage. Score ~8 expected when date confirmed (priority_a venue + rare indigenous tradition + named multi-facilitator). UPDATE 2026-08-12: Last confirmed date from indexed snippet = April 27, 2026, 2:00pm–5:00pm at The Yoga Barn (PAST). No upcoming 2026 date found in any indexed source. Watch slug for next edition announcement."
     },
     {
       "name": "Resonanz x Max Hanuman (Paradiso Ubud)",
@@ -966,7 +966,7 @@
         "ceremony",
         "sound"
       ],
-      "note": "Vocal flow, womb awakening, medicine songs, and breathwork ceremony at Jl. Penestanan No. 8, Sayan, Ubud (Dragon Tea Temple / Dragonfly Village compound address). Surfaced via Megatix WebSearch sweep 2026-08-11. Format: womb activation + vocal ceremony + breathwork — squarely in our ceremony tier. No date or named facilitator confirmed from snippet. Score ~7 when date + named facilitator confirmed. DTT compound = priority_b venue."
+      "note": "Vocal flow, womb awakening, medicine songs, and breathwork ceremony at Jl. Penestanan No. 8, Sayan, Ubud (Dragon Tea Temple / Dragonfly Village compound address). Surfaced via Megatix WebSearch sweep 2026-08-11. UPDATE 2026-08-12: Recurring format confirmed — every Tuesday 11:00 AM–1:00 PM at Dragon Tea Temple. Facilitator: Gigi Courau ('Vocal & Sound Alchemist', womb awakening focus). Recurring anchor — no action on regular weekly instances. Watch for special guest editions or full moon/ceremony alignment that would distinguish an edition for ingestion."
     },
     {
       "name": "Supermoon x Yoga Barn (current series)",
@@ -997,6 +997,17 @@
         "sound"
       ],
       "note": "Kundalini energy + sound ceremony format at Dragon Tea Temple (priority_b venue). 'Sacred' + 'Ceremony' title framing = ceremony tier (not educational). Surfaced via Megatix WebSearch sweep 2026-08-11. No date or named facilitator confirmed. Score ~7 when date + facilitator confirmed. Watch slug for announcement."
+    },
+    {
+      "name": "Believe In Destiny Festival 2026",
+      "megatix_slug": "https://megatix.co.id/events/believe-in-destiny-festival-2026",
+      "first_seen": "2026-08-12",
+      "themes": [
+        "ceremony",
+        "dance",
+        "sound"
+      ],
+      "note": "5-day conscious community festival in Ubud. Dates: Oct 10-16, 2026 — Oct 10 falls within the 60-day curator window (cutoff ~Oct 11). Surfaced via Megatix WebSearch broad sweep 2026-08-12. Discovery-tier candidate — multi-day festival format with apparent conscious-community alignment. Megatix listing = first-party ticket platform. Score pending full format/programme confirmation. If programme includes ceremony, ecstatic dance, and sound healing, expected event_tier='discovery' with score ~7+. Watch slug for programme and headliner announcement before ingesting."
     }
   ],
   "rejected_permanent": [
@@ -1016,7 +1027,7 @@
       "events_seen": [
         "Full Moon Cacao Ceremony — The Yoga Barn"
       ],
-      "note": "Medicine man, sound healer, musician. Runs monthly full moon (Abuela Luna) ceremonies at Yoga Barn. Well-known in Ubud scene. BaliSpirit Festival presenter. ✅ INGESTED 2026-07-19: 'ABUELA LUNA — Full Moon Cacao Ceremony with Raio' — Yoga Barn, Jul 29, 2026, 19:30–21:15, IDR 350,000. Source: megatix.co.id/events/full-moon-cacao-ceremony-in-july. quality_score 0.80. Ensemble: Carlos Romero, Ryan Narayan, Rob Recker, Sky (guitar). NOTE: Event confirmed on Jul 29 itself (the full moon) — prior predictions of Fri Jul 25 or Sat Jul 26 were wrong. Raio aligns ABUELA LUNA precisely with the moon it's named for. Apply moon-date-first assumption to future editions. ✅ INGESTED 2026-07-24: 'ABUELA LUNA — Full Moon Cacao Ceremony with Raio' — Yoga Barn, Aug 9, 2026, 19:30–21:15. Source: megatix.co.id/events/abuela-luna-Aug09. quality_score 0.80. Ensemble: Carlos Romero, Ryan Narayan, Rob Recker, Sky (guitar). NOTE: Per-edition slug `abuela-luna-Aug09` confirmed via WebSearch; August full moon = Aug 9 (moon-date-first confirmed again). Next watch: September full moon ≈ Sep 26–27 2026 (CORRECTED 2026-07-27 — prior note 'Sep 7' was wrong; Harvest Moon peaks Sep 27 00:49 WITA / Sep 26 16:49 UTC). Moon-date-first: ABUELA LUNA likely Sep 26 (Sat evening) or Sep 27 (Sun). Watch for `abuela-luna-sep26` or `abuela-luna-sep27` slug from ~Aug 22. ⚠ Admin flag: ABUELA LUNA Aug 9 (ingested Jul 24) may have a date issue — Aug 9 is 11 days after the Jul 29 purnama, not a lunar cycle; astronomical Aug 2026 full moon = Aug 28. Verify Aug 9 pending event before approval."
+      "note": "Medicine man, sound healer, musician. Runs monthly full moon (Abuela Luna) ceremonies at Yoga Barn. Well-known in Ubud scene. BaliSpirit Festival presenter. ✅ INGESTED 2026-07-19: 'ABUELA LUNA — Full Moon Cacao Ceremony with Raio' — Yoga Barn, Jul 29, 2026, 19:30–21:15, IDR 350,000. Source: megatix.co.id/events/full-moon-cacao-ceremony-in-july. quality_score 0.80. Ensemble: Carlos Romero, Ryan Narayan, Rob Recker, Sky (guitar). NOTE: Event confirmed on Jul 29 itself (the full moon) — prior predictions of Fri Jul 25 or Sat Jul 26 were wrong. Raio aligns ABUELA LUNA precisely with the moon it's named for. Apply moon-date-first assumption to future editions. ✅ INGESTED 2026-07-24: 'ABUELA LUNA — Full Moon Cacao Ceremony with Raio' — Yoga Barn, Aug 9, 2026, 19:30–21:15. Source: megatix.co.id/events/abuela-luna-Aug09. quality_score 0.80. Ensemble: Carlos Romero, Ryan Narayan, Rob Recker, Sky (guitar). NOTE: Per-edition slug `abuela-luna-Aug09` confirmed via WebSearch; August full moon = Aug 9 (moon-date-first confirmed again). Next watch: September full moon ≈ Sep 26–27 2026 (CORRECTED 2026-07-27 — prior note 'Sep 7' was wrong; Harvest Moon peaks Sep 27 00:49 WITA / Sep 26 16:49 UTC). Moon-date-first: ABUELA LUNA likely Sep 26 (Sat evening) or Sep 27 (Sun). Watch for `abuela-luna-sep26` or `abuela-luna-sep27` slug from ~Aug 22. UPDATE 2026-08-12: Slug `abuela-luna-Aug09` confirmed indexed via WebSearch sweep — event was real and occurred Aug 9, 2026. Admin flag CLOSED. Astronomical full moon (Aug 28, partial lunar eclipse) is a separate forthcoming event. Watch for September ABUELA LUNA slug (`abuela-luna-sep26` or `abuela-luna-sep27`) from ~Aug 22 — Harvest Moon peaks Sep 27 00:49 WITA."
     },
     {
       "name": "Jada Jane Boh",
