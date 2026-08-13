@@ -555,7 +555,7 @@
       "themes": [
         "dance"
       ],
-      "note": "Special edition of the Resonanz ecstatic dance series at Paradiso Ubud with guest artist PRABUMI. Surfaced via Megatix WebSearch sweep 2026-07-24. Search snippets cited 'August 29' as the date — confirmed 2026-07-27 that this is the 2024 date (Aug 29 2024 was a Thursday; Aug 29 2026 = Saturday). August 2026 Thursdays: Aug 13, 20, 27. No 2026 date announced. Price: IDR 150,000. Capacity: 50-person hard cap. Score ~7.5 when date confirmed. NOTE 2026-08-07: Megatix resonanz hub shows a '2026 schedule' listing Apr 23 (Thu), Apr 30 (Thu), Jun 4 (Thu), Aug 29 (Sat), Oct 31 (Sat), Dec 12 (Sat) — Q3/Q4 dates are all Saturdays, suggesting the series may now run Saturday special editions alongside Thursday regulars. Day-of-week kill still applies to the specific 'Thursday August 29' framing (confirmed 2024 stale). WIDEN WATCH: if @paradisoubud IG announces Sat Aug 29 2026, ingest immediately as a legitimate Saturday edition. Watch @paradisoubud for both Thursday AND Saturday Resonanz announcements. NOTE 2026-08-08: PRABUMI confirmed active in Ubud 2026 — appeared at Resonanz Apr 30, 2026 (Thursday ✓). 'Thu Aug 29' stale-data kill confirmed for 7th time across Aug 2, 4, 5, 6, 7, 8 runs — do not re-investigate. Saturday Aug 29 2026 watch remains active via @paradisoubud IG."
+      "note": "Special edition of the Resonanz ecstatic dance series at Paradiso Ubud with guest artist PRABUMI. Surfaced via Megatix WebSearch sweep 2026-07-24. Search snippets cited 'August 29' as the date — confirmed 2026-07-27 that this is the 2024 date (Aug 29 2024 was a Thursday; Aug 29 2026 = Saturday). August 2026 Thursdays: Aug 13, 20, 27. No 2026 date announced. Price: IDR 150,000. Capacity: 50-person hard cap. Score ~7.5 when date confirmed. NOTE 2026-08-07: Megatix resonanz hub shows a '2026 schedule' listing Apr 23 (Thu), Apr 30 (Thu), Jun 4 (Thu), Aug 29 (Sat), Oct 31 (Sat), Dec 12 (Sat) — Q3/Q4 dates are all Saturdays, suggesting the series may now run Saturday special editions alongside Thursday regulars. Day-of-week kill still applies to the specific 'Thursday August 29' framing (confirmed 2024 stale). WIDEN WATCH: if @paradisoubud IG announces Sat Aug 29 2026, ingest immediately as a legitimate Saturday edition. Watch @paradisoubud for both Thursday AND Saturday Resonanz announcements. NOTE 2026-08-08: PRABUMI confirmed active in Ubud 2026 — appeared at Resonanz Apr 30, 2026 (Thursday ✓). 'Thu Aug 29' stale-data kill confirmed for 7th time across Aug 2, 4, 5, 6, 7, 8 runs — do not re-investigate. Saturday Aug 29 2026 watch remains active via @paradisoubud IG. NOTE 2026-08-14: Resonanz August hub schedule confirmed — WISECHILD = Aug 13 (regular Thursday, now past), DISTANT GRAND = Aug 20 (regular Thursday), PRABUMI = Aug 27 (regular Thursday). All three are regular weekly instances — recurring anchors, no action. Saturday Aug 29 special edition watch remains active."
     },
     {
       "name": "FLOW — Ecstatic Dance Ubud",
@@ -976,7 +976,7 @@
         "dance",
         "ceremony"
       ],
-      "note": "Active Megatix slug for the Supermoon series at Yoga Barn — distinct from the permanently closed 7th Anniversary slugs (`supermoon7-x-yogabarn-` and `supermoon-anniversary-special-edition-x-the-yogabarn`, both closed 2026-08-10). The Supermoon series is one of Ubud's flagship ecstatic dance + ceremony events (~10th anniversary edition expected ~Oct 2026). Slug confirmed via Agent sweep 2026-08-11. No date confirmed. Score ~8 when date confirmed (Yoga Barn priority_a + established Supermoon brand). Watch slug for date announcement."
+      "note": "Active Megatix slug for the Supermoon series at Yoga Barn — distinct from the permanently closed 7th Anniversary slugs (`supermoon7-x-yogabarn-` and `supermoon-anniversary-special-edition-x-the-yogabarn`, both closed 2026-08-10). The Supermoon series is one of Ubud's flagship ecstatic dance + ceremony events (~10th anniversary edition expected ~Oct 2026). Slug confirmed via Agent sweep 2026-08-11. No date confirmed. Score ~8 when date confirmed (Yoga Barn priority_a + established Supermoon brand). Watch slug for date announcement. NOTE 2026-08-14: Series math confirmed — slug `supermoon-9th-anniversary-x-the-yogabarn` is stale 2025 data (series origin ~2016; 7th=2023, 8th=2024, 9th=2025, 10th=2026 upcoming). Do not ingest that slug. The 10th anniversary 2026 edition is not yet announced — continue watching `supermoon-x-yogabarn` for it."
     },
     {
       "name": "Mysteries of Isis Blue Lotus Tea Ceremony (Dragon Tea Temple)",
@@ -1007,7 +1007,19 @@
         "dance",
         "sound"
       ],
-      "note": "5-day conscious community festival in Ubud. Dates: Oct 10-16, 2026 — Oct 10 falls within the 60-day curator window (cutoff ~Oct 11). Surfaced via Megatix WebSearch broad sweep 2026-08-12. Discovery-tier candidate — multi-day festival format with apparent conscious-community alignment. Megatix listing = first-party ticket platform. Score pending full format/programme confirmation. If programme includes ceremony, ecstatic dance, and sound healing, expected event_tier='discovery' with score ~7+. Watch slug for programme and headliner announcement before ingesting."
+      "note": "5-day conscious community festival in Ubud. Dates: Oct 10-16, 2026 — Oct 10 falls within the 60-day curator window (cutoff ~Oct 11). Surfaced via Megatix WebSearch broad sweep 2026-08-12. Discovery-tier candidate — multi-day festival format with apparent conscious-community alignment. Megatix listing = first-party ticket platform. Score pending full format/programme confirmation. NOTE 2026-08-14: Initial programme hints lean social/personal-growth format (concerts, workshops, personal development / motivation) rather than ceremony/ecstatic dance/sound healing. Borderline ICP — cannot confirm or reject without full programme. Decision gate: if programme explicitly features ecstatic dance, cacao ceremony, or sound healing sessions, ingest at event_tier='discovery' with score ~7+; if primarily motivational/entrepreneurship/social content, hard-reject format. Watch slug for programme and headliner announcement before scoring."
+    }
+  ],
+    {
+      "name": "EGYPTIKA Chants & Dance (Sep 16, Ubud)",
+      "megatix_slug": "https://megatix.co.id/events/egyptikachantsdance",
+      "first_seen": "2026-08-14",
+      "themes": [
+        "ceremony",
+        "dance",
+        "sound"
+      ],
+      "note": "Egyptian sacred ceremony format at an Ubud-area venue. Date confirmed: Sep 16, 2026 — within 60-day window. Format confirmed via Megatix snippet: Vocal Flow Activation + Ankh Breath + Postures of Power & Dance + Egyptian Chants. Celebration of Hathor (Egyptian goddess of love, music, dance, beauty). Format is squarely in our ceremony + dance tier — rare Egyptian mystery school ceremony offering. VENUE UNCONFIRMED: Megatix snippet references an Ubud venue but the address / venue name is not definitively confirmed within the greater-Ubud geo zone from available snippets. Cannot ingest without venue confirmation per policy (playbook geo-confirm requirement). Score ~7.5 expected when venue confirmed (rare ceremony format + named sacred tradition + Sep 16 in window). Watch `egyptikachantsdance` slug for explicit venue name. Sep 16 is 33 days out — confirm venue within ~2 weeks before window pressure builds."
     }
   ],
   "rejected_permanent": [
