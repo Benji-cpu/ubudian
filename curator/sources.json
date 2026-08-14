@@ -1007,11 +1007,10 @@
         "dance",
         "sound"
       ],
-      "note": "5-day conscious community festival in Ubud. Dates: Oct 10-16, 2026 — Oct 10 falls within the 60-day curator window (cutoff ~Oct 11). Surfaced via Megatix WebSearch broad sweep 2026-08-12. Discovery-tier candidate — multi-day festival format with apparent conscious-community alignment. Megatix listing = first-party ticket platform. Score pending full format/programme confirmation. NOTE 2026-08-14: Initial programme hints lean social/personal-growth format (concerts, workshops, personal development / motivation) rather than ceremony/ecstatic dance/sound healing. Borderline ICP — cannot confirm or reject without full programme. Decision gate: if programme explicitly features ecstatic dance, cacao ceremony, or sound healing sessions, ingest at event_tier='discovery' with score ~7+; if primarily motivational/entrepreneurship/social content, hard-reject format. Watch slug for programme and headliner announcement before scoring."
-    }
-  ],
+      "note": "5-day conscious community festival in Ubud. Dates: Oct 10-16, 2026. Surfaced via Megatix WebSearch broad sweep 2026-08-12. ✗ HARD REJECTED 2026-08-15: Programme confirmed as a singles social festival — social gatherings, themed parties, group dinners, speed-friending, creativity/wellbeing/self-development workshops, Ubud flashmob. Zero ceremony, ecstatic dance, or sound healing content. Format = generic social/networking event. Permanent format reject — do not revisit."
+    },
     {
-      "name": "EGYPTIKA Chants & Dance (Sep 16, Ubud)",
+      "name": "EGYPTIKA Chants & Dance (Sep 16, Paradiso Ubud)",
       "megatix_slug": "https://megatix.co.id/events/egyptikachantsdance",
       "first_seen": "2026-08-14",
       "themes": [
@@ -1019,7 +1018,7 @@
         "dance",
         "sound"
       ],
-      "note": "Egyptian sacred ceremony format at an Ubud-area venue. Date confirmed: Sep 16, 2026 — within 60-day window. Format confirmed via Megatix snippet: Vocal Flow Activation + Ankh Breath + Postures of Power & Dance + Egyptian Chants. Celebration of Hathor (Egyptian goddess of love, music, dance, beauty). Format is squarely in our ceremony + dance tier — rare Egyptian mystery school ceremony offering. VENUE UNCONFIRMED: Megatix snippet references an Ubud venue but the address / venue name is not definitively confirmed within the greater-Ubud geo zone from available snippets. Cannot ingest without venue confirmation per policy (playbook geo-confirm requirement). Score ~7.5 expected when venue confirmed (rare ceremony format + named sacred tradition + Sep 16 in window). Watch `egyptikachantsdance` slug for explicit venue name. Sep 16 is 33 days out — confirm venue within ~2 weeks before window pressure builds."
+      "note": "Egyptian mystery school ceremony + ecstatic dance. Date: Sep 16, 2026, 18:00 (doors 17:45), Paradiso Ubud. 200k IDR presale / 250k at door. Format: Vocal Flow Activation + Ankh Breath + Postures of Power & Dance + Egyptian Chants — Celebration of Hathor (Egyptian goddess of love, music, dance, beauty). Two Megatix slugs: `egyptikachantsdance` (primary) + `egyptika`. VENUE CONFIRMED 2026-08-15: Paradiso Ubud confirmed via WebSearch snippet — in-zone (priority_a venue). ✅ INGESTED 2026-08-15 via curator/inbox/2026-08-15.json. quality_score 0.78. Category: Ceremony & Sound, event_tier: core."
     }
   ],
   "rejected_permanent": [

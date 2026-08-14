@@ -1,0 +1,31 @@
+{
+  "date": "2026-08-15",
+  "events": [
+    {
+      "title": "EGYPTIKA Chants & Dance",
+      "description": "An Egyptian mystery school ceremony and ecstatic dance evening led by EGYPTIKA — a practitioner working within ancient Egyptian sacred traditions. The evening unfolds through Vocal Flow Activation, Ankh Breath, Postures of Power & Dance, and Egyptian Chants, honouring Hathor: the Egyptian goddess of love, music, dance, and beauty. Held in the intimate cinema space of Paradiso Ubud, the format weaves ancient ceremonial breathwork, embodied movement, and devotional chanting into a single continuous arc — from activation into surrender. Doors open at 17:45 for an 18:00 start. 200,000 IDR presale via Megatix; 250,000 IDR at the door.",
+      "short_description": "Egyptian mystery school ceremony at Paradiso — Vocal Flow Activation, Ankh Breath, embodied dance, and chants honouring Hathor, goddess of love and music.",
+      "category": "Ceremony & Sound",
+      "event_tier": "core",
+      "venue_name": "Paradiso Ubud",
+      "venue_address": "Jl. Dewi Sita, Ubud, Kabupaten Gianyar, Bali",
+      "start_date": "2026-09-16",
+      "end_date": null,
+      "start_time": "18:00",
+      "end_time": null,
+      "is_recurring": false,
+      "recurrence_rule": null,
+      "price_info": "200,000 IDR presale / 250,000 IDR at the door",
+      "external_ticket_url": "https://megatix.co.id/events/egyptikachantsdance",
+      "source_url": "https://megatix.co.id/events/egyptikachantsdance",
+      "organizer_name": "EGYPTIKA",
+      "organizer_instagram": null,
+      "cover_image_url": null,
+      "quality_score": 0.78,
+      "content_flags": [],
+      "intent_tags": ["ceremony", "dance", "discover", "connect"],
+      "archetype_tags": ["seeker", "explorer", "creative"],
+      "vibe_tags": ["ceremonial", "mystical", "transformative", "devotional"]
+    }
+  ]
+}
