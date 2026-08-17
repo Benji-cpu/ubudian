@@ -1,0 +1,28 @@
+{
+  "date": "2026-08-18",
+  "events": [
+    {
+      "title": "Full Moon Cacao Ceremony at Pyramids of Chi",
+      "start_date": "2026-08-28",
+      "end_date": "2026-08-28",
+      "category": "Ceremony & Sound",
+      "venue_name": "Pyramids of Chi",
+      "venue_address": "Jl. Raya Tegallalang, Tegallalang, Ubud, Bali",
+      "short_description": "Full moon cacao ceremony inside the Pyramid of the Sun with sound healing (Tibetan singing bowls) and a 3-course vegan dinner. A monthly community gathering aligned to the August 28 Sturgeon Moon.",
+      "description": "Join Pyramids of Chi for their monthly Full Moon Cacao Ceremony on August 28, the night of the Sturgeon Moon (partial lunar eclipse). The evening opens with a sacred cacao ceremony, followed by a deep sound healing session inside the Pyramid of the Sun using Tibetan singing bowls, before closing with a 3-course vegan dinner. A grounded, community-centred full moon ritual at one of Ubud's most acoustically and energetically distinct venues.",
+      "source_url": "https://megatix.co.id/events/full-moon-cacao-ceremony-august",
+      "external_ticket_url": "https://megatix.co.id/events/full-moon-cacao-ceremony-august",
+      "price_min": 0,
+      "price_max": 0,
+      "currency": "IDR",
+      "quality_score": 0.75,
+      "event_tier": "core",
+      "intent_tags": ["spirit", "community"],
+      "archetype_tags": ["seeker", "connector"],
+      "vibe_tags": ["cacao-ceremony", "sound-bath"],
+      "_preParsed": true,
+      "_skipClassification": true,
+      "_curatorNote": "Per-edition slug full-moon-cacao-ceremony-august active on both megatix.co.id and megatix.com.au. Aug 28 = confirmed full moon (Sturgeon Moon + partial lunar eclipse). Ingested 10 days before moon consistent with Jul 20 precedent for Jul 29 moon (full-moon-ceremony-july). Watch window was ~Aug 20 but two per-edition slugs on two TLDs is stronger signal than July."
+    }
+  ]
+}

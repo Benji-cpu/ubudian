@@ -49,7 +49,7 @@
         "sound",
         "ceremony"
       ],
-      "note": "Sound healing — gong, bowl, breath journeys. Own ticketing system. Two distinct tiers: (1) daily tourist sessions 350k IDR — reject; (2) monthly community ceremonies (Full Moon, Into the Heart Cacao, solstice specials) — ingest. Into the Heart Cacao date only available on full-calendar page (403 blocked); contact events@pyramidsofchi.com if needed. ✅ INGESTED 2026-07-20: Full Moon Ceremony Jul 29 (Guru Purnima / Buck Moon), per-edition slug `full-moon-ceremony-july`, quality_score 0.75. Signal: per-edition slug = community tier; evergreen slugs = tourist product."
+      "note": "Sound healing — gong, bowl, breath journeys. Own ticketing system. Two distinct tiers: (1) daily tourist sessions 350k IDR — reject; (2) monthly community ceremonies (Full Moon, Into the Heart Cacao, solstice specials) — ingest. Into the Heart Cacao date only available on full-calendar page (403 blocked); contact events@pyramidsofchi.com if needed. ✅ INGESTED 2026-07-20: Full Moon Ceremony Jul 29 (Guru Purnima / Buck Moon), per-edition slug `full-moon-ceremony-july`, quality_score 0.75. Signal: per-edition slug = community tier; evergreen slugs = tourist product. ✅ INGESTED 2026-08-18: Full Moon Cacao Ceremony Aug 28 (Sturgeon Moon + partial lunar eclipse), per-edition slugs `full-moon-cacao-ceremony-august` (co.id) + `full-moon-cacao-ceremony-in-august` (com.au), quality_score 0.75."
     },
     {
       "name": "Dragonfly Village Ubud",
@@ -594,7 +594,7 @@
         "sound",
         "ceremony"
       ],
-      "note": "August edition of Pyramids of Chi's monthly community full moon ceremony. Slug `full-moon-cacao-ceremony-august` (megatix.co.id) + mirror `full-moon-cacao-ceremony-in-august` (megatix.com.au) confirmed active. Date not snippet-confirmed — astronomical calculation places August full moon ~Aug 28, 2026 (also a partial lunar eclipse). Format confirmed from July edition (ingested 2026-07-20, score 0.75): shamanic fire ceremony (four directions) → Ancient Sound Healing inside Pyramid of the Sun (Tibetan bowls) → 3-course vegan dinner at Pyramids Cafe by Malaika. Community-ceremony tier (not tourist daily session). Score ~7.5 when date confirmed from snippet. Watch Megatix directly from ~Aug 20."
+      "note": "August edition of Pyramids of Chi's monthly community full moon ceremony. Slug `full-moon-cacao-ceremony-august` (megatix.co.id) + mirror `full-moon-cacao-ceremony-in-august` (megatix.com.au) confirmed active. Date not snippet-confirmed — astronomical calculation places August full moon ~Aug 28, 2026 (also a partial lunar eclipse). Format confirmed from July edition (ingested 2026-07-20, score 0.75): shamanic fire ceremony (four directions) → Ancient Sound Healing inside Pyramid of the Sun (Tibetan bowls) → 3-course vegan dinner at Pyramids Cafe by Malaika. Community-ceremony tier (not tourist daily session). Score ~7.5 when date confirmed from snippet. Watch Megatix directly from ~Aug 20. ✅ INGESTED 2026-08-18 (quality_score 0.75, 10 days before moon — two per-edition slugs on two TLDs = strong community signal)."
     },
     {
       "name": "Resonanz September (Paradiso Thursdays)",
