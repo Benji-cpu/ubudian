@@ -1,0 +1,27 @@
+{
+  "date": "2026-08-19",
+  "events": [
+    {
+      "title": "ARMA Fest 2026",
+      "start_date": "2026-09-19",
+      "end_date": "2026-09-20",
+      "category": "Art & Culture",
+      "venue_name": "ARMA Museum & Resort",
+      "venue_address": "Jl. Raya Pengosekan, Peliatan, Ubud, Bali",
+      "short_description": "Annual two-day art and culture festival at ARMA Museum celebrating Ubud's creative traditions — traditional crafts, contemporary art, live performance, and community gathering for the museum's 30th anniversary.",
+      "description": "ARMA Fest 2026 returns to the Agung Rai Museum of Art for a two-day celebration of Ubud's living artistic heritage. Now in its 30th anniversary year, the festival spans September 19–20 across ARMA Museum & Resort's gardens and gallery spaces in Pengosekan. The programme brings together traditional Balinese craft, contemporary visual art, live music, and performance — a rare convergence of local artists and international guests in one of Ubud's most architecturally and culturally grounded settings. Previous editions have drawn hundreds across the weekend; 2026 is described as 'bigger and better than ever.'",
+      "source_url": "https://armabali.com/category/events/",
+      "price_min": 0,
+      "price_max": 0,
+      "currency": "IDR",
+      "quality_score": 0.78,
+      "event_tier": "discovery",
+      "intent_tags": ["witness", "explore", "celebrate"],
+      "archetype_tags": ["artist", "explorer"],
+      "vibe_tags": ["festival", "art", "outdoor", "communal"],
+      "_preParsed": true,
+      "_skipClassification": true,
+      "_curatorNote": "Three independent press/news sources (Dewata News Jun 2026, The Bali Sun 2026, + multiple aggregators Hostelworld/AllEvents) all confirm Sep 19-20 2026 at ARMA Museum Pengosekan. armabali.com direct fetch blocked by sandbox proxy — page is indexed and exists, proxy-only block. 30th anniversary year per Dewata News ('part of ARMA's 30th anniversary celebrations'). Prior holds were aggregator-only; Dewata News + Bali Sun upgrades this to press-confirmed. Discovery tier: Art & Culture."
+    }
+  ]
+}
