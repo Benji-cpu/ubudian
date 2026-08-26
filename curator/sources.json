@@ -661,17 +661,7 @@
         "dance",
         "ceremony"
       ],
-      "note": "New slug discovered 2026-08-26 alongside `bali.live/e/events/purnama-gerhana-supermoon-lunar-eclipse/`. Title explicitly names the partial lunar eclipse (purnama gerhana = full moon eclipse in Indonesian). Likely Akasha New Earth Haven / Karunika's Aug 28 SuperMoon edition under new branded slug — the 'Purnama Gerhana' name is the August 28 lunar eclipse. Both pages blocked in sandbox, no date text confirmed via snippet. Format expected: Vital Cacao Ceremony by fire + ecstatic dance + sound healing (standard Akasha SuperMoon format). Score ~7.5 if confirmed at Akasha with Karunika. Watch megatix.com.au/events/purnamagerhana from Aug 26."
-    },
-    {
-      "name": "House of Mantra (Tahir Qawwal) at Yoga Barn",
-      "megatix_slug": "https://megatix.co.id/events/house-of-mantra-sept21",
-      "first_seen": "2026-08-26",
-      "themes": [
-        "ceremony",
-        "sound"
-      ],
-      "note": "Slug `house-of-mantra-sept21` on megatix.co.id. 'sept21' suffix implies September 21, 2026 (Sunday — consistent with Yoga Barn Sunday evening programming). Venue: Yoga Barn (priority_a). Format: soulful Kirtans and Bhajan performances featuring 'world-renowned vocalist Tahir Qawwal.' Qawwali is a Sufi devotional music tradition — if Tahir Qawwal is a genuine touring Sufi vocalist, facilitator reputation score ~8. Category: Ceremony & Sound. AI summary cited Sep 21, 2026 (Sunday confirmed), no raw quoted snippet text — cannot ingest per Aug 23 playbook rule until first-party date text confirmed. Score ~8 when date text confirmed. Ambiguity: 'sept21' could theoretically encode September 2021 (stale) — verify the date is not 'Sales Closed' before ingesting. At 0 qualifying logs."
+      "note": "New slug discovered 2026-08-26 alongside `bali.live/e/events/purnama-gerhana-supermoon-lunar-eclipse/`. Title explicitly names the partial lunar eclipse (purnama gerhana = full moon eclipse in Indonesian). Likely Akasha New Earth Haven / Karunika's Aug 28 SuperMoon edition under new branded slug — the 'Purnama Gerhana' name is the August 28 lunar eclipse. All pages blocked in sandbox, no date text confirmed via snippet. Format expected: Vital Cacao Ceremony by fire + ecstatic dance + sound healing (standard Akasha SuperMoon format). Score ~7.5 if confirmed at Akasha with Karunika. SECOND SLUG confirmed 2026-08-27: megatix.co.id/events/supermoon-conscious-party-purnama-x-villa-akasha (title: 'SuperMoon Conscious Party • Purnama X Villa Akasha') — this appears to be the same event or a companion event with identical format (Handstand & Acro Yoga Jam 16:00-18:00, Shiva Breath Activation Cacao Ceremony 18:00-19:00, Ecstatic Dance with Karunika 19:00-21:00). Three URLs now known: purnamagerhana (megatix.com.au), supermoon-conscious-party-purnama-x-villa-akasha (megatix.co.id), purnama-gerhana-supermoon-lunar-eclipse (bali.live). Aug 28 watch window closed — event passed without sandbox-accessible confirmation. Retain for pattern matching on future supermoon editions."
     },
     {
       "name": "Bhakti Devi Kirtan (Tetiana Ra) at Zest Garden Temple",
@@ -957,6 +947,15 @@
         "dance"
       ],
       "note": "Special edition of the Resonanz ecstatic dance series at Paradiso Ubud with guest DJ SVARA. Slug found via Megatix WebSearch sweep 2026-08-08. SVARA profile: DJ with 20+ years experience spanning classical, techno, ethnic, tribal, rave, and bass. No date confirmed. Score ~7 when date confirmed. Watch @paradisoubud IG alongside other Resonanz series slugs."
+    },
+    {
+      "name": "Resonanz x NRYN (Paradiso Ubud)",
+      "megatix_slug": "https://megatix.co.id/events/resonanz-ecstatic-dance-x-nryn",
+      "first_seen": "2026-08-26",
+      "themes": [
+        "dance"
+      ],
+      "note": "Special edition of the Resonanz ecstatic dance series at Paradiso Ubud. Slug `resonanz-ecstatic-dance-x-nryn` confirmed 2026-08-26. Artist NRYN = Narayan — yogi, ceremonialist & music producer; described as blending 'deep bass of California with a breath of Asian qigong, adding refreshing doses of medicine, hip-hop & house.' No date confirmed as of 2026-08-27. September 2026 Thursdays: Sep 3, 10, 17, 24. Score ~7 when date confirmed. Watch @paradisoubud IG."
     },
     {
       "name": "Full Moon Cacao & Rebirthing Breathwork (Gita)",
