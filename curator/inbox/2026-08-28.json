@@ -1,0 +1,30 @@
+{
+  "date": "2026-08-28",
+  "events": [
+    {
+      "title": "ECSTATIC HEAVEN at The Jungle Club",
+      "description": "Awakened Dreamers brings ECSTATIC HEAVEN back to The Jungle Club's open-air jungle space in Sayan for September — an alcohol-free conscious dance gathering in the trees. The format: ethnic live-electronic music and mystic live sound, a three-hour ecstatic dance floor, and a community lounge. Awakened Dreamers has run conscious dance nights in Ubud across 2026, with the monthly Jungle Club series anchoring their season.",
+      "short_description": "Open-air ecstatic dance in Sayan's jungle canopy — Awakened Dreamers' monthly conscious gathering at The Jungle Club.",
+      "category": "Dance & Movement",
+      "venue_name": "The Jungle Club Ubud",
+      "venue_address": "Sayan, Ubud, Bali",
+      "start_date": "2026-09-12",
+      "end_date": null,
+      "start_time": "16:00",
+      "end_time": "22:00",
+      "is_recurring": false,
+      "recurrence_rule": null,
+      "price_info": null,
+      "external_ticket_url": "https://www.eventbrite.com/e/awakened-dreamers-presents-ecstatic-heaven-at-the-jungle-club-95-tickets-1994521751249",
+      "source_url": "https://www.eventbrite.com/e/awakened-dreamers-presents-ecstatic-heaven-at-the-jungle-club-95-tickets-1994521751249",
+      "organizer_name": "Awakened Dreamers",
+      "organizer_instagram": "@awakeneddreamers",
+      "cover_image_url": null,
+      "quality_score": 0.6,
+      "content_flags": [],
+      "intent_tags": ["community", "spirit"],
+      "archetype_tags": ["explorer", "connector"],
+      "vibe_tags": ["ecstatic-dance", "conscious-movement"]
+    }
+  ]
+}
