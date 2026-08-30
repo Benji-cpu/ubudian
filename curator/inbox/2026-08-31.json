@@ -1,0 +1,31 @@
+{
+  "date": "2026-08-31",
+  "events": [
+    {
+      "title": "Arctic Beats: Dance Journey with Snow Raven (Live)",
+      "description": "A one-off performance by Snow Raven (SUOR), a mystic from Yakutia in northeastern Siberia, whose practice of arctic beatbox fuses the ancient vocal traditions of the Sakha people with deep bass, hypnotic rhythms, and immersive live looping. The set unfolds as a ceremonial dance journey — an invitation to move through layered soundscapes built live and in real time, threading indigenous song forms through a contemporary electronic architecture. At the Zest Garden Temple complex in Penestanan.",
+      "short_description": "Snow Raven (SUOR) — arctic beatbox meets ancient Yakutian vocal ceremony. A live-looped ceremonial dance journey at Penestanan.",
+      "category": "Ceremony & Sound",
+      "event_tier": null,
+      "venue_name": "Zest Ubud",
+      "venue_address": "Jl. Raya Penestanan Kelod No. 8, Sayan, Ubud, Bali",
+      "start_date": "2026-09-20",
+      "end_date": null,
+      "start_time": "19:00",
+      "end_time": null,
+      "is_recurring": false,
+      "recurrence_rule": null,
+      "price_info": null,
+      "external_ticket_url": "https://megatix.co.id/events/snow-raven-zest-ubud-bali",
+      "source_url": "https://megatix.co.id/events/snow-raven-zest-ubud-bali",
+      "organizer_name": null,
+      "organizer_instagram": null,
+      "cover_image_url": null,
+      "quality_score": 0.80,
+      "content_flags": [],
+      "intent_tags": ["spirit", "community"],
+      "archetype_tags": ["seeker", "explorer"],
+      "vibe_tags": ["sound-bath", "live-music"]
+    }
+  ]
+}
