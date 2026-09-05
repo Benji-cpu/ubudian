@@ -1,0 +1,31 @@
+{
+  "date": "2026-09-06",
+  "events": [
+    {
+      "title": "House of Mantra",
+      "description": "A devotional evening orchestrated by House of Mantra, featuring world-renowned Sufi Qawwali vocalist Tahir Qawwal (25+ years, founder of Tabaruq Arts), accompanied by Alexandra Amïe, special vocalist Jamuna Luna, and Rāma on classical percussion. The programme moves through soulful Kirtans and Bhajan — ancient call-and-response devotional forms rooted in the Sufi and Hindustani traditions — designed to dissolve illusions and carry the room into collective resonance. A one-off at the Yoga Barn's main stage.",
+      "short_description": "Sufi Qawwali vocalist Tahir Qawwal leads an evening of Kirtan and Bhajan at the Yoga Barn, joined by Alexandra Amïe, Jamuna Luna, and Rāma on classical percussion.",
+      "category": "Ceremony & Sound",
+      "event_tier": null,
+      "venue_name": "The Yoga Barn",
+      "venue_address": "Jalan Raya Pengosekan No. 36, Ubud, Bali",
+      "start_date": "2026-09-21",
+      "end_date": null,
+      "start_time": null,
+      "end_time": null,
+      "is_recurring": false,
+      "recurrence_rule": null,
+      "price_info": null,
+      "external_ticket_url": "https://megatix.co.id/events/house-of-mantra-sept21",
+      "source_url": "https://megatix.co.id/events/house-of-mantra-sept21",
+      "organizer_name": "House of Mantra",
+      "organizer_instagram": null,
+      "cover_image_url": null,
+      "quality_score": 0.80,
+      "content_flags": [],
+      "intent_tags": ["spirit", "community"],
+      "archetype_tags": ["seeker", "mystic"],
+      "vibe_tags": ["kirtan", "live-music"]
+    }
+  ]
+}
