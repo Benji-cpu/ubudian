@@ -1,0 +1,31 @@
+{
+  "date": "2026-09-13",
+  "events": [
+    {
+      "title": "Ganesha Spirit Celebration with Jeremy Sol",
+      "description": "An evening ceremony honouring Ganesh Chaturthi (September 14, 2026) — the annual Hindu festival celebrating the birth of Ganesha, remover of obstacles. Led by Jeremy Sol of Bhakti Bliss Bali at Alchemy Yoga & Meditation Center (AYMC), Sayan. Programme: 5:45pm sacred space opens; 6:00pm Maha Ganesha Kirtan (call-and-response devotional chanting); 8:00pm Prayer-field + Ganesha Pearls of Wisdom Storytelling by Sacred Fire; 8:30pm Closing Ritual. A one-evening ceremony aligned with the Ganesh Chaturthi festival cycle — not a recurring series. Tickets: IDR 250,000 early bird (limited), IDR 300,000 presale, IDR 350,000 day of event. Children under 12 free.",
+      "short_description": "Jeremy Sol leads a Ganesha Chaturthi ceremony at AYMC: Maha Kirtan, sacred fire storytelling, and closing ritual honouring the remover of obstacles.",
+      "category": "Ceremony & Sound",
+      "event_tier": null,
+      "venue_name": "Alchemy Yoga & Meditation Center",
+      "venue_address": "Jl. Raya Sayan No.10, Sayan, Ubud, Bali",
+      "start_date": "2026-09-13",
+      "end_date": null,
+      "start_time": "18:00",
+      "end_time": "20:30",
+      "is_recurring": false,
+      "recurrence_rule": null,
+      "price_info": "IDR 250,000 early bird / IDR 300,000 presale / IDR 350,000 door. Children under 12 free.",
+      "external_ticket_url": "https://www.alchemyyogacenter.com/ganesha-spirit-celebration-with-jeremy-sol",
+      "source_url": "https://www.alchemyyogacenter.com/ganesha-spirit-celebration-with-jeremy-sol",
+      "organizer_name": "Jeremy Sol / Bhakti Bliss Bali",
+      "organizer_instagram": "@bhaktiblissbali",
+      "cover_image_url": null,
+      "quality_score": 0.80,
+      "content_flags": [],
+      "intent_tags": ["spirit", "community"],
+      "archetype_tags": ["seeker", "connector"],
+      "vibe_tags": ["kirtan-mantra", "ceremony-fire"]
+    }
+  ]
+}

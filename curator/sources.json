@@ -632,7 +632,7 @@
         "ceremony",
         "sound"
       ],
-      "note": "Annual Ganesha Chaturthi celebration at AYMC Ubud led by Jeremy Sol (Bhakti Bliss Bali). AYMC event page confirmed live 2026-07-27. Ganesh Chaturthi 2026 falls on Sep 14 (Monday). Based on prior-year pattern the celebration runs on the closest weekend — likely Sat Sep 12 or Sun Sep 13. No date confirmed, no Megatix slug found yet. Score ~7.5 when confirmed: Jeremy Sol = anchor AYMC facilitator, AYMC = priority_a, celebration format aligns with kirtan/devotional tier. Watch alchemyyogacenter.com/ganesha-spirit-celebration + @alchemyyogacenterubud from ~Aug 22. UPDATE 2026-09-02: Facebook post confirmed at facebook.com/alchemyyogacenterubud/posts/1557996298892206/ — event is being promoted on AYMC's official page, medium-confidence 2026 signal. Post date unverifiable (blocked) but URL existence in search index confirms active promotion. Begin active watch Sep 4 for Megatix date release — Ganesh Chaturthi Sep 14 means event likely Fri Sep 11 or Sat Sep 12."
+      "note": "Annual Ganesha Chaturthi celebration at AYMC Ubud led by Jeremy Sol (Bhakti Bliss Bali). AYMC event page confirmed live 2026-07-27. Ganesh Chaturthi 2026 falls on Sep 14 (Monday). Based on prior-year pattern the celebration runs on the closest weekend — likely Sat Sep 12 or Sun Sep 13. No date confirmed, no Megatix slug found yet. Score ~7.5 when confirmed: Jeremy Sol = anchor AYMC facilitator, AYMC = priority_a, celebration format aligns with kirtan/devotional tier. Watch alchemyyogacenter.com/ganesha-spirit-celebration + @alchemyyogacenterubud from ~Aug 22. UPDATE 2026-09-02: Facebook post confirmed at facebook.com/alchemyyogacenterubud/posts/1557996298892206/ — event is being promoted on AYMC's official page, medium-confidence 2026 signal. Post date unverifiable (blocked) but URL existence in search index confirms active promotion. Begin active watch Sep 4 for Megatix date release — Ganesh Chaturthi Sep 14 means event likely Fri Sep 11 or Sat Sep 12. ✅ INGESTED 2026-09-13: Two independent WebSearch queries confirmed 'Sunday, September 13, 2026' + full programme (5:45pm sacred space, 6pm Maha Ganesha Kirtan, 8pm Prayer-field + Storytelling by Sacred Fire, 8:30pm Closing Ritual) + pricing (IDR 250K early bird / 300K presale / 350K door; children under 12 free). No Megatix slug ever surfaced — AYMC first-party URL is the sole ticket surface. Jeremy Sol AYMC events confirmed walk-in/first-party-only format in Q3 2026."
     },
     {
       "name": "Resonanz x Pakcik Henry (Paradiso Ubud)",
@@ -1609,6 +1609,51 @@
       "first_seen": "2026-09-11",
       "events_seen": [],
       "note": "Festival at Jl. Penestanan, Sayan, Bali, Ubud 80571 (Penestanan arts district — in-zone). Megatix slug: `laik-festival` (megatix.co.id). Surfaced 2026-09-11 via Megatix sweep. UPDATE 2026-09-12: Organizer confirmed as Katya Reihan (also of ECSTANTRIC DANCE). Format confirmed from WebSearch snippet: ecstatic dance + LAIK MARKET (community market) + fire/drum performances + food + silent space. 'Life-changing event,' limited tickets. Website: laikfestival.com. No date confirmed yet. Discovery-tier (multi-format festival with market/fire/food) — if ecstatic dance is framed as the sole/primary offering in the final Megatix description, upgrade to core-tier. Score ~6.5–7 when date confirmed. Watch laikfestival.com and slug for date announcement."
+    },
+    {
+      "name": "Kirtan with Swami Amandeep & Friends (Sep 25?)",
+      "megatix_slug": "kirtan-with-swami-amandeep-and-friends-sept25",
+      "instagram": null,
+      "website": null,
+      "first_seen": "2026-09-13",
+      "events_seen": [],
+      "note": "Megatix slug `kirtan-with-swami-amandeep-and-friends-sept25` surfaced 2026-09-13. The `sept25` suffix suggests a September 25 edition. However, a parallel search only surfaced the `apr2026` slug (April 25, 2026 — past). No verbatim 'September 25, 2026' date text found in any snippet. HOLD: require verbatim date confirmation before ingesting. Swami Amandeep is a Sikh/devotional kirtan facilitator. Venue not yet confirmed — could be DTT, Paradiso, or a temple space. Score ~6.5 when venue and date confirmed."
+    },
+    {
+      "name": "Hanuman Project — Kirtan, Tea & Medicine Music Celebration",
+      "megatix_slug": "hanuman-project-kirtan-tea-medicine-music-celebration",
+      "instagram": null,
+      "website": null,
+      "first_seen": "2026-09-13",
+      "events_seen": [],
+      "note": "Megatix slug `hanuman-project-kirtan-tea-medicine-music-celebration` surfaced 2026-09-13 in Kirtan-adjacent sweep. Format: Kirtan + tea ceremony + medicine music — squarely in our Ceremony & Sound universe. No venue or 2026 date confirmed in any indexed snippet. Score ~7 when venue (in-zone) and date confirmed. Watch for date announcement."
+    },
+    {
+      "name": "Kirtan Night (venue TBC)",
+      "megatix_slug": "kirtan-night",
+      "instagram": null,
+      "website": null,
+      "first_seen": "2026-09-13",
+      "events_seen": [],
+      "note": "Megatix slug `kirtan-night` surfaced 2026-09-13. Generic slug — no venue, facilitator, or 2026 date confirmed. Low priority until additional details surface. Watch for context."
+    },
+    {
+      "name": "Voice of Her (ceremony/sound, venue TBC)",
+      "megatix_slug": "voice-of-her",
+      "instagram": null,
+      "website": null,
+      "first_seen": "2026-09-13",
+      "events_seen": [],
+      "note": "Megatix slug `voice-of-her` surfaced 2026-09-13. Format possibly ecstatic vocals / sound ceremony / women's circle. No venue, facilitator, or 2026 date confirmed. Score TBD once details emerge. Watch for context."
+    },
+    {
+      "name": "DTT Full Moon Kirtan & Sacred Tea (Nov 19)",
+      "megatix_slug": "full-moon-kirtan-sacred-tea-nov19th",
+      "instagram": null,
+      "website": null,
+      "first_seen": "2026-09-13",
+      "events_seen": [],
+      "note": "Megatix slug `full-moon-kirtan-sacred-tea-nov19th` surfaced 2026-09-13. Format: DTT Full Moon Kirtan & Sacred Tea — the regular DTT full moon series, this edition November 19. Nov 19 2026 is a Thursday (Full Moon Oct 25, with Nov 19 ~25 days after — check lunar calendar). Outside the 60-day window (cutoff ~Nov 12 from today). Re-check Oct 20 when window opens. If this is a genuine Nov 19 slug, ingest immediately on re-check."
     }
   ]
 }
