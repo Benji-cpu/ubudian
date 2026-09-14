@@ -1617,7 +1617,7 @@
       "website": null,
       "first_seen": "2026-09-13",
       "events_seen": [],
-      "note": "Megatix slug `kirtan-with-swami-amandeep-and-friends-sept25` surfaced 2026-09-13. The `sept25` suffix suggests a September 25 edition. However, a parallel search only surfaced the `apr2026` slug (April 25, 2026 — past). No verbatim 'September 25, 2026' date text found in any snippet. HOLD: require verbatim date confirmation before ingesting. Swami Amandeep is a Sikh/devotional kirtan facilitator. Venue not yet confirmed — could be DTT, Paradiso, or a temple space. Score ~6.5 when venue and date confirmed."
+      "note": "CLOSED 2026-09-15. The `sept25` suffix resolved to September 25, 2025 (Thursday — past event). Sep 25, 2026 = Friday, not a typical Kirtan circuit day. Stripped-date second search returned only the `apr2026` (April 25, 2026 — also past) slug; no 2026 September edition announced. Slug confirmed as 2025 past event with no 2026 successor. If a 2026 Swami Amandeep kirtan surfaces, it will carry a new slug — watch for it then."
     },
     {
       "name": "Hanuman Project — Kirtan, Tea & Medicine Music Celebration",
@@ -1626,7 +1626,7 @@
       "website": null,
       "first_seen": "2026-09-13",
       "events_seen": [],
-      "note": "Megatix slug `hanuman-project-kirtan-tea-medicine-music-celebration` surfaced 2026-09-13 in Kirtan-adjacent sweep. Format: Kirtan + tea ceremony + medicine music — squarely in our Ceremony & Sound universe. No venue or 2026 date confirmed in any indexed snippet. Score ~7 when venue (in-zone) and date confirmed. Watch for date announcement."
+      "note": "CLOSED 2026-09-15. Verbatim snippet returned date 'April 17, 2024' — confirmed past event with no 2026 successor found. Format (Kirtan + tea ceremony + medicine music) would score ~7 if a 2026 edition surfaces under a new slug. Closed permanently; re-open only if a new slug with 2026 date context appears."
     },
     {
       "name": "Kirtan Night (venue TBC)",
