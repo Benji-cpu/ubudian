@@ -17,7 +17,9 @@ on:
   schedule:
     # 18:40 UTC ≈ 02:40 WITA — ahead of the maintenance (19:02) + curator (19:47)
     # jobs, off the quarter-hour to dodge GH cron pile-up.
-    - cron: "40 18 * * *"
+    # 18:55 — was 18:40, colliding with aggregator-harvest (both written
+    # independently). Moved 2026-09-15.
+    - cron: "55 18 * * *"
   workflow_dispatch: {}
 
 permissions:
@@ -53,6 +55,10 @@ jobs:
           # Bounded each night — the corpus is already fully processed, so these
           # only touch the day's new approved events. Caps keep a Gemini hiccup
           # from running long; anything missed is retried tomorrow.
-          npx tsx scripts/embed-events-backfill.ts --limit 100 --concurrency 5
-          npx tsx scripts/backfill-archetype-tags.ts --limit 60 --concurrency 4
-          npx tsx scripts/backfill-vibe-tags.ts --limit 60 --concurrency 4
+          # Concurrency 2: at 5/4/4 in flight the free-tier key 429s on ~50 of
+          # 60 calls every night (per-minute rate, not daily quota — a single
+          # call succeeds). The run went red 7 nights in a row before anyone
+          # read the log. Slower and green beats fast and red.
+          npx tsx scripts/embed-events-backfill.ts --limit 60 --concurrency 2
+          npx tsx scripts/backfill-archetype-tags.ts --limit 40 --concurrency 2
+          npx tsx scripts/backfill-vibe-tags.ts --limit 40 --concurrency 2

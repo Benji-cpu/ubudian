@@ -32,6 +32,7 @@ This policy is load-bearing — multiple downstream products (training data, his
 | `processed` (event was created from this message) | Indefinite — needed to backtrack from event → source. |
 | `processed_no_event` | Indefinite. |
 | `failed` | Hard-deleted after **90 days** by `purgeFailedMessages()`. (Plan says 90; the current default in code is 30 — those are the same noise floor either way; raise to 90 if/when we want a longer audit window.) |
+| `pending` from a pre-parsed adapter (Megatix, todo.today) with **no event referencing it** | Hard-deleted after **14 days** by `purgeStalePendingMessages()` (added 2026-09-15: 8,194 such rows had accumulated; they are dedup skips, not source records). A pending message that an event's `raw_message_id` points at is never deleted. |
 
 This is the only cleanup that hard-deletes ingestion data. The `events` rows that referenced these messages are unaffected (the FK is `ON DELETE SET NULL`).
 

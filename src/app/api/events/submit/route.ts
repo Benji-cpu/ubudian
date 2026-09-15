@@ -6,6 +6,7 @@ import { sendTransactionalEmail } from "@/lib/email";
 import { eventSubmissionConfirmation } from "@/lib/email-templates";
 import { moderateEvent } from "@/lib/events/moderation";
 import { NextResponse } from "next/server";
+import { normalizeRecurrenceRule } from "@/lib/recurrence";
 import { z } from "zod";
 import { safeUrlOrEmpty } from "@/lib/url-validation";
 
@@ -112,8 +113,8 @@ export async function POST(request: Request) {
           organizer_name: data.organizer_name,
           organizer_contact: data.organizer_contact || null,
           organizer_instagram: data.organizer_instagram || null,
-          is_recurring: data.is_recurring || false,
-          recurrence_rule: data.recurrence_rule || null,
+          is_recurring: data.is_recurring ? normalizeRecurrenceRule(data.recurrence_rule) !== null : false,
+          recurrence_rule: data.is_recurring ? normalizeRecurrenceRule(data.recurrence_rule) : null,
           submitted_by_email: data.submitted_by_email.toLowerCase(),
           is_trusted_submitter: isTrusted,
           status: "approved",

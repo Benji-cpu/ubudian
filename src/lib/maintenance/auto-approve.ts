@@ -35,7 +35,7 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { moderateEvent } from "@/lib/events/moderation";
 import { nowInBali } from "@/lib/events/bali-time";
-import { parseRecurrenceRule } from "@/lib/recurrence";
+import { parseRecurrenceRule, recurrenceEndDate as ruleEndDate } from "@/lib/recurrence";
 import { EVENT_CATEGORIES } from "@/lib/constants";
 
 /** Most events one run may publish. Deliberately small — see rule 2 above. */
@@ -134,27 +134,21 @@ export function screenPendingEvent(event: PendingEventRow, todayStr: string): Sc
 
   // A recurring event legitimately carries a seed date in the past, so it is
   // exempt from the past-date check below — but only if it genuinely still
-  // recurs. Two ways it might not:
+  // recurs. The series end lives in the rule's `until` (the migration folded
+  // the old free-text / RRULE / end_date forms into it; the legacy regexes
+  // below stay as a belt for any row that slips past normalisation).
   //
-  //   1. The rule names an end that has passed. `recurrence_rule` has no
-  //      `until` field, but bad rows carry it as free text ("until 2026-06-09")
-  //      or as an RRULE `UNTIL=`. Either way the series is over.
-  //   2. The rule doesn't parse at all. `expandRecurrence` falls back to
-  //      emitting the seed date alone, so such an event behaves exactly like a
-  //      one-off — and should be judged as one.
+  // A row flagged `is_recurring` with no parseable rule is judged as a
+  // one-off on its date. Megatix copies its own `is_recurring` flag across
+  // without ever writing a rule, and holding those forever was 15 of the 54
+  // nightly holds.
+  const parsedRule = parseRecurrenceRule(event.recurrence_rule);
   const recurrenceEnd = recurrenceEndDate(event.recurrence_rule);
   const stillRecurs =
-    !!event.is_recurring &&
-    parseRecurrenceRule(event.recurrence_rule) !== null &&
-    (recurrenceEnd === null || recurrenceEnd >= todayStr);
+    !!event.is_recurring && parsedRule !== null && (recurrenceEnd === null || recurrenceEnd >= todayStr);
 
-  if (event.is_recurring && !stillRecurs) {
-    return {
-      ok: false,
-      reason: recurrenceEnd
-        ? `recurrence ended ${recurrenceEnd}`
-        : `recurring but rule is unparseable ("${(event.recurrence_rule ?? "").slice(0, 40)}")`,
-    };
+  if (event.is_recurring && parsedRule !== null && !stillRecurs) {
+    return { ok: false, reason: `recurrence ended ${recurrenceEnd}` };
   }
 
   // One-off events must not already be over. `end_date` covers multi-day
@@ -168,9 +162,11 @@ export function screenPendingEvent(event: PendingEventRow, todayStr: string): Sc
   return { ok: true };
 }
 
-/** ISO date an `UNTIL=`/`until …` clause names, or null if the rule has none. */
+/** ISO date the series ends, from the rule's `until` or a legacy clause. */
 function recurrenceEndDate(rule: string | null): string | null {
   if (!rule) return null;
+  const canonical = ruleEndDate(rule);
+  if (canonical) return canonical;
   // RRULE form: UNTIL=20260609 or UNTIL=20260609T000000Z
   const rrule = rule.match(/UNTIL=(\d{4})(\d{2})(\d{2})/i);
   if (rrule) return `${rrule[1]}-${rrule[2]}-${rrule[3]}`;
@@ -201,12 +197,21 @@ export interface AutoApproveResult {
   held: number;
   /** Truncated for payload size; the counters above are complete. */
   decisions: AutoApproveDecision[];
+  /** Ids held only because the per-run cap was reached — expiry must skip these. */
+  heldForCap: string[];
   /**
    * Complete tally of why events were held, keyed by a normalised reason.
    * Unlike `decisions` this is never truncated — it is the signal for whether
    * a screening rule is doing too much work.
    */
   heldReasons: Record<string, number>;
+  /**
+   * Shortlisted events that were published WITHOUT a moderation verdict
+   * because Gemini errored (`moderateEvent` fails open by design). Non-zero
+   * here means the safety layer was off for those rows — the digest must say
+   * so. On 2026-09-15 the sweep was 429ing nightly and this was invisible.
+   */
+  moderationFailedOpen: number;
   errors: string[];
 }
 
@@ -279,7 +284,9 @@ export async function autoApprovePending(
     rejected: 0,
     held: 0,
     decisions: [],
+    heldForCap: [],
     heldReasons: {},
+    moderationFailedOpen: 0,
     errors: [],
   };
 
@@ -360,6 +367,7 @@ export async function autoApprovePending(
     }
     if (shortlist.length >= limit) {
       record(event, "held", "per-run cap reached");
+      result.heldForCap.push(event.id);
       continue;
     }
     shortlist.push(event);
@@ -412,6 +420,9 @@ export async function autoApprovePending(
       continue;
     }
 
+    const failedOpen = verdict.notes === "moderation_failed_open";
+    if (failedOpen) result.moderationFailedOpen += 1;
+
     if (!dryRun) {
       const now = new Date().toISOString();
       const { error: approveError } = await supabase
@@ -420,7 +431,7 @@ export async function autoApprovePending(
           status: "approved",
           auto_approved_at: now,
           ai_approved_at: now,
-          moderation_reason: "auto_gate",
+          moderation_reason: failedOpen ? "auto_gate:unmoderated" : "auto_gate",
         })
         .eq("id", event.id)
         // Re-assert the precondition so a concurrent admin decision wins.
@@ -430,7 +441,7 @@ export async function autoApprovePending(
         continue;
       }
     }
-    record(event, "approved", "cleared structural screen and moderation");
+    record(event, "approved", failedOpen ? "cleared structural screen; moderation unavailable, published unmoderated" : "cleared structural screen and moderation");
   }
 
   return result;

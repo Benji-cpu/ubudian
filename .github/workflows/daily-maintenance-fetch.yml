@@ -44,6 +44,47 @@ jobs:
             -o "digests/${TODAY}.json"
           jq -e '.startedAt' "digests/${TODAY}.json" > /dev/null
 
+      # Liveness → Ben's board. The route reports `liveness.stale` when nothing
+      # has been published for 48h. A digest line is not enough — the digest
+      # is the surface nobody reads on the day it matters — so the workflow
+      # (which has egress) files a CRM row. `dedupeKey` keeps it to one row.
+      - name: File a CRM row if the site is stale
+        env:
+          TODAY: ${{ steps.date.outputs.today }}
+          CRM_HANDOVER_URL: ${{ secrets.CRM_HANDOVER_URL }}
+          CRM_HANDOVER_SECRET: ${{ secrets.CRM_HANDOVER_SECRET }}
+        run: |
+          set -euo pipefail
+          if [ -z "${CRM_HANDOVER_URL:-}" ]; then echo "CRM_HANDOVER_URL secret not set — skipping"; exit 0; fi
+          STALE=$(jq -r '.liveness.stale // true' "digests/${TODAY}.json")
+          UNMOD=$(jq -r '.autoApprove.moderationFailedOpen // 0' "digests/${TODAY}.json")
+          if [ "$STALE" != "true" ] && [ "$UNMOD" = "0" ]; then echo "live and moderated — no row"; exit 0; fi
+          LINE=$(jq -r '.liveness.line // "liveness block missing"' "digests/${TODAY}.json")
+          if [ "$STALE" = "true" ]; then
+            TITLE="Ubudian: nothing published for 48h — the agenda is going stale"
+            PRIORITY="blocking"
+            IMPACT="The homepage and /events stop filling; visitors see last week's rhythms and none of this week's one-offs."
+            KEY="ubudian-liveness-stale"
+          else
+            TITLE="Ubudian: ${UNMOD} events published without a moderation verdict"
+            PRIORITY="soon"
+            IMPACT="Gemini errored on the gate; the structural screen was the only filter for these rows."
+            KEY="ubudian-gate-unmoderated"
+          fi
+          jq -n --arg t "$TITLE" --arg p "$PRIORITY" --arg i "$IMPACT" --arg k "$KEY" --arg line "$LINE" --arg d "$TODAY" '{
+            title: $t, app: "ubudian", priority: $p, impact: $i, dedupeKey: $k, source: "daily-maintenance-fetch",
+            notes: ("Payload " + $d + ": " + $line),
+            steps: [
+              {text: "Read tonight'"'"'s digest and payload", url: ("https://github.com/Benji-cpu/ubudian/blob/main/digests/" + $d + ".md")},
+              {text: "Check the harvest workflows ran green", url: "https://github.com/Benji-cpu/ubudian/actions"},
+              {text: "Check Vercel logs for /api/cron/daily-maintenance", url: "https://vercel.com/bens-projects-9fc2e88a/ubudian-v1/logs"},
+              {text: "If Gemini is 429ing: raise the quota on the Gemini project", url: "https://aistudio.google.com/apikey"}
+            ],
+            links: [{label: "Live agenda", url: "https://theubudian.life/events"}]
+          }' > /tmp/handover.json
+          curl -fsS -X POST -H "Authorization: Bearer $CRM_HANDOVER_SECRET" -H "Content-Type: application/json" \
+            --data @/tmp/handover.json "$CRM_HANDOVER_URL" || echo "CRM handover failed (non-fatal)"
+
       - name: Commit JSON to main
         env:
           TODAY: ${{ steps.date.outputs.today }}

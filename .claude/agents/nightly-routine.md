@@ -66,16 +66,28 @@ The JSON has this shape (verified):
 {
   "startedAt": "ISO timestamp",
   "finishedAt": "ISO timestamp",
+  "liveness": {                       // THE line that matters — see Step 4
+    "lastPublishedAt": "ISO | null", "hoursSincePublish": number | null,
+    "createdLast24h": number, "stale": boolean, "line": string
+  },
   "autoApprove": {                    // the autonomous editorial gate
     "scanned": number, "approved": number, "rejected": number, "held": number,
     "decisions": [{ id, title, startDate, category, recurring, verdict, reason }],
     "heldReasons": { "<reason>": number },   // complete tally; decisions[] is truncated
+    "moderationFailedOpen": number,   // published WITHOUT a Gemini verdict (safety layer was off)
     "errors": [string]
   },
+  "dedupAutoResolve": {               // the dedup backlog, resolved by rule (null on a dry run)
+    "scanned": number, "counterpartGone": number, "seriesAlreadyLive": number,
+    "unresolvedTimedOut": number, "archivedEvents": number, "errors": [string]
+  } | null,
   "autonomous": {
     "autoApprovedEvents": number,
     "autoRejectedEvents": number,
+    "publishedUnmoderated": number,
     "heldPendingEvents": number,
+    "expiredPendingEvents": number,   // held > 30 days → archived
+    "archivedEndedSeries": number,    // recurring rows whose rule's `until` has passed
     "archivedPendingEvents": number,
     "purgedFailedMessages": number,
     "cancelledStaleBookings": number,
@@ -99,6 +111,11 @@ Parse with `jq` and pull the fields you need. Use:
 ```bash
 # $PAYLOAD and $DIGEST_DATE were set in Step 1 — do not rebuild them from $TODAY.
 AUTO_TOTAL=$(jq '[.autonomous[]] | add' "$PAYLOAD")
+LIVE_STALE=$(jq '.liveness.stale // true' "$PAYLOAD")
+LIVE_LINE=$(jq -r '.liveness.line // "liveness block missing — treat as stale"' "$PAYLOAD")
+UNMODERATED=$(jq '.autoApprove.moderationFailedOpen // 0' "$PAYLOAD")
+DEDUP_RESOLVED=$(jq '(.dedupAutoResolve // {}) | (.counterpartGone // 0) + (.seriesAlreadyLive // 0) + (.unresolvedTimedOut // 0)' "$PAYLOAD")
+EXPIRED=$(jq '.autonomous.expiredPendingEvents // 0' "$PAYLOAD")
 GATE_APPROVED=$(jq '.autoApprove.approved // 0' "$PAYLOAD")
 GATE_REJECTED=$(jq '.autoApprove.rejected // 0' "$PAYLOAD")
 GATE_HELD=$(jq '.autoApprove.held // 0' "$PAYLOAD")
@@ -113,7 +130,8 @@ ERROR_COUNT=$(jq '.errors | length' "$PAYLOAD")
 
 ## Step 3: skip rule (no-activity day)
 
-If `AUTO_TOTAL` is 0 AND every review counter is 0 AND `ERROR_COUNT` is 0, write a one-line summary to stdout (`echo "no activity ${TODAY} — skipping commit"`) and **do not commit**. Exit 0. We don't spam `main` with empty digests.
+**Never skip when `LIVE_STALE` is true** — a silent day is exactly the day the
+digest must exist. Otherwise: if `AUTO_TOTAL` is 0 AND every review counter is 0 AND `ERROR_COUNT` is 0, write a one-line summary to stdout (`echo "no activity ${TODAY} — skipping commit"`) and **do not commit**. Exit 0. We don't spam `main` with empty digests.
 
 ## Step 4: synthesise `digests/${DIGEST_DATE}.md`
 
@@ -125,9 +143,20 @@ Structure:
 (If DIGEST_DATE is not today, say so in one line under the heading — e.g.
 "Reporting the 2026-08-02 run; today's payload had not landed when this fired.")
 
+## Liveness
+(Always first, always present. Print `LIVE_LINE` verbatim. If `LIVE_STALE` is
+true, prefix the heading with ⚠ and make it the first line of the file after
+the title — the GitHub workflow has already filed a CRM row for Ben; your job
+is to make the digest say it too. If `UNMODERATED` > 0, add one line: "N events
+published without a moderation verdict — Gemini errored; the structural screen
+was the only gate." That is the safety layer being off and must never be quiet.)
+
 ## Editorial gate
-- Published: N   ·   Rejected: N   ·   Held: N
-(From `.autoApprove`. List the published titles from `.decisions[]` where
+- Published: N   ·   Rejected: N   ·   Held: N   ·   Expired: N   ·   Dedup auto-resolved: N
+(From `.autoApprove`, `.autonomous.expiredPendingEvents`, and
+`.dedupAutoResolve`. "Held" is no longer a backlog: anything held 30 nights is
+expired, and dedup matches resolve by rule, so a held count that stays flat
+for a week is a rule holding good rows, not a queue nobody clears. List the published titles from `.decisions[]` where
 verdict == "approved" — this is the one section worth reading in full, because
 it is what actually changed on the public site. Then summarise `.heldReasons`
 as a compact "held because" line. If a single reason dominates the holds, say

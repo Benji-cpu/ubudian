@@ -324,3 +324,31 @@ describe("bucketEventsByTime", () => {
     });
   });
 });
+
+describe("recurring rows carrying a series end", () => {
+  // 2026-09-15 finding: 79 weekly classes sat under "Today" as "Day 105 of 162"
+  // because end_date held the series end and the roll-forward read it as a span.
+  it("does not pin a weekly class to today because its series end is in end_date", () => {
+    // makeEvent pins is_recurring/recurrence_rule, so spread over it.
+    const wednesdayClass: Event = {
+      ...makeEvent({ id: "wed", start_date: "2026-03-04", end_date: "2026-11-11" }),
+      is_recurring: true,
+      recurrence_rule: JSON.stringify({ frequency: "weekly", day_of_week: 3 }),
+    };
+    const buckets = bucketEventsByTime([wednesdayClass], TUES_8AM);
+    expect(buckets.today).toHaveLength(0);
+    expect(buckets.in_progress).toHaveLength(0);
+    expect(buckets.tomorrow.map((e) => e.id)).toEqual(["wed"]);
+    expect(buckets.tomorrow[0].end_date).toBeNull();
+  });
+
+  it("drops a series whose until has passed", () => {
+    const ended: Event = {
+      ...makeEvent({ id: "ended", start_date: "2026-03-04" }),
+      is_recurring: true,
+      recurrence_rule: JSON.stringify({ frequency: "weekly", day_of_week: 3, until: "2026-04-15" }),
+    };
+    const buckets = bucketEventsByTime([ended], TUES_8AM);
+    expect(Object.values(buckets).flat()).toHaveLength(0);
+  });
+});

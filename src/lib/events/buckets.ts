@@ -48,7 +48,12 @@ const DAY_MS = 24 * 60 * 60 * 1000;
  */
 export function rolledForward(events: Event[], now: Date = new Date()): Event[] {
   const todayStr = nowInBali(now).dateStr;
-  return events.map((event) => nextOccurrence(event, todayStr));
+  const out: Event[] = [];
+  for (const event of events) {
+    const next = nextOccurrence(event, todayStr);
+    if (next) out.push(next);
+  }
+  return out;
 }
 
 export function bucketEventsByTime(
@@ -73,6 +78,7 @@ export function bucketEventsByTime(
 
   for (const event of events) {
     const effective = nextOccurrence(event, todayStr);
+    if (!effective) continue;
     const bucket = pickBucket(effective, bali, todayStr, tomorrowStr, weekendDates);
     if (bucket) buckets[bucket].push(effective);
   }
@@ -212,54 +218,39 @@ function daysBetween(a: string, b: string): number {
  * We only handle daily / weekly / biweekly / monthly frequencies — that's
  * what `recurrence.ts` supports.
  */
-function nextOccurrence(event: Event, today: string): Event {
+function nextOccurrence(event: Event, today: string): Event | null {
   if (!event.is_recurring || !event.recurrence_rule) return event;
   const rule = parseRecurrenceRule(event.recurrence_rule);
   if (!rule) return event;
 
-  const spanDays =
-    event.end_date && event.end_date >= event.start_date
-      ? daysBetween(event.start_date, event.end_date)
-      : 0;
+  // A recurring row's `end_date` is NOT an instance span. The series end lives
+  // in `rule.until`; anything left in `end_date` is legacy and ignored. (For
+  // four months the feed read a Wednesday class "until Nov 11" as a 160-day
+  // event in progress and pinned it under Today, every day.) Each occurrence
+  // is one day; the rolled row carries no end_date at all.
+  if (rule.until && rule.until < today) return null;
 
-  // If currently inside a genuine multi-day instance (today within the span),
-  // don't roll — a retreat on its day 4 should keep showing. We require a REAL
-  // span (end_date after start_date). A single-day recurring row must NOT treat
-  // start_date == today as an "active instance": when its seed weekday disagrees
-  // with the rule (e.g. a Sunday kirtan accidentally seeded on a Monday), that
-  // short-circuits the weekday-snap below and renders the wrong day.
-  if (
-    event.end_date &&
-    event.end_date > event.start_date &&
-    event.start_date <= today &&
-    event.end_date >= today
-  ) {
-    return event;
-  }
+  const occurrence = (date: string): Event | null =>
+    rule.until && date > rule.until ? null : { ...event, start_date: date, end_date: null };
 
   // Weekly with day_of_week (single or multi): pick the soonest matching
   // weekday on or after max(today, start_date). Don't stride from the seed
   // — that breaks when the seed's weekday disagrees with the rule (e.g. a
   // Friday-weekly row whose start_date was accidentally seeded on a Saturday).
-  // Also covers future-anchored rows where start_date itself is on the wrong
-  // weekday.
   if (rule.frequency === "weekly" && rule.day_of_week !== undefined) {
     const days = daysOfWeekArray(rule);
     if (days.length > 0) {
       const anchor = event.start_date > today ? event.start_date : today;
       let probe = anchor;
       for (let i = 0; i < 14; i++) {
-        if (days.includes(dayOfWeekFromDateStr(probe))) {
-          const newEnd = spanDays > 0 ? addDays(probe, spanDays) : event.end_date;
-          return { ...event, start_date: probe, end_date: newEnd };
-        }
+        if (days.includes(dayOfWeekFromDateStr(probe))) return occurrence(probe);
         probe = addDays(probe, 1);
       }
     }
   }
 
-  // Already upcoming and no weekday-snap applies — leave alone.
-  if (event.start_date >= today) return event;
+  // Already upcoming and no weekday-snap applies — leave the date alone.
+  if (event.start_date >= today) return occurrence(event.start_date);
 
   // Roll forward by the rule's step until start >= today.
   // Safety cap at 400 iterations (over a year for weekly).
@@ -268,9 +259,7 @@ function nextOccurrence(event: Event, today: string): Event {
     if (start >= today) break;
     start = advanceByRule(start, rule);
   }
-
-  const newEnd = spanDays > 0 ? addDays(start, spanDays) : event.end_date;
-  return { ...event, start_date: start, end_date: newEnd };
+  return occurrence(start);
 }
 
 /** Day-of-week (0=Sun..6=Sat) for a YYYY-MM-DD string in UTC. */

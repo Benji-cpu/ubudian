@@ -20,7 +20,10 @@ export function formatEventDateLine(
 ): string {
   const today = nowInBali(now).dateStr;
   const start = event.start_date;
-  const end = event.end_date && event.end_date >= event.start_date ? event.end_date : null;
+  // A recurring row's end_date (if any survives) is the series end, never a
+  // span — each occurrence is one day.
+  const end =
+    !event.is_recurring && event.end_date && event.end_date >= event.start_date ? event.end_date : null;
   const singleFmt = style === "long" ? "EEEE, MMMM d" : "MMM d";
 
   // Single-day or no end_date — preserve existing behaviour.

@@ -50,14 +50,12 @@ export function filterEventsInRange(
   const out: Event[] = [];
   for (const event of events) {
     if (event.is_recurring && event.recurrence_rule) {
+      // `expandRecurrence` honours the rule's `until`, so an ended series
+      // yields nothing. Each occurrence is a single day — a recurring row's
+      // legacy `end_date` is never a span (see `nextOccurrence`).
       const hits = expandRecurrence(event, rangeStart, expansionEnd);
       if (hits.length === 0) continue;
-      const first = hits[0];
-      const firstStr = formatYmdLocal(first);
-      const span = spanDays(event.start_date, event.end_date);
-      const newEnd =
-        span > 0 ? formatYmdLocal(addDaysFn(first, span)) : event.end_date;
-      out.push({ ...event, start_date: firstStr, end_date: newEnd });
+      out.push({ ...event, start_date: formatYmdLocal(hits[0]), end_date: null });
       continue;
     }
 

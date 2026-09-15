@@ -13,6 +13,7 @@ import { EVENT_CATEGORIES } from "@/lib/constants";
 import { classifyAndParseMessage, parseEventFromText, parseEventFromImage, LLMApiError } from "./llm-parser";
 import { findDuplicates, recordDedupMatch } from "./dedup";
 import { normalizeVenue } from "./venue-normalizer";
+import { normalizeRecurrenceRule } from "@/lib/recurrence";
 import { generateFingerprint } from "./fingerprint";
 import { getAdapter } from "./source-adapter";
 import { validateAndNormalizeDate } from "./date-validator";
@@ -732,6 +733,24 @@ export async function createEventFromParsed(
 
   // Normalize venue
   const normalizedVenue = await normalizeVenue(parsed.venue_name);
+
+  // One recurrence format. A harvester's series end ("until 11 Nov") arrives
+  // in `end_date`; for a recurring row that is the rule's `until`, not an
+  // instance span — the feed read 174 weekly classes as months-long events
+  // in progress because of exactly this. A recurring flag with no parseable
+  // rule (Megatix) is a one-off on its date.
+  if (parsed.is_recurring) {
+    const rule = normalizeRecurrenceRule(parsed.recurrence_rule, parsed.end_date);
+    if (rule) {
+      parsed.recurrence_rule = rule;
+      parsed.end_date = null;
+    } else {
+      parsed.is_recurring = false;
+      parsed.recurrence_rule = null;
+    }
+  } else {
+    parsed.recurrence_rule = null;
+  }
 
   // Best-effort geocoding — populates lat/lng for the map view. Never throws:
   // any failure just leaves the event without coordinates.

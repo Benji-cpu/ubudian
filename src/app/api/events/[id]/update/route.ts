@@ -4,6 +4,7 @@ import { rateLimit, getClientIp } from "@/lib/rate-limit";
 import { moderateEvent } from "@/lib/events/moderation";
 import { safeUrlOrEmpty } from "@/lib/url-validation";
 import { NextResponse } from "next/server";
+import { normalizeRecurrenceRule } from "@/lib/recurrence";
 import { z } from "zod";
 
 // Organizer self-serve: a signed-in submitter edits their own event. Same
@@ -118,8 +119,8 @@ export async function PATCH(
         organizer_name: data.organizer_name,
         organizer_contact: data.organizer_contact || null,
         organizer_instagram: data.organizer_instagram || null,
-        is_recurring: data.is_recurring || false,
-        recurrence_rule: data.is_recurring ? data.recurrence_rule || null : null,
+        is_recurring: data.is_recurring ? normalizeRecurrenceRule(data.recurrence_rule) !== null : false,
+        recurrence_rule: data.is_recurring ? normalizeRecurrenceRule(data.recurrence_rule) : null,
         last_edited_by_submitter_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       })

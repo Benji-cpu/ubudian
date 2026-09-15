@@ -143,20 +143,43 @@ describe("screenPendingEvent", () => {
   });
 
   it("treats an is_recurring row with an unparseable rule as a one-off", () => {
-    // expandRecurrence() falls back to emitting the seed date alone for these,
-    // so they behave like one-offs and must face the past-date check.
+    // Megatix copies its own is_recurring flag across without a rule. Such a
+    // row is judged on its date like any one-off: past → held, future → fine.
     const past = screenPendingEvent(
       publishable({ start_date: "2026-05-18", is_recurring: true, recurrence_rule: "sometimes" }),
       TODAY,
     );
     expect(past.ok).toBe(false);
-    expect(past.ok === false && past.reason).toMatch(/rule is unparseable/);
+    expect(past.ok === false && past.reason).toMatch(/already past/);
 
-    const alsoHeld = screenPendingEvent(
+    const future = screenPendingEvent(
       publishable({ start_date: "2026-09-01", is_recurring: true, recurrence_rule: null }),
       TODAY,
     );
-    expect(alsoHeld.ok).toBe(false);
+    expect(future).toEqual({ ok: true });
+  });
+
+  it("reads the series end from the rule's until field", () => {
+    const ended = screenPendingEvent(
+      publishable({
+        start_date: "2026-05-05",
+        is_recurring: true,
+        recurrence_rule: JSON.stringify({ frequency: "weekly", day_of_week: 2, until: "2026-07-28" }),
+      }),
+      TODAY,
+    );
+    expect(ended.ok).toBe(false);
+    expect(ended.ok === false && ended.reason).toMatch(/recurrence ended 2026-07-28/);
+
+    const live = screenPendingEvent(
+      publishable({
+        start_date: "2026-05-05",
+        is_recurring: true,
+        recurrence_rule: JSON.stringify({ frequency: "weekly", day_of_week: 2, until: "2026-11-11" }),
+      }),
+      TODAY,
+    );
+    expect(live).toEqual({ ok: true });
   });
 
   it("passes an event starting today", () => {

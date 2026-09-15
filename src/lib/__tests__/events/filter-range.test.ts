@@ -138,11 +138,14 @@ describe("filterEventsInRange", () => {
     expect(out[0].start_date >= "2026-05-18").toBe(true);
   });
 
-  it("preserves multi-day span when rolling a recurring event forward", () => {
+  it("rolls a recurring event forward as a single-day occurrence, whatever end_date says", () => {
+    // 174 todo.today rows carried the SERIES end in end_date; the feed read
+    // each as a months-long event in progress. A recurring occurrence is one
+    // day, and the series end lives in the rule's `until`.
     const event = makeEvent({
       id: "weekly-span",
       start_date: "2026-05-05", // Tue
-      end_date: "2026-05-06", // Wed — 1-day span
+      end_date: "2026-11-11",
       is_recurring: true,
       recurrence_rule: JSON.stringify({ frequency: "weekly", day_of_week: 2 }),
     });
@@ -150,7 +153,18 @@ describe("filterEventsInRange", () => {
     const out = filterEventsInRange([event], "2026-05-19", "2026-05-19");
     expect(out).toHaveLength(1);
     expect(out[0].start_date).toBe("2026-05-19");
-    expect(out[0].end_date).toBe("2026-05-20");
+    expect(out[0].end_date).toBeNull();
+  });
+
+  it("drops a recurring event whose rule has ended", () => {
+    const event = makeEvent({
+      id: "ended-series",
+      start_date: "2026-05-05",
+      is_recurring: true,
+      recurrence_rule: JSON.stringify({ frequency: "weekly", day_of_week: 2, until: "2026-05-12" }),
+    });
+    expect(filterEventsInRange([event], "2026-05-19", "2026-05-26")).toHaveLength(0);
+    expect(filterEventsInRange([event], "2026-05-12", "2026-05-12")).toHaveLength(1);
   });
 
   it("hard-caps the window at MAX_WINDOW_DAYS even if `to` is far out", () => {

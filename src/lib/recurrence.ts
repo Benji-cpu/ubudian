@@ -9,6 +9,15 @@ import {
 export interface RecurrenceRule {
   frequency: "daily" | "weekly" | "biweekly" | "monthly";
   /**
+   * Last date (YYYY-MM-DD, inclusive) the series runs. This is the ONE place a
+   * series end lives. It used to be smuggled in as free text ("until
+   * 2026-06-09"), as an RRULE `UNTIL=`, or — for 174 todo.today rows — as the
+   * event's `end_date`, which the feed then read as a 160-day multi-day event
+   * in progress. Migration `20260915090000_recurrence_until.sql` folded all
+   * three into this field; `normalizeRecurrenceRule` keeps new rows honest.
+   */
+  until?: string;
+  /**
    * 0=Sun, 1=Mon, ..., 6=Sat. A single number is a single weekday; an
    * array represents multi-day weeklies (e.g. Mon/Wed/Fri = [1,3,5]).
    * Arrays are only meaningful for `weekly` frequency.
@@ -33,7 +42,10 @@ export function parseRecurrenceRule(rule: string | null): RecurrenceRule | null 
 
   if (trimmed.startsWith("{")) {
     try {
-      return JSON.parse(trimmed) as RecurrenceRule;
+      const parsed = JSON.parse(trimmed) as Partial<RecurrenceRule>;
+      if (!parsed || typeof parsed !== "object" || !parsed.frequency) return null;
+      if (!["daily", "weekly", "biweekly", "monthly"].includes(parsed.frequency)) return null;
+      return parsed as RecurrenceRule;
     } catch {
       return null;
     }
@@ -60,18 +72,21 @@ function parseRruleString(s: string): RecurrenceRule | null {
   const freq = parts.FREQ?.toUpperCase();
   let frequency: RecurrenceRule["frequency"];
   if (freq === "DAILY") frequency = "daily";
-  else if (freq === "WEEKLY") frequency = "weekly";
+  else if (freq === "WEEKLY") frequency = parts.INTERVAL === "2" ? "biweekly" : "weekly";
   else if (freq === "MONTHLY") frequency = "monthly";
   else return null;
+  const rule: RecurrenceRule = { frequency };
+  const until = parts.UNTIL?.match(/^(\d{4})(\d{2})(\d{2})/);
+  if (until) rule.until = `${until[1]}-${until[2]}-${until[3]}`;
   const byday = parts.BYDAY?.toUpperCase();
-  if (!byday) return { frequency };
+  if (!byday) return rule;
   const days = byday
     .split(",")
     .map((d) => DAY_INDEX_BY_RRULE[d.trim()])
     .filter((d): d is number => typeof d === "number");
-  if (days.length === 0) return { frequency };
-  if (days.length === 1) return { frequency, day_of_week: days[0] };
-  return { frequency, day_of_week: days };
+  if (days.length === 0) return rule;
+  rule.day_of_week = days.length === 1 ? days[0] : days;
+  return rule;
 }
 
 const DAY_NAMES = [
@@ -80,22 +95,67 @@ const DAY_NAMES = [
 
 function parseNaturalLanguage(s: string): RecurrenceRule | null {
   const lower = s.toLowerCase();
+  const untilMatch = lower.match(/until\s+(\d{4}-\d{2}-\d{2})/);
+  const until = untilMatch ? untilMatch[1] : undefined;
+  const withUntil = (rule: RecurrenceRule): RecurrenceRule => (until ? { ...rule, until } : rule);
+
+  const biweekly =
+    lower.startsWith("alternat") ||
+    lower.includes("biweek") ||
+    lower.includes("bi-week") ||
+    lower.includes("every other") ||
+    lower.includes("every second") ||
+    lower.includes("every 2 weeks") ||
+    lower.includes("every two weeks");
+
   const hits: number[] = [];
   for (let i = 0; i < DAY_NAMES.length; i++) {
     if (lower.includes(DAY_NAMES[i])) hits.push(i);
   }
   if (hits.length > 0) {
-    const biweekly =
-      lower.startsWith("alternat") ||
-      lower.includes("biweek") ||
-      lower.includes("every other");
     const frequency: RecurrenceRule["frequency"] = biweekly ? "biweekly" : "weekly";
-    if (hits.length === 1) return { frequency, day_of_week: hits[0] };
-    return { frequency, day_of_week: hits };
+    if (hits.length === 1) return withUntil({ frequency, day_of_week: hits[0] });
+    return withUntil({ frequency, day_of_week: hits });
   }
-  if (lower === "monthly" || lower.startsWith("every month")) return { frequency: "monthly" };
-  if (lower === "daily" || lower.startsWith("every day")) return { frequency: "daily" };
+  if (biweekly) return withUntil({ frequency: "biweekly" });
+  if (lower.startsWith("monthly") || lower.startsWith("every month")) return withUntil({ frequency: "monthly" });
+  if (lower.startsWith("daily") || lower.startsWith("every day")) return withUntil({ frequency: "daily" });
+  if (lower.startsWith("weekly") || lower.startsWith("every week")) return withUntil({ frequency: "weekly" });
+  // "until 2026-06-09" on its own carries an end but no cadence. It only ever
+  // appeared on weekly rows, so read it as weekly-from-seed.
+  if (until && lower.trim().startsWith("until")) return { frequency: "weekly", until };
   return null;
+}
+
+/** ISO date the series ends on, or null when it runs open-ended. */
+export function recurrenceEndDate(rule: string | null): string | null {
+  const parsed = parseRecurrenceRule(rule);
+  return parsed?.until ?? null;
+}
+
+/**
+ * Canonical JSON form of a rule, or null when the input does not describe a
+ * recurrence at all. `seriesEnd` is folded in as `until` when the rule has none —
+ * this is how a harvester's "until 11 Nov" (which used to land in `end_date`)
+ * becomes part of the rule. Every write path that can carry a rule runs its
+ * value through here so the database only ever holds one format.
+ */
+export function normalizeRecurrenceRule(
+  rule: string | null | undefined,
+  seriesEnd?: string | null,
+): string | null {
+  const parsed = parseRecurrenceRule(rule ?? null);
+  if (!parsed) return null;
+  const out: RecurrenceRule = { frequency: parsed.frequency };
+  if (parsed.day_of_week !== undefined) {
+    const days = daysOfWeekArray(parsed).filter((d) => d >= 0 && d <= 6);
+    if (days.length === 1) out.day_of_week = days[0];
+    else if (days.length > 1) out.day_of_week = days;
+  }
+  if (parsed.day_of_month) out.day_of_month = parsed.day_of_month;
+  const until = parsed.until ?? (seriesEnd && /^\d{4}-\d{2}-\d{2}$/.test(seriesEnd) ? seriesEnd : undefined);
+  if (until) out.until = until;
+  return JSON.stringify(out);
 }
 
 export function expandRecurrence(
@@ -107,8 +167,14 @@ export function expandRecurrence(
   if (!rule) return [new Date(event.start_date)];
 
   const seed = startOfDay(new Date(event.start_date));
-  const end = startOfDay(rangeEnd);
   const start = startOfDay(rangeStart);
+  // A series that has ended emits nothing past its last day. `until` is
+  // inclusive; `rangeEnd` is exclusive, so the cap is the day after.
+  const untilExclusive = rule.until ? addDays(startOfDay(new Date(rule.until)), 1) : null;
+  const end =
+    untilExclusive && isBefore(untilExclusive, startOfDay(rangeEnd))
+      ? untilExclusive
+      : startOfDay(rangeEnd);
 
   // Weekly with day_of_week (single or multi): walk each candidate day in
   // the range and emit if the weekday matches. Honours the rule even when
@@ -163,6 +229,14 @@ export function expandRecurrence(
 export function formatRecurrenceRule(rule: string | null): string {
   const parsed = parseRecurrenceRule(rule);
   if (!parsed) return "";
+  const base = formatCadence(parsed);
+  if (!parsed.until) return base;
+  const [y, m, d] = parsed.until.split("-").map(Number);
+  const untilLabel = new Date(y, m - 1, d).toLocaleDateString("en-GB", { day: "numeric", month: "short" });
+  return `${base} · until ${untilLabel}`;
+}
+
+function formatCadence(parsed: RecurrenceRule): string {
 
   const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
   const dayNamesShort = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
