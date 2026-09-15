@@ -21,7 +21,7 @@ import { config } from "dotenv";
 config({ path: ".env.local" });
 
 import { createClient } from "@supabase/supabase-js";
-import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
+import { GoogleGenAI, Type } from "@google/genai";
 import { VIBE_TAGS, VIBE_TAG_DESCRIPTIONS, type VibeTag } from "../src/lib/vibe-tags";
 
 const supabase = createClient(
@@ -30,7 +30,7 @@ const supabase = createClient(
   { auth: { autoRefreshToken: false, persistSession: false } },
 );
 
-const gemini = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+const gemini = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
 
 interface CliArgs {
   limit?: number;
@@ -82,12 +82,12 @@ async function loadEvents(args: CliArgs): Promise<EventRow[]> {
 }
 
 const responseSchema = {
-  type: SchemaType.OBJECT as const,
+  type: Type.OBJECT as const,
   properties: {
     vibe_tags: {
-      type: SchemaType.ARRAY as const,
+      type: Type.ARRAY as const,
       description: "0–4 vibe facet IDs that precisely describe this event. Empty if none clearly apply.",
-      items: { type: SchemaType.STRING as const, enum: [...VIBE_TAGS], format: "enum" as const },
+      items: { type: Type.STRING as const, enum: [...VIBE_TAGS], format: "enum" as const },
     },
   },
   required: ["vibe_tags"],
@@ -98,14 +98,6 @@ const VIBE_PROMPT_DEFINITIONS = VIBE_TAGS.map(
 ).join("\n");
 
 async function tagEvent(event: EventRow): Promise<VibeTag[]> {
-  const model = gemini.getGenerativeModel({
-    model: "gemini-2.5-flash-lite",
-    generationConfig: {
-      responseMimeType: "application/json",
-      responseSchema,
-      temperature: 0.2,
-    },
-  });
 
   const eventBlock = [
     `Title: ${event.title}`,
@@ -126,8 +118,12 @@ Return JSON: { "vibe_tags": [...] }. Each value must be one of the IDs above. No
 Event:
 ${eventBlock}`;
 
-  const result = await model.generateContent(prompt);
-  const text = result.response.text();
+  const result = await gemini.models.generateContent({
+    model: "gemini-2.5-flash-lite",
+    contents: prompt,
+    config: { responseMimeType: "application/json", responseSchema, temperature: 0.2 },
+  });
+  const text = result.text ?? "";
   let parsed: { vibe_tags?: unknown };
   try {
     parsed = JSON.parse(text);

@@ -23,7 +23,7 @@ import { config } from "dotenv";
 config({ path: ".env.local" });
 
 import { createClient } from "@supabase/supabase-js";
-import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
+import { GoogleGenAI, Type } from "@google/genai";
 
 const ARCHETYPE_IDS = ["seeker", "explorer", "creative", "connector", "epicurean"] as const;
 type ArchetypeId = (typeof ARCHETYPE_IDS)[number];
@@ -47,7 +47,7 @@ const supabase = createClient(
   { auth: { autoRefreshToken: false, persistSession: false } },
 );
 
-const gemini = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+const gemini = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
 
 interface CliArgs {
   limit?: number;
@@ -100,13 +100,13 @@ async function loadEvents(args: CliArgs): Promise<EventRow[]> {
 }
 
 const responseSchema = {
-  type: SchemaType.OBJECT as const,
+  type: Type.OBJECT as const,
   properties: {
     archetype_ids: {
-      type: SchemaType.ARRAY as const,
+      type: Type.ARRAY as const,
       description: "1–3 archetype IDs that best match this event's vibe.",
       items: {
-        type: SchemaType.STRING as const,
+        type: Type.STRING as const,
         enum: [...ARCHETYPE_IDS],
         format: "enum" as const,
       },
@@ -120,14 +120,6 @@ const ARCHETYPE_PROMPT_DEFINITIONS = ARCHETYPE_IDS.map(
 ).join("\n");
 
 async function tagEvent(event: EventRow): Promise<ArchetypeId[]> {
-  const model = gemini.getGenerativeModel({
-    model: "gemini-2.5-flash-lite",
-    generationConfig: {
-      responseMimeType: "application/json",
-      responseSchema,
-      temperature: 0.2,
-    },
-  });
 
   const eventBlock = [
     `Title: ${event.title}`,
@@ -150,8 +142,12 @@ Return JSON: { "archetype_ids": [...] }. Each value must be one of the IDs above
 Event:
 ${eventBlock}`;
 
-  const result = await model.generateContent(prompt);
-  const text = result.response.text();
+  const result = await gemini.models.generateContent({
+    model: "gemini-2.5-flash-lite",
+    contents: prompt,
+    config: { responseMimeType: "application/json", responseSchema, temperature: 0.2 },
+  });
+  const text = result.text ?? "";
   let parsed: { archetype_ids?: unknown };
   try {
     parsed = JSON.parse(text);

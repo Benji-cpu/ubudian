@@ -11,7 +11,7 @@
  * thousands corpus and keeps the vector column / index small.
  */
 
-import { GoogleGenerativeAI, TaskType } from "@google/generative-ai";
+import { GoogleGenAI } from "@google/genai";
 
 // gemini-embedding-001 is the embedding model this project's API key can reach
 // (text-embedding-004 404s for it). It defaults to 3072 dims; we request 768
@@ -28,15 +28,15 @@ function l2normalize(v: number[]): number[] {
   return norm === 0 ? v : v.map((x) => x / norm);
 }
 
-let genAI: GoogleGenerativeAI | null = null;
+let genAI: GoogleGenAI | null = null;
 
-function getGenAI(): GoogleGenerativeAI {
+function getGenAI(): GoogleGenAI {
   if (!genAI) {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
       throw new Error("GEMINI_API_KEY environment variable is not set");
     }
-    genAI = new GoogleGenerativeAI(apiKey);
+    genAI = new GoogleGenAI({ apiKey });
   }
   return genAI;
 }
@@ -52,22 +52,14 @@ export async function embedText(
   text: string,
   taskType: EmbeddingTaskType = "RETRIEVAL_DOCUMENT"
 ): Promise<number[]> {
-  const model = getGenAI().getGenerativeModel({ model: EMBEDDING_MODEL });
-  // outputDimensionality isn't in this SDK version's request type, so it's
-  // passed via a cast; if the API ignores it we truncate the longer vector to
-  // EMBEDDING_DIMS ourselves (Matryoshka prefixes are valid lower-dim embeddings).
-  const request = {
-    content: { role: "user", parts: [{ text }] },
-    taskType:
-      taskType === "RETRIEVAL_QUERY"
-        ? TaskType.RETRIEVAL_QUERY
-        : TaskType.RETRIEVAL_DOCUMENT,
-    outputDimensionality: EMBEDDING_DIMS,
-  };
-  const res = await model.embedContent(
-    request as unknown as Parameters<typeof model.embedContent>[0]
-  );
-  const values = res.embedding?.values;
+  const res = await getGenAI().models.embedContent({
+    model: EMBEDDING_MODEL,
+    contents: text,
+    config: { taskType, outputDimensionality: EMBEDDING_DIMS },
+  });
+  // The API honours outputDimensionality; if it ever returns the full 3072 we
+  // truncate ourselves (Matryoshka prefixes are valid lower-dim embeddings).
+  const values = res.embeddings?.[0]?.values;
   if (!values || values.length === 0) {
     throw new Error("Empty embedding returned from Gemini");
   }

@@ -11,7 +11,7 @@
  * permissive publication over a human queue.
  */
 
-import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
+import { GoogleGenAI, Type } from "@google/genai";
 import { logActivity } from "@/lib/ingestion/activity-log";
 
 export type ModerationFlag = "spam" | "inappropriate" | "misleading" | "off_topic";
@@ -53,32 +53,32 @@ Return ONE of these flags, choosing the strongest that clearly applies:
 Be permissive. When in doubt, return "ok". Only flag content a reasonable moderator would reject.`;
 
 const RESPONSE_SCHEMA = {
-  type: SchemaType.OBJECT as const,
+  type: Type.OBJECT as const,
   properties: {
     flag: {
-      type: SchemaType.STRING as const,
+      type: Type.STRING as const,
       enum: ["ok", "spam", "inappropriate", "misleading", "off_topic"],
       format: "enum" as const,
       description: "Moderation decision.",
     },
     reason: {
-      type: SchemaType.STRING as const,
+      type: Type.STRING as const,
       description: "One short sentence explaining the decision. For 'ok', summarize briefly.",
     },
     confidence: {
-      type: SchemaType.NUMBER as const,
+      type: Type.NUMBER as const,
       description: "0–1, how confident the moderator is. Only reject when >= 0.7.",
     },
   },
   required: ["flag", "reason", "confidence"],
 };
 
-let genAI: GoogleGenerativeAI | null = null;
-function getClient(): GoogleGenerativeAI {
+let genAI: GoogleGenAI | null = null;
+function getClient(): GoogleGenAI {
   if (!genAI) {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) throw new Error("GEMINI_API_KEY is not configured");
-    genAI = new GoogleGenerativeAI(apiKey);
+    genAI = new GoogleGenAI({ apiKey });
   }
   return genAI;
 }
@@ -92,18 +92,17 @@ export async function moderateEvent(input: ModerationInput): Promise<ModerationR
   const prompt = buildPrompt(input);
 
   try {
-    const model = getClient().getGenerativeModel({
+    const response = await getClient().models.generateContent({
       model: MODEL,
-      systemInstruction: SYSTEM_PROMPT,
-      generationConfig: {
+      contents: prompt,
+      config: {
+        systemInstruction: SYSTEM_PROMPT,
         responseMimeType: "application/json",
         responseSchema: RESPONSE_SCHEMA,
         temperature: 0,
       },
     });
-
-    const response = await model.generateContent(prompt);
-    const raw = response.response.text().trim();
+    const raw = (response.text ?? "").trim();
     const parsed = JSON.parse(raw) as {
       flag: "ok" | ModerationFlag;
       reason: string;

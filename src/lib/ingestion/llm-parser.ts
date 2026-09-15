@@ -10,7 +10,7 @@
  * guaranteed valid JSON responses.
  */
 
-import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
+import { GoogleGenAI, Type, type Part } from "@google/genai";
 import {
   CLASSIFY_MESSAGE_PROMPT,
   CLASSIFY_AND_PARSE_PROMPT,
@@ -38,17 +38,38 @@ export class LLMApiError extends Error {
   }
 }
 
-let genAI: GoogleGenerativeAI | null = null;
+let genAI: GoogleGenAI | null = null;
 
-function getGenAI(): GoogleGenerativeAI {
+function getGenAI(): GoogleGenAI {
   if (!genAI) {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
       throw new Error("GEMINI_API_KEY environment variable is not set");
     }
-    genAI = new GoogleGenerativeAI(apiKey);
+    genAI = new GoogleGenAI({ apiKey });
   }
   return genAI;
+}
+
+const MODEL = "gemini-2.5-flash-lite";
+
+/** One structured-output call. `contents` is a prompt string or explicit parts. */
+async function generateJson(contents: string | Part[], responseSchema: unknown, label: string): Promise<string> {
+  const ai = getGenAI();
+  const result = await withLLMRetry(
+    () =>
+      ai.models.generateContent({
+        model: MODEL,
+        contents,
+        config: {
+          responseMimeType: "application/json",
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          responseSchema: responseSchema as any,
+        },
+      }),
+    label
+  );
+  return result.text ?? "";
 }
 
 /**
@@ -75,53 +96,53 @@ export function extractJSON(text: string): string {
 // ============================================
 
 const classificationSchema = {
-  type: SchemaType.OBJECT as const,
+  type: Type.OBJECT as const,
   properties: {
-    is_event: { type: SchemaType.BOOLEAN as const, description: "Whether the message contains an event announcement" },
-    confidence: { type: SchemaType.NUMBER as const, description: "Confidence score from 0.0 to 1.0" },
-    reason: { type: SchemaType.STRING as const, description: "Brief explanation of the classification" },
+    is_event: { type: Type.BOOLEAN as const, description: "Whether the message contains an event announcement" },
+    confidence: { type: Type.NUMBER as const, description: "Confidence score from 0.0 to 1.0" },
+    reason: { type: Type.STRING as const, description: "Brief explanation of the classification" },
   },
   required: ["is_event", "confidence", "reason"] ,
 };
 
 const parsedEventItemSchema = {
-  type: SchemaType.OBJECT as const,
+  type: Type.OBJECT as const,
   properties: {
-    title: { type: SchemaType.STRING as const, description: "Event title" },
-    description: { type: SchemaType.STRING as const, description: "Full description of the event" },
-    short_description: { type: SchemaType.STRING as const, description: "One-line summary (max 200 chars)", nullable: true },
-    category: { type: SchemaType.STRING as const, description: "Category from the available list" },
-    venue_name: { type: SchemaType.STRING as const, description: "Venue name", nullable: true },
-    venue_address: { type: SchemaType.STRING as const, description: "Venue address if mentioned", nullable: true },
-    venue_map_url: { type: SchemaType.STRING as const, description: "Map URL if available", nullable: true },
-    start_date: { type: SchemaType.STRING as const, description: "Start date in YYYY-MM-DD format" },
-    end_date: { type: SchemaType.STRING as const, description: "End date in YYYY-MM-DD format", nullable: true },
-    start_time: { type: SchemaType.STRING as const, description: "Start time in HH:MM 24-hour format", nullable: true },
-    end_time: { type: SchemaType.STRING as const, description: "End time in HH:MM 24-hour format", nullable: true },
-    is_recurring: { type: SchemaType.BOOLEAN as const, description: "Whether this is a recurring event" },
-    recurrence_rule: { type: SchemaType.STRING as const, description: "Recurrence pattern description", nullable: true },
-    price_info: { type: SchemaType.STRING as const, description: "Price information", nullable: true },
-    external_ticket_url: { type: SchemaType.STRING as const, description: "Ticket URL", nullable: true },
-    organizer_name: { type: SchemaType.STRING as const, description: "Organizer name", nullable: true },
-    organizer_contact: { type: SchemaType.STRING as const, description: "Contact info", nullable: true },
-    organizer_instagram: { type: SchemaType.STRING as const, description: "Instagram handle", nullable: true },
-    cover_image_url: { type: SchemaType.STRING as const, description: "Cover image URL", nullable: true },
-    quality_score: { type: SchemaType.NUMBER as const, description: "Content quality score 0.0-1.0 based on: field completeness (title, description, date, venue, time, price), description clarity, and overall publish-readiness" },
-    content_flags: { type: SchemaType.ARRAY as const, items: { type: SchemaType.STRING as const }, description: "Content flags: 'spam', 'inappropriate', 'misleading', 'off_topic', 'low_quality'. Empty array if content is clean." },
+    title: { type: Type.STRING as const, description: "Event title" },
+    description: { type: Type.STRING as const, description: "Full description of the event" },
+    short_description: { type: Type.STRING as const, description: "One-line summary (max 200 chars)", nullable: true },
+    category: { type: Type.STRING as const, description: "Category from the available list" },
+    venue_name: { type: Type.STRING as const, description: "Venue name", nullable: true },
+    venue_address: { type: Type.STRING as const, description: "Venue address if mentioned", nullable: true },
+    venue_map_url: { type: Type.STRING as const, description: "Map URL if available", nullable: true },
+    start_date: { type: Type.STRING as const, description: "Start date in YYYY-MM-DD format" },
+    end_date: { type: Type.STRING as const, description: "End date in YYYY-MM-DD format", nullable: true },
+    start_time: { type: Type.STRING as const, description: "Start time in HH:MM 24-hour format", nullable: true },
+    end_time: { type: Type.STRING as const, description: "End time in HH:MM 24-hour format", nullable: true },
+    is_recurring: { type: Type.BOOLEAN as const, description: "Whether this is a recurring event" },
+    recurrence_rule: { type: Type.STRING as const, description: "Recurrence pattern description", nullable: true },
+    price_info: { type: Type.STRING as const, description: "Price information", nullable: true },
+    external_ticket_url: { type: Type.STRING as const, description: "Ticket URL", nullable: true },
+    organizer_name: { type: Type.STRING as const, description: "Organizer name", nullable: true },
+    organizer_contact: { type: Type.STRING as const, description: "Contact info", nullable: true },
+    organizer_instagram: { type: Type.STRING as const, description: "Instagram handle", nullable: true },
+    cover_image_url: { type: Type.STRING as const, description: "Cover image URL", nullable: true },
+    quality_score: { type: Type.NUMBER as const, description: "Content quality score 0.0-1.0 based on: field completeness (title, description, date, venue, time, price), description clarity, and overall publish-readiness" },
+    content_flags: { type: Type.ARRAY as const, items: { type: Type.STRING as const }, description: "Content flags: 'spam', 'inappropriate', 'misleading', 'off_topic', 'low_quality'. Empty array if content is clean." },
     intent_tags: {
-      type: SchemaType.ARRAY as const,
-      items: { type: SchemaType.STRING as const, enum: ["romance", "community", "spirit", "living", "local_culture"] },
+      type: Type.ARRAY as const,
+      items: { type: Type.STRING as const, enum: ["romance", "community", "spirit", "living", "local_culture"] },
       description: "Which guide intent(s) this event serves. 'romance' = tantra/intimacy/dating; 'community' = circles, groups, gatherings; 'spirit' = ceremony, sound, devotional practice; 'living' = lifestyle, food, slow-living; 'local_culture' = Balinese arts, traditions, language. Pick 0-2 best matches; leave empty if none clearly fit.",
     },
     archetype_tags: {
-      type: SchemaType.ARRAY as const,
-      items: { type: SchemaType.STRING as const, enum: [...ARCHETYPE_IDS] },
+      type: Type.ARRAY as const,
+      items: { type: Type.STRING as const, enum: [...ARCHETYPE_IDS] },
       description:
         "1-3 archetype IDs whose vibe best fits this event. 'seeker' = spiritual depth (ceremony, breath, shadow, tantra, meditation); 'explorer' = edge/threshold (ecstatic dance, contact improv, men's/women's circles, embodiment edges); 'creative' = art/music/making (art-as-practice, performance, sound-craft); 'connector' = community/belonging (circles, shared gatherings, cohort retreats); 'epicurean' = sensory pleasure (sound bath, cacao, bodywork, food, lived beauty). Pick 1-3.",
     },
     vibe_tags: {
-      type: SchemaType.ARRAY as const,
-      items: { type: SchemaType.STRING as const, enum: [...VIBE_TAGS] },
+      type: Type.ARRAY as const,
+      items: { type: Type.STRING as const, enum: [...VIBE_TAGS] },
       description:
         "0-4 fine-grained facets from the controlled list that precisely describe the practice (used for event-to-event similarity). Choose only ones that clearly apply; leave empty if none fit.",
     },
@@ -130,10 +151,10 @@ const parsedEventItemSchema = {
 };
 
 const parsedEventSchema = {
-  type: SchemaType.OBJECT as const,
+  type: Type.OBJECT as const,
   properties: {
     events: {
-      type: SchemaType.ARRAY as const,
+      type: Type.ARRAY as const,
       items: parsedEventItemSchema,
       description: "Array of parsed events from the message",
     },
@@ -142,12 +163,12 @@ const parsedEventSchema = {
 };
 
 const classifyAndParseSchema = {
-  type: SchemaType.OBJECT as const,
+  type: Type.OBJECT as const,
   properties: {
-    is_event: { type: SchemaType.BOOLEAN as const, description: "Whether the message contains an event announcement" },
-    confidence: { type: SchemaType.NUMBER as const, description: "Confidence score from 0.0 to 1.0" },
+    is_event: { type: Type.BOOLEAN as const, description: "Whether the message contains an event announcement" },
+    confidence: { type: Type.NUMBER as const, description: "Confidence score from 0.0 to 1.0" },
     events: {
-      type: SchemaType.ARRAY as const,
+      type: Type.ARRAY as const,
       items: parsedEventItemSchema,
       description: "Array of parsed events (empty if is_event is false)",
     },
@@ -156,11 +177,11 @@ const classifyAndParseSchema = {
 };
 
 const semanticDedupSchema = {
-  type: SchemaType.OBJECT as const,
+  type: Type.OBJECT as const,
   properties: {
-    is_duplicate: { type: SchemaType.BOOLEAN as const, description: "Whether the two events are the same event" },
-    confidence: { type: SchemaType.NUMBER as const, description: "Confidence score from 0.0 to 1.0" },
-    reasoning: { type: SchemaType.STRING as const, description: "Explanation of why these are or aren't the same event" },
+    is_duplicate: { type: Type.BOOLEAN as const, description: "Whether the two events are the same event" },
+    confidence: { type: Type.NUMBER as const, description: "Confidence score from 0.0 to 1.0" },
+    reasoning: { type: Type.STRING as const, description: "Explanation of why these are or aren't the same event" },
   },
   required: ["is_duplicate", "confidence", "reasoning"] ,
 };
@@ -176,25 +197,9 @@ export interface ClassificationResult {
  * Throws LLMApiError on API failures (retryable) or unparseable responses.
  */
 export async function classifyMessage(text: string): Promise<ClassificationResult> {
-  const ai = getGenAI();
-  const model = ai.getGenerativeModel({
-    model: "gemini-2.5-flash-lite",
-    generationConfig: {
-      responseMimeType: "application/json",
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      responseSchema: classificationSchema as any,
-    },
-  });
+  const schema = classificationSchema;
 
-  const result = await withLLMRetry(
-    () => model.generateContent([
-      CLASSIFY_MESSAGE_PROMPT,
-      `\nMessage:\n${text}`,
-    ]),
-    "classifyMessage"
-  );
-
-  const response = result.response.text();
+  const response = await generateJson([{ text: CLASSIFY_MESSAGE_PROMPT }, { text: `\nMessage:\n${text}` }], schema, "classifyMessage");
   try {
     return JSON.parse(response) as ClassificationResult;
   } catch {
@@ -214,25 +219,9 @@ export interface ClassifyAndParseResult {
  * halving API usage for text-only messages.
  */
 export async function classifyAndParseMessage(text: string): Promise<ClassifyAndParseResult> {
-  const ai = getGenAI();
-  const model = ai.getGenerativeModel({
-    model: "gemini-2.5-flash-lite",
-    generationConfig: {
-      responseMimeType: "application/json",
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      responseSchema: classifyAndParseSchema as any,
-    },
-  });
+  const schema = classifyAndParseSchema;
 
-  const result = await withLLMRetry(
-    () => model.generateContent([
-      CLASSIFY_AND_PARSE_PROMPT,
-      `\nMessage:\n${text}`,
-    ]),
-    "classifyAndParseMessage"
-  );
-
-  const response = result.response.text();
+  const response = await generateJson([{ text: CLASSIFY_AND_PARSE_PROMPT }, { text: `\nMessage:\n${text}` }], schema, "classifyAndParseMessage");
   try {
     return JSON.parse(response) as ClassifyAndParseResult;
   } catch {
@@ -246,25 +235,9 @@ export async function classifyAndParseMessage(text: string): Promise<ClassifyAnd
  * Throws LLMApiError on API failures.
  */
 export async function parseEventFromText(text: string): Promise<ParsedEvent[]> {
-  const ai = getGenAI();
-  const model = ai.getGenerativeModel({
-    model: "gemini-2.5-flash-lite",
-    generationConfig: {
-      responseMimeType: "application/json",
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      responseSchema: parsedEventSchema as any,
-    },
-  });
+  const schema = parsedEventSchema;
 
-  const result = await withLLMRetry(
-    () => model.generateContent([
-      PARSE_EVENT_PROMPT,
-      `\nMessage:\n${text}`,
-    ]),
-    "parseEventFromText"
-  );
-
-  const response = result.response.text();
+  const response = await generateJson([{ text: PARSE_EVENT_PROMPT }, { text: `\nMessage:\n${text}` }], schema, "parseEventFromText");
   try {
     const parsed = JSON.parse(response);
     const events = parsed.events || [parsed];
@@ -285,31 +258,18 @@ export async function parseEventFromImageBuffer(
   mimeType: string,
   additionalText?: string
 ): Promise<ParsedEvent[]> {
-  const ai = getGenAI();
-  const model = ai.getGenerativeModel({
-    model: "gemini-2.5-flash-lite",
-    generationConfig: {
-      responseMimeType: "application/json",
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      responseSchema: parsedEventSchema as any,
-    },
-  });
+  const schema = parsedEventSchema;
 
   const base64 = imageBuffer.toString("base64");
-  const parts: Parameters<typeof model.generateContent>[0] = [
-    PARSE_EVENT_IMAGE_PROMPT,
+  const parts: Part[] = [
+    { text: PARSE_EVENT_IMAGE_PROMPT },
     { inlineData: { mimeType, data: base64 } },
   ];
   if (additionalText) {
-    (parts as unknown[]).push(`\nAdditional context from message text:\n${additionalText}`);
+    parts.push({ text: `\nAdditional context from message text:\n${additionalText}` });
   }
 
-  const result = await withLLMRetry(
-    () => model.generateContent(parts),
-    "parseEventFromImageBuffer"
-  );
-
-  const response = result.response.text();
+  const response = await generateJson(parts, schema, "parseEventFromImageBuffer");
   try {
     const parsed = JSON.parse(response);
     const events = parsed.events || [parsed];
@@ -327,15 +287,7 @@ export async function parseEventFromImage(
   imageUrl: string,
   additionalText?: string
 ): Promise<ParsedEvent[]> {
-  const ai = getGenAI();
-  const model = ai.getGenerativeModel({
-    model: "gemini-2.5-flash-lite",
-    generationConfig: {
-      responseMimeType: "application/json",
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      responseSchema: parsedEventSchema as any,
-    },
-  });
+  const schema = parsedEventSchema;
 
   // Fetch the image
   const imageResponse = await fetch(imageUrl);
@@ -357,8 +309,8 @@ export async function parseEventFromImage(
     else mimeType = "image/jpeg"; // fallback
   }
 
-  const parts: Parameters<typeof model.generateContent>[0] = [
-    PARSE_EVENT_IMAGE_PROMPT,
+  const parts: Part[] = [
+    { text: PARSE_EVENT_IMAGE_PROMPT },
     {
       inlineData: {
         mimeType,
@@ -368,15 +320,10 @@ export async function parseEventFromImage(
   ];
 
   if (additionalText) {
-    (parts as unknown[]).push(`\nAdditional context from message text:\n${additionalText}`);
+    parts.push({ text: `\nAdditional context from message text:\n${additionalText}` });
   }
 
-  const result = await withLLMRetry(
-    () => model.generateContent(parts),
-    "parseEventFromImage"
-  );
-
-  const response = result.response.text();
+  const response = await generateJson(parts, schema, "parseEventFromImage");
   try {
     const parsed = JSON.parse(response);
     const events = parsed.events || [parsed];
@@ -400,27 +347,14 @@ export async function compareEventsSemantically(
   eventA: { title: string; description: string; venue_name?: string | null; start_date: string },
   eventB: { title: string; description: string; venue_name?: string | null; start_date: string }
 ): Promise<SemanticDedupResult> {
-  const ai = getGenAI();
-  const model = ai.getGenerativeModel({
-    model: "gemini-2.5-flash-lite",
-    generationConfig: {
-      responseMimeType: "application/json",
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      responseSchema: semanticDedupSchema as any,
-    },
-  });
+  const schema = semanticDedupSchema;
 
   const prompt = SEMANTIC_DEDUP_PROMPT.replace(
     "{EVENT_A}",
     JSON.stringify(eventA, null, 2)
   ).replace("{EVENT_B}", JSON.stringify(eventB, null, 2));
 
-  const result = await withLLMRetry(
-    () => model.generateContent(prompt),
-    "compareEventsSemantically"
-  );
-
-  const response = result.response.text();
+  const response = await generateJson(prompt, schema, "compareEventsSemantically");
   try {
     return JSON.parse(response) as SemanticDedupResult;
   } catch {

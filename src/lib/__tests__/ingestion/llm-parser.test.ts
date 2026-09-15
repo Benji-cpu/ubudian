@@ -14,18 +14,14 @@ vi.mock("@/lib/ingestion/llm-prompts", () => ({
   SEMANTIC_DEDUP_PROMPT: "dedup {EVENT_A} vs {EVENT_B}",
 }));
 
-// Mock Google Generative AI
+// Mock the Gemini SDK (@google/genai): one client, `models.generateContent`.
 const mockGenerateContent = vi.fn();
-const mockGetGenerativeModel = vi.fn(() => ({
-  generateContent: mockGenerateContent,
-}));
-
-vi.mock("@google/generative-ai", () => ({
-  GoogleGenerativeAI: class MockGoogleGenerativeAI {
+vi.mock("@google/genai", () => ({
+  GoogleGenAI: class MockGoogleGenAI {
     constructor() {}
-    getGenerativeModel = mockGetGenerativeModel;
+    models = { generateContent: mockGenerateContent };
   },
-  SchemaType: {
+  Type: {
     OBJECT: "OBJECT",
     STRING: "STRING",
     NUMBER: "NUMBER",
@@ -84,9 +80,7 @@ describe("classifyMessage", () => {
       reason: "Contains event details",
     };
 
-    mockGenerateContent.mockResolvedValue({
-      response: { text: () => JSON.stringify(classificationResponse) },
-    });
+    mockGenerateContent.mockResolvedValue({ text: JSON.stringify(classificationResponse) });
 
     const result = await classifyMessage("Join us for yoga tomorrow at 5pm");
     expect(result.is_event).toBe(true);
@@ -95,9 +89,7 @@ describe("classifyMessage", () => {
   });
 
   it("throws LLMApiError for unparseable response", async () => {
-    mockGenerateContent.mockResolvedValue({
-      response: { text: () => "not json" },
-    });
+    mockGenerateContent.mockResolvedValue({ text: "not json" });
 
     await expect(classifyMessage("test")).rejects.toThrow(LLMApiError);
   });
@@ -121,9 +113,7 @@ describe("classifyAndParseMessage", () => {
       }],
     };
 
-    mockGenerateContent.mockResolvedValue({
-      response: { text: () => JSON.stringify(response) },
-    });
+    mockGenerateContent.mockResolvedValue({ text: JSON.stringify(response) });
 
     const result = await classifyAndParseMessage("Sunset yoga March 20 at Yoga Barn");
     expect(result.is_event).toBe(true);
@@ -149,9 +139,7 @@ describe("parseEventFromText", () => {
       }],
     };
 
-    mockGenerateContent.mockResolvedValue({
-      response: { text: () => JSON.stringify(response) },
-    });
+    mockGenerateContent.mockResolvedValue({ text: JSON.stringify(response) });
 
     const events = await parseEventFromText("Jazz Night at Bridges, March 25");
     expect(events).toHaveLength(1);
@@ -167,9 +155,7 @@ describe("parseEventFromText", () => {
       start_date: "2026-04-01",
     };
 
-    mockGenerateContent.mockResolvedValue({
-      response: { text: () => JSON.stringify(response) },
-    });
+    mockGenerateContent.mockResolvedValue({ text: JSON.stringify(response) });
 
     const events = await parseEventFromText("Solo event April 1");
     expect(events).toHaveLength(1);
@@ -204,9 +190,7 @@ describe("parseEventFromImage", () => {
       }],
     };
 
-    mockGenerateContent.mockResolvedValue({
-      response: { text: () => JSON.stringify(response) },
-    });
+    mockGenerateContent.mockResolvedValue({ text: JSON.stringify(response) });
 
     const events = await parseEventFromImage("https://example.com/flyer.jpg");
     expect(events).toHaveLength(1);
@@ -235,14 +219,12 @@ describe("parseEventFromImage", () => {
     });
 
     const response = { events: [{ title: "PNG Event", description: "test", category: "Other", start_date: "2026-04-10" }] };
-    mockGenerateContent.mockResolvedValue({
-      response: { text: () => JSON.stringify(response) },
-    });
+    mockGenerateContent.mockResolvedValue({ text: JSON.stringify(response) });
 
     await parseEventFromImage("https://example.com/image.png");
     // Verify model was called with PNG mime type
     expect(mockGenerateContent).toHaveBeenCalledTimes(1);
-    const callArgs = mockGenerateContent.mock.calls[0][0];
+    const callArgs = mockGenerateContent.mock.calls[0][0].contents;
     const inlineDataPart = callArgs.find((p: unknown) => typeof p === "object" && p !== null && "inlineData" in p);
     expect(inlineDataPart.inlineData.mimeType).toBe("image/png");
   });
@@ -261,9 +243,7 @@ describe("compareEventsSemantically", () => {
       reasoning: "Same event, different descriptions",
     };
 
-    mockGenerateContent.mockResolvedValue({
-      response: { text: () => JSON.stringify(response) },
-    });
+    mockGenerateContent.mockResolvedValue({ text: JSON.stringify(response) });
 
     const result = await compareEventsSemantically(
       { title: "Yoga", description: "Morning yoga", start_date: "2026-03-20" },
@@ -281,9 +261,7 @@ describe("compareEventsSemantically", () => {
       reasoning: "Different events",
     };
 
-    mockGenerateContent.mockResolvedValue({
-      response: { text: () => JSON.stringify(response) },
-    });
+    mockGenerateContent.mockResolvedValue({ text: JSON.stringify(response) });
 
     const result = await compareEventsSemantically(
       { title: "Yoga", description: "Morning yoga", start_date: "2026-03-20" },
