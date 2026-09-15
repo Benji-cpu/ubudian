@@ -109,7 +109,7 @@ export default async function AdminAnalytics() {
   const topEvents = toBarItems((topEventsRes.data ?? []) as SavedRow[], "/events");
   const topJourneys = toBarItems(
     (topJourneysRes.data ?? []) as SavedRow[],
-    "/experiences"
+    "/retreats"
   );
   const topGuides = toBarItems((topGuidesRes.data ?? []) as SavedRow[], "/guides");
   const archetypes = ((archetypesRes.data ?? []) as NamedCount[]).map((r) => ({

@@ -8,7 +8,7 @@ export const NAV_LINKS = [
   { label: "Quiz", href: "/quiz" },
   { label: "Guides", href: "/guides" },
   { label: "Events", href: "/events" },
-  { label: "Ubud Retreats", href: "/experiences" },
+  { label: "Ubud Retreats", href: "/retreats" },
   { label: "Humans of Ubud", href: "/stories" },
   { label: "Tours", href: "/tours" },
   { label: "Newsletter", href: "/newsletter" },
@@ -27,9 +27,9 @@ export const ADMIN_NAV_LINKS: AdminNavItem[] = [
   { type: "link", label: "Events", href: "/admin/events", icon: "Calendar" },
   { type: "link", label: "Sources", href: "/admin/sources", icon: "Zap" },
   { type: "divider" },
-  { type: "link", label: "Content", href: "/admin/content", icon: "FileText" },
+  { type: "link", label: "Newsletter", href: "/admin/content", icon: "FileText" },
   { type: "link", label: "Guides", href: "/admin/guides", icon: "BookOpen" },
-  { type: "link", label: "Tours", href: "/admin/tours", icon: "MapPin" },
+  { type: "link", label: "Retreats", href: "/admin/retreats", icon: "MapPin" },
   { type: "link", label: "Commerce", href: "/admin/commerce", icon: "CreditCard" },
   { type: "link", label: "Partners", href: "/admin/sponsors", icon: "HandHeart" },
   { type: "link", label: "Community", href: "/admin/community", icon: "Users" },
@@ -38,9 +38,8 @@ export const ADMIN_NAV_LINKS: AdminNavItem[] = [
 ];
 
 export const ADMIN_GROUPED_ROUTES: Record<string, string[]> = {
-  "/admin/content": ["/admin/blog", "/admin/stories", "/admin/newsletter"],
-  "/admin/tours": [
-    "/admin/tours",
+  "/admin/content": ["/admin/newsletter"],
+  "/admin/retreats": [
     "/admin/journeys",
     "/admin/practitioners",
     "/admin/partners",

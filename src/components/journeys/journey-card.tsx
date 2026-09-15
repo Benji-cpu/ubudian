@@ -12,7 +12,7 @@ export function JourneyCard({ journey }: JourneyCardProps) {
   const tierLabel = journey.tier === "signature_cohort" ? "Signature" : null;
 
   return (
-    <Link href={`/experiences/${journey.slug}`} className="group block">
+    <Link href={`/retreats/${journey.slug}`} className="group block">
       <article className="overflow-hidden rounded-sm border border-brand-gold/10 bg-card transition-shadow hover:shadow-md">
         {journey.cover_image_url ? (
           <div className="relative aspect-[4/3] w-full">

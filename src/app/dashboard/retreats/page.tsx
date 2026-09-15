@@ -44,7 +44,7 @@ export default async function DashboardRetreatsPage() {
             You haven&apos;t saved any retreats yet.
           </p>
           <Button asChild className="mt-6">
-            <Link href="/experiences">Browse retreats</Link>
+            <Link href="/retreats">Browse retreats</Link>
           </Button>
         </div>
       ) : (

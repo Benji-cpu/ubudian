@@ -17,7 +17,7 @@ interface CrossSectionRibbonProps {
  */
 export function CrossSectionRibbon({
   pitch = "Looking for a packaged path through Ubud?",
-  href = "/experiences",
+  href = "/retreats",
   cta = "See the curated retreats",
 }: CrossSectionRibbonProps) {
   return (

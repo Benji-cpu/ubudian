@@ -6,7 +6,7 @@ import { ScrollReveal } from "@/components/ui/scroll-reveal";
  *   2. MODE — Signature Cohort (hosted, fixed dates) vs Living Guide (free,
  *      self-serve, same recipe).
  *
- * Sits between the differentiator strip and the cohort grid on /experiences.
+ * Sits between the differentiator strip and the cohort grid on /retreats.
  * Deliberately scannable — two compact cards, not prose.
  */
 export function JourneyExplainer() {

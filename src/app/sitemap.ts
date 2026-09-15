@@ -74,10 +74,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "weekly" as const,
       priority: 0.8,
     })),
-    // The retreat product and the quiz were both missing entirely. /experiences
+    // The retreat product and the quiz were both missing entirely. /retreats
     // is the highest-value conversion surface on the site; the five archetype
     // result pages are static and built to be shared.
-    { url: `${SITE_URL}/experiences`, changeFrequency: "weekly", priority: 0.8 },
+    { url: `${SITE_URL}/retreats`, changeFrequency: "weekly", priority: 0.8 },
     { url: `${SITE_URL}/quiz`, changeFrequency: "monthly", priority: 0.7 },
     ...(settings.guides_enabled
       ? [{ url: `${SITE_URL}/guides`, changeFrequency: "weekly" as const, priority: 0.8 }]

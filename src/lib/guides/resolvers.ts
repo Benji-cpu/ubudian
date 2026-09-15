@@ -82,7 +82,7 @@ async function resolveRetreat(slug: string): Promise<ResolvedEntity | null> {
       slug: data.slug as string,
       title: data.title as string,
       subtitle: (data.subtitle as string | null) ?? null,
-      href: `/experiences/${data.slug}`,
+      href: `/retreats/${data.slug}`,
       imageUrl: (data.cover_image_url as string | null) ?? null,
     };
   } catch {

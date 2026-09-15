@@ -123,8 +123,8 @@ export default async function HomePage() {
                 size="lg"
                 className="bg-brand-gold text-[#2C4A3E] hover:bg-brand-gold/90 dark:bg-brand-gold dark:text-[#2C4A3E] dark:hover:bg-brand-gold/90"
               >
-                <Link href="/experiences/3-day-ubud-reset">
-                  Start with a 3-Day Reset &rarr;
+                <Link href="/events">
+                  See what&apos;s on tonight &rarr;
                 </Link>
               </Button>
               <Link
@@ -148,7 +148,7 @@ export default async function HomePage() {
               </h2>
               <p className="mt-4 text-lg text-brand-charcoal-light">
                 Temple nights, sound journeys, embodiment workshops, breathwork,
-                medicine song circles — all in one place, updated daily from the community.
+                medicine song circles — harvested nightly from the venues and ticket sites.
               </p>
             </div>
 
@@ -173,7 +173,7 @@ export default async function HomePage() {
           <div className="mx-auto w-full max-w-6xl">
             <div className="text-center">
               <p className="font-serif text-xs uppercase tracking-[0.25em] text-brand-gold">
-                Journeys
+                Retreats
               </p>
               <h2 className="mt-3 font-serif text-3xl font-medium text-brand-deep-green sm:text-4xl">
                 Curated paths into Ubud
@@ -191,10 +191,10 @@ export default async function HomePage() {
 
             <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
               <Button asChild size="lg">
-                <Link href="/experiences">Explore all journeys</Link>
+                <Link href="/retreats">Explore the retreats</Link>
               </Button>
               <Button asChild variant="outline" size="lg">
-                <Link href="/experiences/3-day-ubud-reset">Start the 3-Day Reset</Link>
+                <Link href="/retreats/3-day-ubud-reset">Start the 3-Day Reset</Link>
               </Button>
             </div>
           </div>

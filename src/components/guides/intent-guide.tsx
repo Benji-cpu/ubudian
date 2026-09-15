@@ -113,7 +113,7 @@ export function IntentGuide({
           <div className="grid gap-12 md:grid-cols-2">
             {linkedRetreat && (
               <Link
-                href={`/experiences/${linkedRetreat.slug}`}
+                href={`/retreats/${linkedRetreat.slug}`}
                 className="group block"
               >
                 <p className="text-[11px] uppercase tracking-[0.22em] text-brand-gold">

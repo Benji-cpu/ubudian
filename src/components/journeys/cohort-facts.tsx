@@ -61,7 +61,7 @@ function formatCohortSize(min: number | null, max: number | null): string | null
  * If a journey has no scheduled cohort, the panel doesn't render.
  *
  * This used to end in an "Apply for a place" button pointing at
- * /experiences/[slug]/apply — a route that has never existed — under the line
+ * /retreats/[slug]/apply — a route that has never existed — under the line
  * "We read every application. We'll come back within three days." Removed
  * rather than built: an application inbox is a standing commitment, and the
  * page already carries the newsletter and enquiry paths.

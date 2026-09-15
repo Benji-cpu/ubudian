@@ -233,7 +233,7 @@ export function JourneyForm({ initialData }: JourneyFormProps) {
                       }}
                     />
                   </FormControl>
-                  <FormDescription>URL: /experiences/{form.watch("slug") || "..."}</FormDescription>
+                  <FormDescription>URL: /retreats/{form.watch("slug") || "..."}</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -383,7 +383,7 @@ export function JourneyForm({ initialData }: JourneyFormProps) {
                   <FormControl>
                     <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                   </FormControl>
-                  <FormLabel className="font-normal">Published (visible on /experiences)</FormLabel>
+                  <FormLabel className="font-normal">Published (visible on /retreats)</FormLabel>
                 </FormItem>
               )}
             />
@@ -439,7 +439,7 @@ export function JourneyForm({ initialData }: JourneyFormProps) {
                   <FormControl>
                     <TagInput options={ARCHETYPE_IDS} value={field.value} onChange={field.onChange} />
                   </FormControl>
-                  <FormDescription>Drives quiz-based ranking on /experiences</FormDescription>
+                  <FormDescription>Drives quiz-based ranking on /retreats</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}

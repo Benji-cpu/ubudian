@@ -209,7 +209,7 @@ export default async function JourneyPage({ params }: JourneyPageProps) {
     notFound();
   }
 
-  const journeyUrl = `${SITE_URL}/experiences/${journey.slug}`;
+  const journeyUrl = `${SITE_URL}/retreats/${journey.slug}`;
 
   // Roll up signals from atoms across every slot — drives the practitioner
   // rail, the map, and (later) personalisation. Done once, used many times.
@@ -332,7 +332,7 @@ export default async function JourneyPage({ params }: JourneyPageProps) {
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbLink href="/experiences">Ubud Retreats</BreadcrumbLink>
+              <BreadcrumbLink href="/retreats">Ubud Retreats</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>

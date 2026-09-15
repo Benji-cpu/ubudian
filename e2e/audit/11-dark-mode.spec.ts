@@ -21,7 +21,7 @@ const ROUTES: { path: string; name: string }[] = [
   { path: "/", name: "home" },
   { path: "/events", name: "events" },
   { path: "/events/full-moon-sound-healing-march-2026", name: "event-detail" },
-  { path: "/experiences", name: "experiences" },
+  { path: "/retreats", name: "experiences" },
   { path: "/guides", name: "guides" },
   { path: "/stories", name: "stories" },
   { path: "/blog", name: "blog" },

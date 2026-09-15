@@ -11,7 +11,7 @@ import { getSiteSettings, type SiteSettings } from "@/lib/site-settings";
 const SUGGESTIONS: { href: string; label: string; flag?: keyof SiteSettings }[] = [
   { href: "/events", label: "Events" },
   { href: "/guides", label: "Guides", flag: "guides_enabled" },
-  { href: "/experiences", label: "Ubud Retreats" },
+  { href: "/retreats", label: "Ubud Retreats" },
   { href: "/quiz", label: "Take the quiz" },
   { href: "/stories", label: "Stories", flag: "stories_enabled" },
   { href: "/tours", label: "Tours", flag: "tours_enabled" },

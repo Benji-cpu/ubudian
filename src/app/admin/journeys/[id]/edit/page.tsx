@@ -30,7 +30,7 @@ export default async function EditJourneyPage({ params }: EditJourneyPageProps) 
         </div>
         {journey.is_published && (
           <Button asChild variant="outline">
-            <Link href={`/experiences/${journey.slug}`} target="_blank">
+            <Link href={`/retreats/${journey.slug}`} target="_blank">
               <Eye className="mr-2 h-4 w-4" />
               View live
             </Link>

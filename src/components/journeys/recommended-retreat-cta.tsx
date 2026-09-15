@@ -73,7 +73,7 @@ export async function RecommendedRetreatCta({
             </span>
           </div>
           <Link
-            href={`/experiences/${top.slug}`}
+            href={`/retreats/${top.slug}`}
             className="mt-6 inline-flex items-center gap-2 rounded-md bg-brand-gold px-5 py-3 text-sm font-semibold uppercase tracking-wider text-brand-deep-green transition-colors hover:bg-brand-gold/90"
           >
             Open the retreat

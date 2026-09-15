@@ -1,6 +1,16 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  async redirects() {
+    return [
+      // 2026-09-15: one name for the retreat product. The URL said
+      // "experiences", the nav said "Ubud Retreats", the homepage said
+      // "Journeys", the table is `journeys`. It is /retreats now; the old
+      // URL has been indexed and linked from emails, so it redirects for good.
+      { source: "/experiences", destination: "/retreats", permanent: true },
+      { source: "/experiences/:slug", destination: "/retreats/:slug", permanent: true },
+    ];
+  },
   async headers() {
     return [
       {

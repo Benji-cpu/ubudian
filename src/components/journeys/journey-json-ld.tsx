@@ -6,7 +6,7 @@ interface JourneyJsonLdProps {
 }
 
 export function JourneyJsonLd({ journey }: JourneyJsonLdProps) {
-  const url = `${SITE_URL}/experiences/${journey.slug}`;
+  const url = `${SITE_URL}/retreats/${journey.slug}`;
   const description = journey.summary || journey.subtitle || undefined;
 
   const jsonLd = {

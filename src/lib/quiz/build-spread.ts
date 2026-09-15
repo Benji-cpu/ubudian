@@ -11,7 +11,7 @@ import { getEventsForArchetype } from "@/lib/quiz-helpers";
  * carry the weight; category fallback fills the rest).
  *
  * This also carried an `experiences` list. That table was superseded by
- * `journeys` when /experiences/[slug] was repointed, and it was never migrated
+ * `journeys` when /retreats/[slug] was repointed, and it was never migrated
  * — so the spread was building links into a route that no longer served that
  * table, including in the outbound email.
  */
