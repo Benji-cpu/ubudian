@@ -10,7 +10,7 @@ The calendar for Ubud's conscious community — ceremonies, dance, breathwork an
 - **Database**: Supabase (Postgres + Auth + Storage)
 - **Styling**: Tailwind CSS 4 + shadcn/ui
 - **Payments**: Stripe (tour bookings + membership subscriptions)
-- **AI**: Gemini for event parsing + moderation, Stability AI for image generation. NOTE: still on **`@google/generative-ai`**, Google's deprecated SDK — the current package is `@google/genai`. Five import sites incl. the safety gate (`src/lib/events/moderation.ts`, pinned to `gemini-2.5-flash-lite`).
+- **AI**: Gemini via **`@google/genai`** (migrated 2026-09-15 off the deprecated `@google/generative-ai`) for parsing, moderation, embeddings and the tag sweep; Stability AI for image generation. Client sites: `src/lib/ingestion/llm-parser.ts`, `src/lib/events/moderation.ts`, `src/lib/embeddings.ts`, `scripts/backfill-*-tags.ts`. All on `gemini-2.5-flash-lite`; the key is free-tier and 429s above ~2 concurrent calls.
 - **Newsletter**: Beehiiv (distribution), Resend (transactional email + ingestion alerts)
 - **Scraping**: Cheerio (HTML parsing for web scrapers)
 - **Forms**: Zod + React Hook Form + zodResolver
@@ -46,15 +46,13 @@ Three backbones. Vercel Cron is capped at **2 jobs on Hobby and both slots are u
 | `ingestion-health` | Vercel Cron | `0 9 * * *` | Health check + second-pass archive sweeps + smart metrics |
 | `todo-today-harvest` | GH Actions | `30 18 * * *` | Stealth Chromium → todo.today → ICP filter → POST `curator-ingest` |
 | `aggregator-harvest` | GH Actions | `40 18 * * *` | Megatix scrape → POST `curator-ingest` |
-| `tag-embed-sweep` | GH Actions | `40 18 * * *` | Embeddings + archetype/vibe tag backfill |
+| `tag-embed-sweep` | GH Actions | `55 18 * * *` | Embeddings + archetype/vibe tag backfill (concurrency 2 — the free-tier key 429s above that) |
 | `daily-maintenance-fetch` | GH Actions | `2 19 * * *` | Curls `/api/cron/daily-maintenance?digest=true`, commits `digests/$TODAY.json` |
 | `event-reminders` | GH Actions | `4 9 * * *` | "Starts tomorrow" mail to savers. Idempotent via `transactional_sends`; `?only=<email>` to test |
 | `weekly-digest` | GH Actions | `6 23 * * 2` | Personalised weekly mail. Idempotent per ISO week; `?only=` to test |
 | `curator-ingest` | GH Actions | on push to `curator/inbox/**` | POSTs the curator's inbox to `/api/cron/curator-ingest` |
 | **daily curator** | Claude trigger `trig_01637DsCbz5qGn6r5RTP4hhi` | `47 19 * * *` | Walks curated sources, writes `curator/inbox/$TODAY.json`. Agent: `.claude/agents/daily-curator.md` |
 | **nightly digest** | Claude trigger `trig_01CnuNJSs8m8wdVyeVrDHrKq` | `17 21 * * *` | Reads the newest unreported payload, commits `digests/*.md`. Agent: `.claude/agents/nightly-routine.md` |
-
-**`aggregator-harvest` and `tag-embed-sweep` collide on `40 18`** — they were written independently and nobody noticed. Not currently causing failures (different work, no shared lock), but if either starts flaking, stagger them first.
 
 **GitHub's scheduled-cron queue runs 60–95 minutes late, consistently.** Measured over 20 consecutive `daily-maintenance-fetch` runs: scheduled `19:02`, actually fired `20:09`–`20:37`, all green. Any design that assumes a GH cron fires near its stated minute will break. This one did: the nightly digest agent used to fire 15 minutes after the workflow and produced **34 false "payload missing" stubs in 51 days** before the trigger moved to `21:17` and the agent learned to read the newest payload rather than today's.
 
@@ -70,6 +68,11 @@ Three backbones. Vercel Cron is capped at **2 jobs on Hobby and both slots are u
 - **No review queue, deliberately.** Anything declined stays `pending` and expires as it always has. Do not add a "needs review" surface — an unstaffed queue is what broke this system the first time.
 - **Ordering is one-offs first, then by date.** Sorting by `start_date` alone puts every recurring event's months-old seed date ahead of the one-off happening on Friday, which is the event about to expire.
 - **Dedup lookup fails closed** — if `dedup_matches` can't be read, the whole batch is held rather than published unverified. Chunk ids at 50; PostgREST rejects filter URLs over ~16KB.
+- **The dedup backlog resolves by rule, before the gate reads it** (`src/lib/maintenance/dedup-autoresolve.ts`): counterpart archived → `not_dup`; a pending weekly row matching a live series at the same venue/weekday ≥0.75 → the pending row is archived as `duplicate_of:<id>`; two pending rows unresolved for 14 days → `not_dup`, each judged alone. Every auto-resolution is stamped `resolved_by = 'auto:<rule>'`. The admin dedup page still exists but nothing waits for it.
+- **Nothing waits longer than 30 nights** (`src/lib/maintenance/expiry.ts`): a pending row older than 30 days is archived `expired_unpublished_30d` — except rows the gate held only for its per-run cap that night. Approved recurring rows whose rule's `until` has passed are archived too.
+- **A recurring flag with no parseable rule is a one-off on its date.** Megatix copies its own `is_recurring` across without a rule; those used to be 15 holds a night, forever.
+- **Moderation failing open is counted.** `moderateEvent` still fails open (an empty site is worse than an unmoderated card) but the run reports `moderationFailedOpen`, such rows carry `moderation_reason='auto_gate:unmoderated'`, and the digest + CRM alert say so.
+- **Liveness** (`src/lib/maintenance/liveness.ts`): the payload's first block. `stale: true` when nothing has auto-published for 48h. The digest agent prints it first and never skips a stale day; the fetch workflow POSTs a `blocking` row to Ben's CRM (`CRM_HANDOVER_URL` / `CRM_HANDOVER_SECRET` repo secrets).
 
 Dry run before trusting a rule change: `npx tsx scripts/auto-approve.ts --limit=250` (add `--apply` to publish), or `GET /api/cron/daily-maintenance?dryRun=true` with the `CRON_SECRET` bearer.
 
@@ -87,7 +90,7 @@ Dry run before trusting a rule change: `npx tsx scripts/auto-approve.ts --limit=
   - `stripe/` — `client.ts`, `server.ts`, `subscription.ts`, `helpers.ts`
   - `utils.ts`, `constants.ts`, `auth.ts`, `email.ts`, `beehiiv.ts`, `stability.ts`, `quiz-data.ts`, `quiz-helpers.ts`, `rate-limit.ts`, `recurrence.ts`
 - `/src/types` — All TypeScript interfaces in `index.ts`
-- `/supabase` — `schema.sql` (**stale**: stops at 25 tables) + `migrations/` (~90 files, the real source of truth)
+- `/supabase` — `schema.sql` (generated snapshot: `npx tsx --env-file=.env.local scripts/dump-schema.ts`, never hand-edited) + `migrations/` (~90 files, the source of truth). Apply one migration with `npx tsx --env-file=.env.local scripts/apply-migration.ts <file>` — it runs statements one at a time in a transaction, prints each row count, and records the version.
 - `/e2e` — Playwright E2E tests
 - `/scripts` — CLI utilities (Telegram setup, schema application, seeding)
 
@@ -105,7 +108,7 @@ Dry run before trusting a rule change: `npx tsx scripts/auto-approve.ts --limit=
 ## Key Conventions
 
 - Supabase server client for reads, browser client for mutations, admin client (service role) for API routes
-- Forms: Zod schema + RHF + zodResolver pattern (see `blog-form.tsx` as template)
+- Forms: Zod schema + RHF + zodResolver pattern (see `event-form.tsx` as template)
 - Data fetching: `(data ?? []) as Type[]` pattern for arrays
 - Slugs: auto-generated from title via `slugify()`, manually editable
 - **Webhook routes use `after()` from `next/server`** to defer heavy processing (LLM parsing, Stripe handling) while returning 200 immediately — prevents timeout and retry storms
@@ -121,7 +124,7 @@ Dry run before trusting a rule change: `npx tsx scripts/auto-approve.ts --limit=
 
 ## Database
 
-**46 tables** across 6 domains (`supabase/schema.sql` plus ~90 migrations — schema.sql alone is *not* current, it stops at 25 `CREATE TABLE`). All have RLS enabled. `is_admin()` SQL function checks admin role.
+**43 tables** across 6 domains (`supabase/schema.sql` is a generated snapshot; regenerate it after any migration). All have RLS enabled. `is_admin()` SQL function checks admin role.
 
 **Content:** `profiles`, `blog_posts`, `stories`, `events`, `tours`, `journeys` (+ `journey_atoms`, `journey_days`, `journey_day_slots`, `journey_testimonials`), `guides` (+ `guide_entity_references`), `places`, `practitioners`, `partners`, `newsletter_editions`, `newsletter_subscribers`, `trusted_submitters`, `site_settings`
 **Ingestion:** `event_sources`, `ingestion_runs`, `raw_ingestion_messages`, `venue_aliases`, `venue_coordinates`, `dedup_matches`, `dedup_decisions`, `unresolved_venues`, `ingestion_activity_log`, `pipeline_health_logs`, `image_gc_log` — admin-only RLS (except `venue_aliases` has public read)
@@ -132,8 +135,9 @@ Key gotchas:
 - Trusted submitters auto-approve at **5 approved events** (`increment_approved_count()` SQL function)
 - Public reads filtered by `status`/`is_active` per entity type
 - `events` carries ingestion columns (`source_id`, `content_fingerprint`, `raw_message_id`, `llm_parsed`, `quality_score`, `content_flags`), personalisation columns (`archetype_tags`, `vibe_tags`, `intent_tags`, `embedding`, `event_tier`, `is_spotlight`) and the gate's audit column (`auto_approved_at`)
-- **`commission_partners` and `commission_payouts` are dead** — created 2026-05-27, zero queries anywhere in `src`. Drop them or wire them; don't assume they work.
 - `saved_spreads` is write-only: the quiz submit route inserts, nothing reads it back.
+- **`recurrence_rule` is JSON, one shape, with the series end inside it**: `{"frequency":"weekly","day_of_week":3,"until":"2026-11-11"}`. `normalizeRecurrenceRule()` (`src/lib/recurrence.ts`) is the only writer — the pipeline, the submit/update APIs and the nightly `normalizeLegacyRecurrence()` all run through it, and migration `20260915090000_recurrence_until.sql` adds a CHECK. **A recurring row's `end_date` is never an instance span**; it is NULL. For four months the todo.today harvester wrote "until 11 Nov" into `end_date` and the feed rendered 174 weekly classes as months-long events "in progress", pinned under Today. `nextOccurrence()` now rolls every recurring row to a single day and drops it once `until` has passed.
+- **`commission_partners` / `commission_payouts`**: dropped by migration `20260915090100_drop_commission_tables.sql` (zero queries ever).
 
 ## Ingestion Pipeline
 
@@ -164,7 +168,7 @@ Automated event ingestion from multiple sources into pending events for admin re
 ## Environment Variables
 
 **Required (Supabase):** `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
-**Required (Stripe):** `STRIPE_SECRET_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET`
+**Required (Stripe):** `STRIPE_SECRET_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_INSIDER_MONTHLY`, `STRIPE_PRICE_INSIDER_YEARLY` (read with `!` on `/membership`), `STRIPE_PRICE_SPONSOR_PATRON|PARTNER|ANCHOR` (sponsor tiers; set in Vercel production, the checkout 503s without them). Full list with comments: `.env.example`.
 **Required (AI):** `GEMINI_API_KEY`
 **Required (Email):** `RESEND_API_KEY`
 **Required (Cron):** `CRON_SECRET`
@@ -215,7 +219,11 @@ Global MCPs also available: Playwright (E2E testing), GitHub (PR/issues), Contex
 
 - Event submission API (`/api/events/submit`) uses admin client — anon RLS can't insert events
 - Image uploads go to `images` bucket with folder prefix (`blog/`, `stories/`, `events/`, `tours/`)
-- Stories route: `/stories` (nav says "Humans of Ubud")
+- Stories route: `/stories` (nav says "Humans of Ubud") — flag-disabled, no admin pages since 2026-09-15.
+- **The retreat product is `/retreats`** (table `journeys`, components `journeys/`, admin `/admin/journeys` via the `/admin/retreats` hub). `/experiences` and `/experiences/:slug` 308 to it (`next.config.ts`). Do not reintroduce a third name.
+
+- **Homepage events block** reads the same rolled-forward buckets as `/events` ("Tonight in Ubud", else "This week", else an honest empty state). It must never filter `start_date >= today` at the DB — that drops every recurring rhythm.
+- **Ben-only actions go to his CRM** (`Freelance/site`, app `ubudian`); this project's automation can file its own via `POST /api/integrations/handover`.
 
 **Status workflows by entity:**
 - **Events:** `pending` → `approved` / `rejected` → `archived`

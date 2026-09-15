@@ -1,5 +1,7 @@
 # The Ubudian — Business Plan
 
+> **Historical (written spring 2026).** Stories, tours, blog and the newsletter archive were switched off on 2026-08-03; the product is the events agenda and the guides. Kept as the record of the original thesis, not as a plan being executed. Current state: `docs/audit-2026-09.md`.
+
 ---
 
 ## Positioning

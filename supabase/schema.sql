@@ -1,942 +1,995 @@
--- The Ubudian — Database Schema
--- Run this in Supabase SQL Editor (Dashboard → SQL Editor → New Query)
-
--- ============================================
--- PROFILES TABLE (linked to auth.users)
--- ============================================
-
-CREATE TABLE profiles (
-  id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-  email TEXT,
-  display_name TEXT,
-  avatar_url TEXT,
-  role TEXT DEFAULT 'user',  -- 'user' | 'admin'
-  ics_token TEXT UNIQUE,     -- Per-user token for ICS calendar feed subscription
-  welcomed_at TIMESTAMPTZ,   -- NULL until the user dismisses the first-login welcome modal
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- Auto-create profile on signup
-CREATE OR REPLACE FUNCTION public.handle_new_user()
-RETURNS TRIGGER AS $$
-BEGIN
-  INSERT INTO public.profiles (id, email, display_name, avatar_url)
-  VALUES (
-    NEW.id,
-    NEW.email,
-    COALESCE(NEW.raw_user_meta_data->>'full_name', NEW.email),
-    NEW.raw_user_meta_data->>'avatar_url'
-  );
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
-CREATE TRIGGER on_auth_user_created
-  AFTER INSERT ON auth.users
-  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
-
--- ============================================
--- CONTENT TABLES
--- ============================================
+-- The Ubudian — public schema snapshot.
+-- Generated 2026-09-15 by scripts/dump-schema.ts from the live database.
+-- Reference only: supabase/migrations/ is the source of truth. Do not hand-edit; regenerate.
 
 CREATE TABLE blog_posts (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  title TEXT NOT NULL,
-  slug TEXT UNIQUE NOT NULL,
-  excerpt TEXT,
-  content TEXT NOT NULL,
-  cover_image_url TEXT,
-  status TEXT DEFAULT 'draft',
-  published_at TIMESTAMPTZ,
-  meta_title TEXT,
-  meta_description TEXT,
-  is_placeholder BOOLEAN DEFAULT FALSE,
-  archetype_tags TEXT[] DEFAULT '{}',
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  title text NOT NULL,
+  slug text NOT NULL,
+  excerpt text,
+  content text NOT NULL,
+  cover_image_url text,
+  status text DEFAULT 'draft'::text,
+  published_at timestamp with time zone,
+  meta_title text,
+  meta_description text,
+  is_placeholder boolean DEFAULT false,
+  archetype_tags text[] DEFAULT '{}'::text[],
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  is_members_only boolean DEFAULT false,
+  PRIMARY KEY (id)
 );
 
-CREATE TABLE stories (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  title TEXT NOT NULL,
-  slug TEXT UNIQUE NOT NULL,
-  subject_name TEXT NOT NULL,
-  subject_instagram TEXT,
-  subject_tagline TEXT,
-  photo_urls TEXT[],
-  narrative TEXT NOT NULL,
-  theme_tags TEXT[],
-  status TEXT DEFAULT 'draft',
-  published_at TIMESTAMPTZ,
-  meta_title TEXT,
-  meta_description TEXT,
-  is_placeholder BOOLEAN DEFAULT FALSE,
-  archetype_tags TEXT[] DEFAULT '{}',
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
+CREATE TABLE bookings (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  tour_id uuid NOT NULL,
+  profile_id uuid,
+  guest_name text NOT NULL,
+  guest_email text NOT NULL,
+  guest_phone text,
+  num_guests integer NOT NULL DEFAULT 1,
+  preferred_date date NOT NULL,
+  special_requests text,
+  price_per_person integer NOT NULL,
+  total_amount integer NOT NULL,
+  currency text NOT NULL DEFAULT 'usd'::text,
+  stripe_checkout_session_id text,
+  stripe_payment_intent_id text,
+  stripe_payment_status text DEFAULT 'unpaid'::text,
+  status text NOT NULL DEFAULT 'pending'::text,
+  booking_reference text NOT NULL,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  PRIMARY KEY (id)
 );
 
--- ============================================
--- EVENT INGESTION TABLES
--- ============================================
-
-CREATE TABLE event_sources (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  name TEXT NOT NULL,
-  slug TEXT UNIQUE NOT NULL,
-  source_type TEXT NOT NULL, -- 'telegram' | 'api' | 'scraper' | 'whatsapp' | 'facebook' | 'instagram' | 'manual'
-  config JSONB DEFAULT '{}',
-  is_enabled BOOLEAN DEFAULT TRUE,
-  fetch_interval_minutes INTEGER DEFAULT 240,
-  last_fetched_at TIMESTAMPTZ,
-  last_success_at TIMESTAMPTZ,
-  last_error TEXT,
-  events_ingested_count INTEGER DEFAULT 0,
-  auto_approve_enabled BOOLEAN DEFAULT FALSE,
-  auto_approve_threshold REAL DEFAULT 0.85,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
+CREATE TABLE commission_partners (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  handle text NOT NULL,
+  display_name text NOT NULL,
+  contact_email text NOT NULL,
+  contact_phone text,
+  commission_pct numeric NOT NULL DEFAULT 30.00,
+  profile_id uuid,
+  bio text,
+  avatar_url text,
+  notes text,
+  is_active boolean NOT NULL DEFAULT true,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  PRIMARY KEY (id)
 );
 
-CREATE TABLE ingestion_runs (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  source_id UUID NOT NULL REFERENCES event_sources(id) ON DELETE CASCADE,
-  status TEXT NOT NULL DEFAULT 'running',
-  started_at TIMESTAMPTZ DEFAULT NOW(),
-  completed_at TIMESTAMPTZ,
-  messages_fetched INTEGER DEFAULT 0,
-  messages_parsed INTEGER DEFAULT 0,
-  events_created INTEGER DEFAULT 0,
-  duplicates_found INTEGER DEFAULT 0,
-  errors_count INTEGER DEFAULT 0,
-  error_log JSONB DEFAULT '[]',
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
-CREATE TABLE raw_ingestion_messages (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  source_id UUID NOT NULL REFERENCES event_sources(id) ON DELETE CASCADE,
-  run_id UUID REFERENCES ingestion_runs(id) ON DELETE SET NULL,
-  external_id TEXT,
-  content_text TEXT,
-  content_html TEXT,
-  image_urls TEXT[],
-  sender_name TEXT,
-  sender_id TEXT,
-  chat_name TEXT,
-  raw_data JSONB,
-  status TEXT NOT NULL DEFAULT 'pending',
-  parsed_event_data JSONB,
-  parse_error TEXT,
-  event_id UUID, -- set after event creation (FK added after events table)
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
-
-CREATE TABLE events (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  title TEXT NOT NULL,
-  slug TEXT UNIQUE NOT NULL,
-  description TEXT NOT NULL,
-  short_description TEXT,
-  cover_image_url TEXT,
-  category TEXT NOT NULL,
-  venue_name TEXT,
-  venue_address TEXT,
-  venue_map_url TEXT,
-  start_date DATE NOT NULL,
-  end_date DATE,
-  start_time TIME,
-  end_time TIME,
-  is_recurring BOOLEAN DEFAULT FALSE,
-  recurrence_rule TEXT,
-  price_info TEXT,
-  external_ticket_url TEXT,
-  organizer_name TEXT,
-  organizer_contact TEXT,
-  organizer_instagram TEXT,
-  status TEXT DEFAULT 'pending',
-  submitted_by_email TEXT,
-  is_trusted_submitter BOOLEAN DEFAULT FALSE,
-  rejection_reason TEXT,
-  is_placeholder BOOLEAN DEFAULT FALSE,
-  archetype_tags TEXT[] DEFAULT '{}',
-  -- Ingestion columns
-  source_id UUID REFERENCES event_sources(id) ON DELETE SET NULL,
-  source_event_id TEXT,
-  source_url TEXT,
-  content_fingerprint TEXT,
-  raw_message_id UUID REFERENCES raw_ingestion_messages(id) ON DELETE SET NULL,
-  llm_parsed BOOLEAN DEFAULT FALSE,
-  quality_score REAL,
-  content_flags TEXT[] DEFAULT '{}',
-  -- Geo (populated by Nominatim geocoding on venue normalization)
-  latitude DOUBLE PRECISION,
-  longitude DOUBLE PRECISION,
-  -- AI moderation audit trail
-  ai_approved_at TIMESTAMPTZ,
-  moderation_reason TEXT,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
-
-CREATE TABLE tours (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  title TEXT NOT NULL,
-  slug TEXT UNIQUE NOT NULL,
-  description TEXT NOT NULL,
-  short_description TEXT,
-  photo_urls TEXT[],
-  itinerary TEXT,
-  duration TEXT,
-  price_per_person INTEGER,
-  max_group_size INTEGER,
-  theme TEXT,
-  whats_included TEXT,
-  what_to_bring TEXT,
-  guide_name TEXT,
-  booking_whatsapp TEXT,
-  booking_email TEXT,
-  is_active BOOLEAN DEFAULT TRUE,
-  is_placeholder BOOLEAN DEFAULT FALSE,
-  archetype_tags TEXT[] DEFAULT '{}',
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
-
-CREATE TABLE newsletter_editions (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  subject TEXT NOT NULL,
-  slug TEXT UNIQUE NOT NULL,
-  preview_text TEXT,
-  content_json JSONB,
-  html_content TEXT,
-  featured_story_id UUID REFERENCES stories(id),
-  sponsor_name TEXT,
-  sponsor_image_url TEXT,
-  sponsor_url TEXT,
-  sponsor_text TEXT,
-  status TEXT DEFAULT 'draft',
-  beehiiv_post_id TEXT,
-  sent_at TIMESTAMPTZ,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
-
-CREATE TABLE newsletter_subscribers (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  email TEXT UNIQUE NOT NULL,
-  first_name TEXT,
-  birthday DATE,
-  instagram_handle TEXT,
-  beehiiv_subscriber_id TEXT,
-  status TEXT DEFAULT 'active',
-  source TEXT DEFAULT 'website',
-  archetype TEXT,
-  subscribed_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- Add FK from raw_ingestion_messages to events (deferred because of table order)
-ALTER TABLE raw_ingestion_messages
-  ADD CONSTRAINT fk_raw_messages_event
-  FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE SET NULL;
-
-CREATE TABLE venue_aliases (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  canonical_name TEXT NOT NULL,
-  alias TEXT NOT NULL,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  UNIQUE(alias)
-);
-
--- Canonical venue → lat/lng cache backing the map-based events discovery view.
--- Populated by the Nominatim geocoder on ingestion (and a backfill script).
-CREATE TABLE venue_coordinates (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  canonical_name TEXT UNIQUE NOT NULL,
-  latitude DOUBLE PRECISION NOT NULL,
-  longitude DOUBLE PRECISION NOT NULL,
-  geocoded_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  source TEXT NOT NULL DEFAULT 'nominatim',  -- nominatim | manual
-  confidence REAL
+CREATE TABLE commission_payouts (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  partner_id uuid NOT NULL,
+  period_start date NOT NULL,
+  period_end date NOT NULL,
+  signups_count integer NOT NULL DEFAULT 0,
+  gross_cents integer NOT NULL DEFAULT 0,
+  amount_cents integer NOT NULL,
+  status text NOT NULL DEFAULT 'pending'::text,
+  paid_at timestamp with time zone,
+  payment_method text,
+  payment_reference text,
+  notes text,
+  created_by uuid,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  PRIMARY KEY (id)
 );
 
 CREATE TABLE dedup_matches (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  event_a_id UUID NOT NULL REFERENCES events(id) ON DELETE CASCADE,
-  event_b_id UUID NOT NULL REFERENCES events(id) ON DELETE CASCADE,
-  match_type TEXT NOT NULL,
-  confidence REAL NOT NULL,
-  status TEXT NOT NULL DEFAULT 'pending',
-  resolved_by UUID REFERENCES profiles(id),
-  resolved_at TIMESTAMPTZ,
-  metadata JSONB DEFAULT '{}',
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  UNIQUE(event_a_id, event_b_id)
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  event_a_id uuid NOT NULL,
+  event_b_id uuid NOT NULL,
+  match_type text NOT NULL,
+  confidence real NOT NULL,
+  status text NOT NULL DEFAULT 'pending'::text,
+  resolved_by uuid,
+  resolved_at timestamp with time zone,
+  metadata jsonb DEFAULT '{}'::jsonb,
+  created_at timestamp with time zone DEFAULT now(),
+  PRIMARY KEY (id)
 );
 
-CREATE TABLE unresolved_venues (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  raw_name TEXT NOT NULL,
-  normalized_name TEXT UNIQUE NOT NULL,
-  seen_count INTEGER DEFAULT 1,
-  first_seen_at TIMESTAMPTZ DEFAULT NOW(),
-  last_seen_at TIMESTAMPTZ DEFAULT NOW(),
-  status TEXT NOT NULL DEFAULT 'unresolved',
-  resolved_canonical_name TEXT,
-  resolved_at TIMESTAMPTZ,
-  resolved_by UUID REFERENCES profiles(id)
+CREATE TABLE event_sources (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  name text NOT NULL,
+  slug text NOT NULL,
+  source_type text NOT NULL,
+  config jsonb DEFAULT '{}'::jsonb,
+  is_enabled boolean DEFAULT true,
+  fetch_interval_minutes integer DEFAULT 240,
+  last_fetched_at timestamp with time zone,
+  last_success_at timestamp with time zone,
+  last_error text,
+  events_ingested_count integer DEFAULT 0,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  auto_approve_enabled boolean DEFAULT false,
+  auto_approve_threshold real DEFAULT 0.85,
+  PRIMARY KEY (id)
 );
 
-CREATE TABLE trusted_submitters (
-  email TEXT PRIMARY KEY,
-  approved_count INTEGER DEFAULT 0,
-  auto_approve BOOLEAN DEFAULT FALSE,
-  created_at TIMESTAMPTZ DEFAULT NOW()
+CREATE TABLE events (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  title text NOT NULL,
+  slug text NOT NULL,
+  description text NOT NULL,
+  short_description text,
+  cover_image_url text,
+  category text NOT NULL,
+  venue_name text,
+  venue_address text,
+  venue_map_url text,
+  start_date date NOT NULL,
+  end_date date,
+  start_time time without time zone,
+  end_time time without time zone,
+  is_recurring boolean DEFAULT false,
+  recurrence_rule text,
+  price_info text,
+  external_ticket_url text,
+  organizer_name text,
+  organizer_contact text,
+  organizer_instagram text,
+  status text DEFAULT 'pending'::text,
+  submitted_by_email text,
+  is_trusted_submitter boolean DEFAULT false,
+  rejection_reason text,
+  is_placeholder boolean DEFAULT false,
+  archetype_tags text[] DEFAULT '{}'::text[],
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  source_id uuid,
+  source_event_id text,
+  source_url text,
+  content_fingerprint text,
+  raw_message_id uuid,
+  llm_parsed boolean DEFAULT false,
+  quality_score real,
+  content_flags text[] DEFAULT '{}'::text[],
+  latitude double precision,
+  longitude double precision,
+  ai_approved_at timestamp with time zone,
+  moderation_reason text,
+  is_core boolean NOT NULL DEFAULT false,
+  last_refreshed_at timestamp with time zone,
+  source_kind text DEFAULT 'manual'::text,
+  raw_text_snippet text,
+  parser_version text,
+  ingested_at timestamp with time zone DEFAULT now(),
+  intent_tags text[] NOT NULL DEFAULT '{}'::text[],
+  is_members_only boolean NOT NULL DEFAULT false,
+  members_only_teaser text,
+  event_tier text NOT NULL DEFAULT 'core'::text,
+  is_spotlight boolean NOT NULL DEFAULT false,
+  embedding vector,
+  vibe_tags text[] NOT NULL DEFAULT '{}'::text[],
+  last_edited_by_submitter_at timestamp with time zone,
+  auto_approved_at timestamp with time zone,
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE feedback (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  type text NOT NULL DEFAULT 'general'::text,
+  message text NOT NULL,
+  email text,
+  page_url text,
+  page_title text,
+  user_agent text,
+  profile_id uuid,
+  image_url text,
+  status text NOT NULL DEFAULT 'new'::text,
+  admin_notes text,
+  created_at timestamp with time zone DEFAULT now(),
+  activity_trail jsonb,
+  viewport_width integer,
+  viewport_height integer,
+  route_params jsonb,
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE guide_entity_references (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  guide_id uuid NOT NULL,
+  ref_kind text NOT NULL,
+  ref_slug text NOT NULL,
+  ref_id uuid,
+  position integer,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE guides (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  slug text NOT NULL,
+  tier text NOT NULL,
+  title text NOT NULL,
+  subtitle text,
+  hero_quote text,
+  intro_md text,
+  body_md text NOT NULL,
+  intent_tags text[] NOT NULL DEFAULT '{}'::text[],
+  archetype_tags text[] NOT NULL DEFAULT '{}'::text[],
+  status text NOT NULL DEFAULT 'draft'::text,
+  is_members_only boolean NOT NULL DEFAULT false,
+  is_editors_pick boolean NOT NULL DEFAULT false,
+  editors_pick_position integer,
+  reading_time_min integer,
+  hero_image_url text,
+  card_image_url text,
+  linked_retreat_id uuid,
+  related_guide_slugs text[] NOT NULL DEFAULT '{}'::text[],
+  field_tested_by text,
+  last_updated_at timestamp with time zone,
+  published_at timestamp with time zone,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  sort_order integer NOT NULL DEFAULT 0,
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE image_gc_log (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  entity_type text NOT NULL,
+  entity_id uuid NOT NULL,
+  storage_path text NOT NULL,
+  original_url text NOT NULL,
+  collected_at timestamp with time zone NOT NULL DEFAULT now(),
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE ingestion_runs (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  source_id uuid NOT NULL,
+  status text NOT NULL DEFAULT 'running'::text,
+  started_at timestamp with time zone DEFAULT now(),
+  completed_at timestamp with time zone,
+  messages_fetched integer DEFAULT 0,
+  messages_parsed integer DEFAULT 0,
+  events_created integer DEFAULT 0,
+  duplicates_found integer DEFAULT 0,
+  errors_count integer DEFAULT 0,
+  error_log jsonb DEFAULT '[]'::jsonb,
+  created_at timestamp with time zone DEFAULT now(),
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE journey_atoms (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  kind text NOT NULL,
+  title text NOT NULL,
+  description text,
+  short_description text,
+  theme_tags text[] DEFAULT '{}'::text[],
+  archetype_tags text[] DEFAULT '{}'::text[],
+  image_url text,
+  affiliate_url text,
+  event_id uuid,
+  practitioner_id uuid,
+  partner_id uuid,
+  latitude double precision,
+  longitude double precision,
+  google_maps_url text,
+  is_active boolean DEFAULT true,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  image_credit text,
+  image_credit_url text,
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE journey_day_slots (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  journey_day_id uuid NOT NULL,
+  slot_window text NOT NULL,
+  position integer NOT NULL DEFAULT 0,
+  is_optional boolean DEFAULT false,
+  atom_kinds text[] DEFAULT '{}'::text[],
+  theme_tags text[] DEFAULT '{}'::text[],
+  curated_atom_id uuid,
+  prompt text,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE journey_days (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  journey_id uuid NOT NULL,
+  day_number integer NOT NULL,
+  day_type text NOT NULL DEFAULT 'light'::text,
+  theme text NOT NULL,
+  theme_subtitle text,
+  intention text,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  background_image_url text,
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE journey_testimonials (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  journey_id uuid NOT NULL,
+  attendee_name text NOT NULL,
+  attendee_origin text,
+  quote text NOT NULL,
+  journey_day_referenced integer,
+  avatar_url text,
+  sort_order integer DEFAULT 0,
+  is_published boolean DEFAULT true,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE journeys (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  slug text NOT NULL,
+  title text NOT NULL,
+  subtitle text,
+  tier text NOT NULL DEFAULT 'living_guide'::text,
+  length_days integer NOT NULL,
+  archetype_tags text[] DEFAULT '{}'::text[],
+  cover_image_url text,
+  hero_quote text,
+  summary text,
+  whats_included text,
+  who_its_for text,
+  practical_info text,
+  is_published boolean DEFAULT false,
+  sort_order integer DEFAULT 0,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  host_name text,
+  host_role text,
+  host_avatar_url text,
+  cohort_size_min smallint,
+  cohort_size_max smallint,
+  villa_neighbourhood text,
+  price_per_person_cents integer,
+  next_cohort_starts_at date,
+  next_cohort_ends_at date,
+  next_cohort_status text,
+  curator_note text,
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE newsletter_editions (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  subject text NOT NULL,
+  slug text NOT NULL,
+  preview_text text,
+  content_json jsonb,
+  html_content text,
+  featured_story_id uuid,
+  sponsor_name text,
+  sponsor_image_url text,
+  sponsor_url text,
+  sponsor_text text,
+  status text DEFAULT 'draft'::text,
+  beehiiv_post_id text,
+  sent_at timestamp with time zone,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE newsletter_subscribers (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  email text NOT NULL,
+  first_name text,
+  birthday date,
+  instagram_handle text,
+  beehiiv_subscriber_id text,
+  status text DEFAULT 'active'::text,
+  source text DEFAULT 'website'::text,
+  archetype text,
+  subscribed_at timestamp with time zone DEFAULT now(),
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE partners (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  slug text NOT NULL,
+  name text NOT NULL,
+  kind text NOT NULL,
+  description text,
+  affiliate_url text,
+  commission_rate numeric,
+  contact_whatsapp text,
+  contact_email text,
+  base_location text,
+  is_active boolean DEFAULT true,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  archetype_tags text[] NOT NULL DEFAULT '{}'::text[],
+  intent_tags text[] NOT NULL DEFAULT '{}'::text[],
+  hero_image_url text,
+  short_description text,
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE payments (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  profile_id uuid,
+  payment_type text NOT NULL,
+  booking_id uuid,
+  subscription_id uuid,
+  stripe_payment_intent_id text,
+  stripe_invoice_id text,
+  stripe_charge_id text,
+  amount integer NOT NULL,
+  currency text NOT NULL DEFAULT 'usd'::text,
+  status text NOT NULL DEFAULT 'pending'::text,
+  receipt_url text,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE places (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  slug text NOT NULL,
+  name text NOT NULL,
+  kind text NOT NULL,
+  description text,
+  short_description text,
+  photo_urls text[] NOT NULL DEFAULT '{}'::text[],
+  hero_image_url text,
+  address text,
+  neighbourhood text,
+  latitude numeric,
+  longitude numeric,
+  google_maps_url text,
+  website_url text,
+  instagram_handle text,
+  opening_hours text,
+  price_range text,
+  theme_tags text[] NOT NULL DEFAULT '{}'::text[],
+  archetype_tags text[] NOT NULL DEFAULT '{}'::text[],
+  intent_tags text[] NOT NULL DEFAULT '{}'::text[],
+  is_published boolean NOT NULL DEFAULT false,
+  sort_order integer NOT NULL DEFAULT 0,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE practitioners (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  slug text NOT NULL,
+  name text NOT NULL,
+  modalities text[] DEFAULT '{}'::text[],
+  bio text,
+  photo_url text,
+  contact_whatsapp text,
+  contact_email text,
+  contact_instagram text,
+  base_location text,
+  theme_tags text[] DEFAULT '{}'::text[],
+  is_active boolean DEFAULT true,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  archetype_tags text[] NOT NULL DEFAULT '{}'::text[],
+  intent_tags text[] NOT NULL DEFAULT '{}'::text[],
+  hero_image_url text,
+  short_description text,
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE profiles (
+  id uuid NOT NULL,
+  email text,
+  display_name text,
+  avatar_url text,
+  role text DEFAULT 'user'::text,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  stripe_customer_id text,
+  ics_token text,
+  primary_archetype text,
+  user_segment text,
+  welcomed_at timestamp with time zone,
+  email_opt_out boolean NOT NULL DEFAULT false,
+  PRIMARY KEY (id)
 );
 
 CREATE TABLE quiz_results (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  profile_id UUID REFERENCES profiles(id) ON DELETE SET NULL,
-  email TEXT,
-  primary_archetype TEXT NOT NULL,
-  secondary_archetype TEXT,
-  scores JSONB NOT NULL,
-  answers JSONB NOT NULL,
-  created_at TIMESTAMPTZ DEFAULT NOW()
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  profile_id uuid,
+  email text,
+  primary_archetype text NOT NULL,
+  secondary_archetype text,
+  scores jsonb NOT NULL,
+  answers jsonb NOT NULL,
+  created_at timestamp with time zone DEFAULT now(),
+  user_segment text,
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE raw_ingestion_messages (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  source_id uuid NOT NULL,
+  run_id uuid,
+  external_id text,
+  content_text text,
+  content_html text,
+  image_urls text[],
+  sender_name text,
+  sender_id text,
+  raw_data jsonb,
+  status text NOT NULL DEFAULT 'pending'::text,
+  parsed_event_data jsonb,
+  parse_error text,
+  event_id uuid,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  chat_name text,
+  PRIMARY KEY (id)
 );
 
 CREATE TABLE saved_events (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  profile_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
-  event_id UUID NOT NULL REFERENCES events(id) ON DELETE CASCADE,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  UNIQUE(profile_id, event_id)
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  profile_id uuid NOT NULL,
+  event_id uuid NOT NULL,
+  created_at timestamp with time zone DEFAULT now(),
+  PRIMARY KEY (id)
 );
 
--- ============================================
--- ROW LEVEL SECURITY
--- ============================================
-
-ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
-ALTER TABLE blog_posts ENABLE ROW LEVEL SECURITY;
-ALTER TABLE stories ENABLE ROW LEVEL SECURITY;
-ALTER TABLE events ENABLE ROW LEVEL SECURITY;
-ALTER TABLE tours ENABLE ROW LEVEL SECURITY;
-ALTER TABLE newsletter_editions ENABLE ROW LEVEL SECURITY;
-ALTER TABLE newsletter_subscribers ENABLE ROW LEVEL SECURITY;
-ALTER TABLE trusted_submitters ENABLE ROW LEVEL SECURITY;
-ALTER TABLE quiz_results ENABLE ROW LEVEL SECURITY;
-ALTER TABLE saved_events ENABLE ROW LEVEL SECURITY;
-
--- Helper: check if user is admin
-CREATE OR REPLACE FUNCTION public.is_admin()
-RETURNS BOOLEAN AS $$
-  SELECT EXISTS (
-    SELECT 1 FROM public.profiles
-    WHERE id = auth.uid() AND role = 'admin'
-  );
-$$ LANGUAGE sql SECURITY DEFINER;
-
--- ============================================
--- PROFILES POLICIES
--- ============================================
-
--- Anyone can read profiles
-CREATE POLICY "Profiles are viewable by everyone"
-  ON profiles FOR SELECT
-  USING (true);
-
--- Users can update their own profile
-CREATE POLICY "Users can update own profile"
-  ON profiles FOR UPDATE
-  USING (auth.uid() = id)
-  WITH CHECK (auth.uid() = id);
-
--- ============================================
--- BLOG POSTS POLICIES
--- ============================================
-
--- Public can read published posts
-CREATE POLICY "Published blog posts are viewable by everyone"
-  ON blog_posts FOR SELECT
-  USING (status = 'published');
-
--- Admins can do everything
-CREATE POLICY "Admins can manage blog posts"
-  ON blog_posts FOR ALL
-  USING (public.is_admin());
-
--- ============================================
--- STORIES POLICIES
--- ============================================
-
-CREATE POLICY "Published stories are viewable by everyone"
-  ON stories FOR SELECT
-  USING (status = 'published');
-
-CREATE POLICY "Admins can manage stories"
-  ON stories FOR ALL
-  USING (public.is_admin());
-
--- ============================================
--- EVENTS POLICIES
--- ============================================
-
--- Public can read approved events
-CREATE POLICY "Approved events are viewable by everyone"
-  ON events FOR SELECT
-  USING (status = 'approved');
-
--- Authenticated users can submit events (status: pending)
-CREATE POLICY "Authenticated users can submit events"
-  ON events FOR INSERT
-  TO authenticated
-  WITH CHECK (status = 'pending');
-
--- Users can read their own submitted events (all statuses)
-CREATE POLICY "Users can read own submitted events"
-  ON events FOR SELECT
-  TO authenticated
-  USING (submitted_by_email = (SELECT email FROM profiles WHERE id = auth.uid()));
-
--- Admins can manage all events
-CREATE POLICY "Admins can manage events"
-  ON events FOR ALL
-  USING (public.is_admin());
-
--- ============================================
--- TOURS POLICIES
--- ============================================
-
-CREATE POLICY "Active tours are viewable by everyone"
-  ON tours FOR SELECT
-  USING (is_active = true);
-
-CREATE POLICY "Admins can manage tours"
-  ON tours FOR ALL
-  USING (public.is_admin());
-
--- ============================================
--- NEWSLETTER EDITIONS POLICIES
--- ============================================
-
-CREATE POLICY "Published newsletter editions are viewable by everyone"
-  ON newsletter_editions FOR SELECT
-  USING (status = 'published');
-
-CREATE POLICY "Admins can manage newsletter editions"
-  ON newsletter_editions FOR ALL
-  USING (public.is_admin());
-
--- ============================================
--- NEWSLETTER SUBSCRIBERS POLICIES
--- ============================================
-
--- Only admins can view/manage subscribers
-CREATE POLICY "Admins can manage subscribers"
-  ON newsletter_subscribers FOR ALL
-  USING (public.is_admin());
-
--- Users can read their own subscription status
-CREATE POLICY "Users can read own subscription"
-  ON newsletter_subscribers FOR SELECT
-  TO authenticated
-  USING (email = (SELECT email FROM profiles WHERE id = auth.uid()));
-
--- Allow insert via service role (API route uses admin client)
--- No anonymous insert policy needed since we use the service role key
-
--- ============================================
--- TRUSTED SUBMITTERS POLICIES
--- ============================================
-
-CREATE POLICY "Admins can manage trusted submitters"
-  ON trusted_submitters FOR ALL
-  USING (public.is_admin());
-
--- ============================================
--- QUIZ RESULTS POLICIES
--- ============================================
-
-CREATE POLICY "Admins can manage quiz results"
-  ON quiz_results FOR ALL
-  USING (public.is_admin());
-
-CREATE POLICY "Users can read own quiz results"
-  ON quiz_results FOR SELECT
-  USING (profile_id = auth.uid());
-
--- ============================================
--- SAVED EVENTS POLICIES
--- ============================================
-
-CREATE POLICY "Users can read own saved events"
-  ON saved_events FOR SELECT
-  TO authenticated
-  USING (profile_id = auth.uid());
-
-CREATE POLICY "Users can save events"
-  ON saved_events FOR INSERT
-  TO authenticated
-  WITH CHECK (profile_id = auth.uid());
-
-CREATE POLICY "Users can unsave events"
-  ON saved_events FOR DELETE
-  TO authenticated
-  USING (profile_id = auth.uid());
-
-CREATE POLICY "Admins can manage saved events"
-  ON saved_events FOR ALL
-  USING (public.is_admin());
-
--- ============================================
--- TRUSTED SUBMITTER FUNCTIONS
--- ============================================
-
-CREATE OR REPLACE FUNCTION public.increment_approved_count(submitter_email TEXT)
-RETURNS void AS $$
-BEGIN
-  INSERT INTO public.trusted_submitters (email, approved_count, auto_approve, created_at)
-  VALUES (submitter_email, 1, FALSE, NOW())
-  ON CONFLICT (email) DO UPDATE
-  SET approved_count = trusted_submitters.approved_count + 1,
-      auto_approve = CASE
-        WHEN trusted_submitters.approved_count + 1 >= 5 THEN TRUE
-        ELSE trusted_submitters.auto_approve
-      END;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
--- ============================================
--- VENUE SEEN COUNT FUNCTION
--- ============================================
-
-CREATE OR REPLACE FUNCTION increment_venue_seen_count(
-  p_normalized_name TEXT,
-  p_raw_name TEXT
-) RETURNS VOID AS $$
-BEGIN
-  INSERT INTO unresolved_venues (raw_name, normalized_name, seen_count, first_seen_at, last_seen_at, status)
-  VALUES (p_raw_name, p_normalized_name, 1, NOW(), NOW(), 'unresolved')
-  ON CONFLICT (normalized_name) DO UPDATE SET
-    seen_count = unresolved_venues.seen_count + 1,
-    last_seen_at = NOW();
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
--- ============================================
--- STORAGE BUCKET
--- ============================================
-
--- Create a public bucket for images (run in SQL Editor)
-INSERT INTO storage.buckets (id, name, public)
-VALUES ('images', 'images', true)
-ON CONFLICT (id) DO NOTHING;
-
--- Allow authenticated users to upload images
-CREATE POLICY "Authenticated users can upload images"
-  ON storage.objects FOR INSERT
-  TO authenticated
-  WITH CHECK (bucket_id = 'images');
-
--- Allow public to read images
-CREATE POLICY "Anyone can view images"
-  ON storage.objects FOR SELECT
-  USING (bucket_id = 'images');
-
--- Allow admins to delete images
-CREATE POLICY "Admins can delete images"
-  ON storage.objects FOR DELETE
-  USING (bucket_id = 'images' AND public.is_admin());
-
--- ============================================
--- INGESTION TABLE RLS & POLICIES
--- ============================================
-
-ALTER TABLE event_sources ENABLE ROW LEVEL SECURITY;
-ALTER TABLE ingestion_runs ENABLE ROW LEVEL SECURITY;
-ALTER TABLE raw_ingestion_messages ENABLE ROW LEVEL SECURITY;
-ALTER TABLE venue_aliases ENABLE ROW LEVEL SECURITY;
-ALTER TABLE dedup_matches ENABLE ROW LEVEL SECURITY;
-ALTER TABLE unresolved_venues ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Admins can manage event sources"
-  ON event_sources FOR ALL
-  USING (public.is_admin());
-
-CREATE POLICY "Admins can manage ingestion runs"
-  ON ingestion_runs FOR ALL
-  USING (public.is_admin());
-
-CREATE POLICY "Admins can manage raw messages"
-  ON raw_ingestion_messages FOR ALL
-  USING (public.is_admin());
-
-CREATE POLICY "Admins can manage venue aliases"
-  ON venue_aliases FOR ALL
-  USING (public.is_admin());
-
-CREATE POLICY "Anyone can read venue aliases"
-  ON venue_aliases FOR SELECT
-  USING (true);
-
-CREATE POLICY "Admins can manage dedup matches"
-  ON dedup_matches FOR ALL
-  USING (public.is_admin());
-
-CREATE POLICY "Admins can manage unresolved venues"
-  ON unresolved_venues FOR ALL
-  USING (public.is_admin());
-
--- ============================================
--- SEED DATA: VENUE ALIASES
--- ============================================
-
-INSERT INTO venue_aliases (canonical_name, alias) VALUES
-  ('The Yoga Barn', 'Yoga Barn'),
-  ('The Yoga Barn', 'yoga barn ubud'),
-  ('The Yoga Barn', 'The Yoga Barn Ubud'),
-  ('Pyramids of Chi', 'pyramids of chi ubud'),
-  ('Pyramids of Chi', 'Pyramids Of Chi Ubud'),
-  ('Pyramids of Chi', 'POC Ubud'),
-  ('Outpost', 'Outpost Ubud'),
-  ('Outpost', 'outpost coworking'),
-  ('Outpost', 'Outpost Co-working'),
-  ('Hubud', 'Hubud Bali'),
-  ('Hubud', 'hubud coworking'),
-  ('Alchemy', 'Alchemy Ubud'),
-  ('Alchemy', 'Alchemy Bali'),
-  ('CP Lounge', 'CP Lounge Ubud'),
-  ('CP Lounge', 'CPUB'),
-  ('Ubud Palace', 'Puri Saren Agung'),
-  ('Ubud Palace', 'Puri Saren'),
-  ('ARMA Museum', 'Agung Rai Museum of Art'),
-  ('ARMA Museum', 'ARMA'),
-  ('Neka Art Museum', 'Neka Museum'),
-  ('Neka Art Museum', 'Neka'),
-  ('Museum Puri Lukisan', 'Puri Lukisan'),
-  ('Museum Puri Lukisan', 'Puri Lukisan Museum'),
-  ('Intuitive Flow', 'Intuitive Flow Yoga'),
-  ('Intuitive Flow', 'Intuitive Flow Ubud'),
-  ('Radiantly Alive', 'Radiantly Alive Yoga'),
-  ('Radiantly Alive', 'Radiantly Alive Ubud'),
-  ('Taksu', 'Taksu Ubud'),
-  ('Taksu', 'Taksu Spa'),
-  ('Bridges Bali', 'Bridges Restaurant'),
-  ('Bridges Bali', 'Bridges Ubud'),
-  ('Locavore', 'Locavore Ubud'),
-  ('Locavore', 'Locavore Restaurant'),
-  ('Sacred Monkey Forest Sanctuary', 'Monkey Forest'),
-  ('Sacred Monkey Forest Sanctuary', 'Monkey Forest Ubud'),
-  ('Sacred Monkey Forest Sanctuary', 'Sacred Monkey Forest'),
-  ('Campuhan Ridge Walk', 'Campuhan Ridge'),
-  ('Campuhan Ridge Walk', 'Campuhan Walk'),
-  ('Fivelements', 'Fivelements Bali'),
-  ('Fivelements', 'Five Elements'),
-  ('Bambu Indah', 'Bambu Indah Ubud'),
-  ('Komaneka', 'Komaneka at Bisma'),
-  ('Komaneka', 'Komaneka Ubud'),
-  ('BaliSpirit Festival Grounds', 'BaliSpirit Festival'),
-  ('BaliSpirit Festival Grounds', 'Bali Spirit Festival')
-ON CONFLICT (alias) DO NOTHING;
-
--- ============================================
--- STRIPE INTEGRATION: ALTER EXISTING TABLES
--- ============================================
-
-ALTER TABLE profiles ADD COLUMN stripe_customer_id TEXT UNIQUE;
-ALTER TABLE tours ADD COLUMN stripe_price_id TEXT;
-ALTER TABLE blog_posts ADD COLUMN is_members_only BOOLEAN DEFAULT FALSE;
-ALTER TABLE stories ADD COLUMN is_members_only BOOLEAN DEFAULT FALSE;
-
--- ============================================
--- BOOKINGS TABLE (tour booking records)
--- ============================================
-
-CREATE TABLE bookings (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  tour_id UUID NOT NULL REFERENCES tours(id) ON DELETE CASCADE,
-  profile_id UUID REFERENCES profiles(id) ON DELETE SET NULL,
-  guest_name TEXT NOT NULL,
-  guest_email TEXT NOT NULL,
-  guest_phone TEXT,
-  num_guests INTEGER NOT NULL DEFAULT 1,
-  preferred_date DATE NOT NULL,
-  special_requests TEXT,
-  price_per_person INTEGER NOT NULL,  -- cents USD
-  total_amount INTEGER NOT NULL,       -- cents USD
-  currency TEXT NOT NULL DEFAULT 'usd',
-  stripe_checkout_session_id TEXT UNIQUE,
-  stripe_payment_intent_id TEXT,
-  stripe_payment_status TEXT DEFAULT 'unpaid', -- unpaid/paid/failed/refunded
-  status TEXT NOT NULL DEFAULT 'pending', -- pending/confirmed/cancelled/completed/refunded
-  booking_reference TEXT UNIQUE NOT NULL,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
+CREATE TABLE saved_guides (
+  profile_id uuid NOT NULL,
+  guide_id uuid NOT NULL,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  PRIMARY KEY (profile_id, guide_id)
 );
 
--- ============================================
--- SUBSCRIPTIONS TABLE (membership records)
--- ============================================
+CREATE TABLE saved_journeys (
+  profile_id uuid NOT NULL,
+  journey_id uuid NOT NULL,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  PRIMARY KEY (profile_id, journey_id)
+);
+
+CREATE TABLE saved_spreads (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  profile_id uuid NOT NULL,
+  quiz_result_id uuid,
+  primary_archetype text NOT NULL,
+  secondary_archetype text,
+  event_ids uuid[] NOT NULL DEFAULT '{}'::uuid[],
+  created_at timestamp with time zone DEFAULT now(),
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE site_settings (
+  id integer NOT NULL DEFAULT 1,
+  blog_enabled boolean NOT NULL DEFAULT false,
+  stories_enabled boolean NOT NULL DEFAULT false,
+  tours_enabled boolean NOT NULL DEFAULT false,
+  newsletter_archive_enabled boolean NOT NULL DEFAULT false,
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  guides_enabled boolean NOT NULL DEFAULT false,
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE sponsor_leads (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  business_name text NOT NULL,
+  contact_name text,
+  contact_email text NOT NULL,
+  contact_whatsapp text,
+  website_url text,
+  tier_interest text,
+  message text,
+  status text NOT NULL DEFAULT 'new'::text,
+  admin_notes text,
+  sponsor_id uuid,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE sponsors (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  slug text NOT NULL,
+  name text NOT NULL,
+  tagline text,
+  description text,
+  logo_url text,
+  hero_image_url text,
+  website_url text,
+  instagram_handle text,
+  contact_email text,
+  contact_whatsapp text,
+  tier text NOT NULL DEFAULT 'patron'::text,
+  status text NOT NULL DEFAULT 'active'::text,
+  category_sponsor text,
+  monthly_amount_cents integer,
+  starts_on date,
+  ends_on date,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  claimed_by_profile_id uuid,
+  stripe_customer_id text,
+  stripe_subscription_id text,
+  stripe_price_id text,
+  stripe_subscription_status text,
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE sponsorship_events (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  sponsor_id uuid NOT NULL,
+  event_type text NOT NULL,
+  context_entity_type text,
+  context_entity_id uuid,
+  dedupe_key text,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE sponsorships (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  sponsor_id uuid NOT NULL,
+  entity_type text NOT NULL,
+  entity_id uuid NOT NULL,
+  starts_at timestamp with time zone NOT NULL DEFAULT now(),
+  ends_at timestamp with time zone,
+  created_at timestamp with time zone DEFAULT now(),
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE stories (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  title text NOT NULL,
+  slug text NOT NULL,
+  subject_name text NOT NULL,
+  subject_instagram text,
+  subject_tagline text,
+  photo_urls text[],
+  narrative text NOT NULL,
+  theme_tags text[],
+  status text DEFAULT 'draft'::text,
+  published_at timestamp with time zone,
+  meta_title text,
+  meta_description text,
+  is_placeholder boolean DEFAULT false,
+  archetype_tags text[] DEFAULT '{}'::text[],
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  is_members_only boolean DEFAULT false,
+  related_organizer_name text,
+  PRIMARY KEY (id)
+);
 
 CREATE TABLE subscriptions (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  profile_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
-  stripe_subscription_id TEXT UNIQUE NOT NULL,
-  stripe_customer_id TEXT NOT NULL,
-  stripe_price_id TEXT,
-  status TEXT NOT NULL DEFAULT 'incomplete', -- active/trialing/past_due/canceled/unpaid/incomplete
-  plan_name TEXT NOT NULL DEFAULT 'Ubudian Insider',
-  interval TEXT NOT NULL DEFAULT 'month', -- month/year
-  current_period_start TIMESTAMPTZ,
-  current_period_end TIMESTAMPTZ,
-  cancel_at_period_end BOOLEAN DEFAULT FALSE,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  profile_id uuid NOT NULL,
+  stripe_subscription_id text NOT NULL,
+  stripe_customer_id text NOT NULL,
+  stripe_price_id text,
+  status text NOT NULL DEFAULT 'incomplete'::text,
+  plan_name text NOT NULL DEFAULT 'Ubudian Insider'::text,
+  interval text NOT NULL DEFAULT 'month'::text,
+  current_period_start timestamp with time zone,
+  current_period_end timestamp with time zone,
+  cancel_at_period_end boolean DEFAULT false,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  payment_country text,
+  payment_last4 text,
+  review_status text NOT NULL DEFAULT 'auto_approved'::text,
+  review_notes text,
+  reviewed_by uuid,
+  reviewed_at timestamp with time zone,
+  commission_partner_id uuid,
+  commission_attribution_source text,
+  PRIMARY KEY (id)
 );
 
--- ============================================
--- PAYMENTS TABLE (unified transaction log)
--- ============================================
-
-CREATE TABLE payments (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  profile_id UUID REFERENCES profiles(id) ON DELETE SET NULL,
-  payment_type TEXT NOT NULL, -- tour_booking/subscription
-  booking_id UUID REFERENCES bookings(id) ON DELETE SET NULL,
-  subscription_id UUID REFERENCES subscriptions(id) ON DELETE SET NULL,
-  stripe_payment_intent_id TEXT,
-  stripe_invoice_id TEXT,
-  stripe_charge_id TEXT,
-  amount INTEGER NOT NULL, -- cents
-  currency TEXT NOT NULL DEFAULT 'usd',
-  status TEXT NOT NULL DEFAULT 'pending', -- pending/succeeded/failed/refunded
-  receipt_url TEXT,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
+CREATE TABLE tours (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  title text NOT NULL,
+  slug text NOT NULL,
+  description text NOT NULL,
+  short_description text,
+  photo_urls text[],
+  itinerary text,
+  duration text,
+  price_per_person integer,
+  max_group_size integer,
+  theme text,
+  whats_included text,
+  what_to_bring text,
+  guide_name text,
+  booking_whatsapp text,
+  booking_email text,
+  is_active boolean DEFAULT true,
+  is_placeholder boolean DEFAULT false,
+  archetype_tags text[] DEFAULT '{}'::text[],
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  stripe_price_id text,
+  PRIMARY KEY (id)
 );
 
--- ============================================
--- STRIPE TABLES: RLS
--- ============================================
-
-ALTER TABLE bookings ENABLE ROW LEVEL SECURITY;
-ALTER TABLE subscriptions ENABLE ROW LEVEL SECURITY;
-ALTER TABLE payments ENABLE ROW LEVEL SECURITY;
-
--- Bookings: users can read own, admins can manage all
-CREATE POLICY "Users can read own bookings"
-  ON bookings FOR SELECT
-  TO authenticated
-  USING (profile_id = auth.uid() OR guest_email = (SELECT email FROM profiles WHERE id = auth.uid()));
-
-CREATE POLICY "Admins can manage bookings"
-  ON bookings FOR ALL
-  USING (public.is_admin());
-
--- Subscriptions: users can read own, admins can manage all
-CREATE POLICY "Users can read own subscriptions"
-  ON subscriptions FOR SELECT
-  TO authenticated
-  USING (profile_id = auth.uid());
-
-CREATE POLICY "Admins can manage subscriptions"
-  ON subscriptions FOR ALL
-  USING (public.is_admin());
-
--- Payments: users can read own, admins can manage all
-CREATE POLICY "Users can read own payments"
-  ON payments FOR SELECT
-  TO authenticated
-  USING (profile_id = auth.uid());
-
-CREATE POLICY "Admins can manage payments"
-  ON payments FOR ALL
-  USING (public.is_admin());
-
--- ============================================
--- FEEDBACK TABLE
--- ============================================
-
-CREATE TABLE feedback (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  type TEXT NOT NULL DEFAULT 'general', -- 'bug' | 'suggestion' | 'general'
-  message TEXT NOT NULL,
-  email TEXT,
-  page_url TEXT,
-  page_title TEXT,
-  user_agent TEXT,
-  profile_id UUID REFERENCES profiles(id) ON DELETE SET NULL,
-  image_url TEXT,
-  status TEXT NOT NULL DEFAULT 'new', -- 'new' | 'reviewed' | 'actioned' | 'dismissed'
-  admin_notes TEXT,
-  pr_url TEXT,
-  route_params JSONB,
-  viewport_width INTEGER,
-  viewport_height INTEGER,
-  activity_trail JSONB,
-  created_at TIMESTAMPTZ DEFAULT NOW()
+CREATE TABLE transactional_sends (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  kind text NOT NULL,
+  email text NOT NULL,
+  dedupe_key text NOT NULL,
+  sent_at timestamp with time zone DEFAULT now(),
+  PRIMARY KEY (id)
 );
 
-ALTER TABLE feedback ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Admins can manage feedback"
-  ON feedback FOR ALL
-  USING (public.is_admin());
-
--- ============================================
--- PIPELINE HEALTH LOGS TABLE
--- ============================================
-
-CREATE TABLE pipeline_health_logs (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  log_type TEXT NOT NULL,  -- 'success' | 'warning' | 'error' | 'info'
-  channel TEXT,            -- 'telegram' | 'whatsapp' | 'megatix' | 'system'
-  group_name TEXT,
-  message TEXT NOT NULL,
-  metadata JSONB DEFAULT '{}',
-  created_at TIMESTAMPTZ DEFAULT NOW()
+CREATE TABLE trusted_submitters (
+  email text NOT NULL,
+  approved_count integer DEFAULT 0,
+  auto_approve boolean DEFAULT false,
+  created_at timestamp with time zone DEFAULT now(),
+  PRIMARY KEY (email)
 );
 
-ALTER TABLE pipeline_health_logs ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Admins can manage health logs"
-  ON pipeline_health_logs FOR ALL
-  USING (public.is_admin());
-
--- ============================================
--- INGESTION ACTIVITY LOG
--- ============================================
-
-CREATE TABLE ingestion_activity_log (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  category TEXT NOT NULL,       -- event_created | event_enriched | event_moderation | source_error | source_recovered | group_quiet | run_summary
-  severity TEXT NOT NULL DEFAULT 'info', -- info | warning | error
-  title TEXT NOT NULL,          -- Short human-readable description
-  details JSONB,                -- Structured metadata
-  source_id UUID REFERENCES event_sources(id) ON DELETE SET NULL,
-  created_at TIMESTAMPTZ DEFAULT NOW()
+CREATE TABLE unresolved_venues (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  raw_name text NOT NULL,
+  normalized_name text NOT NULL,
+  seen_count integer DEFAULT 1,
+  first_seen_at timestamp with time zone DEFAULT now(),
+  last_seen_at timestamp with time zone DEFAULT now(),
+  status text NOT NULL DEFAULT 'unresolved'::text,
+  resolved_canonical_name text,
+  resolved_at timestamp with time zone,
+  resolved_by uuid,
+  PRIMARY KEY (id)
 );
 
-ALTER TABLE ingestion_activity_log ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Admins can manage activity log"
-  ON ingestion_activity_log FOR ALL
-  USING (public.is_admin());
-
--- ============================================
--- PERFORMANCE INDEXES
--- ============================================
-
-CREATE INDEX idx_events_status ON events(status);
-CREATE INDEX idx_events_status_start_date ON events(status, start_date);
-CREATE INDEX idx_blog_posts_status ON blog_posts(status);
-CREATE INDEX idx_stories_status ON stories(status);
-CREATE INDEX idx_newsletter_editions_status ON newsletter_editions(status);
-CREATE INDEX idx_saved_events_profile ON saved_events(profile_id);
-CREATE INDEX idx_event_sources_enabled ON event_sources(is_enabled);
-CREATE INDEX idx_ingestion_runs_source ON ingestion_runs(source_id);
-CREATE INDEX idx_ingestion_runs_status ON ingestion_runs(status);
-CREATE INDEX idx_raw_messages_source ON raw_ingestion_messages(source_id);
-CREATE INDEX idx_raw_messages_status ON raw_ingestion_messages(status);
-CREATE INDEX idx_raw_messages_external_id ON raw_ingestion_messages(source_id, external_id);
-CREATE INDEX idx_venue_aliases_alias ON venue_aliases(alias);
-CREATE INDEX idx_dedup_matches_status ON dedup_matches(status);
-CREATE INDEX idx_events_source ON events(source_id);
-CREATE INDEX idx_events_fingerprint ON events(content_fingerprint);
-CREATE INDEX idx_events_source_event_id ON events(source_id, source_event_id);
-CREATE INDEX idx_events_source_url ON events(source_url);
-CREATE INDEX idx_quiz_results_email ON quiz_results(email);
-CREATE INDEX idx_quiz_results_primary_archetype ON quiz_results(primary_archetype);
-CREATE INDEX idx_quiz_results_created_at ON quiz_results(created_at DESC);
-CREATE INDEX idx_event_sources_type ON event_sources(source_type);
-CREATE INDEX idx_venue_aliases_canonical ON venue_aliases(canonical_name);
-CREATE INDEX idx_dedup_matches_events ON dedup_matches(event_a_id, event_b_id);
-CREATE INDEX idx_unresolved_venues_status ON unresolved_venues(status);
-CREATE INDEX idx_unresolved_venues_seen_count ON unresolved_venues(seen_count DESC);
-
--- Stripe integration indexes
-CREATE INDEX idx_bookings_tour ON bookings(tour_id);
-CREATE INDEX idx_bookings_profile ON bookings(profile_id);
-CREATE INDEX idx_bookings_status ON bookings(status);
-CREATE INDEX idx_bookings_reference ON bookings(booking_reference);
-CREATE INDEX idx_bookings_stripe_session ON bookings(stripe_checkout_session_id);
-CREATE INDEX idx_subscriptions_profile ON subscriptions(profile_id);
-CREATE INDEX idx_subscriptions_status ON subscriptions(status);
-CREATE INDEX idx_subscriptions_stripe_sub ON subscriptions(stripe_subscription_id);
-CREATE INDEX idx_payments_profile ON payments(profile_id);
-CREATE INDEX idx_payments_booking ON payments(booking_id);
-CREATE INDEX idx_payments_subscription ON payments(subscription_id);
-CREATE INDEX idx_payments_stripe_pi ON payments(stripe_payment_intent_id);
-CREATE INDEX idx_profiles_stripe_customer ON profiles(stripe_customer_id);
-
--- Feedback indexes
-CREATE INDEX idx_feedback_status ON feedback(status);
-CREATE INDEX idx_feedback_created_at ON feedback(created_at DESC);
-
--- Pipeline health logs indexes
-CREATE INDEX idx_health_logs_created_at ON pipeline_health_logs(created_at DESC);
-CREATE INDEX idx_health_logs_log_type ON pipeline_health_logs(log_type);
-CREATE INDEX idx_health_logs_channel ON pipeline_health_logs(channel);
-
--- Activity log indexes
-CREATE INDEX idx_activity_log_category ON ingestion_activity_log(category);
-CREATE INDEX idx_activity_log_created ON ingestion_activity_log(created_at DESC);
-CREATE INDEX idx_activity_log_source ON ingestion_activity_log(source_id);
-
--- ==========================================
--- Site Settings (singleton row)
--- Admin-controlled public visibility flags.
--- Added 2026-04-21.
--- ==========================================
-CREATE TABLE site_settings (
-  id                          INT PRIMARY KEY DEFAULT 1 CHECK (id = 1),
-  blog_enabled                BOOLEAN NOT NULL DEFAULT FALSE,
-  stories_enabled             BOOLEAN NOT NULL DEFAULT FALSE,
-  tours_enabled               BOOLEAN NOT NULL DEFAULT FALSE,
-  newsletter_archive_enabled  BOOLEAN NOT NULL DEFAULT FALSE,
-  updated_at                  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+CREATE TABLE venue_aliases (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  canonical_name text NOT NULL,
+  alias text NOT NULL,
+  created_at timestamp with time zone DEFAULT now(),
+  PRIMARY KEY (id)
 );
 
-INSERT INTO site_settings (id) VALUES (1) ON CONFLICT (id) DO NOTHING;
-
-ALTER TABLE site_settings ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "site_settings public read" ON site_settings
-  FOR SELECT USING (true);
-
-CREATE POLICY "site_settings admin update" ON site_settings
-  FOR UPDATE USING (is_admin()) WITH CHECK (is_admin());
-
--- ============================================
--- QUIZ REDESIGN: SEGMENT COLUMNS
--- ============================================
-
-ALTER TABLE quiz_results ADD COLUMN IF NOT EXISTS user_segment TEXT;
-ALTER TABLE profiles ADD COLUMN IF NOT EXISTS primary_archetype TEXT;
-ALTER TABLE profiles ADD COLUMN IF NOT EXISTS user_segment TEXT;
-
--- ============================================
--- IMAGE GC LOG (audit trail for archived event image deletions)
--- Added 2026-05-07.
--- ============================================
-
-CREATE TABLE image_gc_log (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  entity_type TEXT NOT NULL,
-  entity_id UUID NOT NULL,
-  storage_path TEXT NOT NULL,
-  original_url TEXT NOT NULL,
-  collected_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+CREATE TABLE venue_coordinates (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  canonical_name text NOT NULL,
+  latitude double precision NOT NULL,
+  longitude double precision NOT NULL,
+  geocoded_at timestamp with time zone NOT NULL DEFAULT now(),
+  source text NOT NULL DEFAULT 'nominatim'::text,
+  confidence real,
+  PRIMARY KEY (id)
 );
 
-CREATE INDEX image_gc_log_entity_idx ON image_gc_log (entity_type, entity_id);
-CREATE INDEX image_gc_log_collected_at_idx ON image_gc_log (collected_at DESC);
+-- RLS policies (86); bodies live in the migrations.
+--   blog_posts: Admins can manage blog posts [ALL] {public}
+--   blog_posts: Published blog posts are viewable by everyone [SELECT] {public}
+--   bookings: Admins can manage bookings [ALL] {public}
+--   bookings: Users can read own bookings [SELECT] {authenticated}
+--   commission_partners: Admins manage commission partners [ALL] {public}
+--   commission_partners: Public can read active commission partners [SELECT] {public}
+--   commission_payouts: Admins manage commission payouts [ALL] {public}
+--   dedup_matches: Admins can manage dedup matches [ALL] {public}
+--   event_sources: Admins can manage event sources [ALL] {public}
+--   events: Admins can manage events [ALL] {public}
+--   events: Approved events are viewable by everyone [SELECT] {public}
+--   events: Authenticated users can submit events [INSERT] {authenticated}
+--   events: Users can read own submitted events [SELECT] {authenticated}
+--   feedback: Admins can manage feedback [ALL] {public}
+--   guide_entity_references: guide_entity_references_admin_all [ALL] {public}
+--   guide_entity_references: guide_entity_references_public_read [SELECT] {public}
+--   guides: guides_admin_all [ALL] {public}
+--   guides: guides_public_read [SELECT] {public}
+--   image_gc_log: Admins can view image_gc_log [SELECT] {public}
+--   ingestion_runs: Admins can manage ingestion runs [ALL] {public}
+--   journey_atoms: Admins can manage journey_atoms [ALL] {public}
+--   journey_atoms: Anyone can view active atoms [SELECT] {public}
+--   journey_day_slots: Admins can manage journey_day_slots [ALL] {public}
+--   journey_day_slots: Anyone can view slots of published journey days [SELECT] {public}
+--   journey_days: Admins can manage journey_days [ALL] {public}
+--   journey_days: Anyone can view days of published journeys [SELECT] {public}
+--   journey_testimonials: Admins can manage testimonials [ALL] {public}
+--   journey_testimonials: Anyone can view published testimonials [SELECT] {public}
+--   journeys: Admins can manage journeys [ALL] {public}
+--   journeys: Anyone can view published journeys [SELECT] {public}
+--   newsletter_editions: Admins can manage newsletter editions [ALL] {public}
+--   newsletter_editions: Published newsletter editions are viewable by everyone [SELECT] {public}
+--   newsletter_subscribers: Admins can manage subscribers [ALL] {public}
+--   newsletter_subscribers: Users can read own subscription [SELECT] {authenticated}
+--   partners: Admins can manage partners [ALL] {public}
+--   partners: Anyone can view active partners [SELECT] {public}
+--   payments: Admins can manage payments [ALL] {public}
+--   payments: Users can read own payments [SELECT] {authenticated}
+--   places: places_admin_all [ALL] {public}
+--   places: places_public_read [SELECT] {public}
+--   practitioners: Admins can manage practitioners [ALL] {public}
+--   practitioners: Anyone can view active practitioners [SELECT] {public}
+--   profiles: Profiles are viewable by everyone [SELECT] {public}
+--   profiles: Users can update own profile [UPDATE] {public}
+--   quiz_results: Admins can manage quiz results [ALL] {public}
+--   quiz_results: Users can read own quiz results [SELECT] {public}
+--   raw_ingestion_messages: Admins can manage raw messages [ALL] {public}
+--   saved_events: Admins can manage saved events [ALL] {public}
+--   saved_events: Users can read own saved events [SELECT] {authenticated}
+--   saved_events: Users can save events [INSERT] {authenticated}
+--   saved_events: Users can unsave events [DELETE] {authenticated}
+--   saved_guides: saved_guides_owner_delete [DELETE] {public}
+--   saved_guides: saved_guides_owner_insert [INSERT] {public}
+--   saved_guides: saved_guides_owner_select [SELECT] {public}
+--   saved_journeys: Admins manage saved_journeys [ALL] {public}
+--   saved_journeys: Users save their own journeys [INSERT] {public}
+--   saved_journeys: Users see their own saved journeys [SELECT] {public}
+--   saved_journeys: Users unsave their own journeys [DELETE] {public}
+--   saved_spreads: Admins manage spreads [ALL] {public}
+--   saved_spreads: Users delete own spreads [DELETE] {authenticated}
+--   saved_spreads: Users insert own spreads [INSERT] {authenticated}
+--   saved_spreads: Users read own spreads [SELECT] {authenticated}
+--   site_settings: site_settings admin update [UPDATE] {public}
+--   site_settings: site_settings public read [SELECT] {public}
+--   sponsor_leads: Admins manage sponsor leads [ALL] {public}
+--   sponsors: Admins can manage sponsors [ALL] {public}
+--   sponsors: Anyone can view active sponsors [SELECT] {public}
+--   sponsors: Claimed sponsor self-read [SELECT] {public}
+--   sponsors: Claimed sponsor self-update [UPDATE] {public}
+--   sponsorship_events: Admins read sponsorship events [SELECT] {public}
+--   sponsorship_events: Claimed sponsor reads own events [SELECT] {public}
+--   sponsorships: Admins can manage sponsorships [ALL] {public}
+--   sponsorships: Anyone can view sponsorships [SELECT] {public}
+--   stories: Admins can manage stories [ALL] {public}
+--   stories: Published stories are viewable by everyone [SELECT] {public}
+--   subscriptions: Admins can manage subscriptions [ALL] {public}
+--   subscriptions: Users can read own subscriptions [SELECT] {authenticated}
+--   tours: Active tours are viewable by everyone [SELECT] {public}
+--   tours: Admins can manage tours [ALL] {public}
+--   transactional_sends: Admins manage transactional sends [ALL] {public}
+--   trusted_submitters: Admins can manage trusted submitters [ALL] {public}
+--   unresolved_venues: Admins can manage unresolved venues [ALL] {public}
+--   venue_aliases: Admins can manage venue aliases [ALL] {public}
+--   venue_aliases: Anyone can read venue aliases [SELECT] {public}
+--   venue_coordinates: venue_coordinates_admin_write [ALL] {public}
+--   venue_coordinates: venue_coordinates_public_read [SELECT] {public}
 
-ALTER TABLE image_gc_log ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Admins can view image_gc_log"
-  ON image_gc_log FOR SELECT
-  USING (is_admin());
+-- Functions (136)
+--   analytics_accounts_per_day(days integer)
+--   analytics_archetype_distribution()
+--   analytics_login_stats()
+--   analytics_newsletter_per_day(days integer)
+--   analytics_revenue_summary()
+--   analytics_signups_by_source()
+--   analytics_top_saved_events(lim integer)
+--   analytics_top_saved_guides(lim integer)
+--   analytics_top_saved_journeys(lim integer)
+--   archetype_centroid(p_archetype text)
+--   array_to_halfvec(integer[], integer, boolean)
+--   array_to_halfvec(double precision[], integer, boolean)
+--   array_to_halfvec(real[], integer, boolean)
+--   array_to_halfvec(numeric[], integer, boolean)
+--   array_to_sparsevec(real[], integer, boolean)
+--   array_to_sparsevec(numeric[], integer, boolean)
+--   array_to_sparsevec(double precision[], integer, boolean)
+--   array_to_sparsevec(integer[], integer, boolean)
+--   array_to_vector(double precision[], integer, boolean)
+--   array_to_vector(numeric[], integer, boolean)
+--   array_to_vector(real[], integer, boolean)
+--   array_to_vector(integer[], integer, boolean)
+--   avg(vector)
+--   avg(halfvec)
+--   binary_quantize(halfvec)
+--   binary_quantize(vector)
+--   cosine_distance(halfvec, halfvec)
+--   cosine_distance(vector, vector)
+--   cosine_distance(sparsevec, sparsevec)
+--   halfvec(halfvec, integer, boolean)
+--   halfvec_accum(double precision[], halfvec)
+--   halfvec_add(halfvec, halfvec)
+--   halfvec_avg(double precision[])
+--   halfvec_cmp(halfvec, halfvec)
+--   halfvec_combine(double precision[], double precision[])
+--   halfvec_concat(halfvec, halfvec)
+--   halfvec_eq(halfvec, halfvec)
+--   halfvec_ge(halfvec, halfvec)
+--   halfvec_gt(halfvec, halfvec)
+--   halfvec_in(cstring, oid, integer)
+--   halfvec_l2_squared_distance(halfvec, halfvec)
+--   halfvec_le(halfvec, halfvec)
+--   halfvec_lt(halfvec, halfvec)
+--   halfvec_mul(halfvec, halfvec)
+--   halfvec_ne(halfvec, halfvec)
+--   halfvec_negative_inner_product(halfvec, halfvec)
+--   halfvec_out(halfvec)
+--   halfvec_recv(internal, oid, integer)
+--   halfvec_send(halfvec)
+--   halfvec_spherical_distance(halfvec, halfvec)
+--   halfvec_sub(halfvec, halfvec)
+--   halfvec_to_float4(halfvec, integer, boolean)
+--   halfvec_to_sparsevec(halfvec, integer, boolean)
+--   halfvec_to_vector(halfvec, integer, boolean)
+--   halfvec_typmod_in(cstring[])
+--   hamming_distance(bit, bit)
+--   handle_new_user()
+--   hnsw_bit_support(internal)
+--   hnsw_halfvec_support(internal)
+--   hnsw_sparsevec_support(internal)
+--   hnswhandler(internal)
+--   increment_approved_count(submitter_email text)
+--   increment_venue_seen_count(p_normalized_name text, p_raw_name text)
+--   inner_product(sparsevec, sparsevec)
+--   inner_product(vector, vector)
+--   inner_product(halfvec, halfvec)
+--   is_admin()
+--   ivfflat_bit_support(internal)
+--   ivfflat_halfvec_support(internal)
+--   ivfflathandler(internal)
+--   jaccard_distance(bit, bit)
+--   l1_distance(halfvec, halfvec)
+--   l1_distance(vector, vector)
+--   l1_distance(sparsevec, sparsevec)
+--   l2_distance(vector, vector)
+--   l2_distance(halfvec, halfvec)
+--   l2_distance(sparsevec, sparsevec)
+--   l2_norm(sparsevec)
+--   l2_norm(halfvec)
+--   l2_normalize(halfvec)
+--   l2_normalize(vector)
+--   l2_normalize(sparsevec)
+--   match_events_by_embedding(query_embedding vector, match_count integer, exclude_id uuid)
+--   places_set_updated_at()
+--   sparsevec(sparsevec, integer, boolean)
+--   sparsevec_cmp(sparsevec, sparsevec)
+--   sparsevec_eq(sparsevec, sparsevec)
+--   sparsevec_ge(sparsevec, sparsevec)
+--   sparsevec_gt(sparsevec, sparsevec)
+--   sparsevec_in(cstring, oid, integer)
+--   sparsevec_l2_squared_distance(sparsevec, sparsevec)
+--   sparsevec_le(sparsevec, sparsevec)
+--   sparsevec_lt(sparsevec, sparsevec)
+--   sparsevec_ne(sparsevec, sparsevec)
+--   sparsevec_negative_inner_product(sparsevec, sparsevec)
+--   sparsevec_out(sparsevec)
+--   sparsevec_recv(internal, oid, integer)
+--   sparsevec_send(sparsevec)
+--   sparsevec_to_halfvec(sparsevec, integer, boolean)
+--   sparsevec_to_vector(sparsevec, integer, boolean)
+--   sparsevec_typmod_in(cstring[])
+--   subvector(halfvec, integer, integer)
+--   subvector(vector, integer, integer)
+--   sum(vector)
+--   sum(halfvec)
+--   sync_guide_references(p_guide_id uuid, p_refs jsonb)
+--   user_taste_vector(p_profile_id uuid)
+--   vector(vector, integer, boolean)
+--   vector_accum(double precision[], vector)
+--   vector_add(vector, vector)
+--   vector_avg(double precision[])
+--   vector_cmp(vector, vector)
+--   vector_combine(double precision[], double precision[])
+--   vector_concat(vector, vector)
+--   vector_dims(vector)
+--   vector_dims(halfvec)
+--   vector_eq(vector, vector)
+--   vector_ge(vector, vector)
+--   vector_gt(vector, vector)
+--   vector_in(cstring, oid, integer)
+--   vector_l2_squared_distance(vector, vector)
+--   vector_le(vector, vector)
+--   vector_lt(vector, vector)
+--   vector_mul(vector, vector)
+--   vector_ne(vector, vector)
+--   vector_negative_inner_product(vector, vector)
+--   vector_norm(vector)
+--   vector_out(vector)
+--   vector_recv(internal, oid, integer)
+--   vector_send(vector)
+--   vector_spherical_distance(vector, vector)
+--   vector_sub(vector, vector)
+--   vector_to_float4(vector, integer, boolean)
+--   vector_to_halfvec(vector, integer, boolean)
+--   vector_to_sparsevec(vector, integer, boolean)
+--   vector_typmod_in(cstring[])

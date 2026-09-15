@@ -33,6 +33,7 @@ yarn-error.log*
 # env files
 .env*
 !.env.local.example
+!.env.example
 
 # worktrees
 .worktrees/
@@ -48,6 +49,8 @@ yarn-error.log*
 reparse-check.md
 e2e/test-results/
 
+# but DO track the audit's before/after walk (small JPEGs, referenced by docs/audit-2026-09.md)
+!docs/audit-2026-09/*.jpeg
 # but DO track brand assets and Next.js metadata route images
 !public/brand/*.png
 !src/app/icon.png
