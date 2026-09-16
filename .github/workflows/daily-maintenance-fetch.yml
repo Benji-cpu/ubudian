@@ -56,7 +56,15 @@ jobs:
         run: |
           set -euo pipefail
           if [ -z "${CRM_HANDOVER_URL:-}" ]; then echo "CRM_HANDOVER_URL secret not set — skipping"; exit 0; fi
-          STALE=$(jq -r '.liveness.stale // true' "digests/${TODAY}.json")
+          # NOT `.liveness.stale // true`. jq's `//` is the ALTERNATIVE operator:
+          # it yields the right-hand side when the left is null OR FALSE, so a
+          # healthy site (stale: false) reported "true" and this filed a
+          # BLOCKING "nothing published for 48h" row every single night — with
+          # its own note reading "Live: last publish 0h ago" (CRM #346). A red
+          # banner and a web push that fire when nothing is wrong destroy the
+          # signal they exist to carry. Missing/null still means stale, which
+          # is the fail-safe direction.
+          STALE=$(jq -r 'if .liveness.stale == null then "true" else (.liveness.stale | tostring) end' "digests/${TODAY}.json")
           UNMOD=$(jq -r '.autoApprove.moderationFailedOpen // 0' "digests/${TODAY}.json")
           if [ "$STALE" != "true" ] && [ "$UNMOD" = "0" ]; then echo "live and moderated — no row"; exit 0; fi
           LINE=$(jq -r '.liveness.line // "liveness block missing"' "digests/${TODAY}.json")
