@@ -54,25 +54,13 @@ export async function Footer() {
         {/* Newsletter */}
         <div className="mx-auto mt-10 max-w-md text-center">
           <p className="text-sm text-brand-off-white/80">
-            One email a week — ceremonies, workshops, sound journeys, and the stories worth reading.
+            One email a week — ceremonies, workshops, and sound journeys.
           </p>
           <NewsletterSignup variant="dark" className="mt-4" />
         </div>
 
         {/* Social / Info */}
         <div className="mt-10 flex flex-wrap items-center justify-center gap-6">
-          <Link
-            href="/practitioners"
-            className="py-2 text-sm text-brand-off-white/80 transition-colors hover:text-brand-gold"
-          >
-            Practitioners
-          </Link>
-          <Link
-            href="/places"
-            className="py-2 text-sm text-brand-off-white/80 transition-colors hover:text-brand-gold"
-          >
-            Places
-          </Link>
           <a
             href="https://instagram.com/theubudian"
             target="_blank"

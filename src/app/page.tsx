@@ -188,8 +188,8 @@ export default async function HomePage() {
               Flow with us.
             </h2>
             <p className="mt-4 text-lg text-brand-charcoal-light">
-              One email a week with the events, stories, and community happenings
-              that matter — so you never hear about the good ones after they sell out.
+              One email a week with the events and community happenings that
+              matter — so you never hear about the good ones after they sell out.
             </p>
             <NewsletterSignup className="mx-auto mt-8 max-w-md" />
             <p className="mt-3 text-sm text-brand-charcoal-light/60">
