@@ -25,8 +25,14 @@
  *     judged on its own by the gate. Publishing two cards for one class is a
  *     small, visible, reversible cost; holding both forever is what we had.
  *
- * Everything this writes is stamped `resolved_by = 'auto:<rule>'` so it can be
- * told apart from a human decision and reversed.
+ * Everything this writes is stamped `metadata.auto_rule = '<rule>'` (with
+ * `metadata.auto_resolved_at`) so it can be told apart from a human decision
+ * and reversed. NOT `resolved_by`: that column is a uuid foreign key to
+ * `profiles`, and writing the rule string into it made every single update
+ * fail with `invalid input syntax for type uuid` — silently, into the
+ * digest's errors array, for every row on every night this ran. An automated
+ * resolution has no profile, so the column stays null and the rule lives in
+ * the jsonb beside it.
  */
 import { createAdminClient } from "@/lib/supabase/admin";
 
@@ -156,7 +162,11 @@ export async function autoResolveDedupMatches(now: Date = new Date()): Promise<D
     const status = decision.rule === "series-already-live" ? "confirmed_dup" : "not_dup";
     const { error: updError } = await supabase
       .from("dedup_matches")
-      .update({ status, resolved_by: `auto:${decision.rule}`, resolved_at: stamp })
+      .update({
+        status,
+        resolved_at: stamp,
+        metadata: { ...(match.metadata ?? {}), auto_rule: decision.rule, auto_resolved_at: stamp },
+      })
       .eq("id", match.id)
       .eq("status", "pending");
     if (updError) {

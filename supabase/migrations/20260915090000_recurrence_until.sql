@@ -7,12 +7,12 @@
 -- progress and pinned every weekly class under "Today". The gate held 15
 -- Megatix rows a night for a NULL rule.
 --
--- Applied 2026-09-15 statement by statement through a pg client (the CLI's
--- migration history is out of sync with the remote; see MEMORY.md). The
--- RRULE/free-text → JSON conversion (28 rows) was applied by
--- `scripts/normalize-recurrence.ts --apply`, which uses the same
--- `normalizeRecurrenceRule()` the pipeline now runs on insert, so the data
--- and the code cannot disagree.
+-- Applied 2026-09-16 through `scripts/apply-migration.ts` (the CLI's migration
+-- history is out of sync with the remote; see MEMORY.md). Step 4, the
+-- RRULE/free-text → JSON conversion, is `scripts/normalize-recurrence.ts
+-- --apply` and runs FIRST — it uses the same `normalizeRecurrenceRule()` the
+-- pipeline runs on insert, so the data and the code cannot disagree, and the
+-- step 5 constraint cannot land until it has run.
 
 -- 0. One malformed row: three JSON objects glued together (Tue/Thu/Sat).
 UPDATE events
@@ -40,6 +40,18 @@ SET end_date = NULL
 WHERE is_recurring AND end_date IS NOT NULL;
 
 -- 4. (scripts/normalize-recurrence.ts --apply) RRULE and free-text rules → JSON.
+
+-- 4b. A rule on a row that is not recurring is dead data: every read path
+-- gates on `is_recurring && recurrence_rule`, so these four free-text and
+-- RRULE leftovers ("every Sunday", "weekly", FREQ=…) are read by nothing.
+-- Steps 1–4 and both normalisers filter on `is_recurring = true` and so miss
+-- them entirely, but the step 5 CHECK applies to every row — without this the
+-- constraint cannot be created at all.
+UPDATE events
+SET recurrence_rule = NULL
+WHERE NOT is_recurring
+  AND recurrence_rule IS NOT NULL
+  AND recurrence_rule NOT LIKE '{%';
 
 -- 5. Only JSON from here on. Every write path normalises first.
 ALTER TABLE events
