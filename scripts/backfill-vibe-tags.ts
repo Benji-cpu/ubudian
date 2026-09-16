@@ -22,7 +22,6 @@ config({ path: ".env.local" });
 
 import { createClient } from "@supabase/supabase-js";
 import { GoogleGenAI, Type } from "@google/genai";
-import { createRateGate, DEFAULT_FLASH_LITE_RPM } from "../src/lib/rate-gate";
 import { VIBE_TAGS, VIBE_TAG_DESCRIPTIONS, type VibeTag } from "../src/lib/vibe-tags";
 
 const supabase = createClient(
@@ -62,8 +61,6 @@ interface EventRow {
   vibe_tags: string[] | null;
 }
 
-
-const rateGate = createRateGate(DEFAULT_FLASH_LITE_RPM);
 
 async function loadEvents(args: CliArgs): Promise<EventRow[]> {
   let query = supabase
@@ -122,7 +119,6 @@ Return JSON: { "vibe_tags": [...] }. Each value must be one of the IDs above. No
 Event:
 ${eventBlock}`;
 
-  await rateGate();
   const result = await gemini.models.generateContent({
     model: "gemini-2.5-flash-lite",
     contents: prompt,
@@ -150,6 +146,18 @@ async function withRetry<T>(fn: () => Promise<T>, label: string): Promise<T> {
     } catch (err) {
       lastErr = err;
       const msg = err instanceof Error ? err.message : String(err);
+      // A free-tier DAILY cap is not a transient failure. Retrying it burns
+      // minutes of CI and cannot succeed: the quota resets at midnight
+      // Pacific, not in 4 seconds. Measured 2026-09-16 — the 429 names itself
+      // `GenerateRequestsPerDayPerProjectPerModel-FreeTier`, limit 20, and
+      // this sweep needs ~80 calls a night. Stop at the first one and say so.
+      if (/PerDayPerProject|RequestsPerDay|free_tier/i.test(msg)) {
+        throw new Error(
+          `Gemini free-tier DAILY quota exhausted (20 requests/day/model). ` +
+          `Pacing and concurrency cannot fix this — the key needs billing. ` +
+          `Original: ${msg.slice(0, 160)}`,
+        );
+      }
       if (attempt === MAX) break;
       const delay = Math.min(2000 * 2 ** (attempt - 1) + Math.random() * 1000, 8000);
       console.warn(`[${label}] attempt ${attempt} failed: ${msg.slice(0, 120)} — retrying in ${Math.round(delay)}ms`);
