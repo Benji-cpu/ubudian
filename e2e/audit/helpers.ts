@@ -3,43 +3,39 @@ import path from "path";
 
 const SCREENSHOT_DIR = path.resolve(__dirname, "../screenshots");
 
-// Known slugs from seed.sql for detail page testing
+/**
+ * Detail-page slugs are discovered from the live listing, never hard-coded.
+ * The old SEEDED_SLUGS list came from a seed.sql that was deleted 2026-08-03;
+ * the tests kept passing only because an untracked loading.tsx turned every
+ * 404 into a streamed 200 (the bug commit 6205686 fixed).
+ */
 export const SEEDED_SLUGS = {
-  stories: [
-    "wayan-sukerta-mask-carver-mas-village",
-    "sarah-chen-silicon-valley-sacred-breath",
-    "kadek-ariani-farming-future-tegallalang",
-    "marco-rossi-tuscany-meets-tropics",
-    "ni-luh-putu-eka-yoga-teacher-stayed-home",
-  ],
-  events: [
-    "full-moon-sound-healing-march-2026",
-    "ubud-open-mic-night-march-2026",
-    "balinese-painting-workshop-arma",
-    "jazz-night-bridges-bali",
-    "sunrise-yoga-campuhan-ridge",
-    "ubud-organic-farmers-market",
-    "film-night-paradiso-act-of-killing",
-    "raw-food-masterclass-alchemy",
-    "ogoh-ogoh-parade-nyepi-eve-2026",
-    "community-river-cleanup-wos-river",
-  ],
-  tours: [
-    "sacred-water-temples-rice-terraces",
-    "ubud-food-trail",
-    "campuhan-sayan-artists-ridge-walk",
-    "hidden-waterfalls-jungle-trek",
-    "ubud-heritage-walk",
-  ],
-  newsletter: ["weekly-mask-carvers-secret", "weekly-nyepi-is-coming"],
-  quiz_archetypes: [
-    "seeker",
-    "explorer",
-    "creative",
-    "connector",
-    "epicurean",
-  ],
+  quiz_archetypes: ["seeker", "explorer", "creative", "connector", "epicurean"],
 } as const;
+
+/** Up to `max` detail slugs linked from a listing page. Empty if the section is off. */
+export async function discoverSlugs(page: Page, listPath: string, max = 3): Promise<string[]> {
+  const response = await page.goto(listPath);
+  if (!response || response.status() >= 400) return [];
+  const prefix = listPath.replace(/\/$/, "") + "/";
+  const hrefs = await page
+    .locator(`a[href^="${prefix}"]`)
+    .evaluateAll((as) => as.map((a) => a.getAttribute("href") ?? ""));
+  const slugs = Array.from(
+    new Set(
+      hrefs
+        .map((h) => h.split("?")[0].slice(prefix.length))
+        .filter((s) => s && !s.includes("/") && s !== "submit"),
+    ),
+  );
+  return slugs.slice(0, max);
+}
+
+/** True when a flag-gated section answers (stories, blog, tours, newsletter archive). */
+export async function sectionEnabled(page: Page, listPath: string): Promise<boolean> {
+  const response = await page.goto(listPath);
+  return !!response && response.status() < 400;
+}
 
 /**
  * Determine viewport label from the test project name.

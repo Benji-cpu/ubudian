@@ -94,7 +94,7 @@ export function ArchetypeExplainer({
     >
       <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="min-w-0">
-          <span className="text-[0.7rem] uppercase tracking-[0.25em] text-brand-gold">
+          <span className="text-[0.7rem] uppercase tracking-[0.25em] text-brand-deep-green dark:text-brand-gold">
             New here
           </span>
           <p className="mt-1 font-serif text-lg leading-snug text-brand-deep-green dark:text-brand-gold">

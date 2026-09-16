@@ -3,10 +3,17 @@ import {
   runStandardChecks,
   collectConsoleErrors,
   waitForPageReady,
-  SEEDED_SLUGS,
+  sectionEnabled,
+  discoverSlugs,
 } from "./helpers";
 
 test.describe("Stories (Humans of Ubud) Audit", () => {
+  // Flag-gated section (site_settings). Off since 2026-08-03: every test here
+  // skips rather than asserting on a 404, and runs again the day it is switched on.
+  test.beforeEach(async ({ page }) => {
+    test.skip(!(await sectionEnabled(page, "/stories")), "Stories is switched off in site_settings");
+  });
+
   test("stories listing page loads", async ({ page }) => {
     const errors = collectConsoleErrors(page);
     await page.goto("/stories");
@@ -46,8 +53,11 @@ test.describe("Stories (Humans of Ubud) Audit", () => {
     }
   });
 
-  for (const slug of SEEDED_SLUGS.stories) {
-    test(`story detail: ${slug}`, async ({ page }) => {
+  test("story detail: pages render for live entries", async ({ page }) => {
+    test.setTimeout(120000);
+    const slugs = await discoverSlugs(page, "/stories", 3);
+    test.skip(slugs.length === 0, "no stories entries linked from the listing");
+    for (const slug of slugs) {
       const errors = collectConsoleErrors(page);
       const response = await page.goto(`/stories/${slug}`);
 
@@ -70,6 +80,6 @@ test.describe("Stories (Humans of Ubud) Audit", () => {
       if (errors.length) {
         console.log(`Story ${slug} console errors:`, errors);
       }
-    });
-  }
+    }
+  });
 });

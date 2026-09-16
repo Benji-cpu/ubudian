@@ -4,7 +4,7 @@ import {
   collectConsoleErrors,
   waitForPageReady,
   auditScreenshot,
-  SEEDED_SLUGS,
+  discoverSlugs,
 } from "./helpers";
 
 test.describe("Events Audit", () => {
@@ -50,32 +50,22 @@ test.describe("Events Audit", () => {
     await auditScreenshot(page, "events-filters");
   });
 
-  for (const slug of SEEDED_SLUGS.events) {
-    test(`event detail: ${slug}`, async ({ page }) => {
+  test("event detail pages render for live events", async ({ page }) => {
+    test.setTimeout(120000);
+    const slugs = await discoverSlugs(page, "/events", 3);
+    expect(slugs.length, "the agenda links to no event detail pages").toBeGreaterThan(0);
+    for (const slug of slugs) {
       const errors = collectConsoleErrors(page);
       const response = await page.goto(`/events/${slug}`);
-
-      expect(
-        response?.status(),
-        `Event ${slug} returned ${response?.status()}`
-      ).toBeLessThan(400);
-
+      expect(response?.status(), `Event ${slug} returned ${response?.status()}`).toBeLessThan(400);
       const result = await runStandardChecks(page, `event-${slug}`);
-
-      // Should have a title
-      await expect(page.locator("h1").first()).toBeVisible();
-
-      if (result.horizontalOverflow.length) {
-        console.log(`Event ${slug} overflow:`, result.horizontalOverflow);
-      }
-      if (result.brokenImages.length) {
-        console.log(`Event ${slug} broken images:`, result.brokenImages);
-      }
-      if (errors.length) {
-        console.log(`Event ${slug} console errors:`, errors);
-      }
-    });
-  }
+      // The hero renders a desktop h1 and a mobile h1; assert on whichever is shown.
+      await expect(page.locator("h1:visible").first()).toBeVisible();
+      if (result.horizontalOverflow.length) console.log(`Event ${slug} overflow:`, result.horizontalOverflow);
+      if (result.brokenImages.length) console.log(`Event ${slug} broken images:`, result.brokenImages);
+      if (errors.length) console.log(`Event ${slug} console errors:`, errors);
+    }
+  });
 
   test("event submission form loads", async ({ page }) => {
     const errors = collectConsoleErrors(page);

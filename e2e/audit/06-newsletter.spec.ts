@@ -3,10 +3,17 @@ import {
   runStandardChecks,
   collectConsoleErrors,
   waitForPageReady,
-  SEEDED_SLUGS,
+  sectionEnabled,
+  discoverSlugs,
 } from "./helpers";
 
 test.describe("Newsletter Audit", () => {
+  // Flag-gated section (site_settings). Off since 2026-08-03: every test here
+  // skips rather than asserting on a 404, and runs again the day it is switched on.
+  test.beforeEach(async ({ page }) => {
+    test.skip(!(await sectionEnabled(page, "/newsletter")), "Newsletter archive is switched off in site_settings");
+  });
+
   test("newsletter listing page loads", async ({ page }) => {
     const errors = collectConsoleErrors(page);
     await page.goto("/newsletter");
@@ -41,8 +48,11 @@ test.describe("Newsletter Audit", () => {
     console.log(`Subscribe button: ${hasButton > 0 ? "found" : "not found"}`);
   });
 
-  for (const slug of SEEDED_SLUGS.newsletter) {
-    test(`newsletter edition: ${slug}`, async ({ page }) => {
+  test("newsletter edition: pages render for live entries", async ({ page }) => {
+    test.setTimeout(120000);
+    const slugs = await discoverSlugs(page, "/newsletter", 3);
+    test.skip(slugs.length === 0, "no newsletter archive entries linked from the listing");
+    for (const slug of slugs) {
       const errors = collectConsoleErrors(page);
       const response = await page.goto(`/newsletter/${slug}`);
 
@@ -62,11 +72,13 @@ test.describe("Newsletter Audit", () => {
       if (errors.length) {
         console.log(`Newsletter ${slug} console errors:`, errors);
       }
-    });
-  }
+    }
+  });
 
   test("newsletter prev/next navigation", async ({ page }) => {
-    await page.goto(`/newsletter/${SEEDED_SLUGS.newsletter[0]}`);
+    const [first] = await discoverSlugs(page, "/newsletter", 1);
+    test.skip(!first, "no editions linked from the archive");
+    await page.goto(`/newsletter/${first}`);
     await waitForPageReady(page);
 
     // Look for prev/next links

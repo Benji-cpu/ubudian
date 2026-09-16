@@ -50,7 +50,7 @@ test.describe("Navigation Audit", () => {
       await auditScreenshot(page, "mobile-menu-open");
 
       // Sheet renders in a dialog portal — look for nav links inside it
-      const dialog = page.locator('[role="dialog"]');
+      const dialog = page.locator('[role="dialog"][data-slot="sheet-content"]');
       await expect(dialog).toBeVisible({ timeout: 3000 });
       const mobileNav = dialog.locator('a[href="/events"]');
       await expect(mobileNav).toBeVisible({ timeout: 3000 });

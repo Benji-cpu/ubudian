@@ -75,7 +75,7 @@ test.describe("Mobile-Specific Issues", () => {
     await page.waitForTimeout(500);
 
     // Sheet renders in a dialog portal
-    const dialog = page.locator('[role="dialog"]');
+    const dialog = page.locator('[role="dialog"][data-slot="sheet-content"]');
     await expect(dialog).toBeVisible({ timeout: 3000 });
 
     // Collect nav links from the Sheet dialog

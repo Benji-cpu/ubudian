@@ -47,7 +47,7 @@ export function EventCard({ event, saveButton, hideDate }: EventCardProps) {
             />
           )}
           {isFree && (
-            <div className="absolute left-1.5 top-1.5 rounded-full bg-brand-gold px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-[0.16em] text-[#2C4A3E] shadow-sm">
+            <div className="absolute left-1.5 top-1.5 rounded-full bg-[#2C4A3E] px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-[0.16em] text-[#FAF5EC] shadow-sm">
               Free
             </div>
           )}
