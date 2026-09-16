@@ -22,9 +22,18 @@ interface GuideMarkdownProps {
  * - Card-modifier shortcodes (`{{event:slug|card}}`) are block-level — they split the
  *   body into segments, with cards rendered between markdown chunks.
  * - Inline shortcodes (no modifier) are pre-replaced with a sentinel-href markdown
- *   link `[slug](__sc__:kind:slug)` so they flow naturally inside ReactMarkdown — the
+ *   link `[slug](#__sc__:kind:slug)` so they flow naturally inside ReactMarkdown — the
  *   custom <a> handler detects the sentinel and styles them.
  * - Unresolved entities fall back to styled italic text — never broken links.
+ *
+ * The sentinel is a FRAGMENT (`#...`) and must stay one. It was previously a
+ * bare `__sc__:kind:slug`, which react-markdown reads as a URL scheme and, not
+ * recognising it, sanitises away — `href` reached the handler as "", the
+ * sentinel check failed, and every inline shortcode fell through to the plain
+ * <a> branch and rendered its LINK TEXT, which is the raw slug. Readers saw
+ * "yellow-flower-cafe" and "paradiso-5rhythms-friday-with-sophie-weekly" mid
+ * sentence on published guides; it had never worked in production. Fragments
+ * are relative, so the sanitiser leaves them alone.
  */
 export function GuideMarkdown({
   body,
@@ -101,8 +110,8 @@ function inlineLinkRenderer(resolved: ResolvedRefs) {
     href,
     children,
   }: React.ComponentProps<"a">) {
-    if (typeof href === "string" && href.startsWith("__sc__:")) {
-      const [, kind, slug] = href.split(":");
+    if (typeof href === "string" && href.startsWith("#__sc__:")) {
+      const [, kind, slug] = href.slice(1).split(":");
       return (
         <ShortcodeInlineLink
           node={{ type: "shortcode", kind: kind as never, slug, modifier: null }}
@@ -278,7 +287,7 @@ function pushChunk(segments: Segment[], chunk: string) {
       segments.push({ kind: "card", node });
       continue;
     }
-    buffer += `[${node.slug}](__sc__:${node.kind}:${node.slug})`;
+    buffer += `[${node.slug}](#__sc__:${node.kind}:${node.slug})`;
   }
   flush();
 }
