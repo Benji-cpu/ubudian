@@ -32,7 +32,7 @@ concurrency:
 jobs:
   sweep:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
         with:
@@ -55,10 +55,16 @@ jobs:
           # Bounded each night — the corpus is already fully processed, so these
           # only touch the day's new approved events. Caps keep a Gemini hiccup
           # from running long; anything missed is retried tomorrow.
-          # Concurrency 2: at 5/4/4 in flight the free-tier key 429s on ~50 of
-          # 60 calls every night (per-minute rate, not daily quota — a single
-          # call succeeds). The run went red 7 nights in a row before anyone
-          # read the log. Slower and green beats fast and red.
+          # The ceiling is per-MINUTE, so the fix is pacing, not concurrency.
+          # Lowering in-flight 5/4/4 → 2 did NOT work: measured 2026-09-16,
+          # succeeded=4 failed=36. A concurrency cap bounds how many calls
+          # OVERLAP; two workers finishing in ~2s still start ~60 calls a
+          # minute against a 15 RPM free tier. The tag scripts now take a slot
+          # from a shared rate gate (src/lib/rate-gate.ts, 10 RPM) before each
+          # Gemini call, which bounds the start rate. Embeddings are a
+          # different model with its own quota and are not throttled — 3
+          # consecutive calls verified clean. Slower and green beats fast and
+          # red; raise GEMINI_RPM once the key has billing.
           npx tsx scripts/embed-events-backfill.ts --limit 60 --concurrency 2
           npx tsx scripts/backfill-archetype-tags.ts --limit 40 --concurrency 2
           npx tsx scripts/backfill-vibe-tags.ts --limit 40 --concurrency 2

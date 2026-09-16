@@ -24,6 +24,7 @@ config({ path: ".env.local" });
 
 import { createClient } from "@supabase/supabase-js";
 import { GoogleGenAI, Type } from "@google/genai";
+import { createRateGate, DEFAULT_FLASH_LITE_RPM } from "../src/lib/rate-gate";
 
 const ARCHETYPE_IDS = ["seeker", "explorer", "creative", "connector", "epicurean"] as const;
 type ArchetypeId = (typeof ARCHETYPE_IDS)[number];
@@ -77,6 +78,9 @@ interface EventRow {
   category: string | null;
   archetype_tags: string[] | null;
 }
+
+
+const rateGate = createRateGate(DEFAULT_FLASH_LITE_RPM);
 
 async function loadEvents(args: CliArgs): Promise<EventRow[]> {
   let query = supabase
@@ -142,6 +146,7 @@ Return JSON: { "archetype_ids": [...] }. Each value must be one of the IDs above
 Event:
 ${eventBlock}`;
 
+  await rateGate();
   const result = await gemini.models.generateContent({
     model: "gemini-2.5-flash-lite",
     contents: prompt,

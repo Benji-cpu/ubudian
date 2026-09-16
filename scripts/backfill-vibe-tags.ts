@@ -22,6 +22,7 @@ config({ path: ".env.local" });
 
 import { createClient } from "@supabase/supabase-js";
 import { GoogleGenAI, Type } from "@google/genai";
+import { createRateGate, DEFAULT_FLASH_LITE_RPM } from "../src/lib/rate-gate";
 import { VIBE_TAGS, VIBE_TAG_DESCRIPTIONS, type VibeTag } from "../src/lib/vibe-tags";
 
 const supabase = createClient(
@@ -60,6 +61,9 @@ interface EventRow {
   category: string | null;
   vibe_tags: string[] | null;
 }
+
+
+const rateGate = createRateGate(DEFAULT_FLASH_LITE_RPM);
 
 async function loadEvents(args: CliArgs): Promise<EventRow[]> {
   let query = supabase
@@ -118,6 +122,7 @@ Return JSON: { "vibe_tags": [...] }. Each value must be one of the IDs above. No
 Event:
 ${eventBlock}`;
 
+  await rateGate();
   const result = await gemini.models.generateContent({
     model: "gemini-2.5-flash-lite",
     contents: prompt,
