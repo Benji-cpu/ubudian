@@ -60,7 +60,7 @@ export default async function CommunityPartnerPage({ params }: PageProps) {
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbLink href="/community/partners">Community Partners</BreadcrumbLink>
+              <BreadcrumbLink href="/events">Events</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
@@ -155,7 +155,7 @@ export default async function CommunityPartnerPage({ params }: PageProps) {
         <p className="mt-16 text-sm leading-relaxed text-muted-foreground">
           {sponsor.name} is a{" "}
           <Link
-            href="/community/partners"
+            href="/events"
             className="underline decoration-brand-gold/40 underline-offset-4 hover:decoration-brand-gold"
           >
             community partner

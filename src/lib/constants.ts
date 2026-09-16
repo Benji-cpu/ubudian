@@ -9,11 +9,7 @@ export const NAV_LINKS = [
   { label: "Guides", href: "/guides" },
   { label: "Events", href: "/events" },
   { label: "Ubud Retreats", href: "/retreats" },
-  { label: "Humans of Ubud", href: "/stories" },
-  { label: "Tours", href: "/tours" },
-  { label: "Newsletter", href: "/newsletter" },
   { label: "Membership", href: "/membership" },
-  { label: "Community Partners", href: "/community/partners" },
   { label: "About", href: "/about" },
 ] as const;
 

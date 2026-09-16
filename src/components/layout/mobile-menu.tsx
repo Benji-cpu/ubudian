@@ -14,9 +14,6 @@ import type { Profile } from "@/types";
 import type { SiteSettings } from "@/lib/site-settings";
 
 const HREF_TO_FLAG: Record<string, keyof SiteSettings> = {
-  "/stories": "stories_enabled",
-  "/tours": "tours_enabled",
-  "/newsletter": "newsletter_archive_enabled",
   "/guides": "guides_enabled",
 };
 

@@ -9,7 +9,7 @@ import { QuizResults } from "./quiz-results";
 import { QuizImmersiveShell } from "./quiz-immersive-shell";
 import { QuizRouterQuestion } from "./quiz-router-question";
 import { Button } from "@/components/ui/button";
-import type { ArchetypeId, QuizScores, Event, Tour, Story, UserSegment } from "@/types";
+import type { ArchetypeId, QuizScores, Event, UserSegment } from "@/types";
 
 const STORAGE_KEY = "ubudian_quiz_result";
 
@@ -27,11 +27,9 @@ interface StoredResult {
 
 interface QuizContainerProps {
   events: Event[];
-  tours: Tour[];
-  stories: Story[];
 }
 
-export function QuizContainer({ events, tours, stories }: QuizContainerProps) {
+export function QuizContainer({ events }: QuizContainerProps) {
   const [step, setStep] = useState<Step>("intro");
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<{ question_id: number; answer_id: string }[]>([]);
@@ -155,8 +153,6 @@ export function QuizContainer({ events, tours, stories }: QuizContainerProps) {
         secondary={result.secondary}
         scores={result.scores}
         events={events}
-        tours={tours}
-        stories={stories}
         onRetake={handleRetake}
         userSegment={userSegment}
         submitFailed={submitFailed}
@@ -211,7 +207,7 @@ export function QuizContainer({ events, tours, stories }: QuizContainerProps) {
         </h1>
         <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-brand-charcoal-light">
           Answer 5 questions and we&apos;ll match you to one of 5 Ubud
-          archetypes — then show you the events, tours, and stories that fit.
+          archetypes — then show you the events that fit.
         </p>
 
         <Button size="lg" className="mt-8" onClick={() => setStep("router")}>

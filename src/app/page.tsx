@@ -5,13 +5,10 @@ import { Button } from "@/components/ui/button";
 import { NewsletterSignup } from "@/components/layout/newsletter-signup";
 import { PageHero } from "@/components/layout/page-hero";
 import { HomepageScrollSnap } from "@/components/homepage/scroll-snap";
-import { FeaturedStories } from "@/components/homepage/featured-stories";
 import { FeaturedEvents } from "@/components/homepage/featured-events";
-import { FeaturedTours } from "@/components/homepage/featured-tours";
 import { FeaturedJourneys } from "@/components/homepage/featured-journeys";
 import { QuizCtaHomepage } from "@/components/quiz/quiz-cta-homepage";
 import { QuizPrompt } from "@/components/quiz/quiz-prompt";
-import { StoryCardSkeleton } from "@/components/skeletons/story-card-skeleton";
 import { EventCardSkeleton } from "@/components/skeletons/event-card-skeleton";
 import { TourCardSkeleton } from "@/components/skeletons/tour-card-skeleton";
 import { SITE_URL, SITE_NAME, SITE_DESCRIPTION } from "@/lib/constants";
@@ -49,15 +46,6 @@ const organizationJsonLd = {
   },
 };
 
-function StoriesSkeleton() {
-  return (
-    <div className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-      {Array.from({ length: 3 }).map((_, i) => (
-        <StoryCardSkeleton key={i} />
-      ))}
-    </div>
-  );
-}
 
 function EventsSkeleton() {
   return (
@@ -69,7 +57,7 @@ function EventsSkeleton() {
   );
 }
 
-function ToursSkeleton() {
+function CardGridSkeleton() {
   return (
     <div className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
       {Array.from({ length: 3 }).map((_, i) => (
@@ -100,18 +88,6 @@ export default async function HomePage() {
               Ceremonies, sound journeys, ecstatic dance, tantra workshops, and everything
               in between —{" "}
               <Link href="/events" className="text-brand-off-white underline decoration-brand-off-white/30 underline-offset-2 transition-colors hover:text-brand-gold hover:decoration-brand-gold">events</Link>
-              {settings.stories_enabled && (
-                <>
-                  ,{" "}
-                  <Link href="/stories" className="text-brand-off-white underline decoration-brand-off-white/30 underline-offset-2 transition-colors hover:text-brand-gold hover:decoration-brand-gold">stories</Link>
-                </>
-              )}
-              {settings.tours_enabled && (
-                <>
-                  ,{" "}
-                  <Link href="/tours" className="text-brand-off-white underline decoration-brand-off-white/30 underline-offset-2 transition-colors hover:text-brand-gold hover:decoration-brand-gold">tours</Link>
-                </>
-              )}
               , and a{" "}
               <Link href="#newsletter" className="text-brand-off-white underline decoration-brand-off-white/30 underline-offset-2 transition-colors hover:text-brand-gold hover:decoration-brand-gold">weekly newsletter</Link>.
             </>
@@ -185,7 +161,7 @@ export default async function HomePage() {
               </p>
             </div>
 
-            <Suspense fallback={<ToursSkeleton />}>
+            <Suspense fallback={<CardGridSkeleton />}>
               <FeaturedJourneys />
             </Suspense>
 
@@ -200,69 +176,10 @@ export default async function HomePage() {
           </div>
         </section>
 
-        {/* Garden (Humans of Ubud) */}
-        {settings.stories_enabled && (
-          <section className="flex min-h-[100dvh] items-center bg-brand-cream px-4 py-20 sm:py-28">
-            <div className="mx-auto w-full max-w-6xl">
-              <div className="text-center">
-                <h2 className="font-serif text-3xl font-medium text-brand-deep-green sm:text-4xl">
-                  Humans of Ubud
-                </h2>
-                <p className="mx-auto mt-4 max-w-2xl text-lg leading-relaxed text-brand-charcoal-light">
-                  Mask carvers, breathwork guides, tantra facilitators, organic farmers,
-                  and the dreamers who followed something to Bali and stayed.
-                </p>
-              </div>
-
-              <Suspense fallback={<StoriesSkeleton />}>
-                <FeaturedStories />
-              </Suspense>
-
-              <div className="mt-10 text-center">
-                <Link
-                  href="/stories"
-                  className="font-semibold text-brand-deep-green underline underline-offset-4 transition-colors hover:text-brand-gold"
-                >
-                  Read their stories
-                </Link>
-              </div>
-            </div>
-          </section>
-        )}
 
         {/* Quiz CTA — moved down to after content */}
         <QuizCtaHomepage />
 
-        {/* Path (Tours) */}
-        {settings.tours_enabled && (
-          <section className="flex min-h-[100dvh] items-center bg-brand-cream px-4 py-20 sm:py-28">
-            <div className="mx-auto w-full max-w-6xl">
-              <div className="text-center">
-                <h2 className="font-serif text-3xl italic text-brand-deep-green sm:text-4xl">
-                  Explore the Land Beneath the Rituals
-                </h2>
-                <p className="mx-auto mt-4 max-w-xl text-lg text-brand-charcoal-light">
-                  Rice terraces, water temples, jungle treks, and food trails
-                  with guides who actually live here — the Ubud that exists between
-                  the ceremonies.
-                </p>
-              </div>
-
-              <Suspense fallback={<ToursSkeleton />}>
-                <FeaturedTours />
-              </Suspense>
-
-              <div className="mt-10 text-center">
-                <Link
-                  href="/tours"
-                  className="font-semibold text-brand-deep-green underline underline-offset-4 transition-colors hover:text-brand-gold"
-                >
-                  Explore tours
-                </Link>
-              </div>
-            </div>
-          </section>
-        )}
 
         {/* Water (Newsletter) — moved to bottom */}
         <section id="newsletter" className="flex min-h-[100dvh] items-center bg-brand-pale-green px-4 py-20 sm:py-28 scroll-mt-14">

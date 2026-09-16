@@ -8,11 +8,7 @@ import { NewsletterSignup } from "./newsletter-signup";
 // missing here, so the footer could render a Guides link straight into
 // `guides/layout.tsx`'s notFound() whenever the flag was off.
 const HREF_TO_FLAG: Record<string, keyof SiteSettings> = {
-  "/stories": "stories_enabled",
-  "/tours": "tours_enabled",
-  "/newsletter": "newsletter_archive_enabled",
   "/guides": "guides_enabled",
-  "/blog": "blog_enabled",
 };
 
 export async function Footer() {

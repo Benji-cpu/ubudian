@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Mail, Sparkles, Info, ChevronDown } from "lucide-react";
+import { Sparkles, Info, ChevronDown } from "lucide-react";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -12,12 +12,6 @@ import {
 } from "@/components/ui/navigation-menu";
 
 const EXPLORE_ITEMS = [
-  {
-    label: "Newsletter",
-    href: "/newsletter",
-    icon: Mail,
-    description: "Weekly dispatch",
-  },
   {
     label: "Membership",
     href: "/membership",
@@ -32,10 +26,8 @@ const EXPLORE_ITEMS = [
   },
 ] as const;
 
-export function ExploreMenu({ newsletterEnabled = true }: { newsletterEnabled?: boolean } = {}) {
-  const items = EXPLORE_ITEMS.filter(
-    (i) => newsletterEnabled || i.href !== "/newsletter"
-  );
+export function ExploreMenu() {
+  const items = EXPLORE_ITEMS;
   return (
     <NavigationMenu viewport={false}>
       <NavigationMenuList>

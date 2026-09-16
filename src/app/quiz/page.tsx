@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { QuizContainer } from "@/components/quiz/quiz-container";
 import { stripEmbeddings } from "@/lib/events/strip-embedding";
-import type { Event, Tour, Story } from "@/types";
+import type { Event } from "@/types";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -14,34 +14,19 @@ export default async function QuizPage() {
   const supabase = await createClient();
   const today = new Date().toISOString().split("T")[0];
 
-  const [eventsRes, toursRes, storiesRes] = await Promise.all([
-    supabase
-      .from("events")
-      .select("*")
-      .eq("status", "approved")
-      .gte("start_date", today)
-      .order("start_date", { ascending: true })
-      .limit(20),
-    supabase
-      .from("tours")
-      .select("*")
-      .eq("is_active", true)
-      .limit(12),
-    supabase
-      .from("stories")
-      .select("*")
-      .eq("status", "published")
-      .order("published_at", { ascending: false })
-      .limit(12),
-  ]);
+  const { data: eventsData } = await supabase
+    .from("events")
+    .select("*")
+    .eq("status", "approved")
+    .gte("start_date", today)
+    .order("start_date", { ascending: true })
+    .limit(20);
 
-  const events = stripEmbeddings((eventsRes.data ?? []) as Event[]);
-  const tours = (toursRes.data ?? []) as Tour[];
-  const stories = (storiesRes.data ?? []) as Story[];
+  const events = stripEmbeddings((eventsData ?? []) as Event[]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-brand-off-white to-brand-cream dark:from-background dark:to-background">
-      <QuizContainer events={events} tours={tours} stories={stories} />
+      <QuizContainer events={events} />
     </div>
   );
 }

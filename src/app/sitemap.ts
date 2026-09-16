@@ -18,36 +18,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const settings = await getSiteSettings();
 
   const [
-    blogRes,
-    storiesRes,
     eventsRes,
-    toursRes,
-    newsletterRes,
     guidesRes,
     practitionersRes,
     placesRes,
     partnersRes,
   ] = await Promise.all([
     supabase
-      .from("blog_posts")
-      .select("slug, updated_at")
-      .eq("status", "published"),
-    supabase
-      .from("stories")
-      .select("slug, updated_at")
-      .eq("status", "published"),
-    supabase
       .from("events")
       .select("slug, updated_at")
       .eq("status", "approved"),
-    supabase
-      .from("tours")
-      .select("slug, updated_at")
-      .eq("is_active", true),
-    supabase
-      .from("newsletter_editions")
-      .select("slug, updated_at")
-      .eq("status", "published"),
     supabase
       .from("guides")
       .select("slug, updated_at")
@@ -82,39 +62,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...(settings.guides_enabled
       ? [{ url: `${SITE_URL}/guides`, changeFrequency: "weekly" as const, priority: 0.8 }]
       : []),
-    ...(settings.stories_enabled
-      ? [{ url: `${SITE_URL}/stories`, changeFrequency: "weekly" as const, priority: 0.8 }]
-      : []),
-    ...(settings.tours_enabled
-      ? [{ url: `${SITE_URL}/tours`, changeFrequency: "weekly" as const, priority: 0.8 }]
-      : []),
-    ...(settings.blog_enabled
-      ? [{ url: `${SITE_URL}/blog`, changeFrequency: "weekly" as const, priority: 0.7 }]
-      : []),
-    ...(settings.newsletter_archive_enabled
-      ? [{ url: `${SITE_URL}/newsletter`, changeFrequency: "weekly" as const, priority: 0.7 }]
-      : []),
     { url: `${SITE_URL}/practitioners`, changeFrequency: "weekly", priority: 0.7 },
     { url: `${SITE_URL}/places`, changeFrequency: "weekly", priority: 0.7 },
-    { url: `${SITE_URL}/community/partners`, changeFrequency: "monthly", priority: 0.5 },
     { url: `${SITE_URL}/membership`, changeFrequency: "monthly", priority: 0.5 },
     { url: `${SITE_URL}/about`, changeFrequency: "monthly", priority: 0.5 },
     { url: `${SITE_URL}/events/submit`, changeFrequency: "monthly", priority: 0.4 },
   ];
 
-  const blogPages: MetadataRoute.Sitemap = (blogRes.data ?? []).map((p) => ({
-    url: `${SITE_URL}/blog/${p.slug}`,
-    lastModified: p.updated_at,
-    changeFrequency: "monthly",
-    priority: 0.6,
-  }));
 
-  const storyPages: MetadataRoute.Sitemap = (storiesRes.data ?? []).map((s) => ({
-    url: `${SITE_URL}/stories/${s.slug}`,
-    lastModified: s.updated_at,
-    changeFrequency: "monthly",
-    priority: 0.7,
-  }));
 
   const eventPages: MetadataRoute.Sitemap = (eventsRes.data ?? []).map((e) => ({
     url: `${SITE_URL}/events/${e.slug}`,
@@ -123,21 +78,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
-  const tourPages: MetadataRoute.Sitemap = (toursRes.data ?? []).map((t) => ({
-    url: `${SITE_URL}/tours/${t.slug}`,
-    lastModified: t.updated_at,
-    changeFrequency: "monthly",
-    priority: 0.7,
-  }));
 
-  const newsletterPages: MetadataRoute.Sitemap = (newsletterRes.data ?? []).map(
-    (n) => ({
-      url: `${SITE_URL}/newsletter/${n.slug}`,
-      lastModified: n.updated_at,
-      changeFrequency: "monthly",
-      priority: 0.5,
-    })
-  );
 
   const guidePages: MetadataRoute.Sitemap = (guidesRes.data ?? []).map((g) => ({
     url: `${SITE_URL}/guides/${g.slug}`,
@@ -169,11 +110,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   return [
     ...staticPages,
-    ...(settings.blog_enabled ? blogPages : []),
-    ...(settings.stories_enabled ? storyPages : []),
     ...eventPages,
-    ...(settings.tours_enabled ? tourPages : []),
-    ...(settings.newsletter_archive_enabled ? newsletterPages : []),
     ...(settings.guides_enabled ? guidePages : []),
     ...practitionerPages,
     ...placePages,

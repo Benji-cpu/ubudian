@@ -6,19 +6,15 @@ import { ARCHETYPES, ARCHETYPE_IDS } from "@/lib/quiz-data";
 import { getEventsForArchetype, getToursForArchetype, getStoriesForArchetype } from "@/lib/quiz-helpers";
 import { QuizShareButtons } from "./quiz-share-buttons";
 import { EventCard } from "@/components/events/event-card";
-import { TourCard } from "@/components/tours/tour-card";
-import { StoryCard } from "@/components/stories/story-card";
 import { Button } from "@/components/ui/button";
 import { SITE_URL } from "@/lib/constants";
-import type { ArchetypeId, QuizScores, Event, Tour, Story, UserSegment } from "@/types";
+import type { ArchetypeId, QuizScores, Event, UserSegment } from "@/types";
 
 interface QuizResultsProps {
   primary: ArchetypeId;
   secondary: ArchetypeId;
   scores: QuizScores;
   events: Event[];
-  tours: Tour[];
-  stories: Story[];
   onRetake: () => void;
   userSegment?: UserSegment | null;
   submitFailed?: boolean;
@@ -29,8 +25,6 @@ export function QuizResults({
   secondary,
   scores,
   events,
-  tours,
-  stories,
   onRetake,
   userSegment,
   submitFailed,
@@ -41,8 +35,6 @@ export function QuizResults({
   const shareUrl = `${SITE_URL}/quiz/results/${primary}`;
 
   const matchedEvents = getEventsForArchetype(events, primary);
-  const matchedTours = getToursForArchetype(tours, primary);
-  const matchedStories = getStoriesForArchetype(stories, primary);
 
   const segmentCTA = (() => {
     const segment = userSegment || "visiting";
@@ -233,39 +225,7 @@ export function QuizResults({
         <QuizShareButtons archetypeName={archetype.name} url={shareUrl} />
       </div>
 
-      {/* Recommended tours */}
-      {matchedTours.length > 0 && (
-        <div className="mt-12">
-          <h3 className="font-serif text-2xl font-medium text-brand-deep-green dark:text-brand-gold">
-            Tours for {archetype.name}
-          </h3>
-          <p className="mt-2 text-muted-foreground">
-            Get out of the ceremony and into the landscape.
-          </p>
-          <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {matchedTours.map((tour) => (
-              <TourCard key={tour.id} tour={tour} />
-            ))}
-          </div>
-        </div>
-      )}
 
-      {/* Recommended stories */}
-      {matchedStories.length > 0 && (
-        <div className="mt-12">
-          <h3 className="font-serif text-2xl font-medium text-brand-deep-green dark:text-brand-gold">
-            Humans of Ubud for {archetype.name}
-          </h3>
-          <p className="mt-2 text-muted-foreground">
-            The humans behind the events you&apos;ll love.
-          </p>
-          <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {matchedStories.map((story) => (
-              <StoryCard key={story.id} story={story} />
-            ))}
-          </div>
-        </div>
-      )}
 
       {/* Retake */}
       <div className="mt-12 text-center">

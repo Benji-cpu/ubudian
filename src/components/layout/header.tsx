@@ -65,23 +65,7 @@ export async function Header() {
           >
             Retreats
           </Link>
-          {settings.stories_enabled && (
-            <Link
-              href="/stories"
-              className="text-xs font-semibold uppercase tracking-widest text-brand-off-white transition-colors duration-300 hover:text-brand-gold"
-            >
-              Stories
-            </Link>
-          )}
-          {settings.tours_enabled && (
-            <Link
-              href="/tours"
-              className="text-xs font-semibold uppercase tracking-widest text-brand-off-white transition-colors duration-300 hover:text-brand-gold"
-            >
-              Tours
-            </Link>
-          )}
-          <ExploreMenu newsletterEnabled={settings.newsletter_archive_enabled} />
+          <ExploreMenu />
           {profile?.role === "admin" && (
             <Link
               href="/admin"

@@ -2,13 +2,12 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/lib/auth";
-import { getEventsForArchetype, getStoriesForArchetype } from "@/lib/quiz-helpers";
+import { getEventsForArchetype } from "@/lib/quiz-helpers";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { DashboardStats } from "@/components/dashboard/dashboard-stats";
 import { EventCard } from "@/components/events/event-card";
-import { StoryCard } from "@/components/stories/story-card";
 import { Button } from "@/components/ui/button";
-import type { ArchetypeId, Event, Story, QuizResultRecord } from "@/types";
+import type { ArchetypeId, Event, QuizResultRecord } from "@/types";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -46,31 +45,20 @@ export default async function DashboardPage() {
 
   // Fetch personalized content if archetype exists
   let matchedEvents: Event[] = [];
-  let matchedStories: Story[] = [];
 
   if (archetype) {
     const today = new Date().toISOString().split("T")[0];
 
-    const [eventsRes, storiesRes] = await Promise.all([
-      supabase
-        .from("events")
-        .select("*")
-        .eq("status", "approved")
-        .gte("start_date", today)
-        .order("start_date", { ascending: true })
-        .limit(20),
-      supabase
-        .from("stories")
-        .select("*")
-        .eq("status", "published")
-        .order("published_at", { ascending: false })
-        .limit(12),
-    ]);
+    const { data: eventsData } = await supabase
+      .from("events")
+      .select("*")
+      .eq("status", "approved")
+      .gte("start_date", today)
+      .order("start_date", { ascending: true })
+      .limit(20);
 
-    const events = (eventsRes.data ?? []) as Event[];
-    const stories = (storiesRes.data ?? []) as Story[];
+    const events = (eventsData ?? []) as Event[];
     matchedEvents = getEventsForArchetype(events, archetype as ArchetypeId, 8);
-    matchedStories = getStoriesForArchetype(stories, archetype as ArchetypeId, 3);
   }
 
   return (
@@ -105,19 +93,6 @@ export default async function DashboardPage() {
           <div className="mt-4 space-y-3">
             {matchedEvents.map((event) => (
               <EventCard key={event.id} event={event} />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {matchedStories.length > 0 && (
-        <div>
-          <h2 className="font-serif text-xl font-medium text-brand-deep-green">
-            Stories You&apos;ll Love
-          </h2>
-          <div className="mt-4 grid gap-6 sm:grid-cols-3">
-            {matchedStories.map((story) => (
-              <StoryCard key={story.id} story={story} />
             ))}
           </div>
         </div>

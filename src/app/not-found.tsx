@@ -13,9 +13,6 @@ const SUGGESTIONS: { href: string; label: string; flag?: keyof SiteSettings }[] 
   { href: "/guides", label: "Guides", flag: "guides_enabled" },
   { href: "/retreats", label: "Ubud Retreats" },
   { href: "/quiz", label: "Take the quiz" },
-  { href: "/stories", label: "Stories", flag: "stories_enabled" },
-  { href: "/tours", label: "Tours", flag: "tours_enabled" },
-  { href: "/newsletter", label: "Newsletter", flag: "newsletter_archive_enabled" },
 ];
 
 export default async function NotFound() {

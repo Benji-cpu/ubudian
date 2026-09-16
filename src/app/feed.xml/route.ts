@@ -1,8 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { SITE_URL, SITE_NAME, SITE_DESCRIPTION } from "@/lib/constants";
-import { getSiteSettings } from "@/lib/site-settings";
 import { nowInBali } from "@/lib/events/bali-time";
-import type { BlogPost } from "@/types";
 
 function escapeXml(text: string): string {
   return text
@@ -25,10 +23,9 @@ function escapeXml(text: string): string {
  */
 export async function GET() {
   const supabase = await createClient();
-  const settings = await getSiteSettings();
   const today = nowInBali().dateStr;
 
-  const [{ data: events }, { data: posts }, { data: newsletters }] = await Promise.all([
+  const [{ data: events }] = await Promise.all([
     supabase
       .from("events")
       .select("title, slug, short_description, description, start_date, created_at")
@@ -36,22 +33,6 @@ export async function GET() {
       .gte("start_date", today)
       .order("start_date", { ascending: true })
       .limit(40),
-    settings.blog_enabled
-      ? supabase
-          .from("blog_posts")
-          .select("title, slug, excerpt, published_at")
-          .eq("status", "published")
-          .order("published_at", { ascending: false })
-          .limit(20)
-      : Promise.resolve({ data: [] }),
-    settings.newsletter_archive_enabled
-      ? supabase
-          .from("newsletter_editions")
-          .select("subject, slug, preview_text, sent_at")
-          .eq("status", "published")
-          .order("sent_at", { ascending: false })
-          .limit(20)
-      : Promise.resolve({ data: [] }),
   ]);
 
   type FeedItem = { title: string; link: string; description: string; pubDate: string };
@@ -77,23 +58,7 @@ export async function GET() {
     });
   }
 
-  for (const post of (posts ?? []) as BlogPost[]) {
-    items.push({
-      title: post.title,
-      link: `${SITE_URL}/blog/${post.slug}`,
-      description: post.excerpt || "",
-      pubDate: post.published_at ? new Date(post.published_at).toUTCString() : "",
-    });
-  }
 
-  for (const edition of (newsletters ?? []) as { subject: string; slug: string; preview_text: string | null; sent_at: string | null }[]) {
-    items.push({
-      title: edition.subject,
-      link: `${SITE_URL}/newsletter/${edition.slug}`,
-      description: edition.preview_text || "",
-      pubDate: edition.sent_at ? new Date(edition.sent_at).toUTCString() : "",
-    });
-  }
 
   // Sort combined by date descending
   items.sort((a, b) => {

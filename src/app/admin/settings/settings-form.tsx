@@ -11,26 +11,6 @@ type SectionKey = keyof SiteSettings;
 
 const SECTIONS: { key: SectionKey; label: string; description: string }[] = [
   {
-    key: "stories_enabled",
-    label: "Humans of Ubud",
-    description: "Public access to /stories and all individual story pages.",
-  },
-  {
-    key: "tours_enabled",
-    label: "Tours",
-    description: "Public access to /tours, tour detail pages, and the tour booking checkout.",
-  },
-  {
-    key: "blog_enabled",
-    label: "Blog",
-    description: "Public access to /blog and all blog posts.",
-  },
-  {
-    key: "newsletter_archive_enabled",
-    label: "Newsletter archive",
-    description: "Public access to /newsletter and past editions. Signup stays on everywhere regardless.",
-  },
-  {
     key: "guides_enabled",
     label: "Guides",
     description: "Public access to /guides — practical Survival Guide content and intent-based playbooks.",
@@ -42,12 +22,10 @@ export function SettingsForm({ initial }: { initial: SiteSettings }) {
   const [saving, setSaving] = useState(false);
   const router = useRouter();
 
-  const dirty =
-    values.blog_enabled !== initial.blog_enabled ||
-    values.stories_enabled !== initial.stories_enabled ||
-    values.tours_enabled !== initial.tours_enabled ||
-    values.newsletter_archive_enabled !== initial.newsletter_archive_enabled ||
-    values.guides_enabled !== initial.guides_enabled;
+  // Compared over SECTIONS rather than a hand-listed set: the four dead
+  // sections were removed on 2026-09-16 and a literal list silently keeps
+  // comparing fields no toggle can change.
+  const dirty = SECTIONS.some((section) => values[section.key] !== initial[section.key]);
 
   async function handleSave() {
     setSaving(true);

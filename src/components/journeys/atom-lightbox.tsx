@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { ExternalLink, MapPin } from "lucide-react";
-import { MarkdownContent } from "@/components/blog/markdown-content";
+import { MarkdownContent } from "@/components/content/markdown-content";
 import type { JourneyAtom, JourneyAtomKind } from "@/types";
 
 const ATOM_KIND_LABEL: Record<JourneyAtomKind, string> = {

@@ -54,24 +54,6 @@ const WHAT_WE_DO: {
     iconColor: "text-brand-deep-green",
     flag: "guides_enabled",
   },
-  {
-    title: "Meet the community",
-    description:
-      "Read the stories of facilitators, healers, and creators who make Ubud what it is.",
-    href: "/stories",
-    icon: Users,
-    iconColor: "text-brand-deep-green",
-    flag: "stories_enabled",
-  },
-  {
-    title: "Explore the land",
-    description:
-      "Rice terraces, water temples, jungle treks, and food trails with guides who live here.",
-    href: "/tours",
-    icon: Map,
-    iconColor: "text-brand-deep-green",
-    flag: "tours_enabled",
-  },
 ];
 
 const SOLUTION_POINTS = [
