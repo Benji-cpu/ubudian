@@ -163,7 +163,17 @@ export async function purgeStalePendingMessages(): Promise<ExpiryResult> {
   }
   const ids = candidates.filter((id) => !referenced.has(id));
   if (ids.length === 0) return { expired: 0, errors: [] };
-  const { error: delError } = await supabase.from("raw_ingestion_messages").delete().in("id", ids);
-  if (delError) return { expired: 0, errors: [`stale messages delete: ${delError.message}`] };
-  return { expired: ids.length, errors: [] };
+  // Chunked for the same reason the reference lookup above is: PostgREST puts
+  // an `in` list in the QUERY STRING, and ~2000 uuids overruns it — the server
+  // answers "Bad Request" and the purge silently does nothing. It had been
+  // failing that way on every run; the batch cap is 2000, so the unchunked
+  // delete could never have succeeded once the backlog passed a few hundred.
+  let deleted = 0;
+  for (let i = 0; i < ids.length; i += 200) {
+    const chunk = ids.slice(i, i + 200);
+    const { error: delError } = await supabase.from("raw_ingestion_messages").delete().in("id", chunk);
+    if (delError) return { expired: deleted, errors: [`stale messages delete: ${delError.message}`] };
+    deleted += chunk.length;
+  }
+  return { expired: deleted, errors: [] };
 }
