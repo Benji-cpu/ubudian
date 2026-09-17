@@ -156,7 +156,7 @@
         "ceremony",
         "sound"
       ],
-      "note": "Eco-dome and bamboo pavilion retreat at Ubud's jungle edge, with organic gardens and natural swimming pool. Weekly Saturday Ecstatic Dance & Cacao Ceremony (6–10 PM) led by Karunika — opens with Vital Cacao Ceremony by fire, flows into ecstatic dance, closes with sound healing. SuperMoon editions add breathwork. On-site vegan restaurant. Fills the Saturday gap in our calendar. Promoted from discovered_pending to priority_b 2026-07-13 (7 qualifying logs: May 24, Jun 3, Jun 12, Jun 24, Jul 8, Jul 10, Jul 12). IG: @akashanewearthbali. Known Megatix slug patterns: SuperMoon edition = `supermoon-conscious-party-purnama-x-villa-akasha` (✅ INGESTED 2026-07-27 supplementary pass: Jul 29 purnama, quality_score 0.65, date inferred from moon-date-first + active slug), New Moon edition = `new-moon-with-karunika` (watch ~2 days before each new moon). Next SuperMoon watch: August purnama ~Aug 28 (partial lunar eclipse). NEW 2026-08-26: Second slug found for Aug 28 edition — `megatix.com.au/events/purnamagerhana` + `bali.live/e/events/purnama-gerhana-supermoon-lunar-eclipse/` (title "Purnama Gerhana • Supermoon Lunar Eclipse" — names the partial lunar eclipse directly). Pages blocked in sandbox, no date text confirmed, but slug naming is a strong per-edition signal. Added to discovered_pending separately. ⚠ Note: CELESTIA zodiac series has used this venue for some editions but rotates — never assume Akasha for a CELESTIA event without explicit slug/venue confirmation."
+      "note": "Eco-dome and bamboo pavilion retreat at Ubud's jungle edge, with organic gardens and natural swimming pool. Weekly Saturday Ecstatic Dance & Cacao Ceremony (6–10 PM) led by Karunika — opens with Vital Cacao Ceremony by fire, flows into ecstatic dance, closes with sound healing. SuperMoon editions add breathwork. On-site vegan restaurant. Fills the Saturday gap in our calendar. Promoted from discovered_pending to priority_b 2026-07-13 (7 qualifying logs: May 24, Jun 3, Jun 12, Jun 24, Jul 8, Jul 10, Jul 12). IG: @akashanewearthbali. Known Megatix slug patterns: SuperMoon edition = `supermoon-conscious-party-purnama-x-villa-akasha` (✅ INGESTED 2026-07-27 supplementary pass: Jul 29 purnama, quality_score 0.65, date inferred from moon-date-first + active slug), New Moon edition = `new-moon-with-karunika` (watch ~2 days before each new moon). Next SuperMoon watch: August purnama ~Aug 28 (partial lunar eclipse). NEW 2026-08-26: Second slug found for Aug 28 edition — `megatix.com.au/events/purnamagerhana` + `bali.live/e/events/purnama-gerhana-supermoon-lunar-eclipse/` (title \"Purnama Gerhana • Supermoon Lunar Eclipse\" — names the partial lunar eclipse directly). Pages blocked in sandbox, no date text confirmed, but slug naming is a strong per-edition signal. Added to discovered_pending separately. ⚠ Note: CELESTIA zodiac series has used this venue for some editions but rotates — never assume Akasha for a CELESTIA event without explicit slug/venue confirmation."
     },
     {
       "name": "School of Unified Healing",
@@ -691,6 +691,55 @@
         "dance"
       ],
       "note": "Special edition of the Resonanz ecstatic dance series at Paradiso Ubud with guest artist Max Hanuman. Slug `resonanz-ecstatic-dance-x-max-hanuman` on megatix.co.id. Snippet: 'Thursday, 10th July 2025' — Jul 10, 2025 = Thursday ✓ (Jul 10, 2026 = Friday — day-of-week kill confirms stale 2025 date). Max Hanuman: 'chill ambient vibes to gritty breakbeats, house grooves, and techno.' No 2026 date confirmed. Score ~7 when 2026 date confirmed at Paradiso. Watch @paradisoubud for re-announcement."
+    },
+    {
+      "name": "Taroo Ubud (FLOW - Ecstatic Dance)",
+      "megatix_slug": "https://megatix.in.th/events/flow-ecstatic-dance-ubud",
+      "first_seen": "2026-09-18",
+      "themes": [
+        "dance",
+        "ceremony"
+      ],
+      "note": "New venue surfaced in the 2026-09-18 Megatix sweep. 'FLOW - ECSTATIC DANCE' at Taroo Ubud: cacao ceremony 20:15-20:30 then ecstatic dance. Venue not previously tracked in sources.json; in-zone (Ubud) pending address confirmation. No date confirmed in any indexed snippet - slug carries no date suffix, so likely a recurring anchor rather than a per-edition listing. Watch for a dated per-edition slug before ingesting; if it proves a weekly anchor, suppress per the recurring-anchor rule."
+    },
+    {
+      "name": "SUPERMOON Bali - first-party site",
+      "url": "https://supermoonbali.com/",
+      "first_seen": "2026-09-18",
+      "themes": [
+        "dance",
+        "ceremony",
+        "sound"
+      ],
+      "note": "FIRST-PARTY domain for the SUPERMOON series (Yoga Barn full-moon gathering), discovered 2026-09-18 during the 10th-anniversary watch. Not an aggregator - this is the series' own site, so it is a legitimate source_url/external_ticket_url per the attribution rules, unlike the Megatix mirrors. Also first-party: theyogabarn.com/event/supermoon/ and theyogabarn.com/event/fullmoon-kirtan-celebration/. IMPORTANT slug-pattern correction: anniversary editions do NOT follow one convention - known historical slugs are `supermoon7-x-yogabarn-` (megatix.co.id), `supermoon-8th-anniversary-x-the-yogabarn` (megatix.com.au) and a generic `supermoon-anniversary-special-edition-x-the-yogabarn`. The 2026-09-17 log's predicted slug `supermoon-10th-anniversary-x-the-yogabarn` is therefore only one of several plausible forms - do not treat its absence as evidence the event is not happening. Check supermoonbali.com first-party rather than slug-guessing."
+    },
+    {
+      "name": "Pangaea Festival",
+      "megatix_slug": "https://megatix.co.id/events/pangaea-festival1111",
+      "first_seen": "2026-09-18",
+      "themes": [
+        "dance",
+        "festival"
+      ],
+      "note": "Slug surfaced in the 2026-09-18 Megatix sweep. No venue, no date, no organiser in any indexed snippet. Discovery-tier candidate (festival) if it proves in-zone and dated. Passive watch only - do not spend searches re-confirming until a first-party announcement surfaces."
+    },
+    {
+      "name": "Resonanz x PRABUMI (Paradiso Ubud)",
+      "megatix_slug": "https://www.megatix.co.id/events/resonanz-ecstatic-dance-x-prabum",
+      "first_seen": "2026-09-18",
+      "themes": [
+        "dance"
+      ],
+      "note": "New Resonanz special-edition slug surfaced 2026-09-18. STALE: the artist's own SoundCloud set is titled 'DALAM - RESONANZ at Paradiso, Ubud Bali 27/03/25' - March 2025 edition. No 2026 date in any indexed snippet. Filed for pattern-matching only; per the search-budget rule, do not spend future searches re-confirming this slug is stale."
+    },
+    {
+      "name": "Resonanz x UtaraMata x Tanaman Liar x Pakcik (Paradiso Ubud)",
+      "megatix_slug": "https://megatix.co.id/events/resonanz-ecstatic-dance-x-utaramata-x-tanaman-liar-x-pakcik",
+      "first_seen": "2026-09-18",
+      "themes": [
+        "dance"
+      ],
+      "note": "New Resonanz slug surfaced 2026-09-18; appears related to the long-held 'Pakcik Henry' watch and adds UtaraMata + Tanaman Liar as collaborators (Tanaman Liar also appears in the Titik Dua 'A Lure' opening performance). No date in any indexed snippet. Passive watch."
     }
   ],
   "competitor_harvest": [
