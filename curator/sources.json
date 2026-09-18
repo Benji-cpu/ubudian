@@ -700,7 +700,7 @@
         "dance",
         "ceremony"
       ],
-      "note": "New venue surfaced in the 2026-09-18 Megatix sweep. 'FLOW - ECSTATIC DANCE' at Taroo Ubud: cacao ceremony 20:15-20:30 then ecstatic dance. Venue not previously tracked in sources.json; in-zone (Ubud) pending address confirmation. No date confirmed in any indexed snippet - slug carries no date suffix, so likely a recurring anchor rather than a per-edition listing. Watch for a dated per-edition slug before ingesting; if it proves a weekly anchor, suppress per the recurring-anchor rule."
+      "note": "New venue surfaced in the 2026-09-18 Megatix sweep. 'FLOW - ECSTATIC DANCE' at Taroo Ubud: cacao ceremony 20:15-20:30, then ecstatic dance 20:30-22:00 with DJ El Topo; venue has a swimming pool (swimwear suggested). ADDRESS CONFIRMED 2026-09-19: Jl. Rapuan, Mas, Kecamatan Ubud, Gianyar 80571 - Mas is within Ubud district, so this is IN-ZONE for both tiers. Self-description: 'Flow is a project that aims to show that ecstatic dance can be different', emphasising harmony of dance and freedom of contact improvisation in open space - reads as a contact-improv-leaning ecstatic dance, adjacent to the Paradiso Contact Jam register. Slug `flow-ecstatic-dance-ubud` carries no date suffix and no indexed date, so it is almost certainly a recurring anchor, not a per-edition listing. Do NOT spend further searches on the bare slug; ingest only if a dated per-edition slug or a first-party page with a verbatim date appears. At 2 qualifying logs."
     },
     {
       "name": "SUPERMOON Bali - first-party site",
@@ -711,7 +711,7 @@
         "ceremony",
         "sound"
       ],
-      "note": "FIRST-PARTY domain for the SUPERMOON series (Yoga Barn full-moon gathering), discovered 2026-09-18 during the 10th-anniversary watch. Not an aggregator - this is the series' own site, so it is a legitimate source_url/external_ticket_url per the attribution rules, unlike the Megatix mirrors. Also first-party: theyogabarn.com/event/supermoon/ and theyogabarn.com/event/fullmoon-kirtan-celebration/. IMPORTANT slug-pattern correction: anniversary editions do NOT follow one convention - known historical slugs are `supermoon7-x-yogabarn-` (megatix.co.id), `supermoon-8th-anniversary-x-the-yogabarn` (megatix.com.au) and a generic `supermoon-anniversary-special-edition-x-the-yogabarn`. The 2026-09-17 log's predicted slug `supermoon-10th-anniversary-x-the-yogabarn` is therefore only one of several plausible forms - do not treat its absence as evidence the event is not happening. Check supermoonbali.com first-party rather than slug-guessing."
+      "note": "FIRST-PARTY domain for the SUPERMOON series (Yoga Barn full-moon gathering), discovered 2026-09-18 during the 10th-anniversary watch. Not an aggregator - this is the series' own site, so it is a legitimate source_url/external_ticket_url per the attribution rules, unlike the Megatix mirrors. Also first-party: theyogabarn.com/event/supermoon/ and theyogabarn.com/event/fullmoon-kirtan-celebration/. IMPORTANT slug-pattern correction: anniversary editions do NOT follow one convention - known historical slugs are `supermoon7-x-yogabarn-` (megatix.co.id), `supermoon-8th-anniversary-x-the-yogabarn` (megatix.com.au) and a generic `supermoon-anniversary-special-edition-x-the-yogabarn`. The 2026-09-17 log's predicted slug `supermoon-10th-anniversary-x-the-yogabarn` is therefore only one of several plausible forms - do not treat its absence as evidence the event is not happening. Check supermoonbali.com first-party rather than slug-guessing. | 2026-09-19: a SECOND first-party SUPERMOON page exists at `newearthhavenbali.com/events/supermoon` (Akasha New Earth Haven, Keliki - ~15min from Ubud). This is consistent with the 2026-07-13 rotating-venue lesson: SUPERMOON is a travelling brand, not a Yoga Barn fixture, so every edition needs its venue confirmed before ingesting and before applying the geo-rule. Still no 10th-anniversary listing on any surface at 2026-09-19; the only dated anniversary text indexed anywhere remains 'Saturday, October 11th, 2025' (the 9th, at Yoga Barn, with Kimundo + Prabumi). supermoonbali.com is egress-blocked from this sandbox - WebSearch snippets only."
     },
     {
       "name": "Pangaea Festival",
@@ -740,6 +740,16 @@
         "dance"
       ],
       "note": "New Resonanz slug surfaced 2026-09-18; appears related to the long-held 'Pakcik Henry' watch and adds UtaraMata + Tanaman Liar as collaborators (Tanaman Liar also appears in the Titik Dua 'A Lure' opening performance). No date in any indexed snippet. Passive watch."
+    },
+    {
+      "name": "DTT Full Moon Kirtan & Sacred Tea (Sep 8) - STALE 2025",
+      "megatix_slug": "https://megatix.co.id/events/full-moon-kirtan-sacred-tea-sep-8",
+      "first_seen": "2026-09-19",
+      "themes": [
+        "ceremony",
+        "sound"
+      ],
+      "note": "Surfaced 2026-09-19 in the D-7 full-moon-cluster sweep, searching the DTT slug pattern the 2026-09-13 lesson says is still actively ticketed per-edition. MOON-DATE KILL - this is the September 2025 edition, not 2026: Sep 7-8 2025 carried a full moon (total lunar eclipse Sep 7 2025), whereas the September 2026 full moon is ~Sep 26 (derived from the confirmed Aug 28 2026 full moon in the 2026-08-02 playbook lesson + one 29.53-day synodic month). Sep 8 2026 is also already past. Double kill: stale year AND past date. Format for reference (consistent across editions): space opens 17:45, BhakTea Kirtan journey 18:00, ecstatic dance by the fire 20:00, cosmic sound healing 21:15-21:30, at Jl. Penestanan No.8, Sayan. SUPPRESSED - never spend another search on this slug. The genuine Sep 26 2026 DTT edition has no indexed slug as of D-7."
     }
   ],
   "competitor_harvest": [
@@ -1154,7 +1164,8 @@
       "events_seen": [
         "Full Moon Cacao Ceremony — The Yoga Barn"
       ],
-      "note": "Medicine man, sound healer, musician. Runs monthly full moon (Abuela Luna) ceremonies at Yoga Barn. Well-known in Ubud scene. BaliSpirit Festival presenter. ✅ INGESTED 2026-07-19: 'ABUELA LUNA — Full Moon Cacao Ceremony with Raio' — Yoga Barn, Jul 29, 2026, 19:30–21:15, IDR 350,000. Source: megatix.co.id/events/full-moon-cacao-ceremony-in-july. quality_score 0.80. Ensemble: Carlos Romero, Ryan Narayan, Rob Recker, Sky (guitar). NOTE: Event confirmed on Jul 29 itself (the full moon) — prior predictions of Fri Jul 25 or Sat Jul 26 were wrong. Raio aligns ABUELA LUNA precisely with the moon it's named for. Apply moon-date-first assumption to future editions. ✅ INGESTED 2026-07-24: 'ABUELA LUNA — Full Moon Cacao Ceremony with Raio' — Yoga Barn, Aug 9, 2026, 19:30–21:15. Source: megatix.co.id/events/abuela-luna-Aug09. quality_score 0.80. Ensemble: Carlos Romero, Ryan Narayan, Rob Recker, Sky (guitar). NOTE: Per-edition slug `abuela-luna-Aug09` confirmed via WebSearch; August full moon = Aug 9 (moon-date-first confirmed again). Next watch: September full moon ≈ Sep 26–27 2026 (CORRECTED 2026-07-27 — prior note 'Sep 7' was wrong; Harvest Moon peaks Sep 27 00:49 WITA / Sep 26 16:49 UTC). Moon-date-first: ABUELA LUNA likely Sep 26 (Sat evening) or Sep 27 (Sun). Watch for `abuela-luna-sep26` or `abuela-luna-sep27` slug from ~Aug 22. UPDATE 2026-08-12: Slug `abuela-luna-Aug09` confirmed indexed via WebSearch sweep — event was real and occurred Aug 9, 2026. Admin flag CLOSED. Astronomical full moon (Aug 28, partial lunar eclipse) is a separate forthcoming event. Watch for September ABUELA LUNA slug (`abuela-luna-sep26` or `abuela-luna-sep27`) from ~Aug 22 — Harvest Moon peaks Sep 27 00:49 WITA."
+      "note": "Medicine man, sound healer, musician. Runs monthly full moon (Abuela Luna) ceremonies at Yoga Barn. Well-known in Ubud scene. BaliSpirit Festival presenter. ✅ INGESTED 2026-07-19: 'ABUELA LUNA — Full Moon Cacao Ceremony with Raio' — Yoga Barn, Jul 29, 2026, 19:30–21:15, IDR 350,000. Source: megatix.co.id/events/full-moon-cacao-ceremony-in-july. quality_score 0.80. Ensemble: Carlos Romero, Ryan Narayan, Rob Recker, Sky (guitar). NOTE: Event confirmed on Jul 29 itself (the full moon) — prior predictions of Fri Jul 25 or Sat Jul 26 were wrong. Raio aligns ABUELA LUNA precisely with the moon it's named for. Apply moon-date-first assumption to future editions. ✅ INGESTED 2026-07-24: 'ABUELA LUNA — Full Moon Cacao Ceremony with Raio' — Yoga Barn, Aug 9, 2026, 19:30–21:15. Source: megatix.co.id/events/abuela-luna-Aug09. quality_score 0.80. Ensemble: Carlos Romero, Ryan Narayan, Rob Recker, Sky (guitar). NOTE: Per-edition slug `abuela-luna-Aug09` confirmed via WebSearch; August full moon = Aug 9 (moon-date-first confirmed again). Next watch: September full moon ≈ Sep 26–27 2026 (CORRECTED 2026-07-27 — prior note 'Sep 7' was wrong; Harvest Moon peaks Sep 27 00:49 WITA / Sep 26 16:49 UTC). Moon-date-first: ABUELA LUNA likely Sep 26 (Sat evening) or Sep 27 (Sun). Watch for `abuela-luna-sep26` or `abuela-luna-sep27` slug from ~Aug 22. UPDATE 2026-08-12: Slug `abuela-luna-Aug09` confirmed indexed via WebSearch sweep — event was real and occurred Aug 9, 2026. Admin flag CLOSED. Astronomical full moon (Aug 28, partial lunar eclipse) is a separate forthcoming event. Watch for September ABUELA LUNA slug (`abuela-luna-sep26` or `abuela-luna-sep27`) from ~Aug 22 — Harvest Moon peaks Sep 27 00:49 WITA. | 2026-09-19: FIRST-PARTY PAGE CONFIRMED - `theyogabarn.com/event/abuela-luna-raio/` is the series' own Yoga Barn event page and is a legitimate source_url/external_ticket_url under the attribution rules. Prefer it over guessing per-edition Megatix slugs (`full-moon-cacao-ceremony-in-<month>`), which is what the last several ABUELA LUNA watches burned searches on. The page carried no verbatim date in any snippet at D-7 for the ~Sep 26 full moon, consistent with the 2026-09-13 finding that Raio's Ubud editions have moved to walk-in / D-0 IG-story announcement. theyogabarn.com itself is egress-blocked, so the page can only be read via WebSearch snippets from this sandbox.",
+      "website": "https://theyogabarn.com/event/abuela-luna-raio/"
     },
     {
       "name": "Jada Jane Boh",
@@ -1705,13 +1716,13 @@
       "note": "Megatix slug `voice-of-her` surfaced 2026-09-13. Format possibly ecstatic vocals / sound ceremony / women's circle. No venue, facilitator, or 2026 date confirmed. Score TBD once details emerge. Watch for context."
     },
     {
-      "name": "DTT Full Moon Kirtan & Sacred Tea (Nov 19)",
+      "name": "DTT Full Moon Kirtan & Sacred Tea (Nov 19) - WATCH CLOSED, stale",
       "megatix_slug": "full-moon-kirtan-sacred-tea-nov19th",
       "instagram": null,
       "website": null,
       "first_seen": "2026-09-13",
       "events_seen": [],
-      "note": "Megatix slug `full-moon-kirtan-sacred-tea-nov19th` surfaced 2026-09-13. Format: DTT Full Moon Kirtan & Sacred Tea — the regular DTT full moon series, this edition November 19. Nov 19 2026 is a Thursday (Full Moon Oct 25, with Nov 19 ~25 days after — check lunar calendar). Outside the 60-day window (cutoff ~Nov 12 from today). Re-check Oct 20 when window opens. If this is a genuine Nov 19 slug, ingest immediately on re-check."
+      "note": "Megatix slug `full-moon-kirtan-sacred-tea-nov19th` surfaced 2026-09-13; held for an Oct 20 re-check when the 60-day window would open. WATCH CLOSED 2026-09-19 BY ARITHMETIC, NO SEARCH SPENT. The 2026 full moons derive from the confirmed Aug 28 2026 full moon (2026-08-02 lesson) plus 29.53-day synodic months: ~Sep 26, ~Oct 26, ~Nov 24. Nov 19 2026 is therefore about five days BEFORE the November full moon. Per the 2026-07-19 moon-date-first lesson, a named full-moon ceremony runs on the actual moon date, so a DTT 'FULL MOON Kirtan' dated Nov 19 cannot be a 2026 edition - Nov 19 2021 did carry a full moon (partial lunar eclipse), which is the likely vintage. This is the same class of kill as the day-of-week kill, applied to lunar events. THE OCT 20 RE-CHECK IS CANCELLED. If DTT runs a November 2026 full moon edition it will appear under a new slug dated ~Nov 24."
     }
   ]
 }
