@@ -39,7 +39,7 @@
         "tantra",
         "dance"
       ],
-      "note": "Tantra, conscious sexuality, embodied dance. New venue, growing programme. Note: no indexed web presence found as of May 2026 — may be operating primarily via Instagram/WhatsApp. Verify the venue name spelling before each run. DNS failure (ENOTFOUND) confirmed Jun 27 2026 — domain does not resolve; reach only via Instagram (@blossom.ubud)."
+      "note": "Tantra, conscious sexuality, embodied dance. New venue, growing programme. Note: no indexed web presence found as of May 2026 — may be operating primarily via Instagram/WhatsApp. Verify the venue name spelling before each run. DNS failure (ENOTFOUND) confirmed Jun 27 2026 — domain does not resolve; reach only via Instagram (@blossom.ubud). HANDLE CORRECTED 2026-09-20: the real Instagram handle is @blossomspace.ubud, not @blossom.ubud as recorded here since Jun 27 2026. Confirmed by the verbatim indexed profile title 'Slow down. Breath in. (@blossomspace.ubud)'. The wrong handle is the likely reason every Blossom walk since June returned nothing. Search the corrected handle from now on."
     },
     {
       "name": "Pyramids of Chi",
@@ -84,7 +84,7 @@
         "tantra",
         "ceremony"
       ],
-      "note": "Growing fast among digital-nomad-adjacent organisers in Ubud. Filter by date window today → +60 days."
+      "note": "Growing fast among digital-nomad-adjacent organisers in Ubud. Filter by date window today → +60 days. DEMOTED TO MONTHLY PASSIVE 2026-09-20 (Sunday maintenance). Three consecutive runs (Sep 17, 18, 20) returned zero Ubud results; the query does not even surface lu.ma domains, it falls through to Eventbrite. Lu.ma appears not to be indexed for Ubud at all, so a per-run walk is a guaranteed-empty spend against a 12-search budget. Check once a month, not daily."
     },
     {
       "name": "Eventbrite — Ubud dance/tantra search",
@@ -125,7 +125,7 @@
         "ceremony",
         "sound"
       ],
-      "note": "Central Ubud ceremony studio (Jl. Nyuh Kuning No. 1). Weekly Friday 7 PM (cacao + Balinese ritual + sacred sound) and Sunday 7 PM (cacao + restorative movement + sound). Primary offering is ceremonial — not a yoga studio. Promoted from discovered_pending 2026-05-25 (3 qualifying logs: May 21, May 22, May 25)."
+      "note": "Central Ubud ceremony studio (Jl. Nyuh Kuning No. 1). Weekly Friday 7 PM (cacao + Balinese ritual + sacred sound) and Sunday 7 PM (cacao + restorative movement + sound). Primary offering is ceremonial — not a yoga studio. Promoted from discovered_pending 2026-05-25 (3 qualifying logs: May 21, May 22, May 25). 2026-09-20: a sweep summary described the cacao+sound slots as Tuesday 7 PM and Friday 7 PM, which conflicts with the Friday+Sunday pattern recorded here. NOT verbatim-confirmed, so this note is unchanged as fact - flagged only. Confirm against a quoted first-party snippet before rewriting; the Sunday slot may have moved to Tuesday."
     },
     {
       "name": "Mudra Cafe (The Cobra Room)",
@@ -750,6 +750,36 @@
         "sound"
       ],
       "note": "Surfaced 2026-09-19 in the D-7 full-moon-cluster sweep, searching the DTT slug pattern the 2026-09-13 lesson says is still actively ticketed per-edition. MOON-DATE KILL - this is the September 2025 edition, not 2026: Sep 7-8 2025 carried a full moon (total lunar eclipse Sep 7 2025), whereas the September 2026 full moon is ~Sep 26 (derived from the confirmed Aug 28 2026 full moon in the 2026-08-02 playbook lesson + one 29.53-day synodic month). Sep 8 2026 is also already past. Double kill: stale year AND past date. Format for reference (consistent across editions): space opens 17:45, BhakTea Kirtan journey 18:00, ecstatic dance by the fire 20:00, cosmic sound healing 21:15-21:30, at Jl. Penestanan No.8, Sayan. SUPPRESSED - never spend another search on this slug. The genuine Sep 26 2026 DTT edition has no indexed slug as of D-7."
+    },
+    {
+      "name": "REALITY CHECK - Ida Lawrence (Purga Artspace, Ubud)",
+      "url": "https://www.instagram.com/purgaartspace/",
+      "first_seen": "2026-09-20",
+      "themes": [
+        "art",
+        "discovery"
+      ],
+      "note": "Solo exhibition 'REALITY CHECK' by Ida Lawrence, curated by Dwis Wibowo, at Purga Artspace (Jl. Bisma, Ubud - in-zone, already a discovery_sources entry). A sweep summary gave the run as 'October 19 - November 15' but WITH NO YEAR and WITHOUT a verbatim quoted snippet, so it is HELD under the hallucination rule, not ingested. Both verification surfaces are egress-blocked (instagram.com, bulgarihotels.com). The weekday kill gives nothing here because a run range carries no weekday claim. VERIFICATION PLAN - exactly one neutral query next run with the date stripped from the query text, per the 2026-08-23 rule: search the exhibition title plus the artist name only, and demand a quoted year. If the year comes back 2026 the event is a strong discovery-tier ingest (one-off, time-sensitive, first-party gallery, on-brand artist-run register). If no year is quotable, drop it - do not re-query a third time."
+    },
+    {
+      "name": "Dance of the Dragonfly (Dragonfly Village, Ubud)",
+      "megatix_slug": "https://megatix.co.id/events/dance-of-the-dragonfly",
+      "url": "https://dragonfly-village.com/retreats-events/",
+      "first_seen": "2026-09-20",
+      "themes": [
+        "dance"
+      ],
+      "note": "Sunset somatic embodied ecstatic dance at Dragonfly Village (priority_a), every WEDNESDAY 17:00-18:30, with optional herbal steam sauna + fire circle 18:00-21:00. Led by Ritual Beats & Emmalee Bevan. Pricing 150k KITAS / 200k visitor, +80k for sauna/pool/fire circle. RECURRING ANCHOR - suppressed, ingest only on a dated per-edition slug or an explicitly branded special edition (2026-08-09 discriminator). Recorded because Dragonfly Village is a priority_a source whose actual programme was never written down here. First-party events page dragonfly-village.com/retreats-events/ is the legitimate source_url when a dated edition appears."
+    },
+    {
+      "name": "Stale Megatix slugs suppressed 2026-09-20: ecstatic-chocolate-24may, mystic-moon-march",
+      "megatix_slug": "https://megatix.co.id/events/ecstatic-chocolate-24may",
+      "first_seen": "2026-09-20",
+      "themes": [
+        "dance",
+        "ceremony"
+      ],
+      "note": "Two slugs surfaced incidentally in the Megatix forward sweep, both carrying month suffixes already past in 2026 ('24may' and 'march'). Per the 2026-05-25 never-year-roll rule they are prior editions, not forward listings. SUPPRESSED - recorded once so no future run spends a search confirming they are still stale."
     }
   ],
   "competitor_harvest": [
@@ -1145,6 +1175,18 @@
         "sound"
       ],
       "note": "Egyptian mystery school ceremony + ecstatic dance. Date: Sep 16, 2026, 18:00 (doors 17:45), Paradiso Ubud. 200k IDR presale / 250k at door. Format: Vocal Flow Activation + Ankh Breath + Postures of Power & Dance + Egyptian Chants — Celebration of Hathor (Egyptian goddess of love, music, dance, beauty). Two Megatix slugs: `egyptikachantsdance` (primary) + `egyptika`. VENUE CONFIRMED 2026-08-15: Paradiso Ubud confirmed via WebSearch snippet — in-zone (priority_a venue). ✅ INGESTED 2026-08-15 via curator/inbox/2026-08-15.json. quality_score 0.78. Category: Ceremony & Sound, event_tier: core."
+    },
+    {
+      "name": "see.events - Bali events platform",
+      "url": "https://see.events/",
+      "type": "aggregator",
+      "themes": [
+        "dance",
+        "ceremony",
+        "sound"
+      ],
+      "first_seen": "2026-09-19",
+      "note": "Promoted to competitor_harvest 2026-09-20 (Sunday maintenance) on the 2026-09-19 flag. Surfaced carrying a DTT Full Moon Kirtan listing, and was already referenced inside a facilitators_pending note (Mantraman, ID 85110245), so it has been touching our beat unnoticed for weeks. PRIMARY REASON FOR PROMOTION IS ATTRIBUTION SAFETY, not yield: promotion automatically places see.events on the playbook's forbidden-URL list, so no future run can store it as a source_url or external_ticket_url. Reachability from the sandbox is UNVERIFIED - do not budget a search to test it; treat it as a passive scout that we simply must never link to."
     }
   ],
   "rejected_permanent": [
@@ -1723,6 +1765,28 @@
       "first_seen": "2026-09-13",
       "events_seen": [],
       "note": "Megatix slug `full-moon-kirtan-sacred-tea-nov19th` surfaced 2026-09-13; held for an Oct 20 re-check when the 60-day window would open. WATCH CLOSED 2026-09-19 BY ARITHMETIC, NO SEARCH SPENT. The 2026 full moons derive from the confirmed Aug 28 2026 full moon (2026-08-02 lesson) plus 29.53-day synodic months: ~Sep 26, ~Oct 26, ~Nov 24. Nov 19 2026 is therefore about five days BEFORE the November full moon. Per the 2026-07-19 moon-date-first lesson, a named full-moon ceremony runs on the actual moon date, so a DTT 'FULL MOON Kirtan' dated Nov 19 cannot be a 2026 edition - Nov 19 2021 did carry a full moon (partial lunar eclipse), which is the likely vintage. This is the same class of kill as the day-of-week kill, applied to lunar events. THE OCT 20 RE-CHECK IS CANCELLED. If DTT runs a November 2026 full moon edition it will appear under a new slug dated ~Nov 24."
+    },
+    {
+      "name": "Emmalee Bevan / Ritual Beats",
+      "megatix_slug": "dance-of-the-dragonfly",
+      "instagram": null,
+      "website": "https://dragonfly-village.com/retreats-events/",
+      "first_seen": "2026-09-20",
+      "events_seen": [
+        "Dance of the Dragonfly (weekly Wed, Dragonfly Village)"
+      ],
+      "note": "Holds the weekly Wednesday sunset ecstatic dance at Dragonfly Village, a priority_a venue. Not previously tracked despite the venue being tier-A since May. Watch for a dated special edition or a solstice/moon edition - that is the form in which this anchor becomes ingestable."
+    },
+    {
+      "name": "Anu Karoliina & Friends",
+      "megatix_slug": "mudra-kirtan",
+      "instagram": null,
+      "website": "https://mudracafe.com/",
+      "first_seen": "2026-09-20",
+      "events_seen": [
+        "Shakti Bhakti: Kirtan & Cacao (weekly Thu, Mudra / The Cobra Room)"
+      ],
+      "note": "Curates 'Shakti Bhakti: Kirtan & Cacao' at The Cobra Room, Mudra Cafe (priority_b), every THURSDAY 18:00-19:30. Cacao + mantra + devotional music; 150k early bird / 200k door; Megatix slug `mudra-kirtan` is the standing anchor page, not a per-edition slug. RECURRING ANCHOR - suppressed. Named here because the sources.json Mudra note described the slot but never the person holding it."
     }
   ]
 }
