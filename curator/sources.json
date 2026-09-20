@@ -20,7 +20,7 @@
       "themes": [
         "dance"
       ],
-      "note": "Skip the cinema schedule — only the ecstatic dance / live music slots. Note: Thursday nights run multiple overlapping series (Vibración, Resonanz, Dance Temple) — treat as a family of events; admin should clarify which Megatix slugs are live. Tuesday 18:00 Dissolve :: Eros is a separate contact-dance event from Moving Waves 15:00."
+      "note": "Skip the cinema schedule — only the ecstatic dance / live music slots. Note: Thursday nights run multiple overlapping series (Vibración, Resonanz, Dance Temple) — treat as a family of events; admin should clarify which Megatix slugs are live. Tuesday 18:00 Dissolve :: Eros is a separate contact-dance event from Moving Waves 15:00. RESONANZ DATE-WATCH RETIRED 2026-09-21. A full Resonanz sweep at D-3 for the Sep 24 edition returned nine per-edition Megatix slugs -- resonanz-ecstatic-dance-x-el-topox, -x-max-hanuman, -x-henry888, -x-prabum, -x-utaramata-x-tanaman-liar-x-pakcik, plus Special Editions x SVARA and x The Arahant -- and NOT ONE carries a date. Resonanz names its editions by GUEST DJ, never by date. The standing anchor is megatix.co.id/resonanz; the weekly format is Contact Improv 18:15, Ecstatic Dance 19:00-20:30, Sonic Savasana 20:30-21:00, 150k online / 200k door, capped at 50, at Jl. Gautama Selatan. CONSEQUENCE: a dated Resonanz announcement will never appear, so no D-3/D-2 watch can ever close. Resonanz appeared in 9 of the last 9 logs and can never yield under a date rule. Treat as a pure recurring anchor: suppress, and ingest ONLY on an explicitly branded Special Edition whose snippet carries a verbatim date. Do not schedule another Resonanz date-watch."
     },
     {
       "name": "Sanctuary Ubud",
@@ -39,7 +39,7 @@
         "tantra",
         "dance"
       ],
-      "note": "Tantra, conscious sexuality, embodied dance. New venue, growing programme. Note: no indexed web presence found as of May 2026 — may be operating primarily via Instagram/WhatsApp. Verify the venue name spelling before each run. DNS failure (ENOTFOUND) confirmed Jun 27 2026 — domain does not resolve; reach only via Instagram (@blossom.ubud). HANDLE CORRECTED 2026-09-20: the real Instagram handle is @blossomspace.ubud, not @blossom.ubud as recorded here since Jun 27 2026. Confirmed by the verbatim indexed profile title 'Slow down. Breath in. (@blossomspace.ubud)'. The wrong handle is the likely reason every Blossom walk since June returned nothing. Search the corrected handle from now on."
+      "note": "Tantra, conscious sexuality, embodied dance. New venue, growing programme. Note: no indexed web presence found as of May 2026 — may be operating primarily via Instagram/WhatsApp. Verify the venue name spelling before each run. DNS failure (ENOTFOUND) confirmed Jun 27 2026 — domain does not resolve; reach only via Instagram (@blossom.ubud). HANDLE CORRECTED 2026-09-20: the real Instagram handle is @blossomspace.ubud, not @blossom.ubud as recorded here since Jun 27 2026. Confirmed by the verbatim indexed profile title 'Slow down. Breath in. (@blossomspace.ubud)'. The wrong handle is the likely reason every Blossom walk since June returned nothing. Search the corrected handle from now on. STATUS 2026-09-21 (first walk on the CORRECTED handle): @blossomspace.ubud is live and indexed, but ONLY as a profile shell -- the verbatim title 'Slow down. Breath in. (@blossomspace.ubud)' is the entire indexed surface. No post content, no dated event, nothing. Correcting the handle did NOT unlock this source, because Instagram POST content is not in the search index at all; only profile shells are. The Jun-Sep silence therefore had two independent causes, and fixing the first does not fix the second. DEMOTED TO PASSIVE: do not spend further searches here. Blossom becomes reachable only if it appears on a ticketing platform (Megatix/Ticket Tailor) or a first-party domain resolves."
     },
     {
       "name": "Pyramids of Chi",
@@ -214,7 +214,7 @@
       "type": "instagram",
       "tier": "discovery",
       "category_hint": "Music & Performance",
-      "note": "Annual, Biji World (Mas, greater-Ubud). Folk/indie/world music + live art + vinyl market. One parent card. 2026 edition: Aug 14-15 (timing shifted from usual ~April; confirmed Megatix 2026-06-20). Check @ubudfolkfest IG in Mar-Apr each year for annual announcement."
+      "note": "Annual, Biji World (Mas, greater-Ubud). Folk/indie/world music + live art + vinyl market. One parent card. 2026 edition: Aug 14-15 (timing shifted from usual ~April; confirmed Megatix 2026-06-20). Check @ubudfolkfest IG in Mar-Apr each year for annual announcement. 2026-09-21: Aug 14-15 2026 edition CONFIRMED PAST (Fri/Sat, both correct for 2026). Slug ubud-folk-festival-2026 is now STALE -- suppressed, do not re-query. Next possible edition is Aug 2027, far outside the 60-day window; do not walk this source again before ~June 2027."
     },
     {
       "name": "Komaneka Fine Art Gallery",
@@ -223,7 +223,7 @@
       "type": "website",
       "tier": "discovery",
       "category_hint": "Art & Culture",
-      "note": "Monkey Forest Rd, Ubud. 4-6 short-run exhibitions/year + vernissages. Opening nights are one-off discovery events (often the only time the artist is present). First-party site posts full curatorial text + dates. 'What Remains in Water' exhibition confirmed closed Jun 19-22, 2026 (past). Next exhibition: watch gallery.komaneka.com from Aug 2026."
+      "note": "Monkey Forest Rd, Ubud. 4-6 short-run exhibitions/year + vernissages. Opening nights are one-off discovery events (often the only time the artist is present). First-party site posts full curatorial text + dates. 'What Remains in Water' exhibition confirmed closed Jun 19-22, 2026 (past). Next exhibition: watch gallery.komaneka.com from Aug 2026. 2026-09-21: first-party exhibitions index is gallery.komaneka.com/exhibitions/ -- the canonical source_url when a dated opening appears. Domain CONFIRMED EGRESS-BLOCKED 2026-09-21, so it is a record, not a readable surface. Only dated text indexed anywhere is an 'AESTHETICS of CAUTION' retrospective dated Dec 20 2025 (stale). No current opening."
     },
     {
       "name": "Titik Dua / W Barwa Gallery",
@@ -310,7 +310,7 @@
   "instagram_handles": [
     "yogabarnbali",
     "paradisoubud",
-    "blossom.ubud",
+    "blossomspace.ubud",
     "thesanctuaryubud",
     "dragonflyvillageubud",
     "barabalistudio",
@@ -780,6 +780,25 @@
         "ceremony"
       ],
       "note": "Two slugs surfaced incidentally in the Megatix forward sweep, both carrying month suffixes already past in 2026 ('24may' and 'march'). Per the 2026-05-25 never-year-roll rule they are prior editions, not forward listings. SUPPRESSED - recorded once so no future run spends a search confirming they are still stale."
+    },
+    {
+      "name": "Tantra Community Ubud (Facebook page)",
+      "url": "https://www.facebook.com/tantracommunityubud/",
+      "first_seen": "2026-09-21",
+      "themes": [
+        "tantra"
+      ],
+      "note": "Community FB page self-described as 'a place where Tantra practitioners can connect'. Surfaced on the 2026-09-21 tantra sweep. MATERIAL because Tantra & Intimacy is this agent's worst-covered category -- uncovered 5+ weeks -- and the only tier-A tantra venue (Blossom Space) was demoted to passive the same day. Facebook is egress-blocked to this agent and FB pages are handled by src/lib/ingestion/adapters/facebook.ts, so this is an ADAPTER COVERAGE CANDIDATE, not a curator walk. Flagged for Benji: adding this page to the facebook adapter is currently the single cheapest route to restoring tantra coverage."
+    },
+    {
+      "name": "Stale slugs + dead leads suppressed 2026-09-21",
+      "first_seen": "2026-09-21",
+      "themes": [
+        "dance",
+        "tantra",
+        "ceremony"
+      ],
+      "note": "(a) resonanz-october -- titled 'Resonanz - November', slug/title mismatch, no year, no date: a stale pair, suppressed. (b) ubud-folk-festival-2026 -- Aug 14-15 2026, past. (c) REALITY CHECK / Ida Lawrence / Purga Artspace WATCH CLOSED: the run is 19 Oct - 15 Nov 2024, opening 'Saturday, 19 October 2024'. Oct 19 2024 WAS a Saturday and Oct 19 2026 is a MONDAY, so the weekday kill confirms the 2024 vintage. It is also a Ubud Writers & Readers Festival programme item, and UWRF is already seeded as a single parent card, so discovery rule 3 (festival = ONE parent card) would suppress it even if the year were current. Dead twice over; do not re-query. (d) MANTRA DANZA AllEvents ID 200030449185116 returned '29 July 2026' again on a neutral query -- third identical neutral result, the 2026-08-23 lesson holds; now past regardless."
     }
   ],
   "competitor_harvest": [
