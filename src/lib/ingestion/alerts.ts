@@ -1,13 +1,12 @@
 /**
- * Health alerts for the ingestion pipeline.
+ * Health checks for the ingestion pipeline.
  *
- * Sends email alerts via Resend when:
+ * Reports (to the activity log, which /admin renders — never to email) when:
  * - A source fails multiple times in a row
  * - The dedup review queue exceeds a threshold
  * - No events have been ingested in the last 24 hours
  */
 
-import { Resend } from "resend";
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
   computeAverageInterval,
@@ -17,17 +16,7 @@ import {
 import { logActivity } from "./activity-log";
 import { nowInBali } from "@/lib/events/bali-time";
 
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@theubudian.com";
 const DEDUP_QUEUE_THRESHOLD = 20;
-
-let resend: Resend | null = null;
-
-function getResend(): Resend {
-  if (!resend) {
-    resend = new Resend(process.env.RESEND_API_KEY);
-  }
-  return resend;
-}
 
 export interface HealthCheckResult {
   healthy: boolean;
@@ -159,15 +148,18 @@ export async function runHealthCheck(): Promise<HealthCheckResult> {
     }
   }
 
-  // Send alert if there are issues
-  if (issues.length > 0) {
-    await sendHealthAlert(issues);
-  }
-
-  // Weekly digest (Sundays only)
-  const today = new Date();
-  if (today.getUTCDay() === 0) {
-    await sendWeeklyDigest(supabase);
+  // Issues go to the activity log, which /admin renders — not to email.
+  // Until 2026-09-21 this sent an "[Ingestion Alert] N issues detected" mail on
+  // every run that found anything, plus a Sunday summary. That was 34 emails in
+  // the last month to an inbox that also carries the client alerts Ben actually
+  // reads, and most of them were "group X quiet for 7h", which is what a WhatsApp
+  // group does overnight. Genuine breakage still has a channel: it is logged here
+  // with severity, and the nightly maintenance workflow raises a CRM handover when
+  // the site goes stale or moderation backs up.
+  for (const issue of issues) {
+    // Quiet groups log themselves above, with the source id attached.
+    if (issue.startsWith('Group "')) continue;
+    await logActivity({ category: "source_error", severity: "warning", title: issue });
   }
 
   return {
@@ -396,134 +388,4 @@ export async function computeSmartHealthMetrics(): Promise<SmartHealthMetrics> {
   }
 
   return { channels, issues };
-}
-
-/**
- * Send a health alert email via Resend.
- */
-async function sendHealthAlert(issues: string[]): Promise<void> {
-  if (!process.env.RESEND_API_KEY) {
-    console.warn("[alerts] RESEND_API_KEY not configured, skipping email alert");
-    console.warn("[alerts] Issues:", issues);
-    return;
-  }
-
-  try {
-    const r = getResend();
-    await r.emails.send({
-      from: "The Ubudian <alerts@theubudian.life>",
-      to: ADMIN_EMAIL,
-      subject: `[Ingestion Alert] ${issues.length} issue${issues.length > 1 ? "s" : ""} detected`,
-      html: `
-        <h2>Ingestion Pipeline Health Alert</h2>
-        <p>The following issues were detected during the health check:</p>
-        <ul>
-          ${issues.map((i) => `<li>${i}</li>`).join("")}
-        </ul>
-        <p>
-          <a href="${process.env.NEXT_PUBLIC_SITE_URL || "https://theubudian.life"}/admin/ingestion">
-            View Ingestion Dashboard
-          </a>
-        </p>
-      `,
-    });
-  } catch (err) {
-    console.error("[alerts] Failed to send health alert email:", err);
-  }
-}
-
-/**
- * Compile and send a weekly ingestion summary email (Sundays only).
- */
-async function sendWeeklyDigest(supabase: ReturnType<typeof createAdminClient>): Promise<void> {
-  if (!process.env.RESEND_API_KEY) {
-    console.warn("[alerts] RESEND_API_KEY not configured, skipping weekly digest");
-    return;
-  }
-
-  try {
-    const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
-
-    // Fetch activity log entries for the week
-    const [
-      { data: eventsCreated },
-      { data: sourceErrors },
-      { data: runSummaries },
-      { data: quietGroups },
-    ] = await Promise.all([
-      supabase
-        .from("ingestion_activity_log")
-        .select("title, details, created_at")
-        .eq("category", "event_created")
-        .gte("created_at", oneWeekAgo),
-      supabase
-        .from("ingestion_activity_log")
-        .select("title, details, created_at")
-        .eq("category", "source_error")
-        .gte("created_at", oneWeekAgo),
-      supabase
-        .from("ingestion_activity_log")
-        .select("title, details, created_at")
-        .eq("category", "run_summary")
-        .gte("created_at", oneWeekAgo),
-      supabase
-        .from("ingestion_activity_log")
-        .select("title, details, created_at")
-        .eq("category", "group_quiet")
-        .gte("created_at", oneWeekAgo),
-    ]);
-
-    const eventCount = eventsCreated?.length ?? 0;
-    const errorCount = sourceErrors?.length ?? 0;
-    const runCount = runSummaries?.length ?? 0;
-    const quietCount = quietGroups?.length ?? 0;
-
-    // Group events by source
-    const eventsBySource: Record<string, number> = {};
-    for (const entry of eventsCreated ?? []) {
-      const sourceName = (entry.details as Record<string, unknown>)?.source_name as string || "Unknown";
-      eventsBySource[sourceName] = (eventsBySource[sourceName] || 0) + 1;
-    }
-
-    // Group errors by source
-    const errorsBySource: Record<string, number> = {};
-    for (const entry of sourceErrors ?? []) {
-      const sourceName = (entry.details as Record<string, unknown>)?.source_name as string || "Unknown";
-      errorsBySource[sourceName] = (errorsBySource[sourceName] || 0) + 1;
-    }
-
-    // Calculate total messages and success rate from run summaries
-    let totalMessages = 0;
-    let totalEventsFromRuns = 0;
-    for (const entry of runSummaries ?? []) {
-      const details = entry.details as Record<string, unknown>;
-      totalMessages += (details?.messages_fetched as number) || 0;
-      totalEventsFromRuns += (details?.events_created as number) || 0;
-    }
-
-    const successRate = totalMessages > 0
-      ? Math.round((totalEventsFromRuns / totalMessages) * 100)
-      : 0;
-
-    const r = getResend();
-    const { weeklyIngestionDigest } = await import("@/lib/email-templates");
-
-    await r.emails.send({
-      from: "The Ubudian <alerts@theubudian.life>",
-      to: ADMIN_EMAIL,
-      subject: `[Ingestion Weekly] ${eventCount} events created, ${errorCount} errors`,
-      html: weeklyIngestionDigest({
-        eventCount,
-        errorCount,
-        runCount,
-        quietGroupAlerts: quietCount,
-        eventsBySource,
-        errorsBySource,
-        totalMessages,
-        successRate,
-      }),
-    });
-  } catch (err) {
-    console.error("[alerts] Failed to send weekly digest:", err);
-  }
 }

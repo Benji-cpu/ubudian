@@ -40,7 +40,7 @@ jobs:
           mkdir -p digests
           curl -fsS \
             -H "Authorization: Bearer $CRON_SECRET" \
-            "https://theubudian.life/api/cron/daily-maintenance?digest=true" \
+            "https://theubudian.life/api/cron/daily-maintenance" \
             -o "digests/${TODAY}.json"
           jq -e '.startedAt' "digests/${TODAY}.json" > /dev/null
 

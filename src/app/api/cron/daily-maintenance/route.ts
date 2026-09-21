@@ -35,8 +35,6 @@ import {
 } from "@/lib/maintenance/expiry";
 import { checkLiveness, type Liveness } from "@/lib/maintenance/liveness";
 import { nowInBali } from "@/lib/events/bali-time";
-import { sendTransactionalEmail } from "@/lib/email";
-import { dailyMaintenanceDigest } from "@/lib/email-templates";
 
 // The gate makes up to AUTO_APPROVE_MAX_PER_RUN Gemini calls on top of the
 // link-health sweep, so this route needs more than the platform default.
@@ -227,19 +225,11 @@ export async function GET(request: Request) {
     errors,
   };
 
-  // Optional: ?digest=true sends an email digest to ADMIN_EMAIL. Used by the
-  // GitHub Actions nightly workflow so CI doesn't need its own Resend creds.
-  if (url.searchParams.get("digest") === "true" && process.env.ADMIN_EMAIL) {
-    try {
-      await sendTransactionalEmail(
-        process.env.ADMIN_EMAIL,
-        "Ubudian — daily maintenance digest",
-        dailyMaintenanceDigest(payload),
-      );
-    } catch (err) {
-      payload.errors.push(`digest email: ${err instanceof Error ? err.message : String(err)}`);
-    }
-  }
+  // This used to email the digest to ADMIN_EMAIL on ?digest=true — 32 mails in the
+  // last month, every one of them a copy of the JSON below. The workflow that calls
+  // this route already commits that JSON to digests/ and raises a CRM handover when
+  // a check genuinely fails, so the mail was a third copy of a report nobody opened.
+  // Removed 2026-09-21. The payload is unchanged; read it in the repo or the CRM.
 
   return NextResponse.json(payload);
 }
