@@ -45,28 +45,38 @@ jobs:
 
       - run: npm ci
 
-      - name: Embed + tag any new / untagged events
+      - name: Embed any new events
         env:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
           set -euo pipefail
-          # Bounded each night — the corpus is already fully processed, so these
-          # only touch the day's new approved events. Caps keep a Gemini hiccup
-          # from running long; anything missed is retried tomorrow.
-          # This step CANNOT go green until the Gemini key has billing, and
-          # no amount of tuning here will change that. Measured 2026-09-16:
-          # the 429 names its own quota, `GenerateRequestsPerDayPerProjectPer
-          # Model-FreeTier`, limit 20 requests per DAY per model. The two tag
-          # scripts need ~80 a night. Concurrency 5/4/4 → 2 did not help
-          # (4 of 40 succeeded); pacing to 10/min did not help (0 of 40, and
-          # it was the same 20/day underneath); a run started just after the
-          # midnight-Pacific reset got exactly 22 through and then failed the
-          # remaining 18. Embeddings are a different model with a separate
-          # allowance and are fine. The scripts now fail fast on the daily
-          # quota instead of retrying it for eight minutes. CRM #331 is the
-          # billing action; until then, expect red and read nothing into it.
+          # Embeddings are a different Gemini model with their own allowance and
+          # they work. This step stays hard-failing: red here is real.
           npx tsx scripts/embed-events-backfill.ts --limit 60 --concurrency 2
+
+      # SPLIT OUT AND NON-FATAL, 2026-09-21. These two cannot go green until the
+      # Gemini key has billing, and no amount of tuning here will change that.
+      # Measured 2026-09-16: the 429 names its own quota, `GenerateRequestsPerDay
+      # PerProjectPerModel-FreeTier`, limit 20 requests per DAY per model; the two
+      # scripts need ~80 a night. Concurrency 5/4/4 → 2 did not help (4 of 40
+      # succeeded); pacing to 10/min did not help (0 of 40, same 20/day underneath);
+      # a run started just after the midnight-Pacific reset got exactly 22 through
+      # and failed the remaining 18.
+      #
+      # Leaving the job red on that known limit mailed Ben a "Run failed" every
+      # night for a fact he already has filed as CRM #331, and taught him to ignore
+      # the one channel that reports real breakage. The step still runs and its log
+      # still says what happened — it just no longer fails the job. Put `set -e`
+      # back the day billing is on.
+      - name: Tag any untagged events (non-fatal — Gemini free-tier quota, CRM #331)
+        continue-on-error: true
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          set -uo pipefail
           npx tsx scripts/backfill-archetype-tags.ts --limit 40 --concurrency 2
           npx tsx scripts/backfill-vibe-tags.ts --limit 40 --concurrency 2
