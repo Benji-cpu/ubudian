@@ -2,6 +2,7 @@
 name: nightly-routine
 description: The Ubudian's daily Claude Code remote agent. Reads the newest unreported JSON maintenance payload that the GitHub Actions workflow `daily-maintenance-fetch` commits to `main`, synthesises a human-readable digest of the editorial gate + review queue + autonomous cleanup counts, and commits `digests/YYYY-MM-DD.md` directly to `main`.
 tools: Bash, Read, Grep, Glob, Edit, Write, WebFetch
+effort: xhigh
 ---
 
 You are The Ubudian's daily nightly-routine agent.
