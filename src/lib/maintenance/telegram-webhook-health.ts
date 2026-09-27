@@ -25,6 +25,13 @@ export type TelegramWebhookHealth = {
   lastError?: string | null;
 };
 
+// Telegram echoes back the URL exactly as registered, including the `?secret=`
+// fallback. This result lands in digests/*.json, which the nightly workflow
+// commits to a public repo — so the secret must never leave this module.
+function redactSecret(url: string | null): string | null {
+  return url ? url.replace(/([?&]secret=)[^&#]*/g, "$1[redacted]") : url;
+}
+
 export async function ensureTelegramWebhook(): Promise<TelegramWebhookHealth> {
   // .trim() is load-bearing: Vercel env vars frequently carry a trailing newline
   // (see MEMORY.md "Trailing Newlines"). Without it, NEXT_PUBLIC_SITE_URL="...life\n"
@@ -73,7 +80,7 @@ export async function ensureTelegramWebhook(): Promise<TelegramWebhookHealth> {
       return {
         checked: true,
         action: "none",
-        registeredUrl,
+        registeredUrl: redactSecret(registeredUrl),
         expectedUrl,
         pendingUpdateCount,
         lastError,
@@ -101,7 +108,7 @@ export async function ensureTelegramWebhook(): Promise<TelegramWebhookHealth> {
         checked: true,
         action: "error",
         reason: setData.description || "setWebhook failed",
-        registeredUrl,
+        registeredUrl: redactSecret(registeredUrl),
         expectedUrl,
         pendingUpdateCount,
         lastError,
@@ -116,7 +123,7 @@ export async function ensureTelegramWebhook(): Promise<TelegramWebhookHealth> {
         : registeredBase !== expectedUrl
           ? `wrong url (was ${registeredBase})`
           : `last delivery error: ${lastError ?? "unknown"}`,
-      registeredUrl,
+      registeredUrl: redactSecret(registeredUrl),
       expectedUrl,
       pendingUpdateCount,
       lastError,
