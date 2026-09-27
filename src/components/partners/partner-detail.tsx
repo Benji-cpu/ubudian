@@ -100,12 +100,6 @@ export function PartnerDetail({ partner: p }: PartnerDetailProps) {
           </Link>
         </section>
       )}
-
-      <footer className="border-t border-brand-gold/15 bg-brand-cream/40">
-        <div className="mx-auto max-w-3xl px-4 py-6 text-center text-xs uppercase tracking-[0.2em] text-brand-charcoal-light sm:px-6 lg:px-8">
-          Sponsored partner of The Ubudian
-        </div>
-      </footer>
     </article>
   );
 }

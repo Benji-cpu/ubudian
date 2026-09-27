@@ -3,6 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { SITE_URL } from "@/lib/constants";
 import { HUBS } from "@/lib/hubs";
 import { getSiteSettings } from "@/lib/site-settings";
+import { isPublicListing } from "@/lib/events/listing-checks";
 
 /**
  * The sitemap must agree with `site_settings`. A flagged-off section renders
@@ -26,7 +27,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ] = await Promise.all([
     supabase
       .from("events")
-      .select("slug, updated_at")
+      .select("slug, updated_at, venue_name, external_ticket_url, organizer_contact, organizer_instagram, moderation_reason")
       .eq("status", "approved"),
     supabase
       .from("guides")
@@ -70,7 +71,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
 
 
-  const eventPages: MetadataRoute.Sitemap = (eventsRes.data ?? []).map((e) => ({
+  const eventPages: MetadataRoute.Sitemap = (eventsRes.data ?? []).filter(isPublicListing).map((e) => ({
     url: `${SITE_URL}/events/${e.slug}`,
     lastModified: e.updated_at,
     changeFrequency: "weekly",

@@ -8,7 +8,6 @@ interface MoreHappeningsProps {
   events: Event[];
   currentProfileId: string | null;
   savedEventIds: string[];
-  boostedEventIds?: Set<string>;
 }
 
 // Same time windows as the core agenda, reworded slightly so the discovery
@@ -40,13 +39,12 @@ export function MoreHappenings({
   events,
   currentProfileId,
   savedEventIds,
-  boostedEventIds,
 }: MoreHappeningsProps) {
   if (!events.length) return null;
 
   const now = new Date();
   const savedSet = new Set(savedEventIds);
-  const buckets = bucketEventsByTime(events, now, boostedEventIds);
+  const buckets = bucketEventsByTime(events, now);
 
   const renderSave = (event: Event) =>
     currentProfileId ? (

@@ -28,11 +28,10 @@ export function filterEventsInRange(
   events: Event[],
   from: string | null,
   to: string | null,
-  now: Date = new Date(),
-  boostedEventIds?: Set<string>
+  now: Date = new Date()
 ): Event[] {
   if (!from && !to)
-    return sortRolledEvents(rolledForward(events, now), "date", boostedEventIds);
+    return sortRolledEvents(rolledForward(events, now), "date");
 
   // `expandRecurrence` (and `buckets.ts`) interpret Date objects via the
   // host TZ — `startOfDay`, weekday lookups, etc. Anchor the window in
@@ -67,7 +66,7 @@ export function filterEventsInRange(
     }
   }
 
-  return sortRolledEvents(out, "date", boostedEventIds);
+  return sortRolledEvents(out, "date");
 }
 
 function parseYmdLocal(ymd: string): Date {

@@ -96,13 +96,12 @@ export default function TermsPage() {
           </p>
         </Section>
 
-        <Section title="6. Memberships and payments">
+        <Section title="6. Payments">
           <p>
-            Paid memberships, where offered, renew automatically until cancelled.
-            You can cancel at any time, and cancellation takes effect at the end
-            of the current billing period. Fees already paid are non-refundable
-            except where required by law. All amounts are processed securely
-            through Stripe; we do not store your card details.
+            Paid bookings, where offered, are processed securely through Stripe;
+            we do not store your card details. Fees already paid are
+            non-refundable except where required by law or stated in the
+            booking terms.
           </p>
         </Section>
 

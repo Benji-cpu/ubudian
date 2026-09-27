@@ -6,6 +6,7 @@ import { HUBS, getHub } from "@/lib/hubs";
 import { HubJsonLd } from "@/components/hubs/hub-json-ld";
 import { EventGridCard } from "@/components/events/event-grid-card";
 import { stripEmbeddings } from "@/lib/events/strip-embedding";
+import { visibleListings } from "@/lib/events/listing-checks";
 import { formatRecurrenceRule, parseRecurrenceRule, daysOfWeekArray } from "@/lib/recurrence";
 import { formatEventTime } from "@/lib/utils";
 import { nowInBali } from "@/lib/events/bali-time";
@@ -62,7 +63,7 @@ export default async function HubPage({
     .order("start_date", { ascending: true })
     .limit(80);
 
-  const events = stripEmbeddings((data ?? []) as Event[]);
+  const events = visibleListings(stripEmbeddings((data ?? []) as Event[]));
 
   const weekly = events
     .filter((e) => e.is_recurring && e.recurrence_rule)

@@ -9,13 +9,18 @@ const nextConfig: NextConfig = {
       // URL has been indexed and linked from emails, so it redirects for good.
       { source: "/experiences", destination: "/retreats", permanent: true },
       { source: "/experiences/:slug", destination: "/retreats/:slug", permanent: true },
-      // 2026-09-27: off the public path until Ben decides keep/delete. Both
-      // pages promised things no code delivers — /membership sold Insider
-      // perks (early access, discounts, an Insider newsletter) that do not
-      // exist, to 0 active members; /partners' enquiry form posts to an API
-      // route that was never built. Temporary, so reverting is one line.
-      { source: "/membership", destination: "/about", permanent: false },
-      { source: "/partners", destination: "/about", permanent: false },
+      // 2026-09-27: membership and the sponsor portal were deleted (0 members,
+      // 0 sponsors, ever). Their public pages point at /about; the signed-in
+      // and admin ones at their section's home. /partners/:slug (community
+      // partner profiles) is a different thing and stays.
+      { source: "/membership", destination: "/about", permanent: true },
+      { source: "/partners", destination: "/about", permanent: true },
+      { source: "/community/partners/:slug", destination: "/about", permanent: true },
+      { source: "/sponsor/:path*", destination: "/about", permanent: true },
+      { source: "/dashboard/membership", destination: "/dashboard", permanent: true },
+      { source: "/admin/sponsors/:path*", destination: "/admin", permanent: true },
+      { source: "/admin/sponsors", destination: "/admin", permanent: true },
+      { source: "/admin/subscriptions", destination: "/admin/commerce", permanent: true },
     ];
   },
   async headers() {

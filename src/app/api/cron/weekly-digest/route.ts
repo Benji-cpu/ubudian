@@ -3,6 +3,8 @@ import { addDays, getISOWeek, getISOWeekYear } from "date-fns";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { nowInBali } from "@/lib/events/bali-time";
 import { filterEventsInRange } from "@/lib/events/filter-range";
+import { visibleListings } from "@/lib/events/listing-checks";
+import { digestRecipients, type DigestProfile, type DigestSubscriber } from "@/lib/email/digest-recipients";
 import { buildSpread } from "@/lib/quiz/build-spread";
 import { buildWeeklyDigestEmailHtml } from "@/lib/email/weekly-digest-email";
 import { unsubscribeUrl } from "@/lib/email/unsubscribe";
@@ -14,12 +16,15 @@ import type { ArchetypeId, Event } from "@/types";
 export const maxDuration = 60;
 
 /**
- * Weekly For-You digest — runs Wednesday mornings (Bali) via GitHub Actions
- * (NOT Vercel cron; both Hobby slots are taken). Recipients: profiles with an
- * email and either a quiz archetype or at least one saved event, minus
- * opt-outs. Each gets up to 5 events from the next 7 Bali days — spread-
- * matched to their archetype when they have one, the top of the window
- * otherwise. Idempotent per ISO week via transactional_sends.
+ * The weekly email — runs Wednesday mornings (Bali) via GitHub Actions
+ * (NOT Vercel cron; both Hobby slots are taken). It is the only newsletter:
+ * there is no Beehiiv step. Recipients, one email per address:
+ *   - active `newsletter_subscribers` (the footer and quiz sign-ups), and
+ *   - profiles with a quiz archetype or at least one saved event,
+ * minus anyone unsubscribed on either list. Each gets up to 5 events from the
+ * next 7 Bali days — spread-matched to their archetype when they have one,
+ * the top of the window otherwise — with an unsubscribe link and header.
+ * Idempotent per address per ISO week via transactional_sends.
  *
  * Test param: ?only=<email> restricts sends to that address.
  */
@@ -41,12 +46,12 @@ export async function POST(request: Request) {
 
   const supabase = createAdminClient();
 
-  const [profilesRes, savesRes, eventsRes] = await Promise.all([
+  const [profilesRes, subscribersRes, savesRes, eventsRes] = await Promise.all([
     supabase
       .from("profiles")
       .select("id, email, email_opt_out, primary_archetype")
-      .not("email", "is", null)
-      .eq("email_opt_out", false),
+      .not("email", "is", null),
+    supabase.from("newsletter_subscribers").select("email, status, archetype"),
     supabase.from("saved_events").select("profile_id"),
     supabase
       .from("events")
@@ -55,8 +60,9 @@ export async function POST(request: Request) {
       .or(`start_date.gte.${bali.dateStr},is_recurring.eq.true`),
   ]);
 
-  if (profilesRes.error || savesRes.error || eventsRes.error) {
-    console.error("[weekly-digest] fetch failed:", profilesRes.error ?? savesRes.error ?? eventsRes.error);
+  const fetchError = profilesRes.error ?? subscribersRes.error ?? savesRes.error ?? eventsRes.error;
+  if (fetchError) {
+    console.error("[weekly-digest] fetch failed:", fetchError);
     return NextResponse.json({ error: "Fetch failed" }, { status: 500 });
   }
 
@@ -64,32 +70,25 @@ export async function POST(request: Request) {
 
   // Events occurring in the next 7 Bali days, recurring rolled forward.
   const weekEvents = filterEventsInRange(
-    (eventsRes.data ?? []) as Event[],
+    visibleListings((eventsRes.data ?? []) as Event[]),
     bali.dateStr,
     toStr
   );
 
-  type ProfileRow = {
-    id: string;
-    email: string;
-    email_opt_out: boolean;
-    primary_archetype: string | null;
-  };
-
-  const recipients = ((profilesRes.data ?? []) as ProfileRow[])
-    .filter((p) => p.email && (p.primary_archetype || saverIds.has(p.id)))
-    .filter((p) => !only || p.email.toLowerCase() === only);
+  const recipients = digestRecipients(
+    (profilesRes.data ?? []) as DigestProfile[],
+    (subscribersRes.data ?? []) as DigestSubscriber[],
+    saverIds
+  ).filter((r) => !only || r.email === only);
 
   let sent = 0;
   let skippedDuplicate = 0;
   let skippedEmpty = 0;
   let failed = 0;
 
-  for (const profile of recipients) {
-    const archetype: ArchetypeId | null = ARCHETYPE_IDS.includes(
-      profile.primary_archetype as ArchetypeId
-    )
-      ? (profile.primary_archetype as ArchetypeId)
+  for (const recipient of recipients) {
+    const archetype: ArchetypeId | null = ARCHETYPE_IDS.includes(recipient.archetype as ArchetypeId)
+      ? (recipient.archetype as ArchetypeId)
       : null;
 
     const picks = archetype
@@ -101,10 +100,10 @@ export async function POST(request: Request) {
       continue;
     }
 
-    const dedupeKey = `digest:${profile.id}:${weekKey}`;
+    const dedupeKey = `digest:${recipient.email}:${weekKey}`;
     const { error: ledgerError } = await supabase.from("transactional_sends").insert({
       kind: "digest",
-      email: profile.email,
+      email: recipient.email,
       dedupe_key: dedupeKey,
     });
     if (ledgerError) {
@@ -116,18 +115,17 @@ export async function POST(request: Request) {
       continue;
     }
 
+    const unsubUrl = unsubscribeUrl(recipient.email, SITE_URL);
     const html = buildWeeklyDigestEmailHtml({
       archetype,
       events: picks,
       siteUrl: SITE_URL,
-      unsubUrl: unsubscribeUrl(profile.email, SITE_URL),
+      unsubUrl,
       weekLabel,
     });
-    const ok = await sendTransactionalEmail(
-      profile.email,
-      "This week in your Ubud",
-      html
-    );
+    const ok = await sendTransactionalEmail(recipient.email, "This week in your Ubud", html, {
+      unsubUrl,
+    });
     if (ok) {
       sent++;
     } else {

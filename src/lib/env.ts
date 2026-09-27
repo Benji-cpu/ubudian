@@ -26,8 +26,6 @@ const serverEnvSchema = z.object({
   WAHA_API_KEY: z.string().min(1).optional(),
   WAHA_WEBHOOK_SECRET: z.string().min(1).optional(),
   STABILITY_AI_API_KEY: z.string().min(1).optional(),
-  BEEHIIV_API_KEY: z.string().min(1).optional(),
-  BEEHIIV_PUBLICATION_ID: z.string().min(1).optional(),
   ADMIN_EMAIL: z.string().email().optional(),
 });
 

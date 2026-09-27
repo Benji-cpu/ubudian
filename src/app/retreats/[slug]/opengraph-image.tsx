@@ -16,14 +16,14 @@ export default async function JourneyOgImage({
   const supabase = await createClient();
   const { data: row } = await supabase
     .from("journeys")
-    .select("title, subtitle, summary, cover_image_url, length_days, tier, archetype_tags")
+    .select("title, subtitle, summary, cover_image_url, length_days, archetype_tags")
     .eq("slug", slug)
     .eq("is_published", true)
     .maybeSingle();
 
   const journey = (row ?? null) as Pick<
     Journey,
-    "title" | "subtitle" | "summary" | "cover_image_url" | "length_days" | "tier" | "archetype_tags"
+    "title" | "subtitle" | "summary" | "cover_image_url" | "length_days" | "archetype_tags"
   > | null;
 
   if (!journey) {
@@ -49,12 +49,7 @@ export default async function JourneyOgImage({
     );
   }
 
-  const tierLabel =
-    journey.tier === "signature_cohort"
-      ? "Signature Cohort"
-      : journey.tier === "self_paced"
-      ? "Insider Self-Paced"
-      : "Ubud Retreat";
+  const tierLabel = "Ubud Retreat";
 
   const dayLabel = `${journey.length_days} ${journey.length_days === 1 ? "day" : "days"}`;
   const archetypes = (journey.archetype_tags ?? []).slice(0, 3);

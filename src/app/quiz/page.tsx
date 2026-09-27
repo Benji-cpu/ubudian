@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { QuizContainer } from "@/components/quiz/quiz-container";
 import { stripEmbeddings } from "@/lib/events/strip-embedding";
+import { visibleListings } from "@/lib/events/listing-checks";
 import type { Event } from "@/types";
 import type { Metadata } from "next";
 
@@ -22,7 +23,7 @@ export default async function QuizPage() {
     .order("start_date", { ascending: true })
     .limit(20);
 
-  const events = stripEmbeddings((eventsData ?? []) as Event[]);
+  const events = visibleListings(stripEmbeddings((eventsData ?? []) as Event[]));
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-brand-off-white to-brand-cream dark:from-background dark:to-background">

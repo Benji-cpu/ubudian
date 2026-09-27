@@ -1,12 +1,13 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { queryWithRetry } from "@/lib/supabase/retry";
-import { addSubscriberWithArchetype } from "@/lib/beehiiv";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
 import { buildSpread } from "@/lib/quiz/build-spread";
 import { buildSpreadEmailHtml } from "@/lib/email/spread-email";
 import { sendTransactionalEmail } from "@/lib/email";
 import { SITE_URL } from "@/lib/constants";
+import { unsubscribeUrl } from "@/lib/email/unsubscribe";
+import { visibleListings } from "@/lib/events/listing-checks";
 import { ARCHETYPE_IDS } from "@/lib/quiz-data";
 import { NextResponse, after } from "next/server";
 import { quizSubmitSchema } from "@/lib/quiz/submit-schema";
@@ -108,15 +109,6 @@ export async function POST(request: Request) {
       if (subError) {
         console.error("Newsletter subscriber upsert error:", subError);
       }
-
-      // Sync to Beehiiv with archetype
-      const beehiivId = await addSubscriberWithArchetype(normalizedEmail, primary_archetype);
-      if (beehiivId) {
-        await supabase
-          .from("newsletter_subscribers")
-          .update({ beehiiv_subscriber_id: beehiivId })
-          .eq("email", normalizedEmail);
-      }
     }
 
     // Build the custom spread → persist it for logged-in takers and email it so
@@ -137,7 +129,7 @@ export async function POST(request: Request) {
             .gte("start_date", today)
             .order("start_date", { ascending: true })
             .limit(60);
-          const spread = buildSpread(primary, (evRes.data ?? []) as Event[]);
+          const spread = buildSpread(primary, visibleListings((evRes.data ?? []) as Event[]));
           if (spread.events.length === 0) return;
 
           if (profileId) {
@@ -151,15 +143,18 @@ export async function POST(request: Request) {
           }
 
           if (spreadEmail && spread.events.length > 0) {
+            const unsubUrl = unsubscribeUrl(spreadEmail, SITE_URL);
             const html = buildSpreadEmailHtml({
               primary,
               events: spread.events,
               siteUrl: SITE_URL,
+              unsubUrl,
             });
             await sendTransactionalEmail(
               spreadEmail,
               "Your Ubud spirit + a spread picked for you",
-              html
+              html,
+              { unsubUrl }
             );
           }
         } catch (err) {

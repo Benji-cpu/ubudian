@@ -4,9 +4,8 @@ import { formatEventTime } from "@/lib/utils";
 import type { ArchetypeId, Event } from "@/types";
 
 /**
- * "This week in your Ubud" — the weekly For-You digest. Personalised via the
- * taker's archetype when they have one; the saved-only variant drops the
- * archetype framing and leads with the week itself.
+ * "This week in your Ubud" — the weekly email. Personalised via the
+ * reader's archetype when they have one; otherwise it leads with the week itself.
  */
 export function buildWeeklyDigestEmailHtml(opts: {
   archetype: ArchetypeId | null;
@@ -20,7 +19,7 @@ export function buildWeeklyDigestEmailHtml(opts: {
 
   const intro = a
     ? `Picked for ${esc(a.name)} — what's moving in the valley this week.`
-    : `What's moving in the valley this week, picked from the gatherings you've been saving.`;
+    : `What's moving in the valley this week.`;
 
   const rows = events
     .map((e) => {

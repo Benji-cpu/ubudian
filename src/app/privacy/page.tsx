@@ -59,8 +59,8 @@ export default function PrivacyPage() {
               store your email address to send you our weekly newsletter.
             </li>
             <li>
-              <strong>Bookings and payments.</strong> If you book a tour or take
-              out a membership, we record the booking and its status. Card
+              <strong>Bookings and payments.</strong> If you book a tour, we
+              record the booking and its status. Card
               payments are processed by Stripe — we never see or store your full
               card number.
             </li>
@@ -81,7 +81,7 @@ export default function PrivacyPage() {
           <ul className="list-disc space-y-3 pl-6">
             <li>To provide and personalise the service — including event recommendations based on your quiz archetype and saved events.</li>
             <li>To send you the weekly newsletter you signed up for.</li>
-            <li>To process tour bookings and membership subscriptions.</li>
+            <li>To process tour bookings.</li>
             <li>To review and publish events you submit.</li>
             <li>To keep the platform secure, prevent abuse, and fix problems.</li>
             <li>To respond to you when you get in touch.</li>
@@ -107,14 +107,10 @@ export default function PrivacyPage() {
               it.
             </li>
             <li>
-              <strong>Stripe</strong> — payment processing for bookings and
-              memberships.
+              <strong>Stripe</strong> — payment processing for bookings.
             </li>
             <li>
-              <strong>Beehiiv</strong> — newsletter delivery.
-            </li>
-            <li>
-              <strong>Resend</strong> — transactional and notification emails.
+              <strong>Resend</strong> — the weekly email and notification emails.
             </li>
             <li>
               <strong>Vercel</strong> — website hosting and delivery.

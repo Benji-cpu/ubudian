@@ -18,13 +18,12 @@ import { CrossSectionRibbon } from "@/components/journeys/cross-section-ribbon";
 import { NewsletterSignup } from "@/components/layout/newsletter-signup";
 import { eventIsHappeningNow, nowInBali } from "@/lib/events/bali-time";
 import { filterEventsInRange } from "@/lib/events/filter-range";
-import { getActiveBoostedEventIds, getCategorySponsor } from "@/lib/sponsors/sponsor-service";
-import { PartnerCredit } from "@/components/sponsors/partner-credit";
 import { splitByTier, pickSpotlight, bannerEyebrow } from "@/lib/events/discovery";
 import { stripEmbeddings } from "@/lib/events/strip-embedding";
+import { visibleListings } from "@/lib/events/listing-checks";
 import { FestivalBanner } from "@/components/events/festival-banner";
 import { MoreHappenings } from "@/components/events/more-happenings";
-import type { ArchetypeId, Event, QuizResultRecord, Sponsor } from "@/types";
+import type { ArchetypeId, Event, QuizResultRecord } from "@/types";
 
 const VIEWS_USING_OWN_VIEWPORT = new Set(["calendar", "week"]);
 
@@ -72,9 +71,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
   let savedEventIds: string[] = [];
   let viewerArchetypes: ArchetypeId[] | null = null;
   let archetypeLabel: string | null = null;
-  let boostedEventIds: Set<string> = new Set();
   let tasteSimByEventId: Map<string, number> | undefined;
-  let categorySponsor: Sponsor | null = null;
 
   try {
     const supabase = await createClient();
@@ -191,7 +188,8 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
       return query;
     }, "events-list");
     if (error) console.error("Events query error:", error);
-    allEvents = stripEmbeddings((events ?? []) as Event[]);
+    // The gate's rules at read time: moderated, a way in, one card per gathering.
+    allEvents = visibleListings(stripEmbeddings((events ?? []) as Event[]));
 
     // Behavioural taste rail — for signed-in users who've hearted events, score
     // every approved event by cosine to the centroid of their saved events.
@@ -209,13 +207,6 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
           ((sims ?? []) as { id: string; similarity: number }[]).map((s) => [s.id, s.similarity])
         );
       }
-    }
-
-    // Community-partner data — boost-sort eligible event IDs and (when filtered
-    // by category) the anchor sponsor that owns that category.
-    boostedEventIds = await getActiveBoostedEventIds();
-    if (params.category) {
-      categorySponsor = await getCategorySponsor(params.category);
     }
   } catch {
     // Supabase unreachable — render with empty state
@@ -235,9 +226,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
     : filterEventsInRange(
         allEvents,
         params.from ?? null,
-        params.to ?? null,
-        undefined,
-        boostedEventIds
+        params.to ?? null
       );
 
   // Happening-now narrows the page-level array to events the bucket layer
@@ -310,16 +299,6 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
           </Suspense>
         </div>
 
-        <div className="mt-4">
-          {params.category && categorySponsor && (
-            <PartnerCredit
-              sponsor={categorySponsor}
-              verb={`${params.category}, brought to you by`}
-              className="mt-4"
-            />
-          )}
-        </div>
-
         {params.archetype && ARCHETYPE_NAMES[params.archetype] && (
           <div className="mt-4 flex items-center justify-between rounded-lg border border-brand-gold/20 bg-brand-gold/5 px-4 py-3">
             <p className="text-sm text-foreground">
@@ -359,7 +338,6 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
                 savedEventIds={savedEventIds}
                 viewerArchetypes={viewerArchetypes}
                 archetypeLabel={archetypeLabel}
-                boostedEventIds={boostedEventIds}
                 tasteSimByEventId={tasteSimByEventId}
               />
             </Suspense>
@@ -369,7 +347,6 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
                   events={extraDiscovery}
                   currentProfileId={currentProfileId}
                   savedEventIds={savedEventIds}
-                  boostedEventIds={boostedEventIds}
                 />
               </div>
             )}
@@ -392,7 +369,6 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
                   events={extraDiscovery}
                   currentProfileId={currentProfileId}
                   savedEventIds={savedEventIds}
-                  boostedEventIds={boostedEventIds}
                 />
               </div>
             )}

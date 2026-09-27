@@ -61,7 +61,6 @@ const guideSchema = z.object({
     z.enum(["seeker", "explorer", "creative", "connector", "epicurean"]),
   ),
   status: z.enum(["draft", "published", "archived"]),
-  is_members_only: z.boolean(),
   is_editors_pick: z.boolean(),
   editors_pick_position: z.number().int().nullable(),
   reading_time_min: z.number().int().nullable(),
@@ -109,7 +108,6 @@ export function GuideForm({ initialData }: GuideFormProps) {
       intent_tags: initialData?.intent_tags ?? [],
       archetype_tags: initialData?.archetype_tags ?? [],
       status: initialData?.status ?? "draft",
-      is_members_only: initialData?.is_members_only ?? false,
       is_editors_pick: initialData?.is_editors_pick ?? false,
       editors_pick_position: initialData?.editors_pick_position ?? null,
       reading_time_min: initialData?.reading_time_min ?? null,
@@ -159,7 +157,6 @@ export function GuideForm({ initialData }: GuideFormProps) {
       intent_tags: data.intent_tags,
       archetype_tags: data.archetype_tags,
       status: data.status,
-      is_members_only: data.is_members_only,
       is_editors_pick: data.is_editors_pick,
       editors_pick_position: data.is_editors_pick
         ? data.editors_pick_position
@@ -703,27 +700,6 @@ export function GuideForm({ initialData }: GuideFormProps) {
                 )}
               />
             )}
-
-            <FormField
-              control={form.control}
-              name="is_members_only"
-              render={({ field }) => (
-                <FormItem className="flex items-center justify-between rounded-md border p-3">
-                  <div>
-                    <FormLabel>Members only</FormLabel>
-                    <FormDescription className="mt-0.5">
-                      Currently informational — gating UI ships later.
-                    </FormDescription>
-                  </div>
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
 
             <FormField
               control={form.control}

@@ -2,9 +2,11 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { verifyUnsubscribeToken } from "@/lib/email/unsubscribe";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
 
-// One-click unsubscribe from personalised transactional email (weekly digest
-// + saved-event reminders). GET so it works from any mail client. Renders a
-// tiny branded confirmation page rather than JSON — humans land here.
+// One-click unsubscribe from everything The Ubudian sends to subscribers: the
+// weekly email, saved-event reminders and the quiz spread. GET renders a tiny
+// branded confirmation page (humans land here from the footer link); POST is
+// the RFC 8058 one-click call mail clients make from the List-Unsubscribe
+// header. Both stop the address on the profile and the subscriber list.
 
 function page(title: string, body: string): Response {
   return new Response(
@@ -17,37 +19,52 @@ main{max-width:420px;text-align:center}h1{color:#2C4A3E;font-weight:500;font-siz
   );
 }
 
-export async function GET(request: Request) {
-  const ip = getClientIp(request);
-  const { success } = rateLimit(`unsubscribe:${ip}`, { limit: 10, windowSeconds: 600 });
-  if (!success) {
-    return page("Too many requests", "Please try again in a few minutes.");
-  }
+type Outcome = "ok" | "invalid" | "limited" | "failed";
+
+async function unsubscribe(request: Request): Promise<Outcome> {
+  const { success } = rateLimit(`unsubscribe:${getClientIp(request)}`, { limit: 10, windowSeconds: 600 });
+  if (!success) return "limited";
 
   const url = new URL(request.url);
   const email = (url.searchParams.get("email") || "").toLowerCase().trim();
   const token = url.searchParams.get("token") || "";
-
-  if (!email || !token || !verifyUnsubscribeToken(email, token)) {
-    return page(
-      "Link not valid",
-      "This unsubscribe link is incomplete or expired. Reply to any of our emails and we'll sort it out by hand."
-    );
-  }
+  if (!email || !token || !verifyUnsubscribeToken(email, token)) return "invalid";
 
   try {
     const supabase = createAdminClient();
-    await supabase.from("profiles").update({ email_opt_out: true }).eq("email", email);
+    const [profiles, subscribers] = await Promise.all([
+      supabase.from("profiles").update({ email_opt_out: true }).eq("email", email),
+      supabase.from("newsletter_subscribers").update({ status: "unsubscribed" }).eq("email", email),
+    ]);
+    if (profiles.error || subscribers.error) throw profiles.error ?? subscribers.error;
+    return "ok";
   } catch (err) {
     console.error("[unsubscribe] failed:", err);
-    return page(
-      "Something went wrong",
-      "We couldn't process that just now. Reply to any of our emails and we'll sort it out by hand."
-    );
+    return "failed";
   }
+}
 
-  return page(
-    "You're unsubscribed",
-    "No more personalised event emails from The Ubudian. The weekly newsletter (if you're on it) is managed separately via the link in its footer."
-  );
+export async function GET(request: Request) {
+  switch (await unsubscribe(request)) {
+    case "limited":
+      return page("Too many requests", "Please try again in a few minutes.");
+    case "invalid":
+      return page(
+        "Link not valid",
+        "This unsubscribe link is incomplete or expired. Reply to any of our emails and we'll sort it out by hand."
+      );
+    case "failed":
+      return page(
+        "Something went wrong",
+        "We couldn't process that just now. Reply to any of our emails and we'll sort it out by hand."
+      );
+    default:
+      return page("You're unsubscribed", "You won't get any more emails from The Ubudian.");
+  }
+}
+
+export async function POST(request: Request) {
+  const outcome = await unsubscribe(request);
+  const status = outcome === "ok" ? 200 : outcome === "invalid" ? 400 : outcome === "limited" ? 429 : 500;
+  return new Response(null, { status });
 }

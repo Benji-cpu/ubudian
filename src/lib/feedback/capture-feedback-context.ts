@@ -34,7 +34,6 @@ const ROUTE_PATTERNS: Array<{
   { pattern: /^\/guides$/, label: 'Guides', params: [] },
   { pattern: /^\/practitioners$/, label: 'Practitioners', params: [] },
   { pattern: /^\/places$/, label: 'Places', params: [] },
-  { pattern: /^\/membership/, label: 'Membership', params: [] },
   { pattern: /^\/newsletter/, label: 'Newsletter', params: [] },
   { pattern: /^\/about/, label: 'About', params: [] },
   { pattern: /^\/$/, label: 'Home', params: [] },

@@ -2,14 +2,10 @@
  * Slot resolver — given a `journey_day_slot`, return ranked atom candidates.
  *
  * Used by the public journey detail page (Living Guide tier) to fill each
- * slot with concrete candidates the user can see and act on. Milestone 1 is
- * read-only: no per-user state, no Insider gating. Slots are resolved against
- * "now" — upcoming events (where event_ref atoms apply) and any always-on
- * curated atoms whose theme_tags overlap the slot's filter.
- *
- * For Milestone 2 (Insider self-paced) we'll extend this with a `userStartDate`
- * + `dayNumber` parameter to resolve event_ref atoms by the user's actual
- * day-N date, not just upcoming.
+ * slot with concrete candidates the user can see and act on. Read-only, no
+ * per-user state. Slots are resolved against "now" — upcoming events (where
+ * event_ref atoms apply) and any always-on curated atoms whose theme_tags
+ * overlap the slot's filter.
  */
 import { createClient } from "@/lib/supabase/server";
 import type {

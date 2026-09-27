@@ -13,11 +13,16 @@ function getResend(): Resend {
  * Send a transactional email via Resend.
  * Never throws — returns true on accepted send, false otherwise, so callers
  * that keep a send ledger can record the real outcome.
+ *
+ * Pass `unsubUrl` on anything sent to a subscriber (welcome, weekly digest,
+ * reminders, the quiz spread): mail clients then show their own one-click
+ * Unsubscribe button (RFC 8058), which POSTs to the same link.
  */
 export async function sendTransactionalEmail(
   to: string,
   subject: string,
-  html: string
+  html: string,
+  opts: { unsubUrl?: string } = {}
 ): Promise<boolean> {
   if (!process.env.RESEND_API_KEY) {
     console.warn("[email] RESEND_API_KEY not configured, skipping email to", to);
@@ -33,6 +38,12 @@ export async function sendTransactionalEmail(
       to,
       subject,
       html,
+      ...(opts.unsubUrl && {
+        headers: {
+          "List-Unsubscribe": `<${opts.unsubUrl}>`,
+          "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+        },
+      }),
     });
     if (error) {
       console.error("[email] Resend rejected email:", error);

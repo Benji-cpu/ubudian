@@ -99,7 +99,6 @@ The JSON has this shape (verified):
     "feedback":                       [{ /* feedback row */ }],
     "dedupBacklog":                   number,
     "unresolvedVenuesLowConfidence":  number,
-    "incompleteSubscriptions":        number,
     "eventDateInconsistencies":       [{ id, title, reason }],
     "brokenLinks":                    [{ entity, id, url, status }]
   } | null,
@@ -123,7 +122,6 @@ GATE_HELD=$(jq '.autoApprove.held // 0' "$PAYLOAD")
 REVIEW_FEEDBACK=$(jq '.review.feedback // [] | length' "$PAYLOAD")
 REVIEW_DEDUP=$(jq '.review.dedupBacklog // 0' "$PAYLOAD")
 REVIEW_VENUES=$(jq '.review.unresolvedVenuesLowConfidence // 0' "$PAYLOAD")
-REVIEW_SUBS=$(jq '.review.incompleteSubscriptions // 0' "$PAYLOAD")
 REVIEW_DATES=$(jq '.review.eventDateInconsistencies // [] | length' "$PAYLOAD")
 REVIEW_LINKS=$(jq '.review.brokenLinks // [] | length' "$PAYLOAD")
 ERROR_COUNT=$(jq '.errors | length' "$PAYLOAD")
@@ -187,7 +185,6 @@ which — a screening rule doing too much work is the signal to look at.)
 ### Backlog counts
 - Dedup backlog: N
 - Unresolved venues (low confidence): N
-- Incomplete subscriptions: N
 
 ## Errors during run
 (Verbatim from `.errors[]`. Omit section if empty.)

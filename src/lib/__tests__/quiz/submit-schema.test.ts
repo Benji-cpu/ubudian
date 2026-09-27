@@ -3,7 +3,7 @@ import { quizSubmitSchema } from "@/lib/quiz/submit-schema";
 
 // Regression lock for the client/server contract. quiz-container.tsx
 // builds exactly these payloads — if this test fails, every quiz
-// submission silently 400s (no quiz_results row, no Beehiiv subscriber,
+// submission silently 400s (no quiz_results row, no newsletter subscriber,
 // no spread email). That bug shipped once already; don't let it back in.
 
 const clientPayload = {

@@ -99,16 +99,18 @@ export async function POST(request: Request) {
     }
 
     const event = eventsById.get(reminder.eventId)!;
+    const unsubUrl = unsubscribeUrl(reminder.email, SITE_URL);
     const html = buildEventReminderEmailHtml({
       event,
       occurrenceDate: reminder.occurrenceDate,
       siteUrl: SITE_URL,
-      unsubUrl: unsubscribeUrl(reminder.email, SITE_URL),
+      unsubUrl,
     });
     const ok = await sendTransactionalEmail(
       reminder.email,
       `Tomorrow: ${event.title}`,
-      html
+      html,
+      { unsubUrl }
     );
     if (ok) {
       sent++;

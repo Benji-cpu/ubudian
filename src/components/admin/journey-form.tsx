@@ -26,13 +26,6 @@ import {
   FormDescription,
 } from "@/components/ui/form";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -43,16 +36,9 @@ import {
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { JourneyAtomsAdmin } from "@/components/admin/journey-atoms-admin";
-import { JourneyTestimonialsAdmin } from "@/components/admin/journey-testimonials-admin";
 import { JourneyDaysAdmin } from "@/components/admin/journey-days-admin";
 import { Loader2, Trash2 } from "lucide-react";
-import type { Journey, JourneyTier } from "@/types";
-
-const TIER_OPTIONS: { value: JourneyTier; label: string; description: string }[] = [
-  { value: "living_guide", label: "Living Guide", description: "Public, free, SEO" },
-  { value: "self_paced", label: "Self-Paced (Insider)", description: "Members only" },
-  { value: "signature_cohort", label: "Signature Cohort", description: "Premium / paid bundle" },
-];
+import type { Journey } from "@/types";
 
 const journeySchema = z.object({
   title: z.string().min(1, "Title is required").max(200),
@@ -62,7 +48,6 @@ const journeySchema = z.object({
     .max(200)
     .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Slug must be lowercase with hyphens only"),
   subtitle: z.string().max(300).optional().or(z.literal("")),
-  tier: z.enum(["living_guide", "self_paced", "signature_cohort"]),
   length_days: z
     .string()
     .min(1, "Length is required")
@@ -100,7 +85,6 @@ export function JourneyForm({ initialData }: JourneyFormProps) {
       title: initialData?.title ?? "",
       slug: initialData?.slug ?? "",
       subtitle: initialData?.subtitle ?? "",
-      tier: initialData?.tier ?? "living_guide",
       length_days: initialData?.length_days?.toString() ?? "7",
       cover_image_url: initialData?.cover_image_url ?? "",
       hero_quote: initialData?.hero_quote ?? "",
@@ -131,7 +115,6 @@ export function JourneyForm({ initialData }: JourneyFormProps) {
       title: data.title,
       slug: data.slug,
       subtitle: data.subtitle || null,
-      tier: data.tier,
       length_days: Number(data.length_days),
       cover_image_url: data.cover_image_url || null,
       hero_quote: data.hero_quote || null,
@@ -189,7 +172,6 @@ export function JourneyForm({ initialData }: JourneyFormProps) {
           <TabsTrigger value="identity">Identity</TabsTrigger>
           {isEditMode && <TabsTrigger value="days">Days</TabsTrigger>}
           {isEditMode && <TabsTrigger value="atoms">Atoms</TabsTrigger>}
-          {isEditMode && <TabsTrigger value="testimonials">Testimonials</TabsTrigger>}
         </TabsList>
 
         <TabsContent value="identity">
@@ -390,34 +372,6 @@ export function JourneyForm({ initialData }: JourneyFormProps) {
 
             <FormField
               control={form.control}
-              name="tier"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Tier</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
-                      <SelectTrigger className="w-full">
-                        <SelectValue />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {TIER_OPTIONS.map((t) => (
-                        <SelectItem key={t.value} value={t.value}>
-                          <div>
-                            <div>{t.label}</div>
-                            <div className="text-xs text-muted-foreground">{t.description}</div>
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
               name="length_days"
               render={({ field }) => (
                 <FormItem>
@@ -578,15 +532,6 @@ export function JourneyForm({ initialData }: JourneyFormProps) {
         {isEditMode && (
           <TabsContent value="atoms">
             <JourneyAtomsAdmin />
-          </TabsContent>
-        )}
-
-        {isEditMode && (
-          <TabsContent value="testimonials">
-            <JourneyTestimonialsAdmin
-              journeyId={initialData.id}
-              journeyLengthDays={initialData.length_days}
-            />
           </TabsContent>
         )}
       </Tabs>

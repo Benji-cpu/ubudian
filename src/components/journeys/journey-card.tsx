@@ -9,8 +9,6 @@ interface JourneyCardProps {
 }
 
 export function JourneyCard({ journey }: JourneyCardProps) {
-  const tierLabel = journey.tier === "signature_cohort" ? "Signature" : null;
-
   return (
     <Link href={`/retreats/${journey.slug}`} className="group block">
       <article className="overflow-hidden rounded-sm border border-brand-gold/10 bg-card transition-shadow hover:shadow-md">
@@ -30,11 +28,6 @@ export function JourneyCard({ journey }: JourneyCardProps) {
                 <span>
                   {journey.length_days} {journey.length_days === 1 ? "day" : "days"}
                 </span>
-                {tierLabel && (
-                  <span className="rounded-full bg-brand-gold/90 px-2 py-0.5 text-[10px] font-semibold tracking-wider text-brand-deep-green">
-                    {tierLabel}
-                  </span>
-                )}
               </div>
               <h3 className="mt-1 font-serif text-xl font-semibold leading-tight">
                 {journey.title}

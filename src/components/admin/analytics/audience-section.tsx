@@ -1,11 +1,10 @@
-import { Users, UserPlus, LogIn, BadgeCheck, TrendingUp } from "lucide-react";
+import { Users, UserPlus, LogIn, TrendingUp } from "lucide-react";
 import { KpiCard } from "./kpi-card";
 import { Sparkline } from "./sparkline";
 import { SectionCard } from "./section-card";
 
 export interface AudienceSectionProps {
   totalAccounts: number;
-  activeMembers: number;
   logins7d: number;
   newSignups30d: number;
   onboardingCompleted: number;
@@ -20,7 +19,6 @@ export interface AudienceSectionProps {
 
 export function AudienceSection({
   totalAccounts,
-  activeMembers,
   logins7d,
   newSignups30d,
   onboardingCompleted,
@@ -40,23 +38,13 @@ export function AudienceSection({
         <h2 className="text-lg font-semibold">Audience</h2>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
         <KpiCard
           label="Total accounts"
           value={totalAccounts}
           sublabel={`${onboardingPct}% completed welcome`}
           icon={<Users className="h-4 w-4" />}
           href="/admin/community"
-        />
-        <KpiCard
-          label="Active members"
-          value={activeMembers}
-          sublabel="Paying subscribers"
-          icon={<BadgeCheck className="h-4 w-4" />}
-          valueClassName={
-            activeMembers > 0 ? "text-brand-deep-green" : undefined
-          }
-          href="/admin/commerce"
         />
         <KpiCard
           label="Logins (7d)"

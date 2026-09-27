@@ -9,9 +9,9 @@ The calendar for Ubud's conscious community — ceremonies, dance, breathwork an
 - **Framework**: Next.js 16 (App Router), TypeScript
 - **Database**: Supabase (Postgres + Auth + Storage)
 - **Styling**: Tailwind CSS 4 + shadcn/ui
-- **Payments**: Stripe (tour bookings + membership subscriptions)
+- **Payments**: Stripe (tour bookings only; membership and the sponsor portal were deleted 2026-09-27 — their tables stay, unused)
 - **AI**: Gemini via **`@google/genai`** (migrated 2026-09-15 off the deprecated `@google/generative-ai`) for parsing, moderation, embeddings and the tag sweep; Stability AI for image generation. Client sites: `src/lib/ingestion/llm-parser.ts`, `src/lib/events/moderation.ts`, `src/lib/embeddings.ts`, `scripts/backfill-*-tags.ts`. All on `gemini-2.5-flash-lite`. The key is **free tier: 20 requests/day/project/model** (`GenerateRequestsPerDayPerProjectPerModel-FreeTier`, confirmed 2026-09-27) and 429s above ~2 concurrent calls — the tag sweep, the Telegram parser and the gate's moderation share those 20.
-- **Newsletter**: Beehiiv (distribution), Resend (transactional email + ingestion alerts)
+- **Email**: Resend only — the weekly email, reminders, welcome/quiz mail and alerts. **There is no Beehiiv step** (dropped 2026-09-27); `newsletter_subscribers` is the list and the weekly digest is the newsletter.
 - **Scraping**: Cheerio (HTML parsing for web scrapers)
 - **Forms**: Zod + React Hook Form + zodResolver
 - **Testing**: Vitest + Testing Library (unit), Playwright (E2E)
@@ -49,7 +49,7 @@ Three backbones. Vercel Cron is capped at **2 jobs on Hobby and both slots are u
 | `tag-embed-sweep` | GH Actions | after `daily-maintenance-fetch` completes (`workflow_run`) | Embeddings + archetype/vibe tag backfill (concurrency 2). Chained, not scheduled, so the gate's moderation gets the day's free-tier quota first |
 | `daily-maintenance-fetch` | GH Actions | `2 19 * * *` | Curls `/api/cron/daily-maintenance?digest=true`, commits `digests/$TODAY.json` |
 | `event-reminders` | GH Actions | `4 9 * * *` | "Starts tomorrow" mail to savers. Idempotent via `transactional_sends`; `?only=<email>` to test |
-| `weekly-digest` | GH Actions | `6 23 * * 2` | Personalised weekly mail. Idempotent per ISO week; `?only=` to test |
+| `weekly-digest` | GH Actions | `6 23 * * 2` | **The** weekly email: active `newsletter_subscribers` + profiles with an archetype or a save, one per address (`src/lib/email/digest-recipients.ts`). Idempotent per address per ISO week; `?only=` to test |
 | `curator-ingest` | GH Actions | on push to `curator/inbox/**` | POSTs the curator's inbox to `/api/cron/curator-ingest` |
 | **daily curator** | Claude trigger `trig_01637DsCbz5qGn6r5RTP4hhi` | `47 19 * * *` | Walks curated sources, writes `curator/inbox/$TODAY.json`. Agent: `.claude/agents/daily-curator.md` |
 | **nightly digest** | Claude trigger `trig_01CnuNJSs8m8wdVyeVrDHrKq` | `17 21 * * *` | Reads the newest unreported payload, commits `digests/*.md`. Agent: `.claude/agents/nightly-routine.md` |
@@ -76,21 +76,23 @@ Three backbones. Vercel Cron is capped at **2 jobs on Hobby and both slots are u
 - **Submissions** (`/api/events/submit`) publish immediately only when moderation actually ran; otherwise they go in `pending` for the gate. `trusted_submitters` is analytics only — nobody skips a check.
 - **Liveness** (`src/lib/maintenance/liveness.ts`): the payload's first block. `stale: true` when nothing has auto-published for 48h. The digest agent prints it first and never skips a stale day; the fetch workflow POSTs a `blocking` row to Ben's CRM (`CRM_HANDOVER_URL` / `CRM_HANDOVER_SECRET` repo secrets).
 
+**Public pages apply the same rules at read time** (`visibleListings()` / `isPublicListing()` in `listing-checks.ts`): never-moderated rows (`moderation_reason='auto_gate:unmoderated'`) and rows with no way in are hidden, and a gathering shows one card. Every public event read — `/events`, homepage, hubs, quiz, dashboard, related events, RSS, sitemap, the weekly email and the quiz spread — passes through it; the detail page 404s what `isPublicListing` rejects. Nothing is written: `supabase/migrations/20260927120000_walk_cleanup.sql` (unapplied) tidies the rows themselves if Ben runs it. A new public event read must use it too.
+
 Dry run before trusting a rule change: `npx tsx scripts/auto-approve.ts --limit=250` (add `--apply` to publish), or `GET /api/cron/daily-maintenance?dryRun=true` with the `CRON_SECRET` bearer.
 
 ## Architecture
 
 - `/src/app` — Pages and API routes (App Router). Section indexes sit in an `(index)` route group (`events/(index)/page.tsx` → `/events`) so their `loading.tsx` scopes to the index and stops wrapping the sibling `[slug]` segment. **A `loading.tsx` above a page turns its `notFound()` into a streamed 200** — a root `loading.tsx` was doing that to the entire site.
-- `/src/components` — `ui/` (shadcn), `admin/`, `auth/`, `blog/`, `cross-links/`, `dashboard/`, `events/`, `feedback/`, `guides/`, `homepage/`, `hubs/`, `journeys/`, `layout/`, `membership/`, `newsletter/`, `onboarding/`, `partners/`, `places/`, `practitioners/`, `quiz/`, `skeletons/`, `sponsors/`, `stories/`, `tours/`
+- `/src/components` — `ui/` (shadcn), `admin/`, `auth/`, `blog/`, `cross-links/`, `dashboard/`, `events/`, `feedback/`, `guides/`, `homepage/`, `hubs/`, `journeys/`, `layout/`, `newsletter/`, `onboarding/`, `partners/`, `places/`, `practitioners/`, `quiz/`, `skeletons/`, `stories/`, `tours/`
 - `/src/lib` — Core libraries:
   - `supabase/` — `server.ts`, `client.ts`, `admin.ts`, `middleware.ts`
   - `ingestion/` — Event ingestion pipeline (18 files, see Ingestion section)
   - `maintenance/` — nightly cleanups (`cleanups.ts`, `image-gc.ts`, `review-queue.ts`) + the editorial gate (`auto-approve.ts`)
   - `events/` — Bali-time (`bali-time.ts`), recurrence roll-forward, ranking, filtering, views
-  - `email/` — shared branded builders (`brand.ts`, `spread-email.ts`, `weekly-digest-email.ts`)
-  - `guides/`, `journeys/`, `quiz/`, `sponsors/`, `places/`, `reminders/`, `analytics/`, `og/`, `feedback/`
-  - `stripe/` — `client.ts`, `server.ts`, `subscription.ts`, `helpers.ts`
-  - `utils.ts`, `constants.ts`, `auth.ts`, `email.ts`, `beehiiv.ts`, `stability.ts`, `quiz-data.ts`, `quiz-helpers.ts`, `rate-limit.ts`, `recurrence.ts`
+  - `email/` — shared branded builders (`brand.ts`, `spread-email.ts`, `weekly-digest-email.ts`), `digest-recipients.ts`, `unsubscribe.ts`. Anything sent to a subscriber passes `unsubUrl` to `sendTransactionalEmail` (footer link + `List-Unsubscribe` one-click header); `/api/email/unsubscribe` stops the address on both `profiles` and `newsletter_subscribers`.
+  - `guides/`, `journeys/`, `quiz/`, `places/`, `reminders/`, `og/`, `feedback/`
+  - `stripe/` — `client.ts`, `server.ts`, `helpers.ts`
+  - `utils.ts`, `constants.ts`, `auth.ts`, `email.ts`, `stability.ts`, `quiz-data.ts`, `quiz-helpers.ts`, `rate-limit.ts`, `recurrence.ts`
 - `/src/types` — All TypeScript interfaces in `index.ts`
 - `/supabase` — `schema.sql` (generated snapshot: `npx tsx --env-file=.env.local scripts/dump-schema.ts`, never hand-edited) + `migrations/` (~90 files, the source of truth). Apply one migration with `npx tsx --env-file=.env.local scripts/apply-migration.ts <file>` — it runs statements one at a time in a transaction, prints each row count, and records the version.
 - `/e2e` — Playwright E2E tests
@@ -99,11 +101,10 @@ Dry run before trusting a rule change: `npx tsx scripts/auto-approve.ts --limit=
 **API route groups:**
 - `webhooks/` — Stripe, Telegram, WhatsApp
 - `cron/` — `ingest-events`, `ingestion-health`, `daily-maintenance`, `curator-ingest`, `event-reminders`, `weekly-digest` (see "Scheduled Jobs")
-- `checkout/` — `tour`, `subscription`, `sponsorship`
-- `billing/portal` — Stripe customer portal
 - `admin/ingestion/` — Sources, messages, venues, dedup, Telegram webhook management
 - `events/` — `submit`, `approve`
-- `newsletter/` — `subscribe`, `push-to-beehiiv`
+- `newsletter/` — `subscribe`
+- `email/unsubscribe` — GET (footer link) and POST (RFC 8058 one-click)
 - `images/generate` — Stability AI image generation (admin, rate-limited)
 - `quiz/submit`
 
@@ -130,7 +131,7 @@ Dry run before trusting a rule change: `npx tsx scripts/auto-approve.ts --limit=
 
 **Content:** `profiles`, `blog_posts`, `stories`, `events`, `tours`, `journeys` (+ `journey_atoms`, `journey_days`, `journey_day_slots`, `journey_testimonials`), `guides` (+ `guide_entity_references`), `places`, `practitioners`, `partners`, `newsletter_editions`, `newsletter_subscribers`, `trusted_submitters`, `site_settings`
 **Ingestion:** `event_sources`, `ingestion_runs`, `raw_ingestion_messages`, `venue_aliases`, `venue_coordinates`, `dedup_matches`, `dedup_decisions`, `unresolved_venues`, `ingestion_activity_log`, `pipeline_health_logs`, `image_gc_log` — admin-only RLS (except `venue_aliases` has public read)
-**Money:** `bookings`, `subscriptions`, `payments`, `sponsors`, `sponsorships`, `sponsorship_events`, `sponsor_leads` — all amounts in **cents USD**
+**Money:** `bookings`, `payments` — all amounts in **cents USD**. `subscriptions`, `sponsors`, `sponsorships`, `sponsorship_events`, `sponsor_leads`, `journey_testimonials` and the `journeys` cohort columns (`next_cohort_*`, `cohort_size_*`, `price_per_person_cents`, `host_*`, `villa_neighbourhood`) are left in place but no code reads or writes them since 2026-09-27
 **User:** `quiz_results`, `saved_events`, `saved_guides`, `saved_journeys`, `saved_spreads`, `feedback`, `transactional_sends`
 
 Key gotchas:
@@ -166,16 +167,18 @@ Automated event ingestion from multiple sources into pending events for admin re
 | `/api/webhooks/telegram` | `X-Telegram-Bot-Api-Secret-Token` header vs `TELEGRAM_WEBHOOK_SECRET` | Telegram file URLs are ephemeral — download immediately |
 | `/api/webhooks/whatsapp` | `X-Webhook-Secret` header vs `WAHA_WEBHOOK_SECRET` | WAHA media downloads require `WAHA_API_KEY` auth header |
 
+**WhatsApp** (`event_sources.slug='whatsapp'`) was switched back on 2026-09-27 after being off since 2 Jun. It needs a paired WAHA server at `WAHA_API_URL` (a DigitalOcean droplet); the webhook takes pushes and the 17:00 cron polls the two `allowed_groups`. On 27 Sep the droplet answered ping but refused the WAHA port, so nothing flows until Ben brings WAHA back up and pairs the phone.
+
 ## Environment Variables
 
 **Required (Supabase):** `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
-**Required (Stripe):** `STRIPE_SECRET_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_INSIDER_MONTHLY`, `STRIPE_PRICE_INSIDER_YEARLY` (read with `!` on `/membership`), `STRIPE_PRICE_SPONSOR_PATRON|PARTNER|ANCHOR` (sponsor tiers; set in Vercel production, the checkout 503s without them). Full list with comments: `.env.example`.
+**Stripe (tour-booking webhook):** `STRIPE_SECRET_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET`. The `STRIPE_PRICE_INSIDER_*` / `STRIPE_PRICE_SPONSOR_*` values are no longer read. Full list with comments: `.env.example`.
 **Required (AI):** `GEMINI_API_KEY`
 **Required (Email):** `RESEND_API_KEY`
 **Required (Cron):** `CRON_SECRET`
 
 **Optional (Ingestion adapters):** `TELEGRAM_BOT_TOKEN`, `TELEGRAM_WEBHOOK_SECRET`, `WAHA_API_URL`, `WAHA_API_KEY`, `WAHA_WEBHOOK_SECRET`, `EVENTBRITE_API_KEY`, `MEETUP_API_KEY`, `SERPAPI_API_KEY`, `META_PAGE_ACCESS_TOKEN`, `INSTAGRAM_ACCESS_TOKEN`, `RETREAT_GURU_API_KEY`, `RAPIDAPI_KEY`, `ALLEVENTS_API_KEY`, `APIFY_API_TOKEN`
-**Optional (Other):** `STABILITY_AI_API_KEY`, `BEEHIIV_API_KEY`, `BEEHIIV_PUBLICATION_ID`, `NEXT_PUBLIC_SITE_URL`, `ADMIN_EMAIL`, `EMAIL_UNSUB_SECRET` (HMAC key for one-click unsubscribe links; falls back to `CRON_SECRET`)
+**Optional (Other):** `STABILITY_AI_API_KEY`, `NEXT_PUBLIC_SITE_URL`, `ADMIN_EMAIL`, `EMAIL_UNSUB_SECRET` (HMAC key for one-click unsubscribe links; falls back to `CRON_SECRET`)
 
 **Email sending:** Resend from-address is `hello@theubudian.life` — the only Resend-verified domain (verified 2026-06-10 via DKIM/SPF records in Vercel DNS). Never switch the from-address to an unverified domain: Resend silently rejects every send and `sendTransactionalEmail` only logs it.
 
@@ -212,7 +215,7 @@ Configured in `.mcp.json` (project-level):
 | Stripe | HTTP | Payment debugging, subscription management, webhook inspection |
 | WAHA | stdio (npx) | WhatsApp message management for ingestion pipeline |
 | Vercel | stdio (npx) | Deployment monitoring, build logs, env vars, project settings |
-| Beehiiv | stdio (npx) | Subscriber analytics and management (read-only; writes use `beehiiv.ts`) |
+| Beehiiv | stdio (npx) | Legacy — the app no longer talks to Beehiiv (2026-09-27) |
 
 Global MCPs also available: Playwright (E2E testing), GitHub (PR/issues), Context7 (docs lookup).
 
@@ -222,7 +225,7 @@ Global MCPs also available: Playwright (E2E testing), GitHub (PR/issues), Contex
 - Image uploads go to `images` bucket with folder prefix (`blog/`, `stories/`, `events/`, `tours/`)
 - Stories route: `/stories` (nav says "Humans of Ubud") — flag-disabled, no admin pages since 2026-09-15.
 - **The retreat product is `/retreats`** (table `journeys`, components `journeys/`, admin `/admin/journeys` via the `/admin/retreats` hub). `/experiences` and `/experiences/:slug` 308 to it (`next.config.ts`). Do not reintroduce a third name. **Since 2026-09-27 the pages are free self-serve guides only**: the paid-cohort pitch (cohort dates, "Open for application", per-person prices, the application FAQ, 8 attendee testimonials for cohorts that never ran) was removed because no application or booking route exists. Off the homepage.
-- **`/membership` and `/partners` 307 to `/about`** (`next.config.ts`, temporary) pending Ben's keep/delete: membership sold Insider perks no code delivers (0 active members); the partners enquiry form posts to an API route that was never built.
+- **Membership, the sponsor portal and the retreat cohort machinery were deleted 2026-09-27** (0 use each, Ben's yes). `/membership`, `/partners`, `/community/partners/*`, `/sponsor/*` 308 to `/about`; `/dashboard/membership` to `/dashboard`; `/admin/sponsors*` to `/admin`, `/admin/subscriptions` to `/admin/commerce` (now just bookings). `/partners/:slug` is the community-partner directory (`partners` table), a different thing, and stays.
 
 - **Homepage events block** reads the same rolled-forward buckets as `/events` and shows only what you can still get to: not started, started ≤30 min ago, all-day or multi-day ("Still ahead today"/"Still ahead tonight" from 16:00 Bali, else "Coming up this week", else an honest empty state). A same-day listing with no `end_time` is assumed to run `ASSUMED_DURATION_MIN` (2h, `bali-time.ts`) — without that an 8am class stayed "happening now" until midnight. It must never filter `start_date >= today` at the DB — that drops every recurring rhythm.
 - **Every event page answers "how do I get in"** (`components/events/how-to-get-in.tsx`): tickets, the organiser (phone → WhatsApp link), or walk in at the named venue with directions.

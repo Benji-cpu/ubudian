@@ -8,9 +8,12 @@ vi.mock("@/lib/supabase/admin", () => ({
   }),
 }));
 
-vi.mock("@/lib/beehiiv", () => ({
-  addSubscriber: vi.fn().mockResolvedValue(null),
+vi.mock("@/lib/email", () => ({
+  sendTransactionalEmail: vi.fn().mockResolvedValue(true),
 }));
+
+// The welcome email carries a signed unsubscribe link.
+vi.stubEnv("EMAIL_UNSUB_SECRET", "test-secret");
 
 vi.mock("@/lib/rate-limit", () => ({
   rateLimit: () => ({ success: true, remaining: 4, resetAt: Date.now() + 900000 }),

@@ -232,8 +232,6 @@ export type PlaceKind =
   | "market"
   | "other";
 
-export type CohortStatus = "open" | "almost_full" | "full" | "waitlist";
-
 export interface Journey {
   id: string;
   slug: string;
@@ -254,16 +252,6 @@ export interface Journey {
   sort_order: number;
   created_at: string;
   updated_at: string;
-  host_name: string | null;
-  host_role: string | null;
-  host_avatar_url: string | null;
-  cohort_size_min: number | null;
-  cohort_size_max: number | null;
-  villa_neighbourhood: string | null;
-  price_per_person_cents: number | null;
-  next_cohort_starts_at: string | null;
-  next_cohort_ends_at: string | null;
-  next_cohort_status: CohortStatus | null;
 }
 
 export interface JourneyDay {
@@ -386,19 +374,6 @@ export interface Place {
   updated_at: string;
 }
 
-export interface JourneyTestimonial {
-  id: string;
-  journey_id: string;
-  attendee_name: string;
-  attendee_origin: string | null;
-  quote: string;
-  journey_day_referenced: number | null;
-  avatar_url: string | null;
-  sort_order: number;
-  is_published: boolean;
-  created_at: string;
-  updated_at: string;
-}
 
 export interface SavedJourney {
   profile_id: string;
@@ -421,86 +396,6 @@ export interface JourneyDayWithSlots extends JourneyDay {
  */
 export interface JourneyWithDays extends Journey {
   days: JourneyDayWithSlots[];
-}
-
-// ============================================
-// COMMUNITY PARTNERS (sponsorship)
-// ============================================
-
-export type SponsorTier = "patron" | "partner" | "anchor";
-export type SponsorStatus = "active" | "paused" | "ended";
-export type SponsorshipEntityType = "event" | "newsletter_edition" | "journey" | "story";
-
-export interface Sponsor {
-  id: string;
-  slug: string;
-  name: string;
-  tagline: string | null;
-  description: string | null;
-  logo_url: string | null;
-  hero_image_url: string | null;
-  website_url: string | null;
-  instagram_handle: string | null;
-  contact_email: string | null;
-  contact_whatsapp: string | null;
-  tier: SponsorTier;
-  status: SponsorStatus;
-  category_sponsor: string | null;
-  monthly_amount_cents: number | null;
-  starts_on: string | null;
-  ends_on: string | null;
-  claimed_by_profile_id: string | null;
-  stripe_customer_id: string | null;
-  stripe_subscription_id: string | null;
-  stripe_price_id: string | null;
-  stripe_subscription_status: string | null;
-  created_at: string;
-  updated_at: string;
-}
-
-export type SponsorLeadStatus = "new" | "contacted" | "converted" | "dismissed";
-export type SponsorLeadTierInterest = "patron" | "partner" | "anchor" | "unsure";
-
-export interface SponsorLead {
-  id: string;
-  business_name: string;
-  contact_name: string | null;
-  contact_email: string;
-  contact_whatsapp: string | null;
-  website_url: string | null;
-  tier_interest: SponsorLeadTierInterest | null;
-  message: string | null;
-  status: SponsorLeadStatus;
-  admin_notes: string | null;
-  sponsor_id: string | null;
-  created_at: string;
-  updated_at: string;
-}
-
-export type SponsorshipEventType = "event_impression" | "profile_view" | "partner_click";
-
-export interface SponsorshipEvent {
-  id: string;
-  sponsor_id: string;
-  event_type: SponsorshipEventType;
-  context_entity_type: string | null;
-  context_entity_id: string | null;
-  dedupe_key: string | null;
-  created_at: string;
-}
-
-export interface Sponsorship {
-  id: string;
-  sponsor_id: string;
-  entity_type: SponsorshipEntityType;
-  entity_id: string;
-  starts_at: string;
-  ends_at: string | null;
-  created_at: string;
-}
-
-export interface SponsorshipWithSponsor extends Sponsorship {
-  sponsor: Sponsor;
 }
 
 export interface NewsletterEdition {
@@ -622,72 +517,6 @@ export interface Booking {
   stripe_payment_status: string;
   status: BookingStatus;
   booking_reference: string;
-  created_at: string;
-  updated_at: string;
-}
-
-export type SubscriptionStatus = "active" | "trialing" | "past_due" | "canceled" | "unpaid" | "incomplete";
-
-export type SubscriptionReviewStatus = "auto_approved" | "pending_review" | "approved" | "rejected";
-
-export type CommissionAttributionSource = "cookie" | "utm" | "manual" | "partner_page";
-
-export interface Subscription {
-  id: string;
-  profile_id: string;
-  stripe_subscription_id: string;
-  stripe_customer_id: string;
-  stripe_price_id: string | null;
-  status: SubscriptionStatus;
-  plan_name: string;
-  interval: "month" | "year";
-  current_period_start: string | null;
-  current_period_end: string | null;
-  cancel_at_period_end: boolean;
-  payment_country: string | null;
-  payment_last4: string | null;
-  review_status: SubscriptionReviewStatus;
-  review_notes: string | null;
-  reviewed_by: string | null;
-  reviewed_at: string | null;
-  commission_partner_id: string | null;
-  commission_attribution_source: CommissionAttributionSource | null;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface CommissionPartner {
-  id: string;
-  handle: string;
-  display_name: string;
-  contact_email: string;
-  contact_phone: string | null;
-  commission_pct: number;
-  profile_id: string | null;
-  bio: string | null;
-  avatar_url: string | null;
-  notes: string | null;
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
-}
-
-export type CommissionPayoutStatus = "pending" | "paid" | "void";
-
-export interface CommissionPayout {
-  id: string;
-  partner_id: string;
-  period_start: string;
-  period_end: string;
-  signups_count: number;
-  gross_cents: number;
-  amount_cents: number;
-  status: CommissionPayoutStatus;
-  paid_at: string | null;
-  payment_method: string | null;
-  payment_reference: string | null;
-  notes: string | null;
-  created_by: string | null;
   created_at: string;
   updated_at: string;
 }

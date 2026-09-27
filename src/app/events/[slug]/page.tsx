@@ -18,9 +18,7 @@ import { MapPin, ExternalLink, User } from "lucide-react";
 import { isSafeUrl } from "@/lib/url-validation";
 import { getCurrentProfile } from "@/lib/auth";
 import { MentionedInGuides } from "@/components/cross-links/mentioned-in-guides";
-import { getActiveSponsorshipFor } from "@/lib/sponsors/sponsor-service";
-import { recordSponsorshipEvent } from "@/lib/sponsors/analytics";
-import { PartnerCredit } from "@/components/sponsors/partner-credit";
+import { isPublicListing, visibleListings } from "@/lib/events/listing-checks";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -73,7 +71,6 @@ export default async function EventPage({ params }: EventPageProps) {
   let related: Event[] = [];
   let currentProfileId: string | null = null;
   let initiallySaved = false;
-  let sponsorship: Awaited<ReturnType<typeof getActiveSponsorshipFor>> = null;
 
   try {
     const { slug } = await params;
@@ -86,7 +83,9 @@ export default async function EventPage({ params }: EventPageProps) {
       .eq("status", "approved")
       .single();
 
-    if (!event) {
+    // Rows the gate would not publish today (never moderated, or no way in)
+    // stay up in the data until Ben applies the walk cleanup; they 404 here.
+    if (!event || !isPublicListing(event as Event)) {
       notFound();
     }
 
@@ -123,7 +122,7 @@ export default async function EventPage({ params }: EventPageProps) {
           .in("id", ids)
           .eq("status", "approved");
         const order = new Map(ids.map((id, i) => [id, i] as const));
-        related = ((rel ?? []) as Event[])
+        related = visibleListings((rel ?? []) as Event[])
           .sort((a, b) => (order.get(a.id) ?? 99) - (order.get(b.id) ?? 99))
           .slice(0, 4);
         related.forEach((r) => delete (r as unknown as Record<string, unknown>).embedding);
@@ -141,20 +140,10 @@ export default async function EventPage({ params }: EventPageProps) {
         .neq("id", e.id)
         .gte("start_date", new Date().toISOString().split("T")[0])
         .order("start_date", { ascending: true })
-        .limit(4);
+        .limit(8);
       if (relatedError) console.error("Related events query error:", relatedError);
-      related = ((relatedEvents ?? []) as Event[]);
+      related = visibleListings((relatedEvents ?? []) as Event[]).slice(0, 4);
       related.forEach((r) => delete (r as unknown as Record<string, unknown>).embedding);
-    }
-
-    sponsorship = await getActiveSponsorshipFor("event", e.id);
-    if (sponsorship) {
-      await recordSponsorshipEvent({
-        sponsorId: sponsorship.sponsor.id,
-        eventType: "event_impression",
-        contextEntityType: "event",
-        contextEntityId: e.id,
-      });
     }
   } catch {
     notFound();
@@ -256,10 +245,6 @@ export default async function EventPage({ params }: EventPageProps) {
                 </div>
               </div>
             </div>
-          )}
-
-          {sponsorship && (
-            <PartnerCredit sponsor={sponsorship.sponsor} className="mt-4" />
           )}
 
           <div className="mt-5">

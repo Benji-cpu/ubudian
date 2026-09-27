@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/lib/auth";
 import { getEventsForArchetype } from "@/lib/quiz-helpers";
+import { visibleListings } from "@/lib/events/listing-checks";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { DashboardStats } from "@/components/dashboard/dashboard-stats";
 import { EventCard } from "@/components/events/event-card";
@@ -57,7 +58,7 @@ export default async function DashboardPage() {
       .order("start_date", { ascending: true })
       .limit(20);
 
-    const events = (eventsData ?? []) as Event[];
+    const events = visibleListings((eventsData ?? []) as Event[]);
     matchedEvents = getEventsForArchetype(events, archetype as ArchetypeId, 8);
   }
 

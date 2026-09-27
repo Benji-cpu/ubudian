@@ -194,3 +194,44 @@ export function sameGathering(a: SlotFields, b: SlotFields): boolean {
   }
   return oneOffCoversDay(a, b.start_date) || oneOffCoversDay(b, a.start_date);
 }
+
+// ---------------------------------------------------------------------------
+// What a public page may show
+// ---------------------------------------------------------------------------
+
+/** Stamped by the gate on rows it published without a moderation verdict (before 27 Sep 2026). */
+export const UNMODERATED = "auto_gate:unmoderated";
+
+type VisibleFields = SlotFields &
+  ListingFields & { moderation_reason?: string | null; created_at?: string | null };
+
+/**
+ * The gate's rules, applied at read time to rows it published before it had
+ * them: moderated, a way in, and one card per gathering. Nothing is written —
+ * `supabase/migrations/20260927120000_walk_cleanup.sql` tidies the rows
+ * themselves if Ben applies it. Keeps input order.
+ *
+ * Which copy survives follows the cleanup script: a series over a one-off,
+ * then the surest way in, then the oldest row.
+ */
+export function visibleListings<T extends VisibleFields>(rows: T[]): T[] {
+  const eligible = rows.filter((r) => r.moderation_reason !== UNMODERATED && wayIn(r));
+  const strength = (r: T) => ({ tickets: 2, organiser: 1, "walk-in": 0 })[wayIn(r)!.kind];
+  const ordered = [...eligible].sort(
+    (a, b) =>
+      Number(!!b.is_recurring) - Number(!!a.is_recurring) ||
+      strength(b) - strength(a) ||
+      (a.created_at ?? "").localeCompare(b.created_at ?? ""),
+  );
+  const kept: T[] = [];
+  for (const r of ordered) {
+    if (!kept.some((k) => sameGathering(r, k) && !(r.is_recurring && !k.is_recurring))) kept.push(r);
+  }
+  const keep = new Set(kept);
+  return eligible.filter((r) => keep.has(r));
+}
+
+/** A single listing's page: moderated and has a way in. Copies of a gathering still resolve. */
+export function isPublicListing(row: ListingFields & { moderation_reason?: string | null }): boolean {
+  return row.moderation_reason !== UNMODERATED && wayIn(row) !== null;
+}

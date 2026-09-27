@@ -26,12 +26,6 @@ export interface RankingContext {
    * and sync, so the DB work happens upstream and the result is passed in here.
    */
   tasteSimByEventId?: Map<string, number>;
-  /**
-   * Event IDs currently sponsored at Partner+ tier. Gets a strong boost so
-   * the surface honours the "top placement" promise we sell, without changing
-   * the card visually elsewhere. Patron-tier sponsors are NOT included here.
-   */
-  boostedEventIds?: Set<string>;
 }
 
 export interface ScoredEvent<T extends Event = Event> {
@@ -51,8 +45,6 @@ export interface ScoredEvent<T extends Event = Event> {
      * (festival kickoff). Captures "the big thing happening today."
      */
     festivalBoost: number;
-    /** Boost for events with an active Partner+ community-partner sponsorship. */
-    sponsorBoost: number;
   };
 }
 
@@ -146,10 +138,6 @@ export function scoreEvent<T extends Event & { save_count?: number }>(
   // headline event — outrank the weekly anchors that also fall on this day.
   const festivalBoost = isFestivalKickoffToday(event, now) ? 0.9 : 0;
 
-  // Community partner boost — outranks both core and festival so a sponsored
-  // event surfaces as the hero on days when its sponsorship is active.
-  const sponsorBoost = ctx.boostedEventIds?.has(event.id) ? 1.5 : 0;
-
   const score =
     time + // 0–1
     0.8 * quality + // 0–0.8
@@ -157,8 +145,7 @@ export function scoreEvent<T extends Event & { save_count?: number }>(
     1.2 * personalization + // 0–1.2 (explicit archetype intent leads)
     1.0 * taste + // 0–1.0 (behavioural; sits just below archetype)
     coreBoost + // 0 or 0.4
-    festivalBoost + // 0 or 0.9
-    sponsorBoost; // 0 or 1.5
+    festivalBoost; // 0 or 0.9
 
   return {
     event,
@@ -171,7 +158,6 @@ export function scoreEvent<T extends Event & { save_count?: number }>(
       taste,
       coreBoost,
       festivalBoost,
-      sponsorBoost,
     },
   };
 }

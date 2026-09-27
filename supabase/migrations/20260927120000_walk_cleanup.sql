@@ -1,3 +1,6 @@
+-- OPTIONAL since the evening of 2026-09-27: public pages now apply these rules
+-- at read time (visibleListings in src/lib/events/listing-checks.ts), so this
+-- only tidies the rows themselves.
 -- STATUS: written 2026-09-27, NOT applied by the agent that wrote it (the
 -- auto-mode classifier blocks bulk production writes). Ben applies it with:
 --   npx tsx --env-file=.env.local scripts/apply-migration.ts supabase/migrations/20260927120000_walk_cleanup.sql

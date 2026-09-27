@@ -4,7 +4,6 @@ import { EngagementSection } from "@/components/admin/analytics/engagement-secti
 import { RevenueSection } from "@/components/admin/analytics/revenue-section";
 import { GrowthSection } from "@/components/admin/analytics/growth-section";
 import type { BarListItem } from "@/components/admin/analytics/bar-list";
-import { estimateMrrCents } from "@/lib/analytics/mrr";
 import { formatDistanceToNow } from "date-fns";
 
 export const revalidate = 60;
@@ -88,16 +87,10 @@ export default async function AdminAnalytics() {
 
   // --- Revenue ---
   const rev = (revenueRes.data?.[0] ?? {}) as Partial<{
-    active_subs_monthly: number;
-    active_subs_yearly: number;
     bookings_realized: number;
     payments_succeeded: number;
     revenue_collected_cents: number;
   }>;
-  const monthly = n(rev.active_subs_monthly);
-  const yearly = n(rev.active_subs_yearly);
-  const activeMembers = monthly + yearly;
-  const mrrCents = estimateMrrCents({ monthly, yearly });
 
   // --- Engagement ---
   const toBarItems = (rows: SavedRow[], base: string): BarListItem[] =>
@@ -142,7 +135,6 @@ export default async function AdminAnalytics() {
 
       <AudienceSection
         totalAccounts={totalAccounts}
-        activeMembers={activeMembers}
         logins7d={login.active_7d}
         newSignups30d={newSignups30d}
         onboardingCompleted={onboardingCompleted}
@@ -160,12 +152,9 @@ export default async function AdminAnalytics() {
       />
 
       <RevenueSection
-        activeMembers={activeMembers}
-        mrrCents={mrrCents}
         bookingsRealized={n(rev.bookings_realized)}
         revenueCollectedCents={n(rev.revenue_collected_cents)}
         paymentsSucceeded={n(rev.payments_succeeded)}
-        totalAccounts={totalAccounts}
       />
 
       <GrowthSection

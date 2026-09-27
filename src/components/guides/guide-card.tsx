@@ -1,7 +1,5 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Badge } from "@/components/ui/badge";
-import { Lock } from "lucide-react";
 import type { Guide } from "@/types";
 import { GUIDE_INTENTS } from "@/lib/guides/intents";
 
@@ -87,12 +85,6 @@ export function GuideCard({ guide, variant = "intent-medium", priority = false }
               sizes={isLarge ? "(max-width: 768px) 100vw, 50vw" : "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"}
               className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
             />
-            {guide.is_members_only && (
-              <Badge variant="outline" className="absolute right-3 top-3 gap-1 border-brand-cream/60 bg-brand-deep-green/70 text-brand-cream backdrop-blur-sm">
-                <Lock className="h-3 w-3" />
-                Members
-              </Badge>
-            )}
           </div>
         ) : (
           <div className={`w-full bg-brand-cream ${isLarge ? "aspect-[4/5]" : "aspect-[3/4]"}`} />

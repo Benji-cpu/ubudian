@@ -25,8 +25,7 @@ export const ADMIN_NAV_LINKS: AdminNavItem[] = [
   { type: "link", label: "Newsletter", href: "/admin/content", icon: "FileText" },
   { type: "link", label: "Guides", href: "/admin/guides", icon: "BookOpen" },
   { type: "link", label: "Retreats", href: "/admin/retreats", icon: "MapPin" },
-  { type: "link", label: "Commerce", href: "/admin/commerce", icon: "CreditCard" },
-  { type: "link", label: "Partners", href: "/admin/sponsors", icon: "HandHeart" },
+  { type: "link", label: "Bookings", href: "/admin/commerce", icon: "CreditCard" },
   { type: "link", label: "Community", href: "/admin/community", icon: "Users" },
   { type: "divider" },
   { type: "link", label: "Site Settings", href: "/admin/settings", icon: "Settings" },
@@ -40,7 +39,7 @@ export const ADMIN_GROUPED_ROUTES: Record<string, string[]> = {
     "/admin/partners",
     "/admin/places",
   ],
-  "/admin/commerce": ["/admin/bookings", "/admin/subscriptions"],
+  "/admin/commerce": ["/admin/bookings"],
   "/admin/community": ["/admin/subscribers", "/admin/trusted-submitters", "/admin/feedback"],
   "/admin/sources": ["/admin/ingestion"],
 };
@@ -115,7 +114,6 @@ export const DASHBOARD_NAV_LINKS = [
   { label: "My Agenda", href: "/dashboard/events" },
   { label: "My Retreats", href: "/dashboard/retreats" },
   { label: "My Guides", href: "/dashboard/guides" },
-  { label: "Membership", href: "/dashboard/membership" },
   { label: "Settings", href: "/dashboard/settings" },
 ] as const;
 
@@ -166,16 +164,6 @@ export const CATEGORY_BRAND_GRADIENTS: Record<string, string> = {
   "Retreat & Training": "from-[#2C4A3E] via-[#253D33] to-[#2D2D2D]",
   "Other": "from-[#2D2D2D] via-[#2C4A3E] to-[#3A5A4A]",
 };
-
-/**
- * Ubudian Insider membership prices, in cents USD. Mirrors the Stripe prices
- * (`STRIPE_PRICE_INSIDER_MONTHLY` / `_YEARLY`) and the displayed $9.99/mo,
- * $99/yr. Used to derive an MRR estimate on the admin analytics dashboard —
- * `subscriptions` stores no amount column, so MRR is computed from the count
- * of active subs per billing interval. Keep in sync if the Stripe prices change.
- */
-export const MEMBERSHIP_MONTHLY_CENTS = 999;
-export const MEMBERSHIP_YEARLY_CENTS = 9900;
 
 export const TOUR_THEMES = [
   "Cultural & Heritage",

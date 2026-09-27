@@ -9,7 +9,7 @@ const COLORS = {
   charcoal: "#2D2D2D",
 };
 
-function layout(body: string): string {
+function layout(body: string, unsubUrl?: string): string {
   return `
 <!DOCTYPE html>
 <html>
@@ -35,7 +35,11 @@ function layout(body: string): string {
           <!-- Footer -->
           <tr>
             <td style="padding:16px 24px;text-align:center;font-size:13px;color:#888;">
-              <a href="${SITE_URL}" style="color:${COLORS.deepGreen};text-decoration:none;">theubudian.life</a>
+              <a href="${SITE_URL}" style="color:${COLORS.deepGreen};text-decoration:none;">theubudian.life</a>${
+                unsubUrl
+                  ? ` · <a href="${unsubUrl}" style="color:${COLORS.deepGreen};">Unsubscribe</a>`
+                  : ""
+              }
             </td>
           </tr>
         </table>
@@ -84,15 +88,10 @@ export function eventRejectedNotification(eventName: string, reason?: string): s
   `);
 }
 
-export function newsletterWelcome(): string {
+export function newsletterWelcome(unsubUrl: string): string {
   return layout(`
     <h2 style="margin:0 0 16px;font-family:'Lora',Georgia,serif;color:${COLORS.deepGreen};">Welcome to The Ubudian!</h2>
-    <p>You&rsquo;re now part of our community. Every week, we&rsquo;ll send you a curated newsletter with:</p>
-    <ul style="padding-left:20px;margin:16px 0;">
-      <li>The best events happening in Ubud</li>
-      <li>Stories from the people who make this place special</li>
-      <li>Hidden gems, new openings, and local tips</li>
-    </ul>
+    <p>Every Wednesday morning we&rsquo;ll send you the week ahead in Ubud: the ceremonies, dance, breathwork and sound worth clearing an evening for.</p>
     <p>In the meantime, explore what&rsquo;s on:</p>
     <p style="margin-top:20px;">
       <a href="${SITE_URL}/events" style="display:inline-block;padding:10px 24px;background-color:${COLORS.deepGreen};color:#ffffff;text-decoration:none;border-radius:4px;font-weight:600;">Browse Events</a>
@@ -101,7 +100,7 @@ export function newsletterWelcome(): string {
       Want personalized event recommendations? Take the 90-second Ubud Spirit Quiz:
       <a href="${SITE_URL}/quiz" style="color:#B85C3F;text-decoration:underline;font-weight:600;">Take the Quiz</a>
     </p>
-  `);
+  `, unsubUrl);
 }
 
 // ============================================
@@ -281,7 +280,6 @@ interface DailyMaintenancePayload {
     feedback: { id: string; type: string; status: string; message: string; page_url: string | null; created_at: string }[];
     dedupBacklog: number;
     unresolvedVenuesLowConfidence: number;
-    incompleteSubscriptions: number;
     eventDateInconsistencies: { id: string; title: string; reason: string }[];
     brokenLinks?: { entity: "event" | "venue"; id: string; url: string; status: number | string }[];
   } | null;
@@ -340,7 +338,7 @@ export function dailyMaintenanceDigest(p: DailyMaintenancePayload): string {
     ${errorBlock}
 
     <h3 style="margin:24px 0 8px;font-family:'Lora',Georgia,serif;color:${COLORS.deepGreen};font-size:16px;">Needs your attention</h3>
-    <p style="margin:0 0 8px;font-size:14px;color:#666;">${fbCount} open feedback · ${r?.dedupBacklog ?? 0} stale dedup · ${r?.unresolvedVenuesLowConfidence ?? 0} low-confidence venues · ${r?.incompleteSubscriptions ?? 0} stuck subscriptions · ${r?.eventDateInconsistencies.length ?? 0} event date issues · ${broken.length} broken links</p>
+    <p style="margin:0 0 8px;font-size:14px;color:#666;">${fbCount} open feedback · ${r?.dedupBacklog ?? 0} stale dedup · ${r?.unresolvedVenuesLowConfidence ?? 0} low-confidence venues · ${r?.eventDateInconsistencies.length ?? 0} event date issues · ${broken.length} broken links</p>
 
     ${fbRows ? `<h4 style="margin:16px 0 4px;font-size:14px;color:${COLORS.charcoal};">Recent feedback</h4><ul style="margin:0 0 16px;padding-left:20px;font-size:14px;">${fbRows}</ul>` : ""}
 

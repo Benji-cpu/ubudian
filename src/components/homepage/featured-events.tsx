@@ -2,10 +2,10 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { queryWithRetry } from "@/lib/supabase/retry";
 import { EventCard } from "@/components/events/event-card";
-import { getActiveBoostedEventIds } from "@/lib/sponsors/sponsor-service";
 import { bucketEventsByTime } from "@/lib/events/buckets";
 import { nowInBali, parseTimeToMinutes } from "@/lib/events/bali-time";
 import { stripEmbeddings } from "@/lib/events/strip-embedding";
+import { visibleListings } from "@/lib/events/listing-checks";
 import type { Event } from "@/types";
 
 const MAX_CARDS = 6;
@@ -30,7 +30,6 @@ const JOINABLE_AFTER_START_MIN = 30;
 export async function FeaturedEvents() {
   let tonight: Event[] = [];
   let thisWeek: Event[] = [];
-  let boosted = new Set<string>();
   const bali = nowInBali();
 
   try {
@@ -46,9 +45,8 @@ export async function FeaturedEvents() {
       "homepage-events"
     );
     if (error) console.error("Homepage events query error:", error);
-    boosted = await getActiveBoostedEventIds();
 
-    const buckets = bucketEventsByTime(stripEmbeddings((data ?? []) as Event[]), new Date(), boosted);
+    const buckets = bucketEventsByTime(visibleListings(stripEmbeddings((data ?? []) as Event[])), new Date());
     const stillJoinable = buckets.happening_now.filter((e) => {
       if (e.end_date && e.end_date > e.start_date) return true;
       const start = parseTimeToMinutes(e.start_time);

@@ -12,8 +12,6 @@ interface AgendaFeedProps {
   savedEventIds: string[];
   viewerArchetypes?: ArchetypeId[] | null;
   archetypeLabel?: string | null;
-  /** Event IDs with an active Partner+ sponsorship — boost in ranking + buckets. */
-  boostedEventIds?: Set<string>;
   /** Per-event cosine to the viewer's taste vector (centroid of their hearts). */
   tasteSimByEventId?: Map<string, number>;
 }
@@ -34,7 +32,6 @@ export function AgendaFeed({
   savedEventIds,
   viewerArchetypes,
   archetypeLabel,
-  boostedEventIds,
   tasteSimByEventId,
 }: AgendaFeedProps) {
   const now = new Date();
@@ -66,7 +63,6 @@ export function AgendaFeed({
   const ranked = rankEvents(events, {
     now,
     viewerArchetypes: viewerArchetypes ?? undefined,
-    boostedEventIds,
     tasteSimByEventId,
   });
 
@@ -74,7 +70,7 @@ export function AgendaFeed({
   // whatever ranks highest. Surfacing a Jun-29 event under a "Featured today"
   // badge on a quiet Tuesday reads as a lie. Walk buckets nearest-to-furthest
   // and pick the top-ranked event within the first non-empty bucket.
-  const heroBuckets = bucketEventsByTime(events, now, boostedEventIds);
+  const heroBuckets = bucketEventsByTime(events, now);
   const HERO_PRIORITY: { key: EventBucket; label: string }[] = [
     { key: "happening_now", label: "Happening now" },
     { key: "today", label: "Featured today" },
@@ -132,7 +128,7 @@ export function AgendaFeed({
 
   // Bucket the remainder (everything except the hero) into time sections.
   const remainder = events.filter((e) => e.id !== hero?.id);
-  const buckets = bucketEventsByTime(remainder, now, boostedEventIds);
+  const buckets = bucketEventsByTime(remainder, now);
 
   return (
     <div className="space-y-8 sm:space-y-12">

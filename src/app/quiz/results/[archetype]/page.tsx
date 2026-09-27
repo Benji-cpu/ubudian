@@ -20,6 +20,7 @@ import { PractitionerCard } from "@/components/practitioners/practitioner-card";
 import { RecommendedRetreatCta } from "@/components/journeys/recommended-retreat-cta";
 import { Button } from "@/components/ui/button";
 import { SITE_URL } from "@/lib/constants";
+import { visibleListings } from "@/lib/events/listing-checks";
 import type { ArchetypeId, Event, Guide, Practitioner } from "@/types";
 import type { Metadata } from "next";
 
@@ -98,7 +99,7 @@ export default async function ArchetypeResultPage({ params }: PageProps) {
         .limit(24),
     ]);
 
-    events = (eventsRes.data ?? []) as Event[];
+    events = visibleListings((eventsRes.data ?? []) as Event[]);
     guides = (guidesRes.data ?? []) as Guide[];
     practitioners = (practitionersRes.data ?? []) as Practitioner[];
   } catch {

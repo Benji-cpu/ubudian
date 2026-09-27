@@ -19,8 +19,9 @@ export function buildSpreadEmailHtml(opts: {
   primary: ArchetypeId;
   events: Event[];
   siteUrl: string;
+  unsubUrl: string;
 }): string {
-  const { primary, events, siteUrl } = opts;
+  const { primary, events, siteUrl, unsubUrl } = opts;
   const base = siteUrl.replace(/\/$/, "");
   const a = ARCHETYPES[primary];
 
@@ -69,7 +70,7 @@ export function buildSpreadEmailHtml(opts: {
         </td></tr>
 
         <tr><td style="background:${CREAM};padding:18px 32px;color:#8a8a7a;font-size:12px;line-height:1.5;">
-          You're getting this because you took the quiz at <a href="${base}" style="color:${GREEN};">theubudian.life</a>. The valley, one email at a time.
+          You're getting this because you took the quiz at <a href="${base}" style="color:${GREEN};">theubudian.life</a>. The valley, one email at a time. <a href="${esc(unsubUrl)}" style="color:${GREEN};">Unsubscribe</a>.
         </td></tr>
 
       </table>

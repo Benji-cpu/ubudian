@@ -1,6 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
 import { SITE_URL, SITE_NAME, SITE_DESCRIPTION } from "@/lib/constants";
 import { nowInBali } from "@/lib/events/bali-time";
+import { visibleListings } from "@/lib/events/listing-checks";
+import type { Event } from "@/types";
 
 function escapeXml(text: string): string {
   return text
@@ -28,7 +30,7 @@ export async function GET() {
   const [{ data: events }] = await Promise.all([
     supabase
       .from("events")
-      .select("title, slug, short_description, description, start_date, created_at")
+      .select("id, title, slug, short_description, description, venue_name, start_date, end_date, start_time, is_recurring, recurrence_rule, external_ticket_url, organizer_contact, organizer_instagram, moderation_reason, created_at")
       .eq("status", "approved")
       .gte("start_date", today)
       .order("start_date", { ascending: true })
@@ -39,15 +41,13 @@ export async function GET() {
 
   const items: FeedItem[] = [];
 
-  type EventRow = {
-    title: string;
-    slug: string;
-    short_description: string | null;
-    description: string | null;
-    start_date: string;
-    created_at: string | null;
-  };
-  for (const event of (events ?? []) as EventRow[]) {
+  type EventRow = Pick<
+    Event,
+    | "id" | "title" | "slug" | "short_description" | "description" | "venue_name" | "start_date"
+    | "end_date" | "start_time" | "is_recurring" | "recurrence_rule" | "external_ticket_url"
+    | "organizer_contact" | "organizer_instagram" | "moderation_reason" | "created_at"
+  >;
+  for (const event of visibleListings((events ?? []) as EventRow[])) {
     items.push({
       title: event.title,
       link: `${SITE_URL}/events/${event.slug}`,

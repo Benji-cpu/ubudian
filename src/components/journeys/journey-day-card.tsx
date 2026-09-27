@@ -23,20 +23,13 @@ interface JourneyDayCardProps {
   journeyTitle?: string;
   journeyUrl?: string;
   /**
-   * Map of partner_id → sponsor slug for partners that are also active
-   * Anchor-tier community partners. Atoms with a matching partner_id render
-   * their title with a subtle gold underline that links to the partner profile.
-   */
-  anchorPartnerSlugs?: Map<string, string>;
-  /**
    * Map of practitioners.id → slug. Atoms with practitioner_id link out to
    * their /practitioners/[slug] detail page when this is provided.
    */
   practitionerSlugs?: Map<string, string>;
   /**
    * Map of partners.id → slug for the affiliate `partners` table. Atoms with
-   * partner_id link out to /partners/[slug] when this is provided (and
-   * anchorPartnerSlugs hasn't already claimed them).
+   * partner_id link out to /partners/[slug] when this is provided.
    */
   partnerSlugs?: Map<string, string>;
 }
@@ -86,7 +79,6 @@ export function JourneyDayCard({
   eventSlugs,
   journeyTitle,
   journeyUrl,
-  anchorPartnerSlugs,
   practitionerSlugs,
   partnerSlugs,
 }: JourneyDayCardProps) {
@@ -239,7 +231,6 @@ export function JourneyDayCard({
                       slot={slot}
                       candidates={candidatesBySlot.get(slot.id) ?? []}
                       eventSlugs={eventSlugs}
-                      anchorPartnerSlugs={anchorPartnerSlugs}
                       practitionerSlugs={practitionerSlugs}
                       partnerSlugs={partnerSlugs}
                     />
@@ -258,14 +249,12 @@ function SlotRow({
   slot,
   candidates,
   eventSlugs,
-  anchorPartnerSlugs,
   practitionerSlugs,
   partnerSlugs,
 }: {
   slot: JourneyDaySlot;
   candidates: JourneyAtom[];
   eventSlugs: Map<string, string>;
-  anchorPartnerSlugs?: Map<string, string>;
   practitionerSlugs?: Map<string, string>;
   partnerSlugs?: Map<string, string>;
 }) {
@@ -290,7 +279,6 @@ function SlotRow({
               key={atom.id}
               atom={atom}
               eventSlugs={eventSlugs}
-              anchorPartnerSlugs={anchorPartnerSlugs}
               practitionerSlugs={practitionerSlugs}
               partnerSlugs={partnerSlugs}
             />
@@ -304,13 +292,11 @@ function SlotRow({
 function AtomLine({
   atom,
   eventSlugs,
-  anchorPartnerSlugs,
   practitionerSlugs,
   partnerSlugs,
 }: {
   atom: JourneyAtom;
   eventSlugs: Map<string, string>;
-  anchorPartnerSlugs?: Map<string, string>;
   practitionerSlugs?: Map<string, string>;
   partnerSlugs?: Map<string, string>;
 }) {
@@ -322,9 +308,6 @@ function AtomLine({
       : atom.kind === "accommodation" || atom.kind === "restaurant"
       ? "Visit"
       : "Open";
-  const anchorPartnerSlug = atom.partner_id
-    ? anchorPartnerSlugs?.get(atom.partner_id) ?? null
-    : null;
   const inner = (
     <>
       {atom.image_url ? (
@@ -352,22 +335,9 @@ function AtomLine({
             </span>
           )}
         </div>
-        <p className="text-sm font-medium text-foreground">
-          {anchorPartnerSlug ? (
-            <span className="underline decoration-brand-gold/50 underline-offset-4 decoration-1">
-              {atom.title}
-            </span>
-          ) : (
-            atom.title
-          )}
-        </p>
+        <p className="text-sm font-medium text-foreground">{atom.title}</p>
         {atom.short_description && (
           <p className="text-xs text-muted-foreground line-clamp-2">{atom.short_description}</p>
-        )}
-        {anchorPartnerSlug && (
-          <p className="mt-0.5 text-[10px] uppercase tracking-wider text-brand-gold/80">
-            Community partner
-          </p>
         )}
       </div>
       {href?.startsWith("http") && (

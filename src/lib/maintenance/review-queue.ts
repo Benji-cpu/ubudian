@@ -23,7 +23,6 @@ export interface ReviewQueue {
   feedback: FeedbackItem[];
   dedupBacklog: number;
   unresolvedVenuesLowConfidence: number;
-  incompleteSubscriptions: number;
   eventDateInconsistencies: { id: string; title: string; reason: string }[];
   brokenLinks: BrokenLink[];
 }
@@ -33,7 +32,7 @@ export async function buildReviewQueue(linkHealth?: LinkHealthReport): Promise<R
   const fourteenDaysAgo = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString();
   const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
 
-  const [feedback, dedup, venues, subs, events] = await Promise.all([
+  const [feedback, dedup, venues, events] = await Promise.all([
     supabase
       .from("feedback")
       .select(
@@ -52,11 +51,6 @@ export async function buildReviewQueue(linkHealth?: LinkHealthReport): Promise<R
       .select("id", { count: "exact", head: true })
       .lt("seen_count", 2)
       .lt("last_seen_at", sevenDaysAgo),
-    supabase
-      .from("subscriptions")
-      .select("id", { count: "exact", head: true })
-      .eq("status", "incomplete")
-      .lt("created_at", sevenDaysAgo),
     supabase
       .from("events")
       .select("id, title, start_date, end_date, start_time")
@@ -84,7 +78,6 @@ export async function buildReviewQueue(linkHealth?: LinkHealthReport): Promise<R
     feedback: (feedback.data ?? []) as FeedbackItem[],
     dedupBacklog: dedup.count ?? 0,
     unresolvedVenuesLowConfidence: venues.count ?? 0,
-    incompleteSubscriptions: subs.count ?? 0,
     eventDateInconsistencies: inconsistencies,
     brokenLinks: linkHealth?.broken ?? [],
   };

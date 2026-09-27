@@ -32,7 +32,7 @@ export function emailFooter(unsubUrl: string): string {
   <tr><td style="padding:24px 32px;border-top:1px solid ${GOLD}33;">
     <p style="margin:0;font-size:12px;line-height:1.6;color:${CHARCOAL}99;font-family:Georgia,serif;">
       The Ubudian — the pulse of the valley.
-      <a href="${unsubUrl}" style="color:${GREEN};">Unsubscribe</a> from personalised event emails.
+      <a href="${unsubUrl}" style="color:${GREEN};">Unsubscribe</a> from all our emails.
     </p>
   </td></tr>`;
 }

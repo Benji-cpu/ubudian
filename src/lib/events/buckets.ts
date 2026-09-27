@@ -58,8 +58,7 @@ export function rolledForward(events: Event[], now: Date = new Date()): Event[] 
 
 export function bucketEventsByTime(
   events: Event[],
-  now: Date = new Date(),
-  boostedEventIds?: Set<string>
+  now: Date = new Date()
 ): BucketedEvents {
   const buckets: BucketedEvents = {
     happening_now: [],
@@ -83,17 +82,8 @@ export function bucketEventsByTime(
     if (bucket) buckets[bucket].push(effective);
   }
 
-  const compare = boostedEventIds && boostedEventIds.size > 0
-    ? (a: Event, b: Event) => {
-        const aBoost = boostedEventIds.has(a.id) ? 1 : 0;
-        const bBoost = boostedEventIds.has(b.id) ? 1 : 0;
-        if (aBoost !== bBoost) return bBoost - aBoost;
-        return compareEvents(a, b);
-      }
-    : compareEvents;
-
   for (const key of Object.keys(buckets) as EventBucket[]) {
-    buckets[key].sort(compare);
+    buckets[key].sort(compareEvents);
   }
 
   return buckets;
@@ -161,32 +151,17 @@ export const compareEventsByStart = compareEvents;
 /**
  * Stable sort over rolled-forward events. `mode === 'newest'` keys on
  * `created_at` descending; everything else falls back to start-date ASC.
- * If `boostedEventIds` is provided, those events sort to the front of their
- * tie group (date- or recency-equal) so the community-partner boost shows up
- * in flat views (grid, list) too. Mutates a new array; does not touch the input.
+ * Mutates a new array; does not touch the input.
  */
 export function sortRolledEvents(
   events: Event[],
-  mode: "date" | "newest" = "date",
-  boostedEventIds?: Set<string>
+  mode: "date" | "newest" = "date"
 ): Event[] {
-  const out = [...events];
-  const base =
+  return [...events].sort(
     mode === "newest"
       ? (a: Event, b: Event) => b.created_at.localeCompare(a.created_at)
-      : compareEvents;
-
-  if (boostedEventIds && boostedEventIds.size > 0) {
-    out.sort((a, b) => {
-      const aBoost = boostedEventIds.has(a.id) ? 1 : 0;
-      const bBoost = boostedEventIds.has(b.id) ? 1 : 0;
-      if (aBoost !== bBoost) return bBoost - aBoost;
-      return base(a, b);
-    });
-  } else {
-    out.sort(base);
-  }
-  return out;
+      : compareEvents
+  );
 }
 
 /** Add N days to a YYYY-MM-DD string, returning a YYYY-MM-DD string. */
