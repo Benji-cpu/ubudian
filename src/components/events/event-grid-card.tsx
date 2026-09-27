@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { formatEventTime, isRecentlyAddedEvent } from "@/lib/utils";
 import { formatEventDateLine } from "@/lib/events/format";
 import { getTimeSensitivityLabel } from "@/lib/events/discovery";
-import { isFreeEvent } from "@/lib/price-parser";
+import { isFreeEvent, formatPriceInfo } from "@/lib/price-parser";
 import { categoryShortLabel } from "@/lib/constants";
 import { EventCardPlaceholder } from "./event-card-placeholder";
 import { EventCardExternalLinks } from "./event-card-external-links";
@@ -131,7 +131,7 @@ export function EventGridCard({
             <div className="flex items-center gap-2">
               {event.price_info && !isFree && (
                 <span className="text-sm font-semibold tracking-tight text-brand-terracotta">
-                  {event.price_info}
+                  {formatPriceInfo(event.price_info)}
                 </span>
               )}
               <EventCardExternalLinks

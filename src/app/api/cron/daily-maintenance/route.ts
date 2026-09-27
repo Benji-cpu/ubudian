@@ -89,6 +89,7 @@ export async function GET(request: Request) {
       heldForCap: [],
       heldReasons: {},
       moderationFailedOpen: 0,
+      archivedDuplicates: 0,
       errors: [],
     };
   });
@@ -203,7 +204,8 @@ export async function GET(request: Request) {
     autonomous: {
       autoApprovedEvents: autoApprove.approved,
       autoRejectedEvents: autoApprove.rejected,
-      publishedUnmoderated: autoApprove.moderationFailedOpen,
+      heldForModeration: autoApprove.moderationFailedOpen,
+      archivedDuplicateListings: autoApprove.archivedDuplicates,
       heldPendingEvents: autoApprove.held,
       expiredPendingEvents: expiry.expired,
       archivedEndedSeries: endedSeries.expired,

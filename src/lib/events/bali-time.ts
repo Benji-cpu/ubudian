@@ -116,6 +116,27 @@ export function parseTimeToMinutes(value: string | null): number | null {
 }
 
 /**
+ * How long a same-day listing with a start time but no end time is assumed to
+ * run. Without it, an 8am class with no end time counted as "happening now"
+ * until midnight — the homepage's "Tonight" list was showing morning classes
+ * at 5pm. Two hours is a class, a dance or a ceremony; longer events say so.
+ */
+export const ASSUMED_DURATION_MIN = 120;
+
+/**
+ * Minutes since midnight the event ends on its last day: its end_time, or for
+ * a single-day event with only a start_time, start + {@link ASSUMED_DURATION_MIN}.
+ */
+export function effectiveEndMinutes(event: Event): number | null {
+  const endMin = parseTimeToMinutes(event.end_time);
+  if (endMin !== null) return endMin;
+  const singleDay = !event.end_date || event.end_date === event.start_date;
+  const startMin = parseTimeToMinutes(event.start_time);
+  if (!singleDay || startMin === null) return null;
+  return Math.min(startMin + ASSUMED_DURATION_MIN, 24 * 60);
+}
+
+/**
  * Strict "you can show up right now" predicate for the Happening Now bucket.
  *
  * True only for events you could plausibly drop in on this minute:
@@ -135,8 +156,8 @@ export function eventIsHappeningNow(event: Event, now: BaliNow): boolean {
   if (start > today || end < today) return false;
 
   // Already past on a multi-day event whose end is in the past (handled above)
-  // or a same-day event whose end_time has passed.
-  const endMin = parseTimeToMinutes(event.end_time);
+  // or a same-day event whose end_time (or assumed end) has passed.
+  const endMin = effectiveEndMinutes(event);
   if (start === today && end === today && endMin !== null && timeMinutes >= endMin) {
     return false;
   }
@@ -171,7 +192,7 @@ export function eventIsInProgress(event: Event, now: BaliNow): boolean {
   if (start < today && end > today) return true;
 
   const startMin = parseTimeToMinutes(event.start_time);
-  const endMin = parseTimeToMinutes(event.end_time);
+  const endMin = end === today ? effectiveEndMinutes(event) : parseTimeToMinutes(event.end_time);
 
   if (start === today && end === today && startMin === null) return true;
   if (startMin !== null && timeMinutes < startMin) return false;
@@ -195,7 +216,7 @@ export function eventEndedToday(event: Event, now: BaliNow): boolean {
   if (end < today) return true;
   if (end > today) return false;
   // end === today
-  const endMin = parseTimeToMinutes(event.end_time);
+  const endMin = effectiveEndMinutes(event);
   if (endMin === null) return false;
   return timeMinutes >= endMin;
 }

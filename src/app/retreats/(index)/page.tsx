@@ -4,9 +4,6 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/lib/auth";
 import { JourneyCard } from "@/components/journeys/journey-card";
-import { WhatsIncludedIcons } from "@/components/journeys/whats-included-icons";
-import { DifferentiatorStrip } from "@/components/journeys/differentiator-strip";
-import { JourneyExplainer } from "@/components/journeys/journey-explainer";
 import { WordReveal } from "@/components/ui/word-reveal";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { GrainTexture } from "@/components/ui/grain-texture";
@@ -20,7 +17,7 @@ const LISTING_HERO_IMAGE =
 export const metadata: Metadata = {
   title: "Ubud Retreats",
   description:
-    "An introduction into Ubud's conscious community — practitioners, circles, and tables that don't open easily. Small cohort, luxury villa, four to eight people, hand-picked for fit.",
+    "Multi-day paths through Ubud's conscious community — the practitioners, circles and places we'd send a friend to, to follow at your own pace.",
 };
 
 export default async function ExperiencesPage() {
@@ -92,35 +89,12 @@ export default async function ExperiencesPage() {
           />
           <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-foreground/75">
             Ubud&apos;s conscious community lives behind soft doors — practitioners
-            who don&apos;t advertise, circles that don&apos;t take strangers,
-            tables you have to be brought to. Come for a few days. Villa sorted,
-            meals handled, three or four introductions to the people we trust
-            most. You leave with phone numbers, not just photographs.
+            who don&apos;t advertise, circles you only hear about once you&apos;re
+            here. These guides string together the ones we&apos;d send a friend to,
+            day by day. Follow them at your own pace; you book your own stay and
+            sessions.
           </p>
         </div>
-      </section>
-
-      {/* Differentiator — the typographic moment */}
-      <DifferentiatorStrip />
-
-      {/* Clarify the two axes a first-timer conflates: length + mode */}
-      <JourneyExplainer />
-
-      {/* What an Ubud Retreat actually delivers — icon row */}
-      <section className="mx-auto max-w-5xl px-4 py-16 sm:px-6 sm:py-20">
-        <ScrollReveal>
-          <div className="mb-8 text-center">
-            <span className="text-xs uppercase tracking-[0.3em] text-brand-gold">
-              What you actually get
-            </span>
-            <h2 className="mt-3 font-serif text-2xl font-medium text-brand-deep-green sm:text-3xl">
-              Six promises, kept quietly
-            </h2>
-          </div>
-        </ScrollReveal>
-        <ScrollReveal delayMs={150}>
-          <WhatsIncludedIcons variant="card" />
-        </ScrollReveal>
       </section>
 
       {/* The retreats themselves */}
@@ -129,14 +103,14 @@ export default async function ExperiencesPage() {
           <div className="mb-10 flex items-end justify-between border-b border-brand-gold/20 pb-4">
             <div>
               <span className="text-xs uppercase tracking-[0.3em] text-brand-gold">
-                The cohorts
+                The guides
               </span>
               <h2 className="mt-2 font-serif text-3xl font-medium text-brand-deep-green sm:text-4xl">
-                Four to eight people, hand-picked
+                Paths you walk yourself
               </h2>
               <p className="mt-2 max-w-xl text-sm leading-relaxed text-foreground/65">
-                Each retreat runs a few times a year. Apply for the week that
-                resonates and we&apos;ll come back within three days.
+                Free to follow. Each one is a day-by-day recipe; the sessions and
+                the stay are yours to book.
               </p>
             </div>
             {primary && (
@@ -150,7 +124,7 @@ export default async function ExperiencesPage() {
         {livingGuides.length === 0 ? (
           <div className="py-16 text-center">
             <p className="font-serif text-lg italic text-muted-foreground">
-              The first cohorts are being threaded together. Back soon.
+              No guides are published right now.
             </p>
           </div>
         ) : (
@@ -164,36 +138,12 @@ export default async function ExperiencesPage() {
         )}
       </section>
 
-      {/* Free Living Guide — secondary panel, the Ekumal tiered-access pattern */}
-      <section className="border-t border-brand-gold/15 bg-brand-cream/50 px-4 py-16 sm:px-6">
-        <ScrollReveal>
-          <div className="mx-auto max-w-3xl text-center">
-            <span className="text-xs uppercase tracking-[0.3em] text-brand-gold">
-              Or follow it yourself
-            </span>
-            <h2 className="mt-3 font-serif text-2xl font-medium italic text-brand-deep-green sm:text-3xl">
-              Living Guides — same curation, free
-            </h2>
-            <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-foreground/70">
-              If a cohort doesn&apos;t fit your dates, or the budget isn&apos;t
-              there, the curated itinerary is yours to follow. You handle the
-              villa and the bookings; we keep the recipe up to date. The doors
-              we open in cohort weeks stay closed in self-serve mode — that&apos;s
-              the difference. Use the guides as a soft start.
-            </p>
-            <Button asChild variant="outline" className="mt-7">
-              <Link href="/membership">Read about Living Guides</Link>
-            </Button>
-          </div>
-        </ScrollReveal>
-      </section>
-
       {/* Quiz CTA */}
       <section className="bg-brand-pale-green/60 px-4 py-16">
         <ScrollReveal>
           <div className="mx-auto max-w-xl text-center">
             <h2 className="font-serif text-2xl font-medium text-brand-deep-green sm:text-3xl">
-              Not sure which week is yours?
+              Not sure which path is yours?
             </h2>
             <p className="mt-3 text-base leading-relaxed text-foreground/70">
               Take the quiz. We&apos;ll surface the retreat that lines up with

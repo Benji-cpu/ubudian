@@ -10,7 +10,7 @@ The calendar for Ubud's conscious community — ceremonies, dance, breathwork an
 - **Database**: Supabase (Postgres + Auth + Storage)
 - **Styling**: Tailwind CSS 4 + shadcn/ui
 - **Payments**: Stripe (tour bookings + membership subscriptions)
-- **AI**: Gemini via **`@google/genai`** (migrated 2026-09-15 off the deprecated `@google/generative-ai`) for parsing, moderation, embeddings and the tag sweep; Stability AI for image generation. Client sites: `src/lib/ingestion/llm-parser.ts`, `src/lib/events/moderation.ts`, `src/lib/embeddings.ts`, `scripts/backfill-*-tags.ts`. All on `gemini-2.5-flash-lite`; the key is free-tier and 429s above ~2 concurrent calls.
+- **AI**: Gemini via **`@google/genai`** (migrated 2026-09-15 off the deprecated `@google/generative-ai`) for parsing, moderation, embeddings and the tag sweep; Stability AI for image generation. Client sites: `src/lib/ingestion/llm-parser.ts`, `src/lib/events/moderation.ts`, `src/lib/embeddings.ts`, `scripts/backfill-*-tags.ts`. All on `gemini-2.5-flash-lite`. The key is **free tier: 20 requests/day/project/model** (`GenerateRequestsPerDayPerProjectPerModel-FreeTier`, confirmed 2026-09-27) and 429s above ~2 concurrent calls — the tag sweep, the Telegram parser and the gate's moderation share those 20.
 - **Newsletter**: Beehiiv (distribution), Resend (transactional email + ingestion alerts)
 - **Scraping**: Cheerio (HTML parsing for web scrapers)
 - **Forms**: Zod + React Hook Form + zodResolver
@@ -46,7 +46,7 @@ Three backbones. Vercel Cron is capped at **2 jobs on Hobby and both slots are u
 | `ingestion-health` | Vercel Cron | `0 9 * * *` | Health check + second-pass archive sweeps + smart metrics |
 | `todo-today-harvest` | GH Actions | `30 18 * * *` | Stealth Chromium → todo.today → ICP filter → POST `curator-ingest` |
 | `aggregator-harvest` | GH Actions | `40 18 * * *` | Megatix scrape → POST `curator-ingest` |
-| `tag-embed-sweep` | GH Actions | `55 18 * * *` | Embeddings + archetype/vibe tag backfill (concurrency 2 — the free-tier key 429s above that) |
+| `tag-embed-sweep` | GH Actions | after `daily-maintenance-fetch` completes (`workflow_run`) | Embeddings + archetype/vibe tag backfill (concurrency 2). Chained, not scheduled, so the gate's moderation gets the day's free-tier quota first |
 | `daily-maintenance-fetch` | GH Actions | `2 19 * * *` | Curls `/api/cron/daily-maintenance?digest=true`, commits `digests/$TODAY.json` |
 | `event-reminders` | GH Actions | `4 9 * * *` | "Starts tomorrow" mail to savers. Idempotent via `transactional_sends`; `?only=<email>` to test |
 | `weekly-digest` | GH Actions | `6 23 * * 2` | Personalised weekly mail. Idempotent per ISO week; `?only=` to test |
@@ -62,7 +62,8 @@ Three backbones. Vercel Cron is capped at **2 jobs on Hobby and both slots are u
 
 `src/lib/maintenance/auto-approve.ts` is the only thing that moves an event to `approved`. Ingest never publishes directly, so the screening rules live in one place and apply to every source identically.
 
-- **Structural screen first** (free, deterministic, unit-tested): venue ≥3 chars, category in `EVENT_CATEGORIES` and not the `Other` fallback, body ≥40 chars (`short_description` counts), no `content_flags`, `quality_score` ≥0.4 when present, live recurrence, future date. Then `moderateEvent()` on the survivors — this is the **only** place ingested content is moderated; `pipeline.ts` applies just the keyword ICP filter.
+- **Structural screen first** (free, deterministic, unit-tested): venue ≥3 chars, **a way in** (ticket link, organiser contact/Instagram, or a named venue — not an area like "Outside Ubud"/"Penestanan"; `wayIn()` in `src/lib/events/listing-checks.ts`), category in `EVENT_CATEGORIES` and not the `Other` fallback, body ≥40 chars (`short_description` counts), no `content_flags`, `quality_score` ≥0.4 when present, live recurrence, future date. Then `moderateEvent()` on the survivors — this is the **only** place ingested content is moderated; `pipeline.ts` applies just the keyword ICP filter.
+- **One card per gathering.** A candidate that `sameGathering()` matches against a live row (same named venue, same start time, a shared day, a shared distinctive title word) is archived `duplicate_of:<id>`; a new weekly row never displaces a live one-off. Built for todo.today listing each week of a series under that week's facilitator ("Friday Ecstatic Dance w/ DION", "… w/ Karunika") — one Friday dance was four cards.
 - **Bounded**: `AUTO_APPROVE_MAX_PER_RUN = 25`, 25s budget, 5 moderation calls in flight.
 - **Reversible**: every auto-publish stamps `events.auto_approved_at`. Undo the lot with `UPDATE events SET status='pending', auto_approved_at=NULL WHERE auto_approved_at IS NOT NULL`.
 - **No review queue, deliberately.** Anything declined stays `pending` and expires as it always has. Do not add a "needs review" surface — an unstaffed queue is what broke this system the first time.
@@ -71,7 +72,8 @@ Three backbones. Vercel Cron is capped at **2 jobs on Hobby and both slots are u
 - **The dedup backlog resolves by rule, before the gate reads it** (`src/lib/maintenance/dedup-autoresolve.ts`): counterpart archived → `not_dup`; a pending weekly row matching a live series at the same venue/weekday ≥0.75 → the pending row is archived as `duplicate_of:<id>`; two pending rows unresolved for 14 days → `not_dup`, each judged alone. Every auto-resolution is stamped `resolved_by = 'auto:<rule>'`. The admin dedup page still exists but nothing waits for it.
 - **Nothing waits longer than 30 nights** (`src/lib/maintenance/expiry.ts`): a pending row older than 30 days is archived `expired_unpublished_30d` — except rows the gate held only for its per-run cap that night. Approved recurring rows whose rule's `until` has passed are archived too.
 - **A recurring flag with no parseable rule is a one-off on its date.** Megatix copies its own `is_recurring` across without a rule; those used to be 15 holds a night, forever.
-- **Moderation failing open is counted.** `moderateEvent` still fails open (an empty site is worse than an unmoderated card) but the run reports `moderationFailedOpen`, such rows carry `moderation_reason='auto_gate:unmoderated'`, and the digest + CRM alert say so.
+- **Moderation failing means hold, not publish** (since 2026-09-27). `moderateEvent` still returns `notes: "moderation_failed_open"`; the gate holds that row (retried nightly) and counts it in `moderationFailedOpen` (name is historical), and the CRM alert says events are held. Before this, 33 of September's 79 publishes went out unmoderated (`moderation_reason='auto_gate:unmoderated'`). On the free-tier key a quota-starved night publishes little — that is the intended trade; the fix is billing, not failing open.
+- **Submissions** (`/api/events/submit`) publish immediately only when moderation actually ran; otherwise they go in `pending` for the gate. `trusted_submitters` is analytics only — nobody skips a check.
 - **Liveness** (`src/lib/maintenance/liveness.ts`): the payload's first block. `stale: true` when nothing has auto-published for 48h. The digest agent prints it first and never skips a stale day; the fetch workflow POSTs a `blocking` row to Ben's CRM (`CRM_HANDOVER_URL` / `CRM_HANDOVER_SECRET` repo secrets).
 
 Dry run before trusting a rule change: `npx tsx scripts/auto-approve.ts --limit=250` (add `--apply` to publish), or `GET /api/cron/daily-maintenance?dryRun=true` with the `CRON_SECRET` bearer.
@@ -132,7 +134,6 @@ Dry run before trusting a rule change: `npx tsx scripts/auto-approve.ts --limit=
 **User:** `quiz_results`, `saved_events`, `saved_guides`, `saved_journeys`, `saved_spreads`, `feedback`, `transactional_sends`
 
 Key gotchas:
-- Trusted submitters auto-approve at **5 approved events** (`increment_approved_count()` SQL function)
 - Public reads filtered by `status`/`is_active` per entity type
 - `events` carries ingestion columns (`source_id`, `content_fingerprint`, `raw_message_id`, `llm_parsed`, `quality_score`, `content_flags`), personalisation columns (`archetype_tags`, `vibe_tags`, `intent_tags`, `embedding`, `event_tier`, `is_spotlight`) and the gate's audit column (`auto_approved_at`)
 - `saved_spreads` is write-only: the quiz submit route inserts, nothing reads it back.
@@ -220,9 +221,11 @@ Global MCPs also available: Playwright (E2E testing), GitHub (PR/issues), Contex
 - Event submission API (`/api/events/submit`) uses admin client — anon RLS can't insert events
 - Image uploads go to `images` bucket with folder prefix (`blog/`, `stories/`, `events/`, `tours/`)
 - Stories route: `/stories` (nav says "Humans of Ubud") — flag-disabled, no admin pages since 2026-09-15.
-- **The retreat product is `/retreats`** (table `journeys`, components `journeys/`, admin `/admin/journeys` via the `/admin/retreats` hub). `/experiences` and `/experiences/:slug` 308 to it (`next.config.ts`). Do not reintroduce a third name.
+- **The retreat product is `/retreats`** (table `journeys`, components `journeys/`, admin `/admin/journeys` via the `/admin/retreats` hub). `/experiences` and `/experiences/:slug` 308 to it (`next.config.ts`). Do not reintroduce a third name. **Since 2026-09-27 the pages are free self-serve guides only**: the paid-cohort pitch (cohort dates, "Open for application", per-person prices, the application FAQ, 8 attendee testimonials for cohorts that never ran) was removed because no application or booking route exists. Off the homepage.
+- **`/membership` and `/partners` 307 to `/about`** (`next.config.ts`, temporary) pending Ben's keep/delete: membership sold Insider perks no code delivers (0 active members); the partners enquiry form posts to an API route that was never built.
 
-- **Homepage events block** reads the same rolled-forward buckets as `/events` ("Tonight in Ubud", else "This week", else an honest empty state). It must never filter `start_date >= today` at the DB — that drops every recurring rhythm.
+- **Homepage events block** reads the same rolled-forward buckets as `/events` and shows only what you can still get to: not started, started ≤30 min ago, all-day or multi-day ("Still ahead today"/"Still ahead tonight" from 16:00 Bali, else "Coming up this week", else an honest empty state). A same-day listing with no `end_time` is assumed to run `ASSUMED_DURATION_MIN` (2h, `bali-time.ts`) — without that an 8am class stayed "happening now" until midnight. It must never filter `start_date >= today` at the DB — that drops every recurring rhythm.
+- **Every event page answers "how do I get in"** (`components/events/how-to-get-in.tsx`): tickets, the organiser (phone → WhatsApp link), or walk in at the named venue with directions.
 - **Ben-only actions go to his CRM** (`Freelance/site`, app `ubudian`); this project's automation can file its own via `POST /api/integrations/handover`.
 
 **Status workflows by entity:**

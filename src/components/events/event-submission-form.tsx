@@ -69,6 +69,7 @@ export function EventSubmissionForm({ initialEvent }: EventSubmissionFormProps =
   const isEdit = !!initialEvent;
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
+  const [liveNow, setLiveNow] = useState(true);
 
   const form = useForm<SubmissionFormValues>({
     resolver: zodResolver(submissionSchema),
@@ -185,6 +186,7 @@ export function EventSubmissionForm({ initialEvent }: EventSubmissionFormProps =
         return;
       }
 
+      setLiveNow(isEdit || result.autoApproved !== false);
       setStatus("success");
     } catch {
       setStatus("error");
@@ -202,7 +204,9 @@ export function EventSubmissionForm({ initialEvent }: EventSubmissionFormProps =
         <p className="mt-2 text-muted-foreground">
           {isEdit
             ? "Your event is updated and live."
-            : "Thank you! Your event has been submitted for review. We'll publish it shortly."}
+            : liveNow
+              ? "Thank you! It passed our automated check and is live on the calendar now."
+              : "Thank you! Our automated check couldn't run just now, so it will be checked and published overnight if it passes."}
         </p>
         {isEdit && (
           <p className="mt-4">
@@ -537,7 +541,7 @@ export function EventSubmissionForm({ initialEvent }: EventSubmissionFormProps =
 
         <Button type="submit" size="lg" disabled={status === "loading"} className="w-full">
           {status === "loading" && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          {isEdit ? "Save changes" : "Submit Event for Review"}
+          {isEdit ? "Save changes" : "Submit Event"}
         </Button>
       </form>
     </Form>

@@ -9,6 +9,13 @@ const nextConfig: NextConfig = {
       // URL has been indexed and linked from emails, so it redirects for good.
       { source: "/experiences", destination: "/retreats", permanent: true },
       { source: "/experiences/:slug", destination: "/retreats/:slug", permanent: true },
+      // 2026-09-27: off the public path until Ben decides keep/delete. Both
+      // pages promised things no code delivers — /membership sold Insider
+      // perks (early access, discounts, an Insider newsletter) that do not
+      // exist, to 0 active members; /partners' enquiry form posts to an API
+      // route that was never built. Temporary, so reverting is one line.
+      { source: "/membership", destination: "/about", permanent: false },
+      { source: "/partners", destination: "/about", permanent: false },
     ];
   },
   async headers() {

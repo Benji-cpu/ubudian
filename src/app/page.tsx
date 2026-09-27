@@ -6,13 +6,10 @@ import { NewsletterSignup } from "@/components/layout/newsletter-signup";
 import { PageHero } from "@/components/layout/page-hero";
 import { HomepageScrollSnap } from "@/components/homepage/scroll-snap";
 import { FeaturedEvents } from "@/components/homepage/featured-events";
-import { FeaturedJourneys } from "@/components/homepage/featured-journeys";
 import { QuizCtaHomepage } from "@/components/quiz/quiz-cta-homepage";
 import { QuizPrompt } from "@/components/quiz/quiz-prompt";
 import { EventCardSkeleton } from "@/components/skeletons/event-card-skeleton";
-import { TourCardSkeleton } from "@/components/skeletons/tour-card-skeleton";
 import { SITE_URL, SITE_NAME, SITE_DESCRIPTION } from "@/lib/constants";
-import { getSiteSettings } from "@/lib/site-settings";
 
 export const metadata: Metadata = {
   title: "The Ubudian — Ubud's Conscious Community",
@@ -57,19 +54,7 @@ function EventsSkeleton() {
   );
 }
 
-function CardGridSkeleton() {
-  return (
-    <div className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-      {Array.from({ length: 3 }).map((_, i) => (
-        <TourCardSkeleton key={i} />
-      ))}
-    </div>
-  );
-}
-
 export default async function HomePage() {
-  const settings = await getSiteSettings();
-
   return (
     <>
       <script
@@ -123,8 +108,9 @@ export default async function HomePage() {
                 What&apos;s Happening in Ubud
               </h2>
               <p className="mt-4 text-lg text-brand-charcoal-light">
-                Temple nights, sound journeys, embodiment workshops, breathwork,
-                medicine song circles — harvested nightly from the venues and ticket sites.
+                Sound journeys, ecstatic dance, embodiment workshops, breathwork,
+                kirtan and cacao — gathered nightly from ticket sites, event boards
+                and community channels, and checked before they go up.
               </p>
             </div>
 
@@ -143,39 +129,6 @@ export default async function HomePage() {
             <div className="mx-auto mt-8 h-px w-16 bg-brand-gold/40" />
           </div>
         </section>
-
-        {/* Journeys — curated paths into Ubud */}
-        <section className="flex min-h-[100dvh] items-center bg-brand-cream px-4 py-20 sm:py-28">
-          <div className="mx-auto w-full max-w-6xl">
-            <div className="text-center">
-              <p className="font-serif text-xs uppercase tracking-[0.25em] text-brand-gold">
-                Retreats
-              </p>
-              <h2 className="mt-3 font-serif text-3xl font-medium text-brand-deep-green sm:text-4xl">
-                Curated paths into Ubud
-              </h2>
-              <p className="mx-auto mt-4 max-w-2xl text-lg leading-relaxed text-brand-charcoal-light">
-                A handful of carefully shaped multi-day threads — temples, teachers,
-                rituals, and rest — to walk through the conscious-community scene
-                without drowning in choice.
-              </p>
-            </div>
-
-            <Suspense fallback={<CardGridSkeleton />}>
-              <FeaturedJourneys />
-            </Suspense>
-
-            <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-              <Button asChild size="lg">
-                <Link href="/retreats">Explore the retreats</Link>
-              </Button>
-              <Button asChild variant="outline" size="lg">
-                <Link href="/retreats/3-day-ubud-reset">Start the 3-Day Reset</Link>
-              </Button>
-            </div>
-          </div>
-        </section>
-
 
         {/* Quiz CTA — moved down to after content */}
         <QuizCtaHomepage />

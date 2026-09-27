@@ -37,6 +37,7 @@ import { moderateEvent } from "@/lib/events/moderation";
 import { nowInBali } from "@/lib/events/bali-time";
 import { parseRecurrenceRule, recurrenceEndDate as ruleEndDate } from "@/lib/recurrence";
 import { EVENT_CATEGORIES } from "@/lib/constants";
+import { wayIn, sameGathering, type SlotFields } from "@/lib/events/listing-checks";
 
 /** Most events one run may publish. Deliberately small — see rule 2 above. */
 export const AUTO_APPROVE_MAX_PER_RUN = 25;
@@ -83,6 +84,10 @@ export interface PendingEventRow {
   quality_score: number | null;
   organizer_name: string | null;
   source_url: string | null;
+  start_time?: string | null;
+  external_ticket_url?: string | null;
+  organizer_contact?: string | null;
+  organizer_instagram?: string | null;
 }
 
 export type ScreenResult = { ok: true } | { ok: false; reason: string };
@@ -111,6 +116,13 @@ export function screenPendingEvent(event: PendingEventRow, todayStr: string): Sc
   const venue = (event.venue_name ?? "").trim();
   if (venue.length < MIN_VENUE_LENGTH) {
     return { ok: false, reason: "no usable venue" };
+  }
+
+  // Could a visitor go on this listing alone? A ticket link, an organiser
+  // they can reach, or a named venue they can walk into. "Outside Ubud" with
+  // no contact is a private address nobody can find (38 live rows, Sep 2026).
+  if (!wayIn(event)) {
+    return { ok: false, reason: "no way in (no ticket link, organiser contact or named venue)" };
   }
 
   const category = (event.category ?? "").trim();
@@ -175,7 +187,7 @@ function recurrenceEndDate(rule: string | null): string | null {
   return freeText ? freeText[1] : null;
 }
 
-export type AutoApproveVerdict = "approved" | "rejected" | "held";
+export type AutoApproveVerdict = "approved" | "rejected" | "held" | "duplicate";
 
 export interface AutoApproveDecision {
   id: string;
@@ -206,12 +218,15 @@ export interface AutoApproveResult {
    */
   heldReasons: Record<string, number>;
   /**
-   * Shortlisted events that were published WITHOUT a moderation verdict
-   * because Gemini errored (`moderateEvent` fails open by design). Non-zero
-   * here means the safety layer was off for those rows — the digest must say
-   * so. On 2026-09-15 the sweep was 429ing nightly and this was invisible.
+   * Shortlisted events HELD because moderation could not run (Gemini errored
+   * or hit its free-tier quota; `moderateEvent` reports that as
+   * `moderation_failed_open`). The name is historical — until 27 Sep 2026 these
+   * rows were published unmoderated. Non-zero means the site is not filling:
+   * the digest and the CRM alert must say so.
    */
   moderationFailedOpen: number;
+  /** Candidates archived because a live listing is already the same gathering. */
+  archivedDuplicates: number;
   errors: string[];
 }
 
@@ -287,6 +302,7 @@ export async function autoApprovePending(
     heldForCap: [],
     heldReasons: {},
     moderationFailedOpen: 0,
+    archivedDuplicates: 0,
     errors: [],
   };
 
@@ -296,7 +312,7 @@ export async function autoApprovePending(
   const { data, error } = await supabase
     .from("events")
     .select(
-      "id, title, description, short_description, category, venue_name, start_date, end_date, is_recurring, recurrence_rule, content_flags, quality_score, organizer_name, source_url",
+      "id, title, description, short_description, category, venue_name, start_date, end_date, start_time, is_recurring, recurrence_rule, content_flags, quality_score, organizer_name, source_url, external_ticket_url, organizer_contact, organizer_instagram",
     )
     .eq("status", "pending")
     .or(`start_date.gte.${today},end_date.gte.${today},is_recurring.eq.true`)
@@ -325,6 +341,19 @@ export async function autoApprovePending(
     candidates.map((c) => c.id),
   );
 
+  // What is already live, so the gate never publishes the same gathering
+  // twice. Fails closed like the dedup lookup: no live list, no publishing.
+  const { data: liveRows, error: liveError } = await supabase
+    .from("events")
+    .select("id, title, venue_name, start_date, end_date, start_time, is_recurring, recurrence_rule")
+    .eq("status", "approved")
+    .or(`start_date.gte.${today},end_date.gte.${today},is_recurring.eq.true`);
+  if (liveError) {
+    result.errors.push(`autoApprovePending live lookup: ${liveError.message}`);
+    return result;
+  }
+  const live = (liveRows ?? []) as SlotFields[];
+
   const record = (
     event: PendingEventRow,
     verdict: AutoApproveVerdict,
@@ -332,6 +361,7 @@ export async function autoApprovePending(
   ): void => {
     if (verdict === "approved") result.approved += 1;
     else if (verdict === "rejected") result.rejected += 1;
+    else if (verdict === "duplicate") result.archivedDuplicates += 1;
     else {
       result.held += 1;
       const key = normaliseReason(reason);
@@ -365,6 +395,31 @@ export async function autoApprovePending(
       record(event, "held", "unresolved dedup match");
       continue;
     }
+    const slot = { ...event, start_time: event.start_time ?? null } as SlotFields;
+    // A new weekly row never displaces a live one-off, but a one-off on a live
+    // series' day, or a second weekly row for the same slot, is that gathering.
+    const twin = live.find(
+      (l) => sameGathering(slot, l) && !(slot.is_recurring && !l.is_recurring),
+    );
+    if (twin) {
+      if (!dryRun) {
+        const { error: dupError } = await supabase
+          .from("events")
+          .update({ status: "archived", moderation_reason: `duplicate_of:${twin.id}` })
+          .eq("id", event.id)
+          .eq("status", "pending");
+        if (dupError) {
+          result.errors.push(`archive duplicate ${event.id}: ${dupError.message}`);
+          continue;
+        }
+      }
+      record(event, "duplicate", `same gathering as live ${twin.id} (${twin.title})`);
+      continue;
+    }
+    if (shortlist.some((s) => sameGathering(slot, { ...s, start_time: s.start_time ?? null } as SlotFields))) {
+      record(event, "held", "same gathering as another candidate this run");
+      continue;
+    }
     if (shortlist.length >= limit) {
       record(event, "held", "per-run cap reached");
       result.heldForCap.push(event.id);
@@ -376,9 +431,8 @@ export async function autoApprovePending(
   // Pass 2 — moderate the shortlist, a few at a time. Ingested events have
   // never been through the safety gate: `pipeline.ts` applies only the keyword
   // ICP filter, so this is the first and only place ingestion content is
-  // moderated. It fails open by design (see `moderation.ts`), which is safe
-  // here because pass 1 already dropped everything thin, unclassified,
-  // parser-flagged or contested.
+  // moderated. `moderateEvent` fails open for its other caller; here a failed
+  // call means "hold", below.
   const verdicts = await mapWithConcurrency(shortlist, moderationConcurrency, async (event) => {
     if (Date.now() - startedAt > maxElapsedMs) return null;
     return moderateEvent({
@@ -420,8 +474,15 @@ export async function autoApprovePending(
       continue;
     }
 
-    const failedOpen = verdict.notes === "moderation_failed_open";
-    if (failedOpen) result.moderationFailedOpen += 1;
+    // Moderation could not run (Gemini errored or hit its quota). Hold rather
+    // than publish unchecked: this is a trust product, and a held row is
+    // re-screened tomorrow night. Until 27 Sep 2026 these were published
+    // anyway, stamped `auto_gate:unmoderated` — 33 of 79 publishes that month.
+    if (verdict.notes === "moderation_failed_open") {
+      result.moderationFailedOpen += 1;
+      record(event, "held", "moderation unavailable");
+      continue;
+    }
 
     if (!dryRun) {
       const now = new Date().toISOString();
@@ -431,7 +492,7 @@ export async function autoApprovePending(
           status: "approved",
           auto_approved_at: now,
           ai_approved_at: now,
-          moderation_reason: failedOpen ? "auto_gate:unmoderated" : "auto_gate",
+          moderation_reason: "auto_gate",
         })
         .eq("id", event.id)
         // Re-assert the precondition so a concurrent admin decision wins.
@@ -441,7 +502,7 @@ export async function autoApprovePending(
         continue;
       }
     }
-    record(event, "approved", failedOpen ? "cleared structural screen; moderation unavailable, published unmoderated" : "cleared structural screen and moderation");
+    record(event, "approved", "cleared structural screen and moderation");
   }
 
   return result;

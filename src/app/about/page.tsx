@@ -57,7 +57,7 @@ const WHAT_WE_DO: {
 ];
 
 const SOLUTION_POINTS = [
-  "Events aggregated from community sources and submitted by organizers — screened and published daily",
+  "Events gathered nightly from ticket sites, event boards and Telegram channels, plus organisers' own submissions — each one needs a real venue and a way in, and is screened before it goes up",
   "The Ubud Spirit Quiz matches you to one of five archetypes for personalized recommendations",
   "Practical guides to arriving, staying, and finding your people",
   "A weekly email that picks out what's worth your evening",
@@ -85,12 +85,18 @@ export default async function AboutPage() {
           <p>
             Ubud has more ecstatic dance, breathwork, and cacao ceremonies per
             square kilometer than anywhere on Earth. Finding them means
-            monitoring 10+ WhatsApp groups, following 50 Instagram accounts, and
+            monitoring WhatsApp groups, following Instagram accounts, and
             asking that friend who&apos;s been here for three years.
           </p>
           <p>
             We built The Ubudian because the community deserved better than
-            scattered posts and secondhand tips.
+            scattered posts and secondhand tips. It gathers the public
+            listings into one calendar. It can&apos;t see private WhatsApp
+            groups — if your gathering lives in one,{" "}
+            <Link href="/events/submit" className="underline underline-offset-2 hover:text-brand-gold">
+              add it here
+            </Link>
+            .
           </p>
         </div>
       </section>
@@ -146,9 +152,9 @@ export default async function AboutPage() {
           </h2>
           <p className="mt-6 text-lg leading-relaxed text-muted-foreground">
             Run a workshop, ceremony, or class in Ubud? Submit your event for
-            free. Submissions are screened nightly — give it a real description
-            and a venue we can find, and it goes live. After 5 approved events
-            you become a trusted submitter and skip the queue entirely.
+            free. It goes live as soon as it passes an automated check — give it
+            a real description, a venue people can find, and a way to reach
+            you or buy a ticket.
           </p>
           <Link
             href="/events/submit"

@@ -48,7 +48,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: true });
     }
 
-    // AI moderation gate — auto-reject hard red flags, everything else publishes.
+    // AI moderation — reject hard red flags. If moderation cannot run (Gemini
+    // down or out of quota) the event is held as `pending` for the nightly
+    // gate instead of going live unchecked.
     const moderation = await moderateEvent({
       title: data.title,
       description: data.description,
@@ -70,6 +72,7 @@ export async function POST(request: Request) {
       );
     }
 
+    const moderated = moderation.notes !== "moderation_failed_open";
     const supabase = createAdminClient();
 
     // Generate unique slug
@@ -82,7 +85,8 @@ export async function POST(request: Request) {
       slug = `${slug}-${Date.now().toString(36)}`;
     }
 
-    // Trusted submitter flag is now purely for analytics — everyone publishes.
+    // Trusted submitter flag is purely for analytics — every submission that
+    // clears moderation publishes.
     const { data: trusted } = await queryWithRetry(
       () =>
         supabase
@@ -117,8 +121,9 @@ export async function POST(request: Request) {
           recurrence_rule: data.is_recurring ? normalizeRecurrenceRule(data.recurrence_rule) : null,
           submitted_by_email: data.submitted_by_email.toLowerCase(),
           is_trusted_submitter: isTrusted,
-          status: "approved",
-          ai_approved_at: new Date().toISOString(),
+          status: moderated ? "approved" : "pending",
+          ai_approved_at: moderated ? new Date().toISOString() : null,
+          moderation_reason: moderated ? "submission" : null,
         }),
       "event-submit-insert"
     );
@@ -134,13 +139,13 @@ export async function POST(request: Request) {
     // Fire-and-forget confirmation email
     sendTransactionalEmail(
       data.submitted_by_email,
-      "Your event is live!",
-      eventSubmissionConfirmation(data.title, true)
+      moderated ? "Your event is live!" : "We've got your event",
+      eventSubmissionConfirmation(data.title, moderated)
     );
 
     return NextResponse.json({
       success: true,
-      autoApproved: true,
+      autoApproved: moderated,
       slug,
       url: `/events/${slug}`,
     });

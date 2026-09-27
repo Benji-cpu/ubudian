@@ -106,3 +106,17 @@ describe("matchesPriceBracket", () => {
     expect(matchesPriceBracket("Rp 750,000", "300k-500k")).toBe(false);
   });
 });
+
+describe("formatPriceInfo", () => {
+  it("makes raw rupiah readable and leaves everything else alone", async () => {
+    const { formatPriceInfo } = await import("@/lib/price-parser");
+    expect(formatPriceInfo("IDR 90000")).toBe("Rp 90K");
+    expect(formatPriceInfo("IDR 194174")).toBe("Rp 194,174");
+    expect(formatPriceInfo("IDR 4368932")).toBe("Rp 4.37M");
+    expect(formatPriceInfo("IDR 1500000")).toBe("Rp 1.5M");
+    expect(formatPriceInfo("Rp 250K")).toBe("Rp 250K");
+    expect(formatPriceInfo("IDR 150,000")).toBe("IDR 150,000");
+    expect(formatPriceInfo("Donation · Min. Rp 50K")).toBe("Donation · Min. Rp 50K");
+    expect(formatPriceInfo(null)).toBeNull();
+  });
+});

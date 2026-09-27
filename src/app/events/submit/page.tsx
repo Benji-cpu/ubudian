@@ -67,7 +67,7 @@ export default async function SubmitEventPage() {
             <li>Include accurate dates, times, and venue information</li>
             <li>Provide a way for people to contact you, register, or buy tickets</li>
             <li>Workshops, ceremonies, retreats, sound journeys, circles, and community gatherings are all welcome</li>
-            <li>Submissions publish instantly after automated checks; our editors review the calendar daily</li>
+            <li>Submissions publish as soon as they pass an automated check; if the check can&apos;t run, they&apos;re checked and published overnight</li>
             <li>Sign in before submitting to edit your events later from your dashboard</li>
           </ul>
         </div>

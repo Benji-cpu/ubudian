@@ -352,3 +352,18 @@ describe("recurring rows carrying a series end", () => {
     expect(Object.values(buckets).flat()).toHaveLength(0);
   });
 });
+
+describe("events with a start time but no end time", () => {
+  it("drops a morning class from today once its assumed two hours are up", () => {
+    const at5pm = new Date("2026-09-27T09:00:00Z"); // 17:00 Bali
+    const b = bucketEventsByTime(
+      [
+        makeEvent({ id: "morning", start_date: "2026-09-27", start_time: "08:00", end_time: null }),
+        makeEvent({ id: "evening", start_date: "2026-09-27", start_time: "19:00", end_time: null }),
+      ],
+      at5pm,
+    );
+    const ids = [...b.happening_now, ...b.today].map((e) => e.id);
+    expect(ids).toEqual(["evening"]);
+  });
+});

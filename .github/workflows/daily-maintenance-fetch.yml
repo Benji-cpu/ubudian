@@ -74,9 +74,9 @@ jobs:
             IMPACT="The homepage and /events stop filling; visitors see last week's rhythms and none of this week's one-offs."
             KEY="ubudian-liveness-stale"
           else
-            TITLE="Ubudian: ${UNMOD} events published without a moderation verdict"
+            TITLE="Ubudian: ${UNMOD} events held because moderation could not run"
             PRIORITY="soon"
-            IMPACT="Gemini errored on the gate; the structural screen was the only filter for these rows."
+            IMPACT="Gemini errored on the gate, so these listings stay off the site until it can moderate them (held rows are retried nightly)."
             KEY="ubudian-gate-unmoderated"
           fi
           jq -n --arg t "$TITLE" --arg p "$PRIORITY" --arg i "$IMPACT" --arg k "$KEY" --arg line "$LINE" --arg d "$TODAY" '{

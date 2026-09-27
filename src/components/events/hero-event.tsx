@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { formatPriceInfo } from "@/lib/price-parser";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -89,7 +90,7 @@ export function HeroEvent({ event, saveButton, label = "Featured today" }: HeroE
             <div className="mt-6 flex items-center gap-3">
               {event.price_info && (
                 <span className="text-base font-semibold text-brand-terracotta">
-                  {event.price_info}
+                  {formatPriceInfo(event.price_info)}
                 </span>
               )}
               <Button variant="ghost" className="ml-auto gap-1 text-brand-deep-green">

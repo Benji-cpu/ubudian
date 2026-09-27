@@ -48,8 +48,8 @@ function layout(body: string): string {
 
 export function eventSubmissionConfirmation(eventName: string, autoApproved: boolean): string {
   const statusMessage = autoApproved
-    ? `<p>As a trusted submitter, your event has been <strong>automatically approved</strong> and is now live on our events page.</p>`
-    : `<p>Our team will review your submission shortly. You&rsquo;ll receive an email once it&rsquo;s been approved.</p>`;
+    ? `<p>It passed our automated check and is <strong>now live</strong> on our events page.</p>`
+    : `<p>Our automated check couldn&rsquo;t run just now, so it will be checked and published overnight (Bali time) if it passes.</p>`;
 
   return layout(`
     <h2 style="margin:0 0 16px;font-family:'Lora',Georgia,serif;color:${COLORS.deepGreen};">Thanks for submitting!</h2>

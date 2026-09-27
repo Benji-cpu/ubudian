@@ -133,6 +133,9 @@ function mapEvent(ev) {
     category,
     venue_name: ev.venue || null,
     venue_map_url: ev.google_map || null,
+    // Who runs it. Until Sep 2026 this only went into the description text,
+    // so 117 live listings named no organiser at all.
+    organizer_name: ev.creator_name || null,
     start_date,
     end_date: rec.end_date,
     start_time: toHHMM(ev.start_time),

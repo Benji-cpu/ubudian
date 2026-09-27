@@ -10,11 +10,6 @@ import { ShareButtons } from "@/components/content/share-buttons";
 import { JourneyCard } from "@/components/journeys/journey-card";
 import { JourneyDayCard } from "@/components/journeys/journey-day-card";
 import { JourneyJsonLd } from "@/components/journeys/journey-json-ld";
-import { JourneyTestimonials } from "@/components/journeys/journey-testimonials";
-import { JourneyFaq } from "@/components/journeys/journey-faq";
-import { WhatsIncludedIcons } from "@/components/journeys/whats-included-icons";
-import { DifferentiatorStrip } from "@/components/journeys/differentiator-strip";
-import { CohortFacts } from "@/components/journeys/cohort-facts";
 import { JourneyGuides } from "@/components/journeys/journey-guides";
 import { JourneyDayTabs } from "@/components/journeys/journey-day-tabs";
 import { JourneyMap } from "@/components/journeys/journey-map";
@@ -43,7 +38,6 @@ import type {
   JourneyDay,
   JourneyDaySlot,
   JourneyAtom,
-  JourneyTestimonial,
 } from "@/types";
 
 interface JourneyPageProps {
@@ -89,7 +83,6 @@ export default async function JourneyPage({ params }: JourneyPageProps) {
   let candidatesBySlot = new Map<string, JourneyAtom[]>();
   const eventSlugs = new Map<string, string>();
   let moreJourneys: Journey[] = [];
-  let testimonials: JourneyTestimonial[] = [];
   let initialSaved = false;
   let anchorPartnerSlugs: Map<string, string> = new Map();
   const profile = await getCurrentProfile();
@@ -118,7 +111,7 @@ export default async function JourneyPage({ params }: JourneyPageProps) {
       initialSaved = Boolean(savedRow);
     }
 
-    const [daysRes, moreRes, testRes, quizRes] = await Promise.all([
+    const [daysRes, moreRes, quizRes] = await Promise.all([
       supabase
         .from("journey_days")
         .select("*")
@@ -132,12 +125,6 @@ export default async function JourneyPage({ params }: JourneyPageProps) {
         .eq("is_published", true)
         .eq("tier", "living_guide")
         .neq("id", journey.id)
-        .order("sort_order", { ascending: true }),
-      supabase
-        .from("journey_testimonials")
-        .select("*")
-        .eq("journey_id", journey.id)
-        .eq("is_published", true)
         .order("sort_order", { ascending: true }),
       profile
         ? supabase
@@ -157,7 +144,6 @@ export default async function JourneyPage({ params }: JourneyPageProps) {
       primary: quiz?.primary_archetype ?? null,
       secondary: quiz?.secondary_archetype ?? null,
     }).slice(0, 3);
-    testimonials = (testRes.data ?? []) as JourneyTestimonial[];
 
     if (days.length > 0) {
       const { data: slots } = await supabase
@@ -399,20 +385,7 @@ export default async function JourneyPage({ params }: JourneyPageProps) {
           })}
         </p>
 
-        {/* Cohort facts — who, when, where, how many, what cost */}
-        <CohortFacts journey={journey} />
-
-        {/* What this retreat holds — icon row */}
-        <section className="mt-12">
-          <h2 className="mb-5 font-serif text-xl font-medium text-brand-deep-green">
-            What this retreat holds
-          </h2>
-          <WhatsIncludedIcons variant="card" />
-        </section>
       </div>
-
-      {/* Differentiator — typographic moment between summary and the day-by-day */}
-      <DifferentiatorStrip />
 
       <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
 
@@ -464,12 +437,6 @@ export default async function JourneyPage({ params }: JourneyPageProps) {
         </>
       )}
 
-      {/* Testimonials */}
-      <JourneyTestimonials testimonials={testimonials} journeyTitle={journey.title} />
-
-      {/* FAQ */}
-      <JourneyFaq journey={journey} />
-
       {/* Who it's for */}
       {journey.who_its_for && (
         <section className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
@@ -507,7 +474,7 @@ export default async function JourneyPage({ params }: JourneyPageProps) {
       <section className="bg-brand-pale-green px-4 py-14">
         <div className="mx-auto max-w-xl text-center">
           <h2 className="font-serif text-2xl font-bold text-brand-deep-green">
-            Want more retreats like this?
+            Want more like this?
           </h2>
           <p className="mt-2 text-muted-foreground">
             One email a week with new threads, the events that matter this week,

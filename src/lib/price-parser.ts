@@ -103,3 +103,21 @@ export function matchesPriceBracket(
       return true;
   }
 }
+
+/**
+ * Make a stored price readable. Ticket sites and the parser hand over raw
+ * rupiah ("IDR 4368932", "IDR 90000"); the rest of the calendar reads
+ * "Rp 250K". Anything that is not a bare rupiah amount passes through as-is.
+ */
+export function formatPriceInfo(priceInfo: string | null): string | null {
+  if (!priceInfo) return priceInfo;
+  return priceInfo.replace(/\b(?:IDR|Rp\.?)\s*(\d{4,})(?![\d.,])/gi, (_, digits: string) => {
+    const n = Number(digits);
+    if (n >= 1_000_000) {
+      const m = n / 1_000_000;
+      return `Rp ${Number.isInteger(m) ? m : m.toFixed(2).replace(/0$/, "")}M`;
+    }
+    if (n % 1000 === 0) return `Rp ${n / 1000}K`;
+    return `Rp ${n.toLocaleString("en-US")}`;
+  });
+}

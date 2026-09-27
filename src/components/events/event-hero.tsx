@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { formatPriceInfo } from "@/lib/price-parser";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Clock, Ticket } from "lucide-react";
 import { formatEventDate, formatEventTime } from "@/lib/utils";
@@ -73,7 +74,7 @@ export function EventHero({ event, saveButton }: EventHeroProps) {
             {event.price_info && (
               <Chip variant="price">
                 <Ticket className="h-3.5 w-3.5" />
-                {event.price_info}
+                {formatPriceInfo(event.price_info)}
               </Chip>
             )}
           </div>
@@ -99,7 +100,7 @@ export function EventHero({ event, saveButton }: EventHeroProps) {
           {event.price_info && (
             <Chip variant="price-light">
               <Ticket className="h-3.5 w-3.5" />
-              {event.price_info}
+              {formatPriceInfo(event.price_info)}
             </Chip>
           )}
         </div>

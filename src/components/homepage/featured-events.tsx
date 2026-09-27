@@ -4,15 +4,22 @@ import { queryWithRetry } from "@/lib/supabase/retry";
 import { EventCard } from "@/components/events/event-card";
 import { getActiveBoostedEventIds } from "@/lib/sponsors/sponsor-service";
 import { bucketEventsByTime } from "@/lib/events/buckets";
-import { nowInBali } from "@/lib/events/bali-time";
+import { nowInBali, parseTimeToMinutes } from "@/lib/events/bali-time";
 import { stripEmbeddings } from "@/lib/events/strip-embedding";
 import type { Event } from "@/types";
 
 const MAX_CARDS = 6;
 
+/** Minutes after its start that a gathering is still worth walking into. */
+const JOINABLE_AFTER_START_MIN = 30;
+
 /**
- * The homepage's one job: what is on tonight. Falls back to the rest of the
- * week, and only then to an honest "nothing listed" — never a fake card.
+ * The homepage's one job: what is still ahead today. Falls back to the rest
+ * of the week, and only then to an honest "nothing listed" — never a fake card.
+ *
+ * "Still ahead" means you can still get there: not yet started, started in the
+ * last half hour, all-day, or a multi-day event. A 4–6pm ceremony is not
+ * something to go to at 5pm, and an 8am class is not "tonight".
  *
  * Reads the same rolled-forward buckets as /events, so a weekly class lands
  * here on its day and a one-off lands on its date. (The previous version
@@ -24,10 +31,11 @@ export async function FeaturedEvents() {
   let tonight: Event[] = [];
   let thisWeek: Event[] = [];
   let boosted = new Set<string>();
+  const bali = nowInBali();
 
   try {
     const supabase = await createClient();
-    const today = nowInBali().dateStr;
+    const today = bali.dateStr;
     const { data, error } = await queryWithRetry(
       () =>
         supabase
@@ -41,14 +49,24 @@ export async function FeaturedEvents() {
     boosted = await getActiveBoostedEventIds();
 
     const buckets = bucketEventsByTime(stripEmbeddings((data ?? []) as Event[]), new Date(), boosted);
-    tonight = [...buckets.happening_now, ...buckets.today];
+    const stillJoinable = buckets.happening_now.filter((e) => {
+      if (e.end_date && e.end_date > e.start_date) return true;
+      const start = parseTimeToMinutes(e.start_time);
+      return start === null || bali.timeMinutes - start <= JOINABLE_AFTER_START_MIN;
+    });
+    tonight = [...stillJoinable, ...buckets.today];
     thisWeek = [...buckets.tomorrow, ...buckets.weekend, ...buckets.next_week];
   } catch {
     // Supabase unreachable — fall through to the honest empty state.
   }
 
   const showing = tonight.length > 0 ? tonight : thisWeek;
-  const heading = tonight.length > 0 ? "Tonight in Ubud" : "This week in Ubud";
+  const heading =
+    tonight.length > 0
+      ? bali.timeMinutes >= 16 * 60
+        ? "Still ahead tonight"
+        : "Still ahead today"
+      : "Coming up this week";
   const count = showing.length;
 
   if (count === 0) {
@@ -58,7 +76,7 @@ export async function FeaturedEvents() {
           Nothing listed for this week yet
         </h3>
         <p className="mt-2 text-sm text-brand-charcoal-light">
-          The agenda is harvested nightly from the venues and ticket sites. If it is empty, something
+          The calendar is gathered nightly from ticket sites, event boards and community channels. If it is empty, something
           upstream has stopped — check back tomorrow, or{" "}
           <Link href="/events/submit" className="underline underline-offset-2 hover:text-brand-gold">
             list what you know is on
@@ -82,7 +100,7 @@ export async function FeaturedEvents() {
       {count > MAX_CARDS && (
         <p className="mt-4 text-center text-sm text-brand-charcoal-light">
           <Link href="/events" className="underline underline-offset-2 hover:text-brand-gold">
-            {count - MAX_CARDS} more {tonight.length > 0 ? "tonight" : "this week"} →
+            {count - MAX_CARDS} more {tonight.length > 0 ? "today" : "this week"} →
           </Link>
         </p>
       )}

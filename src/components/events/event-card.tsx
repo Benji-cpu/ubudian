@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { formatEventTime, isRecentlyAddedEvent } from "@/lib/utils";
 import { formatEventDateLine } from "@/lib/events/format";
 import { getTimeSensitivityLabel } from "@/lib/events/discovery";
-import { isFreeEvent } from "@/lib/price-parser";
+import { isFreeEvent, formatPriceInfo } from "@/lib/price-parser";
 import { categoryShortLabel } from "@/lib/constants";
 import { EventCardPlaceholder } from "./event-card-placeholder";
 import { EventCardExternalLinks } from "./event-card-external-links";
@@ -20,6 +20,14 @@ interface EventCardProps {
    * own start_date would otherwise read as the wrong day.
    */
   hideDate?: boolean;
+}
+
+/** Harvested listings often mirror (or truncate) the title into the summary. */
+function echoesTitle(summary: string, title: string): boolean {
+  const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+  const a = norm(summary);
+  const b = norm(title);
+  return !a || b.startsWith(a) || a.startsWith(b);
 }
 
 export function EventCard({ event, saveButton, hideDate }: EventCardProps) {
@@ -107,7 +115,7 @@ export function EventCard({ event, saveButton, hideDate }: EventCardProps) {
             )}
           </div>
 
-          {event.short_description && (
+          {event.short_description && !echoesTitle(event.short_description, event.title) && (
             <p className="mt-2 text-sm leading-relaxed text-foreground/75 line-clamp-1">
               {event.short_description}
             </p>
@@ -116,7 +124,7 @@ export function EventCard({ event, saveButton, hideDate }: EventCardProps) {
           <div className="mt-2 flex items-center gap-2">
             {event.price_info && !isFree && (
               <span className="text-sm font-semibold tracking-tight text-brand-terracotta">
-                {event.price_info}
+                {formatPriceInfo(event.price_info)}
               </span>
             )}
             <EventCardExternalLinks

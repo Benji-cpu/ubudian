@@ -5,7 +5,6 @@ import { getCurrentProfile } from "@/lib/auth";
 import { getSiteSettings } from "@/lib/site-settings";
 import { UserMenu } from "./user-menu";
 import { MobileMenu } from "./mobile-menu";
-import { ExploreMenu } from "./explore-menu";
 import { Button } from "@/components/ui/button";
 import { Shield } from "lucide-react";
 import { ThemeToggle } from "./theme-toggle";
@@ -65,7 +64,12 @@ export async function Header() {
           >
             Retreats
           </Link>
-          <ExploreMenu />
+          <Link
+            href="/about"
+            className="text-xs font-semibold uppercase tracking-widest text-brand-off-white transition-colors duration-300 hover:text-brand-gold"
+          >
+            About
+          </Link>
           {profile?.role === "admin" && (
             <Link
               href="/admin"

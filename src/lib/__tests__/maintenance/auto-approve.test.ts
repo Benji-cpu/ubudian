@@ -192,3 +192,22 @@ describe("screenPendingEvent", () => {
     expect(result.ok === false && result.reason).toMatch(/title too short/);
   });
 });
+
+describe("screenPendingEvent — a way in", () => {
+  it("holds an area-only venue with no ticket link or organiser contact", () => {
+    for (const venue of ["Outside Ubud", "Ubud", "Penestanan", "Central Ubud"]) {
+      const result = screenPendingEvent(publishable({ venue_name: venue }), TODAY);
+      expect(result.ok, venue).toBe(false);
+      if (!result.ok) expect(result.reason).toMatch(/no way in/);
+    }
+  });
+
+  it("passes an area-only venue when the organiser can be reached", () => {
+    expect(screenPendingEvent(publishable({ venue_name: "Penestanan", organizer_contact: "+62 812 3456 789" }), TODAY).ok).toBe(true);
+    expect(screenPendingEvent(publishable({ venue_name: "Outside Ubud", external_ticket_url: "https://megatix.co.id/events/x" }), TODAY).ok).toBe(true);
+  });
+
+  it("passes a named venue as a walk-in", () => {
+    expect(screenPendingEvent(publishable({ venue_name: "Paradiso Ubud" }), TODAY).ok).toBe(true);
+  });
+});

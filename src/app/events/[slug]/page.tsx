@@ -10,6 +10,7 @@ import { EventCard } from "@/components/events/event-card";
 import { EventHero } from "@/components/events/event-hero";
 import { rolledForward } from "@/lib/events/buckets";
 import { EventMap } from "@/components/events/event-map";
+import { HowToGetIn } from "@/components/events/how-to-get-in";
 import { FacilitatorCard } from "@/components/events/facilitator-card";
 import { SaveEventButton } from "@/components/dashboard/save-event-button";
 import { Button } from "@/components/ui/button";
@@ -201,6 +202,9 @@ export default async function EventPage({ params }: EventPageProps) {
             </BreadcrumbList>
           </Breadcrumb>
         </nav>
+
+        {/* How to get in — tickets, the organiser, or the door */}
+        <HowToGetIn event={e} />
 
         {/* Inline ticket CTA (desktop) */}
         {e.external_ticket_url && isSafeUrl(e.external_ticket_url) && (

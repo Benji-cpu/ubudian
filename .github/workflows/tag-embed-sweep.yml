@@ -14,12 +14,17 @@ name: tag-embed-sweep
 # corpus is already fully embedded + tagged.
 
 on:
-  schedule:
-    # 18:40 UTC ≈ 02:40 WITA — ahead of the maintenance (19:02) + curator (19:47)
-    # jobs, off the quarter-hour to dodge GH cron pile-up.
-    # 18:55 — was 18:40, colliding with aggregator-harvest (both written
-    # independently). Moved 2026-09-15.
-    - cron: "55 18 * * *"
+  # Runs AFTER the nightly gate, never before it (2026-09-27). The Gemini key is
+  # free tier — 20 requests/day/project/model on gemini-2.5-flash-lite, shared by
+  # this sweep's tag backfill and the gate's moderation. On a schedule this job
+  # fired first and spent the day's quota, and the gate then published 70% of
+  # September's listings unmoderated. The gate now HOLDS what it cannot
+  # moderate, so it gets first claim on the quota; tagging can wait a night.
+  # (GH's scheduled queue runs 60-170 min late and does not keep order, which is
+  # why this chains on completion instead of a later cron.)
+  workflow_run:
+    workflows: ["daily-maintenance-fetch"]
+    types: [completed]
   workflow_dispatch: {}
 
 permissions:
