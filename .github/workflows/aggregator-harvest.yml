@@ -6,7 +6,10 @@ name: aggregator-harvest
 # one source failing can't block the others.
 #
 # Why chunked: the curator-ingest route geocodes + dedups per event under a 60s
-# maxDuration; a 60-event POST 504s. We POST in batches of 15 (~25-35s each).
+# maxDuration; a 60-event POST 504s. We POST in batches of 10. Batches of 15
+# ran 20-60s and 504'd on 20, 24 and 25 Sep; each 504 dropped that night's
+# last 15 listings and left an ingestion_runs row stuck at "running". 10 is
+# what todo-today-harvest has used without a 504.
 
 on:
   schedule:
@@ -47,14 +50,14 @@ jobs:
           i=0
           while [ "$i" -lt "$TOTAL" ]; do
             jq -c --argjson i "$i" --arg s "$SRC" --arg d "$DATE" \
-              '{date:$d, source:$s, events:(.events[$i:($i+15)])}' "$FILE" > /tmp/chunk.json
+              '{date:$d, source:$s, events:(.events[$i:($i+10)])}' "$FILE" > /tmp/chunk.json
             RESP=$(curl -fsS --max-time 90 -X POST \
               -H "Authorization: Bearer $CRON_SECRET" -H "Content-Type: application/json" \
               -d @/tmp/chunk.json "$INGEST_URL" || echo '{}')
             ING=$((ING + $(echo "$RESP" | jq -r '.ingested // 0')))
             DUP=$((DUP + $(echo "$RESP" | jq -r '.duplicates // 0')))
             FAIL=$((FAIL + $(echo "$RESP" | jq -r '.failed // 0')))
-            i=$((i + 15))
+            i=$((i + 10))
           done
           echo "::notice::$SRC ingested $ING ($DUP duplicates, $FAIL failed) of $TOTAL harvested"
           SH

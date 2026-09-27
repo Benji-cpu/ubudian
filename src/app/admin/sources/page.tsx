@@ -136,7 +136,9 @@ export default async function AdminSourcesPage() {
   const wahaApiUrl = process.env.WAHA_API_URL;
   const wahaApiKey = process.env.WAHA_API_KEY;
 
-  if (wahaApiUrl && wahaApiKey) {
+  // WhatsApp was dropped 2026-09-27 (Ben) and its row is off. Don't call the
+  // WAHA droplet on every page load while it is: the droplet refuses its port.
+  if (whatsappSource?.is_enabled && wahaApiUrl && wahaApiKey) {
     try {
       const res = await fetch(`${wahaApiUrl}/api/default/chats`, {
         headers: { "X-Api-Key": wahaApiKey },

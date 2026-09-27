@@ -51,8 +51,8 @@ Three backbones. Vercel Cron is capped at **2 jobs on Hobby and both slots are u
 | `event-reminders` | GH Actions | `4 9 * * *` | "Starts tomorrow" mail to savers. Idempotent via `transactional_sends`; `?only=<email>` to test |
 | `weekly-digest` | GH Actions | `6 23 * * 2` | **The** weekly email: active `newsletter_subscribers` + profiles with an archetype or a save, one per address (`src/lib/email/digest-recipients.ts`). Idempotent per address per ISO week; `?only=` to test |
 | `curator-ingest` | GH Actions | on push to `curator/inbox/**` | POSTs the curator's inbox to `/api/cron/curator-ingest` |
-| **daily curator** | Claude trigger `trig_01637DsCbz5qGn6r5RTP4hhi` | `47 19 * * *` | Walks curated sources, writes `curator/inbox/$TODAY.json`. Agent: `.claude/agents/daily-curator.md` |
-| **nightly digest** | Claude trigger `trig_01CnuNJSs8m8wdVyeVrDHrKq` | `17 21 * * *` | Reads the newest unreported payload, commits `digests/*.md`. Agent: `.claude/agents/nightly-routine.md` |
+| **daily curator** | Claude trigger `trig_01637DsCbz5qGn6r5RTP4hhi` | `47 19 * * *` — **paused since 2026-09-21 (Ben)** | Walks curated sources, writes `curator/inbox/$TODAY.json`. Agent: `.claude/agents/daily-curator.md` |
+| **nightly digest** | Claude trigger `trig_01CnuNJSs8m8wdVyeVrDHrKq` | `17 21 * * *` — **paused since 2026-09-21 (Ben)** | Reads the newest unreported payload, commits `digests/*.md`. Agent: `.claude/agents/nightly-routine.md` |
 
 **GitHub's scheduled-cron queue runs 60–95 minutes late, consistently.** Measured over 20 consecutive `daily-maintenance-fetch` runs: scheduled `19:02`, actually fired `20:09`–`20:37`, all green. Any design that assumes a GH cron fires near its stated minute will break. This one did: the nightly digest agent used to fire 15 minutes after the workflow and produced **34 false "payload missing" stubs in 51 days** before the trigger moved to `21:17` and the agent learned to read the newest payload rather than today's.
 
@@ -159,15 +159,32 @@ Automated event ingestion from multiple sources into pending events for admin re
 
 **Ingested events always start as `pending`** — never auto-approved regardless of source.
 
+### Event channels (verified against production 2026-09-27)
+
+| Channel | Path in | State |
+|---|---|---|
+| Telegram | bot webhook `/api/webhooks/telegram` (4 groups) | **Live.** Parsing shares the free-tier Gemini 20/day; 16 of 66 messages in the 14 days to 27 Sep failed to parse, mostly on that quota; the 17:00 cron retries failures from the last 24h. Billing fixes it (CRM #331) |
+| todo.today | `todo-today-harvest` → `curator-ingest` | **Live.** 28–41 harvested a night, 3–9 new |
+| Megatix | `aggregator-harvest` → `curator-ingest` | **Live.** 60 a night, 0–4 new. Chunks of 10 since 27 Sep (15 504'd) |
+| Organiser submissions | `/events/submit` → `/api/events/submit` | **Live.** 2 ever, the last on 17 Jun |
+| Curator | Claude trigger → `curator/inbox/` → `curator-ingest` | **Paused** by Ben on 21 Sep. Last event 13 Sep |
+| WhatsApp | WAHA | **Dropped** (above) |
+| Apify Instagram | Vercel cron adapter (`paradisoubud`, weekly) | **Off.** The token works (free plan, $5/mo). A run is ~12 posts, 10 of them film screenings, and each post is a Gemini image parse. That spends the day's whole free quota and starves the gate, and it doesn't fit the 60s cron (a local run took 492s on 7 May). Revisit after Gemini billing |
+| instagram-public, Blissbase, Soulwise | would be GH harvesters | **Off, never built.** The IG POC posts to `/api/cron/instagram-ingest`, which doesn't exist |
+| TicketTailor | adapter | **Off.** The row holds no organiser API keys |
+| Eventbrite, Meetup, AllEvents, SerpAPI, Retreat Guru, BookRetreats (RapidAPI), Facebook, Meta Instagram, WordPress | adapters only | **Never had an `event_sources` row**, so nothing runs them. Meetup, AllEvents and SerpAPI are also commented out in `adapters/index.ts` for noise. Prod holds keys only for SerpAPI, RapidAPI and Apify. Adding a row is adding a source, which is Ben's call |
+
+`todo-today` and `megatix` rows are `is_enabled=false` **on purpose**: that only keeps them off the Vercel cron. `curator-ingest` doesn't read `is_enabled`. With WhatsApp off, no pull source is enabled, so the 17:00 `ingest-events` cron only retries stuck messages and refreshes linked events.
+
 ## Webhooks
 
 | Endpoint | Verification | Key gotcha |
 |----------|-------------|------------|
 | `/api/webhooks/stripe` | `stripe.webhooks.constructEvent()` with `STRIPE_WEBHOOK_SECRET` | Uses `after()` for background processing |
 | `/api/webhooks/telegram` | `X-Telegram-Bot-Api-Secret-Token` header vs `TELEGRAM_WEBHOOK_SECRET` | Telegram file URLs are ephemeral — download immediately |
-| `/api/webhooks/whatsapp` | `X-Webhook-Secret` header vs `WAHA_WEBHOOK_SECRET` | WAHA media downloads require `WAHA_API_KEY` auth header |
+| `/api/webhooks/whatsapp` | `X-Webhook-Secret` header vs `WAHA_WEBHOOK_SECRET` | Unused since WhatsApp was dropped (27 Sep); stores nothing while the row is off |
 
-**WhatsApp** (`event_sources.slug='whatsapp'`) was switched back on 2026-09-27 after being off since 2 Jun. It needs a paired WAHA server at `WAHA_API_URL` (a DigitalOcean droplet); the webhook takes pushes and the 17:00 cron polls the two `allowed_groups`. On 27 Sep the droplet answered ping but refused the WAHA port, so nothing flows until Ben brings WAHA back up and pairs the phone.
+**WhatsApp is dropped — Ben's decision, 27 Sep 2026** ("We are stopping the WhatsApp stuff, only telegram and other channels"). `event_sources.slug='whatsapp'` is off; the WAHA droplet refuses every port and nobody is bringing it back. With the row off nothing calls WAHA: the 17:00 cron skips disabled rows, the health checks only look at enabled rows, the webhook stores nothing, the admin dashboard hides the card and `/admin/sources` skips the chat fetch. The adapter, webhook route and `/admin/ingestion/whatsapp` stay in the code, unused. It is not waiting on Ben; don't re-enable it or chase WAHA without asking him.
 
 ## Environment Variables
 
@@ -213,7 +230,7 @@ Configured in `.mcp.json` (project-level):
 |--------|-----------|---------|
 | Supabase | HTTP | Schema queries, RLS debugging, data inspection (read-only) |
 | Stripe | HTTP | Payment debugging, subscription management, webhook inspection |
-| WAHA | stdio (npx) | WhatsApp message management for ingestion pipeline |
+| WAHA | stdio (npx) | Unused — WhatsApp was dropped 2026-09-27 |
 | Vercel | stdio (npx) | Deployment monitoring, build logs, env vars, project settings |
 | Beehiiv | stdio (npx) | Legacy — the app no longer talks to Beehiiv (2026-09-27) |
 

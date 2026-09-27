@@ -30,46 +30,54 @@ interface ChannelConfig {
   types: string[];
   icon: React.ReactNode;
   color: string;
+  /** Latest message younger than this is healthy; younger than warnHours, a warning. */
+  healthyHours: number;
+  warnHours: number;
 }
 
+// Thresholds follow each channel's real cadence. The groups post a few times a
+// day and the harvests land once a night, so the old 3h/12h rule showed both
+// red for most of every day while they were working.
 const CHANNELS: ChannelConfig[] = [
   {
     label: "Telegram",
     types: ["telegram"],
     icon: <MessageSquare className="h-4 w-4" />,
     color: "text-blue-600",
+    healthyHours: 24,
+    warnHours: 48,
   },
   {
+    // Dropped 2026-09-27 (Ben). The card only appears if the row is switched
+    // back on or messages arrive, so a switched-off channel never reads "Error".
     label: "WhatsApp",
     types: ["whatsapp"],
     icon: <Phone className="h-4 w-4" />,
     color: "text-green-600",
+    healthyHours: 24,
+    warnHours: 48,
   },
   {
-    label: "Megatix",
+    label: "Harvests",
     types: ["scraper", "api"],
     icon: <Globe className="h-4 w-4" />,
     color: "text-purple-600",
+    healthyHours: 26,
+    warnHours: 48,
   },
 ];
 
-function getRecencyColor(date: Date): string {
+function getRecencyColor(date: Date, channel: ChannelConfig): string {
   const hoursAgo = (Date.now() - date.getTime()) / (1000 * 60 * 60);
-  if (hoursAgo < 3) return "text-green-600";
-  if (hoursAgo < 12) return "text-amber-600";
+  if (hoursAgo < channel.healthyHours) return "text-green-600";
+  if (hoursAgo < channel.warnHours) return "text-amber-600";
   return "text-red-600";
 }
 
 function getChannelStatus(
-  sourceIds: string[],
-  messages: Array<{ source_id: string; created_at: string }>
+  channel: ChannelConfig,
+  channelMessages: Array<{ source_id: string; created_at: string }>
 ): ChannelStatus {
-  if (sourceIds.length === 0) return "error";
-
-  const channelMessages = messages.filter((m) =>
-    sourceIds.includes(m.source_id)
-  );
-
   if (channelMessages.length === 0) return "error";
 
   const latestMessage = channelMessages[0]; // Already sorted desc
@@ -77,8 +85,8 @@ function getChannelStatus(
     (Date.now() - new Date(latestMessage.created_at).getTime()) /
     (1000 * 60 * 60);
 
-  if (hoursAgo < 3) return "healthy";
-  if (hoursAgo < 12) return "warning";
+  if (hoursAgo < channel.healthyHours) return "healthy";
+  if (hoursAgo < channel.warnHours) return "warning";
   return "error";
 }
 
@@ -112,21 +120,31 @@ export function ChannelHealthCards({
     now.getTime() - 24 * 60 * 60 * 1000
   );
 
+  // A channel is shown when one of its rows is on or it has recent messages.
+  // The harvest rows are off by design and still deliver; WhatsApp is off and
+  // silent, so it drops out instead of sitting on the dashboard as a failure.
+  const shown = CHANNELS.map((channel) => {
+    const channelSources = sources.filter((s) =>
+      channel.types.includes(s.source_type)
+    );
+    const sourceIds = channelSources.map((s) => s.id);
+    const channelMessages = recentMessages.filter((m) =>
+      sourceIds.includes(m.source_id)
+    );
+    return { channel, channelSources, channelMessages };
+  }).filter(
+    ({ channelSources, channelMessages }) =>
+      channelSources.some((s) => s.is_enabled) || channelMessages.length > 0
+  );
+
   return (
     <div className="grid gap-4 md:grid-cols-3">
-      {CHANNELS.map((channel) => {
-        const channelSources = sources.filter((s) =>
-          channel.types.includes(s.source_type)
-        );
-        const sourceIds = channelSources.map((s) => s.id);
-        const channelMessages = recentMessages.filter((m) =>
-          sourceIds.includes(m.source_id)
-        );
+      {shown.map(({ channel, channelMessages }) => {
         const messagesLast24h = channelMessages.filter(
           (m) => new Date(m.created_at) >= twentyFourHoursAgo
         );
 
-        const status = getChannelStatus(sourceIds, channelMessages);
+        const status = getChannelStatus(channel, channelMessages);
         const statusConfig = STATUS_CONFIG[status];
 
         // Group by chat_name
@@ -135,7 +153,7 @@ export function ChannelHealthCards({
           { name: string; lastMessage: Date }
         >();
         for (const msg of channelMessages) {
-          const groupName = msg.chat_name || "Unknown";
+          const groupName = msg.chat_name || "Nightly harvest";
           const existing = groupMap.get(groupName);
           const msgDate = new Date(msg.created_at);
           if (!existing || msgDate > existing.lastMessage) {
@@ -193,7 +211,7 @@ export function ChannelHealthCards({
                       <span
                         className={cn(
                           "shrink-0 ml-2",
-                          getRecencyColor(group.lastMessage)
+                          getRecencyColor(group.lastMessage, channel)
                         )}
                       >
                         {formatDistanceToNow(group.lastMessage, {

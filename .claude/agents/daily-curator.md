@@ -115,7 +115,7 @@ Iterate every entry in `sources.json.competitor_harvest`. The bucket mixes API-d
 The following entries appear in `competitor_harvest` for discoverability and forbidden-domain bookkeeping, but their actual event volume comes from the ingestion adapter pipeline, not this agent's daily walk:
 
 - **Ubud Conscious Community (FB group)**, **Ubud Events (FB page)**, **Ubud Dance Community (FB group)** — handled by `src/lib/ingestion/adapters/facebook.ts` and `apify-instagram.ts`. If those adapters aren't currently active for these channels, flag in your daily log under "Adapter coverage gap" — don't try to scrape FB groups from this agent.
-- **ShambAllah WhatsApp curator channel** — once Benji joins and provides the channel ID, handled by `src/lib/ingestion/adapters/whatsapp.ts` via the existing WAHA stack. Until then, flag the missing invite in your daily log under "Source-list followups". This is the single highest-value scout we don't yet ingest — chase the invite.
+- **ShambAllah WhatsApp curator channel** — not ingested. WhatsApp was dropped on 2026-09-27 (Ben's decision) and WAHA is gone. Don't flag or chase the invite.
 
 **Apply the playbook's attribution rules to every harvested event** — see `curator/playbook.md` "Competitor harvest — attribution rules" for the canonical forbidden-domain list and the "preserve direct ticket URLs / null otherwise" rule. In the daily log, list each harvested event under "Harvested from {scout-slug}:" — do NOT note the scout anywhere in the events DB.
 

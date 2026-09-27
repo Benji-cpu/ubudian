@@ -33,13 +33,15 @@ export default async function AdminDashboard() {
     healthLogsRes,
     activityLogRes,
   ] = await Promise.all([
-    // Channel sources with type
+    // Channel sources with type. All rows, not just enabled ones: the
+    // todo.today and Megatix rows are disabled on purpose (that only keeps them
+    // off the Vercel cron; GH Actions harvests them nightly), so filtering on
+    // is_enabled showed a working harvest as a red "Error" card.
     supabase
       .from("event_sources")
       .select(
         "id, name, slug, source_type, is_enabled, last_fetched_at, last_error"
-      )
-      .eq("is_enabled", true),
+      ),
     // Recent group messages (last 48h) with chat_name
     supabase
       .from("raw_ingestion_messages")
