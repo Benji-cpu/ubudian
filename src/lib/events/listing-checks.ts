@@ -49,6 +49,8 @@ export function isSpecificVenue(name: string | null | undefined): boolean {
   return !PLACEHOLDER.test(n);
 }
 
+const HANDLE = /^@?[A-Za-z0-9._]{3,30}$/;
+
 export type WayIn =
   | { kind: "tickets"; url: string }
   | { kind: "organiser"; contact: string | null; instagram: string | null }
@@ -61,8 +63,12 @@ export type WayIn =
 export function wayIn(event: ListingFields): WayIn | null {
   const ticket = event.external_ticket_url?.trim();
   if (ticket && /^https?:\/\//i.test(ticket)) return { kind: "tickets", url: ticket };
-  const contact = event.organizer_contact?.trim() || null;
-  const instagram = event.organizer_instagram?.trim() || null;
+  // Only a contact someone can actually use counts: a phone, an email, a URL
+  // or a handle. The Telegram parser has stored "DM" as a contact.
+  const rawContact = event.organizer_contact?.trim() || null;
+  const contact = rawContact && (contactHref(rawContact) || HANDLE.test(rawContact)) ? rawContact : null;
+  const rawInstagram = event.organizer_instagram?.trim() || null;
+  const instagram = rawInstagram && HANDLE.test(rawInstagram) ? rawInstagram : null;
   if (contact || instagram) return { kind: "organiser", contact, instagram };
   if (isSpecificVenue(event.venue_name)) return { kind: "walk-in", venue: event.venue_name!.trim() };
   return null;

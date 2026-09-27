@@ -34,6 +34,9 @@ describe("wayIn", () => {
     expect(wayIn({ venue_name: "Ubud", organizer_instagram: "@dissolve" })?.kind).toBe("organiser");
     expect(wayIn({ venue_name: "The Yoga Barn" })?.kind).toBe("walk-in");
     expect(wayIn({ venue_name: "Outside Ubud" })).toBeNull();
+    // "DM" is not a way to reach anyone.
+    expect(wayIn({ venue_name: "Ubud", organizer_contact: "DM" })).toBeNull();
+    expect(wayIn({ venue_name: "The Yoga Barn", organizer_contact: "DM" })?.kind).toBe("walk-in");
   });
 });
 

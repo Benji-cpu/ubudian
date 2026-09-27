@@ -10,10 +10,17 @@ import { expandRecurrence } from "@/lib/recurrence";
 import { bucketEventsByTime } from "@/lib/events/buckets";
 import { nowInBali } from "@/lib/events/bali-time";
 import type { Event } from "@/types";
+import { readFileSync } from "fs";
+import { sameGathering, wayIn as listingWayIn } from "@/lib/events/listing-checks";
 
 const arg = (k: string) => process.argv.find((a) => a.startsWith(`--${k}=`))?.split("=")[1];
 const at = arg("at") ? new Date(arg("at")!) : new Date();
 const list = process.argv.includes("--list");
+// --exclude=<migration.sql>: project the numbers as if that cleanup had run.
+const excludeFile = arg("exclude");
+const excluded = new Set<string>(
+  excludeFile ? (readFileSync(excludeFile, "utf8").match(/'[0-9a-f-]{36}'/g) ?? []).map((s) => s.slice(1, -1)) : [],
+);
 
 function words(s: string | null) {
   return new Set(
@@ -31,7 +38,6 @@ function jaccard(a: Set<string>, b: Set<string>) {
   for (const w of a) if (b.has(w)) n++;
   return n / (a.size + b.size - n);
 }
-const venueKey = (v: string | null) => (v ?? "").toLowerCase().replace(/[^a-z]/g, "").slice(0, 8);
 
 async function main() {
   const supabase = createAdminClient();
@@ -42,7 +48,7 @@ async function main() {
     .eq("status", "approved")
     .or(`start_date.gte.${today},is_recurring.eq.true,end_date.gte.${today}`);
   if (error) throw error;
-  const rows = (data ?? []) as unknown as (Event & { auto_approved_at: string | null; source: { slug: string } | null })[];
+  const rows = ((data ?? []) as unknown as (Event & { auto_approved_at: string | null; source: { slug: string } | null })[]).filter((e) => !excluded.has(e.id));
 
   // Occurrences over the next 14 days, one per day per row (how the week view and the list read them).
   const occ: { e: (typeof rows)[number]; date: string }[] = [];
@@ -61,8 +67,8 @@ async function main() {
   const live = rows.filter((e) => occ.some((o) => o.e.id === e.id) || e.start_date > end.toISOString().slice(0, 10));
   const src = (e: (typeof rows)[number]) => e.source?.slug ?? e.source_kind ?? "none";
   const wayIn = (e: Event) => !!(e.external_ticket_url || e.organizer_contact || e.organizer_instagram);
+  const anyWayIn = (e: Event) => !!listingWayIn(e);
   const AREA = /^(ubud|central ubud|outside ubud|bali|penestanan|sayan|kedewatan|mas|nyuh kuning|tbc|tba|secret.*|private.*|location.*|various)$/i;
-  const walkIn = (e: Event) => !!e.venue_name && !AREA.test(e.venue_name.trim()) && !!e.venue_map_url;
 
   // Duplicates: same day, similar title (>=0.5) or same venue + same start time + overlapping title.
   const byDay = new Map<string, typeof occ>();
@@ -74,8 +80,7 @@ async function main() {
         const a = list[i].e, b = list[j].e;
         if (a.id === b.id) continue;
         const sim = jaccard(words(a.title), words(b.title));
-        const sameSlot = venueKey(a.venue_name) === venueKey(b.venue_name) && a.start_time === b.start_time;
-        if (sim >= 0.5 || (sameSlot && sim >= 0.25)) dups.push(`${day} ${sim.toFixed(2)} [${src(a)}] ${a.title} @${a.venue_name} ${a.start_time} <> [${src(b)}] ${b.title} @${b.venue_name} ${b.start_time}  (${a.id.slice(0, 8)} / ${b.id.slice(0, 8)})`);
+        if (sameGathering(a, b)) dups.push(`${day} ${sim.toFixed(2)} [${src(a)}] ${a.title} @${a.venue_name} ${a.start_time} <> [${src(b)}] ${b.title} @${b.venue_name} ${b.start_time}  (${a.id.slice(0, 8)} / ${b.id.slice(0, 8)})`);
       }
   }
 
@@ -88,7 +93,7 @@ async function main() {
   console.log(`at ${at.toISOString()} (bali ${today})`);
   console.log(`live listings (next 14d + later one-offs): ${live.length}`);
   console.log(`  with a ticket or organiser contact: ${live.filter(wayIn).length} (${Math.round((100 * live.filter(wayIn).length) / live.length)}%)`);
-  console.log(`  with ticket/organiser OR a walk-in venue (real venue + map pin): ${live.filter((e) => wayIn(e) || walkIn(e)).length} (${Math.round((100 * live.filter((e) => wayIn(e) || walkIn(e)).length) / live.length)}%)`);
+  console.log(`  with a way in (ticket, organiser, or a named venue to walk into): ${live.filter(anyWayIn).length} (${Math.round((100 * live.filter(anyWayIn).length) / live.length)}%)`);
   console.log(`  area-only venue ("Ubud", "Outside Ubud"…): ${live.filter((e) => !e.venue_name || AREA.test(e.venue_name.trim())).length}`);
   console.log(`  raw prices (IDR 5+ digits, no separators): ${live.filter((e) => /IDR\s*\d{5,}/.test(e.price_info ?? "")).length}`);
   console.log(`  live rows published unmoderated: ${unmod.length}`);
