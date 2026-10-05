@@ -2,7 +2,8 @@ import { describe, expect, it } from "vitest";
 import { spreadAcrossWeek } from "@/lib/email/week-spread";
 import type { Event } from "@/types";
 
-const ev = (id: string, start_date: string) => ({ id, start_date }) as Event;
+const ev = (id: string, start_date: string, extra: Partial<Event> = {}) =>
+  ({ id, start_date, title: id, start_time: "19:00", venue_name: `venue-${id}`, organizer_name: null, ...extra }) as Event;
 
 describe("spreadAcrossWeek", () => {
   it("takes one per day before a second from any day", () => {
@@ -17,6 +18,27 @@ describe("spreadAcrossWeek", () => {
   it("never repeats a recurring event that runs on several days", () => {
     const events = [ev("yoga", "2026-10-07"), ev("yoga", "2026-10-08"), ev("dance", "2026-10-08")];
     expect(spreadAcrossWeek(events, 5).map((e) => e.id)).toEqual(["yoga", "dance"]);
+  });
+
+  it("one per organiser or venue, timed before untimed, courses last", () => {
+    const events = [
+      ev("qigong-wed", "2026-10-07", { organizer_name: "Qi School" }),
+      ev("reiki", "2026-10-07", { title: "Certified Reiki Training" }),
+      ev("notime", "2026-10-07", { start_time: null }),
+      ev("qigong-fri", "2026-10-09", { organizer_name: "Qi School" }),
+      ev("dance", "2026-10-09"),
+    ];
+    expect(spreadAcrossWeek(events, 3).map((e) => e.id)).toEqual(["qigong-wed", "notime", "dance"]);
+  });
+
+  it("uses courses only to fill a thin week, and drops what started before the window", () => {
+    const events = [
+      ev("reiki", "2026-10-06", { title: "Certified Reiki Training" }),
+      ev("dance", "2026-10-07"),
+      ev("workshop", "2026-10-08", { title: "2-Day Workshop" }),
+    ];
+    expect(spreadAcrossWeek(events, 5, "2026-10-07").map((e) => e.id)).toEqual(["dance", "workshop"]);
+    expect(spreadAcrossWeek(events, 1, "2026-10-07").map((e) => e.id)).toEqual(["dance"]);
   });
 
   it("returns fewer when there aren't enough", () => {

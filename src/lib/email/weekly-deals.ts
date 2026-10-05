@@ -1,5 +1,5 @@
 import { GREEN, GOLD, CHARCOAL, esc } from "@/lib/email/brand";
-import { formatHours, formatIdr, formatWeekdays } from "@/lib/specials";
+import { daysUnknown, formatDays, formatHours, formatIdr, formatWeekdays } from "@/lib/specials";
 import type { Special } from "@/types";
 
 /** Where the deals live on the site. One constant, so a rename is one line. */
@@ -29,32 +29,98 @@ function daysUntilNext(weekdays: number[], fromDay: number): number {
   return Math.min(...weekdays.map((d) => (d - fromDay + 7) % 7));
 }
 
+/** A generic happy hour, as opposed to something only this venue does. */
+export function isPlainHappyHour(special: Pick<Special, "title">): boolean {
+  return /happy\s*hour/i.test(special.title);
+}
+
+/** Runs on particular days (not every day) — the distinctive ones. */
+function hasSetDays(special: Pick<Special, "weekdays">): boolean {
+  const n = new Set(special.weekdays).size;
+  return n > 0 && n < 7;
+}
+
+/** At most this many generic happy hours in one issue. */
+export const MAX_HAPPY_HOURS = 2;
+
 /**
- * The issue's deals: sourced ones only, soonest first from the send day
- * (every-day deals count as today), then the venue name, so the order is
- * stable week to week. One deal per venue keeps a single place from filling
- * the block.
+ * The issue's deals, chosen to be worth opening:
+ *  - sourced deals only, and never one whose days we don't know (we won't
+ *    mail "Every day" for "days not stated");
+ *  - one deal per venue, the venue's most distinctive;
+ *  - deals on particular days first, spread across the week from the send
+ *    day (one per day before a second on any day), then every-day deals, and
+ *    at most MAX_HAPPY_HOURS plain happy hours, last.
  */
 export function pickWeeklyDeals(
   specials: Special[],
   dayOfWeek: number,
   limit = WEEKLY_DEAL_LIMIT
 ): Special[] {
-  const seenVenues = new Set<string>();
-  return specials
-    .filter((s) => dealSourceUrl(s) !== null)
-    .sort(
-      (a, b) =>
-        daysUntilNext(a.weekdays, dayOfWeek) - daysUntilNext(b.weekdays, dayOfWeek) ||
-        a.venue_name.localeCompare(b.venue_name)
-    )
-    .filter((s) => {
-      const key = s.venue_name.trim().toLowerCase();
-      if (seenVenues.has(key)) return false;
-      seenVenues.add(key);
-      return true;
-    })
-    .slice(0, limit);
+  const rank = (s: Special) => (isPlainHappyHour(s) ? 2 : 0) + (hasSetDays(s) ? 0 : 1);
+  const bestPerVenue = new Map<string, Special>();
+  for (const s of specials) {
+    if (dealSourceUrl(s) === null || daysUnknown(s)) continue;
+    const key = s.venue_name.trim().toLowerCase();
+    const held = bestPerVenue.get(key);
+    if (!held || rank(s) < rank(held)) bestPerVenue.set(key, s);
+  }
+  const pool = [...bestPerVenue.values()].sort((a, b) => a.venue_name.localeCompare(b.venue_name));
+
+  const happyHours = pool.filter(isPlainHappyHour);
+  const others = pool.filter((s) => !isPlainHappyHour(s));
+  const everyDay = others.filter((s) => !hasSetDays(s));
+
+  // Particular-day deals, round-robin over how soon they next run.
+  const byDay = new Map<number, Special[]>();
+  for (const s of others.filter(hasSetDays)) {
+    const d = daysUntilNext(s.weekdays, dayOfWeek);
+    byDay.set(d, [...(byDay.get(d) ?? []), s]);
+  }
+  const spread: Special[] = [];
+  const days = [...byDay.keys()].sort((a, b) => a - b);
+  while (days.some((d) => (byDay.get(d) ?? []).length > 0)) {
+    for (const d of days) {
+      const next = byDay.get(d)!.shift();
+      if (next) spread.push(next);
+    }
+  }
+
+  const hh = happyHours
+    .sort((a, b) => Number(hasSetDays(b)) - Number(hasSetDays(a)) || a.venue_name.localeCompare(b.venue_name))
+    .slice(0, MAX_HAPPY_HOURS);
+  return [...spread, ...everyDay, ...hh].slice(0, limit);
+}
+
+/**
+ * The description, unless it only restates the title or where we found it
+ * ("Happy hour (Finn's guide, 24 Aug 2026).") — the Source link covers that.
+ */
+export function dealBlurb(special: Pick<Special, "title" | "description">): string | null {
+  const desc = special.description?.trim();
+  if (!desc) return null;
+  const core = desc.replace(/\([^)]*\)/g, "").replace(/[.\s]+$/, "").trim();
+  if (core.length < 25 || core.toLowerCase() === special.title.trim().toLowerCase()) return null;
+  return desc;
+}
+
+/** The inbox preview line: the first two deals, then the event count. */
+export function buildPreheader(deals: Special[], eventCount: number): string {
+  const full = preheaderFor(deals.slice(0, 2), eventCount);
+  // Inboxes show ~100–140 characters; drop the second deal rather than cut mid-word.
+  return full.length <= 140 ? full : preheaderFor(deals.slice(0, 1), eventCount);
+}
+
+function preheaderFor(deals: Special[], eventCount: number): string {
+  const parts = deals.map((d) => {
+    const days = hasSetDays(d) ? ` on ${formatWeekdays(d.weekdays)}` : "";
+    return `${d.title} at ${d.venue_name}${days}`;
+  });
+  const events = eventCount > 0 ? `${eventCount} thing${eventCount === 1 ? "" : "s"} on this week` : "";
+  const text = [...parts, events].filter(Boolean);
+  if (text.length === 0) return "";
+  const joined = text.length > 1 ? `${text.slice(0, -1).join(", ")}, and ${text[text.length - 1]}.` : `${text[0]}.`;
+  return joined.charAt(0).toUpperCase() + joined.slice(1);
 }
 
 function shortDate(iso: string): string {
@@ -72,12 +138,13 @@ export function buildDealsBlockHtml(deals: Special[], siteUrl: string): string {
   const rows = deals
     .map((s) => {
       const where = [s.venue_name, s.venue_area].filter(Boolean).map((v) => esc(v as string)).join(" · ");
-      const when = [formatWeekdays(s.weekdays), formatHours(s.start_time, s.end_time), formatIdr(s.price_idr)]
+      const when = [formatDays(s), formatHours(s.start_time, s.end_time), formatIdr(s.price_idr)]
         .filter(Boolean)
         .join(" · ");
       const source = dealSourceUrl(s) as string;
-      const desc = s.description
-        ? `<p style="margin:6px 0 0;font-size:13px;line-height:1.5;color:${CHARCOAL};font-family:Georgia,serif;">${esc(clip(s.description, 160))}</p>`
+      const blurb = dealBlurb(s);
+      const desc = blurb
+        ? `<p style="margin:6px 0 0;font-size:13px;line-height:1.5;color:${CHARCOAL};font-family:Georgia,serif;">${esc(clip(blurb, 160))}</p>`
         : "";
       return `
   <tr><td style="padding:14px 32px;border-top:1px solid ${GOLD}22;">

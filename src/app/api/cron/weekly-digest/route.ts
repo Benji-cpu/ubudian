@@ -102,7 +102,7 @@ export async function POST(request: Request) {
 
     const picks = archetype
       ? buildSpread(archetype, weekEvents, { eventLimit: 5 }).events
-      : spreadAcrossWeek(weekEvents, 5);
+      : spreadAcrossWeek(weekEvents, 5, bali.dateStr);
 
     if (picks.length === 0 && deals.length === 0) {
       skippedEmpty++;

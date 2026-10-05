@@ -1,7 +1,7 @@
 import { GREEN, GOLD, CREAM, CHARCOAL, esc, fmtEmailDate, emailFooter } from "@/lib/email/brand";
 import { ARCHETYPES } from "@/lib/quiz-data";
 import { formatEventTime } from "@/lib/utils";
-import { buildDealsBlockHtml } from "@/lib/email/weekly-deals";
+import { buildDealsBlockHtml, buildPreheader } from "@/lib/email/weekly-deals";
 import type { ArchetypeId, Event, Special } from "@/types";
 
 /**
@@ -53,8 +53,18 @@ export function buildWeeklyDigestEmailHtml(opts: {
     })
     .join("");
 
+  const preheader = withDeals ? buildPreheader(deals, events.length) : "";
+  const preheaderHtml = preheader
+    ? `<div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">${esc(preheader)}</div>`
+    : "";
+
   return `<!doctype html>
-<html><body style="margin:0;padding:0;background:${CREAM};">
+<html><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>This week in Ubud</title>
+</head><body style="margin:0;padding:0;background:${CREAM};">
+${preheaderHtml}
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${CREAM};padding:24px 12px;">
 <tr><td align="center">
 <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#ffffff;border-radius:8px;overflow:hidden;">

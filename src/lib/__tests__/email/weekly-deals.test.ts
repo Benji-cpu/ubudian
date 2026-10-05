@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildDealsBlockHtml, dealSourceUrl, pickWeeklyDeals } from "@/lib/email/weekly-deals";
+import { buildDealsBlockHtml, buildPreheader, dealBlurb, dealSourceUrl, pickWeeklyDeals } from "@/lib/email/weekly-deals";
 import type { Special } from "@/types";
 
 function deal(overrides: Partial<Special>): Special {
@@ -48,22 +48,48 @@ describe("pickWeeklyDeals", () => {
     expect(picked).toHaveLength(0);
   });
 
-  it("orders soonest from the send day, every-day deals as today", () => {
+  it("leaves out deals whose days we don't know", () => {
+    const picked = pickWeeklyDeals([deal({ venue_name: "CP Lounge", days_stated: false })], tuesday);
+    expect(picked).toHaveLength(0);
+  });
+
+  it("puts particular-day deals first, spread from the send day, then every day, happy hours last", () => {
     const picked = pickWeeklyDeals(
       [
-        deal({ venue_name: "Monday place", weekdays: [1] }),
-        deal({ venue_name: "Every day", weekdays: [] }),
-        deal({ venue_name: "Thursday place", weekdays: [4] }),
-        deal({ venue_name: "Tuesday place", weekdays: [2] }),
+        deal({ venue_name: "HH one", title: "Happy hour", weekdays: [] }),
+        deal({ venue_name: "Every day tea", title: "Afternoon tea", weekdays: [] }),
+        deal({ venue_name: "Milk & Madu", title: "2-for-1 pizza", weekdays: [0, 2] }),
+        deal({ venue_name: "Kraton", title: "All you can eat", weekdays: [1, 4] }),
+        deal({ venue_name: "Melali", title: "GINtastic", weekdays: [4] }),
       ],
       tuesday
     );
     expect(picked.map((d) => d.venue_name)).toEqual([
-      "Every day",
-      "Tuesday place",
-      "Thursday place",
-      "Monday place",
+      "Milk & Madu", // Tue (today)
+      "Kraton", // Thu, first of the Thu pair alphabetically
+      "Melali", // Thu, second round
+      "Every day tea",
+      "HH one",
     ]);
+  });
+
+  it("caps plain happy hours at two", () => {
+    const picked = pickWeeklyDeals(
+      Array.from({ length: 5 }, (_, i) => deal({ venue_name: `Bar ${i}`, title: "Happy hour" })),
+      tuesday
+    );
+    expect(picked).toHaveLength(2);
+  });
+
+  it("prefers a venue's distinctive deal over its happy hour", () => {
+    const picked = pickWeeklyDeals(
+      [
+        deal({ venue_name: "Blue Door", title: "Happy hour" }),
+        deal({ venue_name: "Blue Door", title: "Taco Tuesday", weekdays: [2] }),
+      ],
+      tuesday
+    );
+    expect(picked.map((d) => d.title)).toEqual(["Taco Tuesday"]);
   });
 
   it("keeps one deal per venue and respects the limit", () => {
@@ -78,6 +104,31 @@ describe("pickWeeklyDeals", () => {
     );
     expect(picked).toHaveLength(4);
     expect(picked.filter((d) => d.venue_name.trim().toLowerCase() === "milk & madu")).toHaveLength(1);
+  });
+});
+
+describe("dealBlurb", () => {
+  it("drops a description that is only the source note", () => {
+    expect(dealBlurb({ title: "Happy hour", description: "Happy hour (Finn's guide, 24 Aug 2026)." })).toBeNull();
+    expect(dealBlurb({ title: "Happy hour", description: "Happy hour (Finn's guide)." })).toBeNull();
+  });
+  it("keeps a real one", () => {
+    const d = "Buy one pizza, get one free, all evening on the terrace.";
+    expect(dealBlurb({ title: "2-for-1 pizza", description: d })).toBe(d);
+  });
+});
+
+describe("buildPreheader", () => {
+  it("names the first two deals and counts the events", () => {
+    expect(
+      buildPreheader(
+        [
+          deal({ venue_name: "Milk & Madu", title: "2-for-1 pizza", weekdays: [0, 2] }),
+          deal({ venue_name: "Kraton", title: "all-you-can-eat", weekdays: [1, 4] }),
+        ],
+        5
+      )
+    ).toBe("2-for-1 pizza at Milk & Madu on Sun, Tue, all-you-can-eat at Kraton on Mon, Thu, and 5 things on this week.");
   });
 });
 
