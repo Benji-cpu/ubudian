@@ -50,7 +50,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticPages: MetadataRoute.Sitemap = [
     { url: SITE_URL, changeFrequency: "daily", priority: 1.0 },
     { url: `${SITE_URL}/events`, changeFrequency: "daily", priority: 0.9 },
-    { url: `${SITE_URL}/tonight`, changeFrequency: "daily", priority: 0.9 },
     { url: `${SITE_URL}/deals`, changeFrequency: "daily", priority: 0.9 },
     ...HUBS.map((h) => ({
       url: `${SITE_URL}/${h.slug}`,
