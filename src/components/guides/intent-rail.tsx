@@ -43,13 +43,17 @@ export function IntentRail({ activeIntent }: IntentRailProps) {
                   }`}
                 >
                   <div className="relative aspect-[5/6] w-full overflow-hidden">
-                    <Image
-                      src={intent.imageUrl}
-                      alt=""
-                      fill
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 33vw, 20vw"
-                      className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
-                    />
+                    {intent.imageUrl ? (
+                      <Image
+                        src={intent.imageUrl}
+                        alt=""
+                        fill
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 33vw, 20vw"
+                        className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 bg-brand-deep-green" />
+                    )}
                     <div className="absolute inset-0 bg-gradient-to-t from-[#2C4A3E]/85 via-[#2C4A3E]/15 to-transparent" />
                     <div className="absolute inset-x-0 bottom-0 p-4">
                       <h3 className="font-serif text-lg font-medium leading-tight text-[#FAF5EC] sm:text-xl">

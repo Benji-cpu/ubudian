@@ -39,7 +39,7 @@ export const ARCHETYPES: Record<ArchetypeId, ArchetypeResult> = {
     tagline: "You don't just attend the ceremony — you make the music",
     description:
       "Ubud has been pulling artists, musicians, and makers here for over a century, and you're the latest in that lineage. Maybe you're the one playing medicine songs at the circle, building soundscapes for ceremonies, painting on the walls of the cafe, or writing the thing that's been burning in you since you arrived. The creative energy here is specific — it's not just pretty, it's sacred. The Kecak fire dance at the palace, the stone carvers in the villages, the sound healers crafting alchemical journeys — art in Ubud isn't decoration. It's practice.",
-    hero_image: "/images/archetypes/creative.jpg",
+    hero_image: null,
     color: "brand-gold",
     content_keywords: {
       event_categories: ["Art & Culture", "Music & Performance", "Ceremony & Sound"],
@@ -53,7 +53,7 @@ export const ARCHETYPES: Record<ArchetypeId, ArchetypeResult> = {
     tagline: "You're the reason Ubud feels like a village",
     description:
       "You're at the women's circle on Monday, the sharing circle on Tuesday, the tantric temple on Wednesday, and the community dinner on Friday — and somehow you already know half the room at each one. You came to Ubud and immediately understood that the magic here isn't the place, it's the people. You're the one introducing the nervous newcomer to the facilitator they need to meet. The one organizing the potluck. The one who remembers everyone's name and asks about their sister. Connection isn't something you do — it's what you are.",
-    hero_image: "/images/archetypes/connector.jpg",
+    hero_image: null,
     color: "brand-terracotta",
     content_keywords: {
       event_categories: ["Circle & Community", "Tantra & Intimacy"],

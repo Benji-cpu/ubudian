@@ -4,7 +4,8 @@ export interface IntentConfig {
   id: GuideIntent;
   label: string;
   blurb: string;
-  imageUrl: string;
+  /** null = no real photo yet; the tile is a plain deep-green block (Ben, 6 Oct). */
+  imageUrl: string | null;
   archetypeAffinity: ArchetypeId[];
 }
 
@@ -16,7 +17,7 @@ export const GUIDE_INTENTS: IntentConfig[] = [
     id: "romance",
     label: "Romance & Intimacy",
     blurb: "The Eat-Pray-Love fantasy, honestly. What it actually takes.",
-    imageUrl: `${STORAGE_BASE}/intents/romance.jpg`,
+    imageUrl: null,
     archetypeAffinity: ["connector", "epicurean"],
   },
   {
@@ -44,7 +45,7 @@ export const GUIDE_INTENTS: IntentConfig[] = [
     id: "local_culture",
     label: "Local Culture, Honestly",
     blurb: "Beyond the cliché, into the relationships.",
-    imageUrl: `${STORAGE_BASE}/intents/local-culture.jpg`,
+    imageUrl: null,
     archetypeAffinity: ["explorer", "seeker"],
   },
 ];

@@ -39,13 +39,17 @@ export function QuizCtaHomepage() {
         <div className="mx-auto flex max-w-3xl items-center justify-between gap-4 px-4 py-4">
           <div className="flex items-center gap-3">
             <div className="relative h-10 w-10 overflow-hidden rounded-full">
-              <Image
-                src={archetype.hero_image}
-                alt={archetype.name}
-                fill
-                className="object-cover"
-                sizes="40px"
-              />
+              {archetype.hero_image ? (
+                <Image
+                  src={archetype.hero_image}
+                  alt={archetype.name}
+                  fill
+                  className="object-cover"
+                  sizes="40px"
+                />
+              ) : (
+                <div className="absolute inset-0 bg-brand-deep-green" />
+              )}
             </div>
             <div>
               <p className="text-sm text-brand-charcoal-light">Matched as</p>

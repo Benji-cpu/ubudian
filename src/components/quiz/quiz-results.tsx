@@ -91,14 +91,18 @@ export function QuizResults({
       {/* Hero */}
       <div className="relative mb-8 overflow-hidden rounded-2xl">
         <div className="relative aspect-[2/1] sm:aspect-[5/2]">
-          <Image
-            src={archetype.hero_image}
-            alt={archetype.name}
-            fill
-            className="object-cover"
-            sizes="(max-width: 768px) 100vw, 768px"
-            priority
-          />
+          {archetype.hero_image ? (
+            <Image
+              src={archetype.hero_image}
+              alt={archetype.name}
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 768px"
+              priority
+            />
+          ) : (
+            <div className="absolute inset-0 bg-brand-deep-green" />
+          )}
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
         </div>
         <div className="absolute inset-x-0 bottom-0 p-6 sm:p-8">

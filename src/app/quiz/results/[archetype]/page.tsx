@@ -44,14 +44,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       title: `I'm ${archetype.name}! Discover Your Ubud Spirit`,
       description: archetype.tagline,
       url: `${SITE_URL}/quiz/results/${slug}`,
-      images: [
-        {
-          url: `${SITE_URL}/images/og/${slug}.jpg`,
-          width: 1200,
-          height: 630,
-          alt: archetype.name,
-        },
-      ],
+      // No share image for an archetype with no real photo yet (Ben, 6 Oct).
+      images: archetype.hero_image
+        ? [{ url: `${SITE_URL}/images/og/${slug}.jpg`, width: 1200, height: 630, alt: archetype.name }]
+        : [],
     },
     twitter: {
       card: "summary_large_image",
@@ -125,14 +121,18 @@ export default async function ArchetypeResultPage({ params }: PageProps) {
         {/* Hero */}
         <div className="relative mb-8 overflow-hidden rounded-2xl">
           <div className="relative aspect-[2/1] sm:aspect-[5/2]">
-            <Image
-              src={archetype.hero_image}
-              alt={archetype.name}
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 100vw, 768px"
-              priority
-            />
+            {archetype.hero_image ? (
+              <Image
+                src={archetype.hero_image}
+                alt={archetype.name}
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 768px"
+                priority
+              />
+            ) : (
+              <div className="absolute inset-0 bg-brand-deep-green" />
+            )}
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
           </div>
           <div className="absolute inset-x-0 bottom-0 p-6 sm:p-8">
