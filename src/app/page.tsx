@@ -105,7 +105,7 @@ export default async function HomePage() {
           </p>
           <div className="mt-7 flex flex-wrap gap-3">
             <Button asChild size="lg" className="bg-white text-brand-charcoal hover:bg-white/90">
-              <Link href="/tonight">
+              <Link href="/deals">
                 Today&apos;s deals <ArrowRight className="h-4 w-4" />
               </Link>
             </Button>
@@ -140,7 +140,7 @@ export default async function HomePage() {
 
       {/* Deals */}
       <section className="mx-auto max-w-5xl px-4 pt-12 sm:px-6">
-        <SectionHead title="Deals today" href="/tonight" cta="This week" />
+        <SectionHead title="Deals today" href="/deals" cta="This week" />
         <DealsTodayRail deals={dealsToday} />
       </section>
 

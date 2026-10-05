@@ -9,7 +9,7 @@ export function DealsTodayRail({ deals }: { deals: Special[] }) {
     return (
       <p className="mt-4 rounded-2xl border border-dashed p-6 text-muted-foreground">
         No deals listed for the rest of today.{" "}
-        <Link href="/tonight" className="font-medium text-foreground underline underline-offset-4">
+        <Link href="/deals" className="font-medium text-foreground underline underline-offset-4">
           See this week&apos;s
         </Link>
       </p>
@@ -24,7 +24,7 @@ export function DealsTodayRail({ deals }: { deals: Special[] }) {
       ))}
       {deals.length > 6 && (
         <Link
-          href="/tonight"
+          href="/deals"
           className="flex w-[40%] shrink-0 snap-start items-center justify-center gap-1 rounded-xl border text-sm font-medium sm:hidden"
         >
           {deals.length - 6} more <ArrowRight className="h-4 w-4" />

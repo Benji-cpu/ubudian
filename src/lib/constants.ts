@@ -5,7 +5,7 @@ export const SITE_URL =
   (process.env.NEXT_PUBLIC_SITE_URL?.trim()) || "http://localhost:4000";
 
 export const NAV_LINKS = [
-  { label: "Deals", href: "/tonight" },
+  { label: "Deals", href: "/deals" },
   { label: "Events", href: "/events" },
   { label: "Retreats", href: "/retreats" },
   { label: "Guides", href: "/guides" },
@@ -16,7 +16,7 @@ export const NAV_LINKS = [
 /** The phone tab bar: the four things people come back for. */
 export const TAB_LINKS = [
   { label: "Today", href: "/", icon: "Sun" },
-  { label: "Deals", href: "/tonight", icon: "Tag" },
+  { label: "Deals", href: "/deals", icon: "Tag" },
   { label: "Events", href: "/events", icon: "CalendarDays" },
   { label: "Weekly", href: "/#newsletter", icon: "Mail" },
 ] as const;
