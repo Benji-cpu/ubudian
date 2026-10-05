@@ -50,7 +50,7 @@ export default async function NewsletterPage() {
       {preview.length > 0 && (
         <section className="mx-auto max-w-2xl px-4 py-12 sm:px-6">
           <h2 className="font-serif text-2xl text-brand-deep-green dark:text-brand-gold">
-            Deals on now
+            This week&apos;s deals
           </h2>
           <ul className="mt-6 space-y-4">
             {preview.map((deal) => {
