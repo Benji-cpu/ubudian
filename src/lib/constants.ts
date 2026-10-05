@@ -7,7 +7,7 @@ export const SITE_URL =
 export const NAV_LINKS = [
   { label: "Deals", href: "/deals" },
   { label: "Events", href: "/events" },
-  { label: "Retreats", href: "/retreats" },
+  { label: "Day plans", href: "/retreats" },
   { label: "Guides", href: "/guides" },
   { label: "Quiz", href: "/quiz" },
   { label: "About", href: "/about" },

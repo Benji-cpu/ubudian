@@ -61,14 +61,7 @@ export async function Footer() {
 
         {/* Social / Info */}
         <div className="mt-10 flex flex-wrap items-center justify-center gap-6">
-          <a
-            href="https://instagram.com/theubudian"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="py-2 text-sm text-brand-off-white/80 transition-colors hover:text-brand-gold"
-          >
-            Instagram
-          </a>
+          {/* Instagram link removed 5 Oct: @theubudian isn't confirmed as ours. Restore only on Ben's word. */}
           <Link
             href="/about"
             className="py-2 text-sm text-brand-off-white/80 transition-colors hover:text-brand-gold"
