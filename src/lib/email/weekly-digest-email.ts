@@ -1,11 +1,14 @@
 import { GREEN, GOLD, CREAM, CHARCOAL, esc, fmtEmailDate, emailFooter } from "@/lib/email/brand";
 import { ARCHETYPES } from "@/lib/quiz-data";
 import { formatEventTime } from "@/lib/utils";
-import type { ArchetypeId, Event } from "@/types";
+import { buildDealsBlockHtml } from "@/lib/email/weekly-deals";
+import type { ArchetypeId, Event, Special } from "@/types";
 
 /**
  * "This week in your Ubud" — the weekly email. Personalised via the
  * reader's archetype when they have one; otherwise it leads with the week itself.
+ * With `deals`, the issue opens on this week's deals and the events follow
+ * under "What's on".
  */
 export function buildWeeklyDigestEmailHtml(opts: {
   archetype: ArchetypeId | null;
@@ -13,13 +16,26 @@ export function buildWeeklyDigestEmailHtml(opts: {
   siteUrl: string;
   unsubUrl: string;
   weekLabel: string;
+  deals?: Special[];
 }): string {
-  const { archetype, events, siteUrl, unsubUrl, weekLabel } = opts;
+  const { archetype, events, siteUrl, unsubUrl, weekLabel, deals = [] } = opts;
+  const withDeals = deals.length > 0;
   const a = archetype ? ARCHETYPES[archetype] : null;
 
-  const intro = a
-    ? `Picked for ${esc(a.name)} — what's moving in the valley this week.`
-    : `What's moving in the valley this week.`;
+  const intro = withDeals
+    ? a
+      ? `The week's best deals, then what's on — picked for ${esc(a.name)}.`
+      : `The week's best deals, then what's on in the valley.`
+    : a
+      ? `Picked for ${esc(a.name)} — what's moving in the valley this week.`
+      : `What's moving in the valley this week.`;
+  const eventsHeading =
+    withDeals && events.length > 0
+      ? `
+  <tr><td style="padding:22px 32px 4px;">
+    <p style="margin:0;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:${GOLD};font-family:Georgia,serif;">What's on</p>
+  </td></tr>`
+      : "";
 
   const rows = events
     .map((e) => {
@@ -49,6 +65,8 @@ export function buildWeeklyDigestEmailHtml(opts: {
   <tr><td style="padding:20px 32px 6px;">
     <p style="margin:0;font-size:14px;line-height:1.6;color:${CHARCOAL};font-family:Georgia,serif;">${intro}</p>
   </td></tr>
+  ${buildDealsBlockHtml(deals, siteUrl)}
+  ${eventsHeading}
   ${rows}
   <tr><td style="padding:24px 32px;">
     <table role="presentation" cellpadding="0" cellspacing="0"><tr>

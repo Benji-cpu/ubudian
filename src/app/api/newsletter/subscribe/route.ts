@@ -18,7 +18,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const { email, archetype } = await request.json();
+    const { email, archetype, source } = await request.json();
 
     if (!email || typeof email !== "string") {
       return NextResponse.json(
@@ -41,6 +41,10 @@ export async function POST(request: Request) {
       ? (archetype as ArchetypeId)
       : null;
 
+    // Where they signed up, for counting what works; anything odd is just "website".
+    const validSource =
+      typeof source === "string" && /^[a-z_]{2,30}$/.test(source) ? source : "website";
+
     const normalizedEmail = email.toLowerCase().trim();
     const supabase = createAdminClient();
 
@@ -53,7 +57,7 @@ export async function POST(request: Request) {
           .upsert(
             {
               email: normalizedEmail,
-              source: "website",
+              source: validSource,
               status: "active",
               ...(validArchetype && { archetype: validArchetype }),
             },

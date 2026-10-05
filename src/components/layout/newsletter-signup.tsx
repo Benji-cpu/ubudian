@@ -8,6 +8,8 @@ import { Loader2, CheckCircle2 } from "lucide-react";
 interface NewsletterSignupProps {
   className?: string;
   variant?: "light" | "dark";
+  /** Where the sign-up happened (`newsletter_page`, `deals`, …), stored on the subscriber. */
+  source?: string;
 }
 
 function getStoredArchetype(): string | null {
@@ -21,7 +23,7 @@ function getStoredArchetype(): string | null {
   }
 }
 
-export function NewsletterSignup({ className, variant = "light" }: NewsletterSignupProps) {
+export function NewsletterSignup({ className, variant = "light", source }: NewsletterSignupProps) {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
@@ -36,7 +38,7 @@ export function NewsletterSignup({ className, variant = "light" }: NewsletterSig
       const res = await fetch("/api/newsletter/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, ...(archetype && { archetype }) }),
+        body: JSON.stringify({ email, ...(archetype && { archetype }), ...(source && { source }) }),
       });
 
       const data = await res.json();
@@ -48,7 +50,7 @@ export function NewsletterSignup({ className, variant = "light" }: NewsletterSig
       }
 
       setStatus("success");
-      setMessage("You're in. See you in your inbox.");
+      setMessage("You're in. The first one lands Wednesday morning.");
       setEmail("");
       try {
         localStorage.setItem("ubudian_subscribed", "true");

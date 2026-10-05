@@ -91,10 +91,10 @@ export function eventRejectedNotification(eventName: string, reason?: string): s
 export function newsletterWelcome(unsubUrl: string): string {
   return layout(`
     <h2 style="margin:0 0 16px;font-family:'Lora',Georgia,serif;color:${COLORS.deepGreen};">Welcome to The Ubudian!</h2>
-    <p>Every Wednesday morning we&rsquo;ll send you the week ahead in Ubud: the ceremonies, dance, breathwork and sound worth clearing an evening for.</p>
-    <p>In the meantime, explore what&rsquo;s on:</p>
+    <p>Every Wednesday morning we&rsquo;ll send you the week ahead in Ubud: the best food and drink deals, and the ceremonies, dance, music and gatherings worth clearing an evening for.</p>
+    <p>In the meantime, here&rsquo;s what&rsquo;s on tonight:</p>
     <p style="margin-top:20px;">
-      <a href="${SITE_URL}/events" style="display:inline-block;padding:10px 24px;background-color:${COLORS.deepGreen};color:#ffffff;text-decoration:none;border-radius:4px;font-weight:600;">Browse Events</a>
+      <a href="${SITE_URL}/tonight" style="display:inline-block;padding:10px 24px;background-color:${COLORS.deepGreen};color:#ffffff;text-decoration:none;border-radius:4px;font-weight:600;">Tonight in Ubud</a>
     </p>
     <p style="margin-top:24px;padding-top:20px;border-top:1px solid #eee;font-size:14px;color:#666;">
       Want personalized event recommendations? Take the 90-second Ubud Spirit Quiz:

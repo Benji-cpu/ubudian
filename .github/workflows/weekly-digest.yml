@@ -6,7 +6,16 @@ on:
     # Wednesday-morning coffee in Bali. Off-minute dodges the on-the-hour
     # GH Actions cron pile-up.
     - cron: "6 23 * * 2"
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      only:
+        description: "Test: send only to this address (skips the weekly once-per-address record)"
+        required: false
+        default: ""
+      deals:
+        description: "Open the issue with this week's deals (1 = yes)"
+        required: false
+        default: ""
 
 concurrency:
   group: weekly-digest
@@ -20,9 +29,14 @@ jobs:
       - name: Trigger digest send
         env:
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          ONLY: ${{ inputs.only }}
+          DEALS: ${{ inputs.deals }}
         run: |
           set -euo pipefail
+          query=""
+          if [ -n "${ONLY:-}" ]; then query="only=$(printf %s "$ONLY" | jq -sRr @uri)"; fi
+          if [ "${DEALS:-}" = "1" ]; then query="${query:+$query&}deals=1"; fi
           response=$(curl -fsS -X POST \
             -H "Authorization: Bearer ${CRON_SECRET}" \
-            "https://theubudian.life/api/cron/weekly-digest")
+            "https://theubudian.life/api/cron/weekly-digest${query:+?$query}")
           echo "Response: ${response}"

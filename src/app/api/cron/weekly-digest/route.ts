@@ -7,6 +7,8 @@ import { visibleListings } from "@/lib/events/listing-checks";
 import { digestRecipients, type DigestProfile, type DigestSubscriber } from "@/lib/email/digest-recipients";
 import { buildSpread } from "@/lib/quiz/build-spread";
 import { buildWeeklyDigestEmailHtml } from "@/lib/email/weekly-digest-email";
+import { pickWeeklyDeals } from "@/lib/email/weekly-deals";
+import { getLiveSpecials } from "@/lib/specials/queries";
 import { unsubscribeUrl } from "@/lib/email/unsubscribe";
 import { sendTransactionalEmail } from "@/lib/email";
 import { SITE_URL } from "@/lib/constants";
@@ -27,6 +29,9 @@ export const maxDuration = 60;
  * Idempotent per address per ISO week via transactional_sends.
  *
  * Test param: ?only=<email> restricts sends to that address.
+ * ?deals=1 opens the issue with this week's live deals (src/lib/email/weekly-deals.ts).
+ * It stays opt-in until Ben's yes on the first deals issue to the list; the
+ * scheduled workflow does not pass it yet.
  */
 export async function POST(request: Request) {
   const authHeader = request.headers.get("authorization");
@@ -36,6 +41,7 @@ export async function POST(request: Request) {
 
   const url = new URL(request.url);
   const only = url.searchParams.get("only")?.toLowerCase().trim() || null;
+  const includeDeals = url.searchParams.get("deals") === "1";
 
   const bali = nowInBali();
   const [y, m, d] = bali.dateStr.split("-").map(Number);
@@ -75,6 +81,8 @@ export async function POST(request: Request) {
     toStr
   );
 
+  const deals = includeDeals ? pickWeeklyDeals(await getLiveSpecials(), bali.dayOfWeek) : [];
+
   const recipients = digestRecipients(
     (profilesRes.data ?? []) as DigestProfile[],
     (subscribersRes.data ?? []) as DigestSubscriber[],
@@ -95,17 +103,21 @@ export async function POST(request: Request) {
       ? buildSpread(archetype, weekEvents, { eventLimit: 5 }).events
       : weekEvents.slice(0, 5);
 
-    if (picks.length === 0) {
+    if (picks.length === 0 && deals.length === 0) {
       skippedEmpty++;
       continue;
     }
 
+    // A test send (?only=) never touches the ledger, so it can be repeated and
+    // doesn't use up that reader's real issue for the week.
     const dedupeKey = `digest:${recipient.email}:${weekKey}`;
-    const { error: ledgerError } = await supabase.from("transactional_sends").insert({
-      kind: "digest",
-      email: recipient.email,
-      dedupe_key: dedupeKey,
-    });
+    const { error: ledgerError } = only
+      ? { error: null }
+      : await supabase.from("transactional_sends").insert({
+          kind: "digest",
+          email: recipient.email,
+          dedupe_key: dedupeKey,
+        });
     if (ledgerError) {
       if (ledgerError.code === "23505") skippedDuplicate++;
       else {
@@ -122,15 +134,17 @@ export async function POST(request: Request) {
       siteUrl: SITE_URL,
       unsubUrl,
       weekLabel,
+      deals,
     });
-    const ok = await sendTransactionalEmail(recipient.email, "This week in your Ubud", html, {
+    const subject = deals.length > 0 ? "This week in Ubud: deals and what's on" : "This week in your Ubud";
+    const ok = await sendTransactionalEmail(recipient.email, subject, html, {
       unsubUrl,
     });
     if (ok) {
       sent++;
     } else {
       failed++;
-      await supabase.from("transactional_sends").delete().eq("dedupe_key", dedupeKey);
+      if (!only) await supabase.from("transactional_sends").delete().eq("dedupe_key", dedupeKey);
     }
   }
 
@@ -140,6 +154,7 @@ export async function POST(request: Request) {
   return NextResponse.json({
     data: {
       week: weekKey,
+      deals: deals.length,
       recipients: recipients.length,
       sent,
       skipped_duplicate: skippedDuplicate,
