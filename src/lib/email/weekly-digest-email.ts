@@ -4,6 +4,15 @@ import { formatEventTime } from "@/lib/utils";
 import { buildDealsBlockHtml, buildPreheader } from "@/lib/email/weekly-deals";
 import type { ArchetypeId, Event, Special } from "@/types";
 
+/** One plain line on what an event is, so a title like "Contact Class with Sima" isn't a mystery. */
+export function eventBlurb(e: Pick<Event, "short_description" | "description">): string {
+  const text = (e.short_description || e.description || "").replace(/\s+/g, " ").trim();
+  if (!text) return "";
+  const firstSentence = text.match(/^.+?[.!?](?=\s|$)/)?.[0] ?? text;
+  const line = firstSentence.length <= 140 ? firstSentence : `${text.slice(0, 139).trimEnd()}…`;
+  return line;
+}
+
 /**
  * "This week in Ubud" — the weekly email. Personalised via the
  * reader's archetype when they have one; otherwise it leads with the week itself.
@@ -43,12 +52,17 @@ export function buildWeeklyDigestEmailHtml(opts: {
         .filter(Boolean)
         .join(" · ");
       const where = e.venue_name ? ` · ${esc(e.venue_name)}` : "";
+      const blurb = eventBlurb(e);
+      const blurbHtml = blurb
+        ? `
+    <p style="margin:6px 0 0;font-size:13px;line-height:1.5;color:${CHARCOAL};font-family:Georgia,serif;">${esc(blurb)}</p>`
+        : "";
       return `
   <tr><td style="padding:14px 32px;border-top:1px solid ${GOLD}22;">
     <a href="${siteUrl}/events/${e.slug}" style="text-decoration:none;">
       <p style="margin:0;font-size:17px;color:${GREEN};font-family:Georgia,serif;font-weight:500;">${esc(e.title)}</p>
     </a>
-    <p style="margin:4px 0 0;font-size:13px;color:${CHARCOAL}aa;font-family:Georgia,serif;">${esc(when)}${where}</p>
+    <p style="margin:4px 0 0;font-size:13px;color:${CHARCOAL}aa;font-family:Georgia,serif;">${esc(when)}${where}</p>${blurbHtml}
   </td></tr>`;
     })
     .join("");
