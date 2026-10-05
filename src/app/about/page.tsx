@@ -190,19 +190,18 @@ export default async function AboutPage() {
             Connect With Us
           </h2>
           <div className="mt-6 space-y-3">
+            {/* Instagram link removed 5 Oct: @theubudian isn't confirmed as ours. Restore only on Ben's word. */}
+            <p className="text-muted-foreground">
+              Have a tip, a deal we&apos;re missing, or just want to say hi? Tap the
+              feedback button at the bottom of any page and it reaches us directly.
+            </p>
             <p>
-              <a
-                href="https://instagram.com/theubudian"
-                target="_blank"
-                rel="noopener noreferrer"
+              <Link
+                href="/tonight/add"
                 className="text-primary underline underline-offset-4 transition-colors hover:text-primary/80"
               >
-                Follow us on Instagram
-              </a>
-            </p>
-            <p className="text-muted-foreground">
-              Have a tip, story idea, or just want to say hi? We&apos;d love to
-              hear from you.
+                Run a venue? Add your deal free
+              </Link>
             </p>
           </div>
         </div>
