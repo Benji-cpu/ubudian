@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { SpecialCard } from "@/components/specials/special-card";
+import { NewsletterSignup } from "@/components/layout/newsletter-signup";
 import { nowInBali } from "@/lib/events/bali-time";
 import { isOnNow, runsOn, specialsForToday, WEEKDAY_NAMES } from "@/lib/specials";
 import { getLiveSpecials } from "@/lib/specials/queries";
@@ -97,6 +98,16 @@ export default async function DealsPage() {
           </div>
         </section>
       )}
+
+      <section className="border-t border-brand-gold/20 px-4 py-12 text-center">
+        <div className="mx-auto max-w-xl">
+          <h2 className="font-serif text-2xl text-brand-deep-green dark:text-brand-gold">
+            Get the week&apos;s best deals every Wednesday
+          </h2>
+          <p className="mt-2 text-sm text-muted-foreground">One short email. Unsubscribe any time.</p>
+          <NewsletterSignup source="deals" className="mx-auto mt-6 max-w-md" />
+        </div>
+      </section>
 
       <section className="bg-brand-pale-green px-4 py-14 text-center">
         <div className="mx-auto max-w-xl">
