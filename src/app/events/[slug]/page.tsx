@@ -9,6 +9,7 @@ import { AddToCalendarButton } from "@/components/events/add-to-calendar-button"
 import { EventCard } from "@/components/events/event-card";
 import { EventHero } from "@/components/events/event-hero";
 import { rolledForward } from "@/lib/events/buckets";
+import { nowInBali } from "@/lib/events/bali-time";
 import { EventMap } from "@/components/events/event-map";
 import Link from "next/link";
 import { HowToGetIn } from "@/components/events/how-to-get-in";
@@ -71,6 +72,16 @@ export async function generateMetadata({ params }: EventPageProps): Promise<Meta
   }
 }
 
+/**
+ * rolledForward moves recurring rows to their next date but passes one-offs
+ * through as they are, so a one-off that ended yesterday still needs dropping
+ * (the nightly archive sweep catches it, but only overnight).
+ */
+function notOver(events: Event[]): Event[] {
+  const today = nowInBali().dateStr;
+  return events.filter((e) => (e.end_date && e.end_date > e.start_date ? e.end_date : e.start_date) >= today);
+}
+
 export default async function EventPage({ params }: EventPageProps) {
   let e: Event;
   let related: Event[] = [];
@@ -127,9 +138,9 @@ export default async function EventPage({ params }: EventPageProps) {
           .in("id", ids)
           .eq("status", "approved");
         const order = new Map(ids.map((id, i) => [id, i] as const));
-        // Roll recurring rows to their next date and drop past one-offs; the
+        // Roll recurring rows to their next date, then drop past one-offs; the
         // embedding match knows nothing about time ("Sep 4" showed in October).
-        related = rolledForward(visibleListings((rel ?? []) as Event[]))
+        related = notOver(rolledForward(visibleListings((rel ?? []) as Event[])))
           .sort((a, b) => (order.get(a.id) ?? 99) - (order.get(b.id) ?? 99))
           .slice(0, 4);
         related.forEach((r) => delete (r as unknown as Record<string, unknown>).embedding);
@@ -149,7 +160,7 @@ export default async function EventPage({ params }: EventPageProps) {
         .order("start_date", { ascending: true })
         .limit(8);
       if (relatedError) console.error("Related events query error:", relatedError);
-      related = rolledForward(visibleListings((relatedEvents ?? []) as Event[])).slice(0, 4);
+      related = notOver(rolledForward(visibleListings((relatedEvents ?? []) as Event[]))).slice(0, 4);
       related.forEach((r) => delete (r as unknown as Record<string, unknown>).embedding);
     }
   } catch {
