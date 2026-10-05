@@ -1,5 +1,5 @@
 -- The Ubudian — public schema snapshot.
--- Generated 2026-09-15 by scripts/dump-schema.ts from the live database.
+-- Generated 2026-10-05 by scripts/dump-schema.ts from the live database.
 -- Reference only: supabase/migrations/ is the source of truth. Do not hand-edit; regenerate.
 
 CREATE TABLE blog_posts (
@@ -41,42 +41,6 @@ CREATE TABLE bookings (
   booking_reference text NOT NULL,
   created_at timestamp with time zone DEFAULT now(),
   updated_at timestamp with time zone DEFAULT now(),
-  PRIMARY KEY (id)
-);
-
-CREATE TABLE commission_partners (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
-  handle text NOT NULL,
-  display_name text NOT NULL,
-  contact_email text NOT NULL,
-  contact_phone text,
-  commission_pct numeric NOT NULL DEFAULT 30.00,
-  profile_id uuid,
-  bio text,
-  avatar_url text,
-  notes text,
-  is_active boolean NOT NULL DEFAULT true,
-  created_at timestamp with time zone NOT NULL DEFAULT now(),
-  updated_at timestamp with time zone NOT NULL DEFAULT now(),
-  PRIMARY KEY (id)
-);
-
-CREATE TABLE commission_payouts (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
-  partner_id uuid NOT NULL,
-  period_start date NOT NULL,
-  period_end date NOT NULL,
-  signups_count integer NOT NULL DEFAULT 0,
-  gross_cents integer NOT NULL DEFAULT 0,
-  amount_cents integer NOT NULL,
-  status text NOT NULL DEFAULT 'pending'::text,
-  paid_at timestamp with time zone,
-  payment_method text,
-  payment_reference text,
-  notes text,
-  created_by uuid,
-  created_at timestamp with time zone NOT NULL DEFAULT now(),
-  updated_at timestamp with time zone NOT NULL DEFAULT now(),
   PRIMARY KEY (id)
 );
 
@@ -577,6 +541,35 @@ CREATE TABLE site_settings (
   PRIMARY KEY (id)
 );
 
+CREATE TABLE specials (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  venue_name text NOT NULL,
+  venue_area text,
+  venue_address text,
+  google_maps_url text,
+  instagram_handle text,
+  website_url text,
+  place_id uuid,
+  title text NOT NULL,
+  description text,
+  price_idr integer,
+  weekdays int2[] NOT NULL DEFAULT '{}'::smallint[],
+  start_time time without time zone,
+  end_time time without time zone,
+  status text NOT NULL DEFAULT 'live'::text,
+  source text NOT NULL,
+  source_url text,
+  confirmed_at timestamp with time zone NOT NULL DEFAULT now(),
+  expires_on date NOT NULL DEFAULT (((now() AT TIME ZONE 'Asia/Makassar'::text))::date + 30),
+  contact_name text,
+  contact_phone text,
+  contact_email text,
+  not_honoured_count integer NOT NULL DEFAULT 0,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  PRIMARY KEY (id)
+);
+
 CREATE TABLE sponsor_leads (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   business_name text NOT NULL,
@@ -768,14 +761,11 @@ CREATE TABLE venue_coordinates (
   PRIMARY KEY (id)
 );
 
--- RLS policies (86); bodies live in the migrations.
+-- RLS policies (84); bodies live in the migrations.
 --   blog_posts: Admins can manage blog posts [ALL] {public}
 --   blog_posts: Published blog posts are viewable by everyone [SELECT] {public}
 --   bookings: Admins can manage bookings [ALL] {public}
 --   bookings: Users can read own bookings [SELECT] {authenticated}
---   commission_partners: Admins manage commission partners [ALL] {public}
---   commission_partners: Public can read active commission partners [SELECT] {public}
---   commission_payouts: Admins manage commission payouts [ALL] {public}
 --   dedup_matches: Admins can manage dedup matches [ALL] {public}
 --   event_sources: Admins can manage event sources [ALL] {public}
 --   events: Admins can manage events [ALL] {public}
@@ -833,6 +823,7 @@ CREATE TABLE venue_coordinates (
 --   saved_spreads: Users read own spreads [SELECT] {authenticated}
 --   site_settings: site_settings admin update [UPDATE] {public}
 --   site_settings: site_settings public read [SELECT] {public}
+--   specials: specials_admin_all [ALL] {public}
 --   sponsor_leads: Admins manage sponsor leads [ALL] {public}
 --   sponsors: Admins can manage sponsors [ALL] {public}
 --   sponsors: Anyone can view active sponsors [SELECT] {public}

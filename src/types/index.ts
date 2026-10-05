@@ -710,3 +710,24 @@ export interface PipelineHealthLog {
   metadata: Record<string, unknown>;
   created_at: string;
 }
+
+// Restaurant specials ("Tonight in Ubud"). Contact columns are private and
+// never selected for public pages — see PUBLIC_SPECIAL_COLUMNS.
+export interface Special {
+  id: string;
+  venue_name: string;
+  venue_area: string | null;
+  venue_address: string | null;
+  google_maps_url: string | null;
+  instagram_handle: string | null;
+  website_url: string | null;
+  title: string;
+  description: string | null;
+  price_idr: number | null;
+  /** 0 = Sunday … 6 = Saturday. Empty = every day. */
+  weekdays: number[];
+  start_time: string | null;
+  end_time: string | null;
+  expires_on: string;
+  confirmed_at: string;
+}

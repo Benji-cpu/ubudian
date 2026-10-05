@@ -39,6 +39,12 @@ export async function Header() {
         {/* Desktop Nav */}
         <nav className="hidden items-center gap-6 md:flex">
           <Link
+            href="/tonight"
+            className="text-xs font-semibold uppercase tracking-widest text-brand-gold transition-colors duration-300 hover:text-brand-off-white"
+          >
+            Tonight
+          </Link>
+          <Link
             href="/quiz"
             className="text-xs font-semibold uppercase tracking-widest text-brand-off-white transition-colors duration-300 hover:text-brand-gold"
           >

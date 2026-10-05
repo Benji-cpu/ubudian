@@ -5,6 +5,7 @@ export const SITE_URL =
   (process.env.NEXT_PUBLIC_SITE_URL?.trim()) || "http://localhost:4000";
 
 export const NAV_LINKS = [
+  { label: "Tonight", href: "/tonight" },
   { label: "Quiz", href: "/quiz" },
   { label: "Guides", href: "/guides" },
   { label: "Events", href: "/events" },

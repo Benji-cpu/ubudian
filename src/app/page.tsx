@@ -84,7 +84,7 @@ export default async function HomePage() {
                 size="lg"
                 className="bg-brand-gold text-[#2C4A3E] hover:bg-brand-gold/90 dark:bg-brand-gold dark:text-[#2C4A3E] dark:hover:bg-brand-gold/90"
               >
-                <Link href="/events">
+                <Link href="/tonight">
                   See what&apos;s on tonight &rarr;
                 </Link>
               </Button>
