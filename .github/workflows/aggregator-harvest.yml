@@ -74,3 +74,15 @@ jobs:
         run: |
           node scripts/scrape/pyramids-harvest.mjs --out /tmp/pyramids.json
           bash /tmp/post_chunks.sh /tmp/pyramids.json
+
+      # Copy hot-linked covers into our own storage so cards never go blank when a
+      # source blocks hot-linking. ~45s per call; stop once nothing is left.
+      - name: Persist event images
+        continue-on-error: true
+        run: |
+          for i in 1 2 3 4 5 6; do
+            RESP=$(curl -fsS --max-time 70 -X POST -H "Authorization: Bearer $CRON_SECRET" \
+              https://theubudian.life/api/cron/persist-event-images || echo '{}')
+            echo "$RESP"
+            [ "$(echo "$RESP" | jq -r '.data.persisted // 0')" -eq 0 ] && break
+          done
