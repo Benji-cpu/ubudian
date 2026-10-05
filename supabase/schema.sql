@@ -829,14 +829,16 @@ CREATE TABLE venue_coordinates (
   PRIMARY KEY (id)
 );
 
--- RLS policies (86); bodies live in the migrations.
+-- RLS policies (89); bodies live in the migrations.
 --   blog_posts: Admins can manage blog posts [ALL] {public}
 --   blog_posts: Published blog posts are viewable by everyone [SELECT] {public}
 --   bookings: Admins can manage bookings [ALL] {public}
 --   bookings: Users can read own bookings [SELECT] {authenticated}
+--   curation_reports: admins manage curation_reports [ALL] {public}
 --   deal_venues: deal_venues_admin_all [ALL] {public}
 --   dedup_matches: Admins can manage dedup matches [ALL] {public}
---   event_picks: picks are public [SELECT] {public}
+--   event_picks: admins manage event_picks [ALL] {public}
+--   event_signals: admins manage event_signals [ALL] {public}
 --   event_sources: Admins can manage event sources [ALL] {public}
 --   events: Admins can manage events [ALL] {public}
 --   events: Approved events are viewable by everyone [SELECT] {public}
@@ -893,6 +895,7 @@ CREATE TABLE venue_coordinates (
 --   saved_spreads: Users read own spreads [SELECT] {authenticated}
 --   site_settings: site_settings admin update [UPDATE] {public}
 --   site_settings: site_settings public read [SELECT] {public}
+--   source_suggestions: admins manage source_suggestions [ALL] {public}
 --   specials: specials_admin_all [ALL] {public}
 --   sponsor_leads: Admins manage sponsor leads [ALL] {public}
 --   sponsors: Admins can manage sponsors [ALL] {public}

@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { HUBS } from "@/lib/hubs";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { queryWithRetry } from "@/lib/supabase/retry";
 import { getCurrentProfile } from "@/lib/auth";
 import { ARCHETYPES } from "@/lib/quiz-data";
@@ -80,7 +81,8 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
   try {
     const supabase = await createClient();
     const profile = await getCurrentProfile();
-    weekPicks = await getWeekPicks(supabase).catch(() => []);
+    // event_picks is admin-only under RLS; picks are public content, read server-side.
+    weekPicks = await getWeekPicks(createAdminClient()).catch(() => []);
     if (profile) {
       currentProfileId = profile.id;
 
