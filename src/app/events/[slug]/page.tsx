@@ -15,6 +15,9 @@ import { HowToGetIn } from "@/components/events/how-to-get-in";
 import { NewsletterSignup } from "@/components/layout/newsletter-signup";
 import { FacilitatorCard } from "@/components/events/facilitator-card";
 import { SaveEventButton } from "@/components/dashboard/save-event-button";
+import { InterestButton } from "@/components/events/interest-button";
+import { OutboundClickBeacon } from "@/components/events/outbound-click-beacon";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { Button } from "@/components/ui/button";
 import { MapPin, ExternalLink, User } from "lucide-react";
 import { isSafeUrl } from "@/lib/url-validation";
@@ -155,6 +158,22 @@ export default async function EventPage({ params }: EventPageProps) {
 
   const eventUrl = `${SITE_URL}/events/${e.slug}`;
 
+  // Reader interest is anonymous and not public at the row level; count it here.
+  let interestCount = 0;
+  try {
+    const { count } = await createAdminClient()
+      .from("event_signals")
+      .select("id", { count: "exact", head: true })
+      .eq("event_id", e.id)
+      .eq("kind", "interest");
+    interestCount = count ?? 0;
+  } catch {}
+  const trackedHrefs = [
+    e.external_ticket_url,
+    e.source_url,
+    e.organizer_instagram ? `https://instagram.com/${e.organizer_instagram.replace(/^@/, "")}` : null,
+  ].filter((h): h is string => !!h);
+
   // Roll recurring events forward to their next occurrence so the hero
   // matches what the agenda card showed when the user clicked through.
   // Without this the detail page renders the seed date (e.g. April 26)
@@ -198,6 +217,8 @@ export default async function EventPage({ params }: EventPageProps) {
 
         {/* How to get in — tickets, the organiser, or the door */}
         <HowToGetIn event={e} />
+        <InterestButton eventId={e.id} initialCount={interestCount} />
+        <OutboundClickBeacon eventId={e.id} hrefs={trackedHrefs} />
         <p className="mx-auto mt-3 max-w-3xl px-4 text-sm text-muted-foreground sm:px-6">
           Making a night of it?{" "}
           <Link href="/deals" className="font-medium text-brand-deep-green underline underline-offset-4">

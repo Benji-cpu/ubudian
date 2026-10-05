@@ -23,6 +23,9 @@ import { stripEmbeddings } from "@/lib/events/strip-embedding";
 import { visibleListings } from "@/lib/events/listing-checks";
 import { FestivalBanner } from "@/components/events/festival-banner";
 import { MoreHappenings } from "@/components/events/more-happenings";
+import { WeekPicks } from "@/components/events/week-picks";
+import { SuggestSource } from "@/components/events/suggest-source";
+import { getWeekPicks, type WeekPick } from "@/lib/events/picks";
 import type { ArchetypeId, Event, QuizResultRecord } from "@/types";
 
 const VIEWS_USING_OWN_VIEWPORT = new Set(["calendar", "week"]);
@@ -72,10 +75,12 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
   let viewerArchetypes: ArchetypeId[] | null = null;
   let archetypeLabel: string | null = null;
   let tasteSimByEventId: Map<string, number> | undefined;
+  let weekPicks: WeekPick[] = [];
 
   try {
     const supabase = await createClient();
     const profile = await getCurrentProfile();
+    weekPicks = await getWeekPicks(supabase).catch(() => []);
     if (profile) {
       currentProfileId = profile.id;
 
@@ -276,6 +281,12 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
         </Link>
       </p>
 
+      {/* Picks only on the plain agenda: a filtered or calendar view is the
+          reader asking for something specific. */}
+      {!useOwnViewport && !isMapView && Object.keys(params).every((k) => k === "view") && (
+        <WeekPicks picks={weekPicks} />
+      )}
+
       {spotlight && (
         <div className="mt-2">
           <FestivalBanner
@@ -381,6 +392,8 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
           </>
         )}
       </section>
+
+      <SuggestSource />
 
       {/* SEO hub cross-links — evergreen practice pages */}
       <section className="mx-auto max-w-7xl px-4 pb-12 sm:px-6 lg:px-8">

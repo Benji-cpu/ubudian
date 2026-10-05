@@ -25,6 +25,7 @@ import { garbageCollectArchivedEventImages, type ImageGcResult } from "@/lib/mai
 import { ensureTelegramWebhook, type TelegramWebhookHealth } from "@/lib/maintenance/telegram-webhook-health";
 import { buildReviewQueue } from "@/lib/maintenance/review-queue";
 import { autoApprovePending, type AutoApproveResult } from "@/lib/maintenance/auto-approve";
+import { eventsDeskHealth } from "@/lib/events-bus/health";
 import { autoResolveDedupMatches, type DedupAutoResolveResult } from "@/lib/maintenance/dedup-autoresolve";
 import {
   archiveEndedRecurringEvents,
@@ -212,6 +213,11 @@ export async function GET(request: Request) {
         return null;
       });
 
+  const eventsDesk = await eventsDeskHealth().catch((err) => {
+    errors.push(`eventsDeskHealth: ${err?.message ?? String(err)}`);
+    return null;
+  });
+
   const payload = {
     startedAt,
     finishedAt: new Date().toISOString(),
@@ -240,6 +246,7 @@ export async function GET(request: Request) {
     },
     specialsReconfirm,
     dealsReview,
+    eventsDesk,
     telegramWebhook,
     linkHealth,
     review,

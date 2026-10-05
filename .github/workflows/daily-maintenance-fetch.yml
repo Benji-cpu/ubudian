@@ -66,8 +66,37 @@ jobs:
           # is the fail-safe direction.
           STALE=$(jq -r 'if .liveness.stale == null then "true" else (.liveness.stale | tostring) end' "digests/${TODAY}.json")
           UNMOD=$(jq -r '.autoApprove.moderationFailedOpen // 0' "digests/${TODAY}.json")
-          if [ "$STALE" != "true" ] && [ "$UNMOD" = "0" ]; then echo "live and moderated — no row"; exit 0; fi
+          # The events desk (Instagram + venue pages, routine in the private bus
+          # repo Benji-cpu/ubudian-events-bus). A missing block is not an alarm:
+          # the route failed to compute it and says so in .errors.
+          DESK_STALE=$(jq -r '.eventsDesk.stale // false | tostring' "digests/${TODAY}.json")
+          APIFY_LOW=$(jq -r '.eventsDesk.apifyLow // false | tostring' "digests/${TODAY}.json")
+          if [ "$STALE" != "true" ] && [ "$UNMOD" = "0" ] && [ "$DESK_STALE" != "true" ] && [ "$APIFY_LOW" != "true" ]; then echo "live and moderated — no row"; exit 0; fi
           LINE=$(jq -r '.liveness.line // "liveness block missing"' "digests/${TODAY}.json")
+          if [ "$STALE" != "true" ] && [ "$UNMOD" = "0" ]; then
+            LINE=$(jq -r '.eventsDesk.line' "digests/${TODAY}.json")
+            if [ "$DESK_STALE" = "true" ]; then
+              TITLE="Ubudian: the events desk routine hasn't run for 2 days"
+              IMPACT="No new Instagram or venue-page events, and no weekly picks, until it runs again."
+              KEY="ubudian-events-desk-stale"
+            else
+              TITLE="Ubudian: Apify credit is nearly used up this month"
+              IMPACT="The Instagram fetch stops when the \$5 monthly credit runs out; venue pages and harvesters carry on."
+              KEY="ubudian-apify-low"
+            fi
+            jq -n --arg t "$TITLE" --arg i "$IMPACT" --arg k "$KEY" --arg line "$LINE" --arg d "$TODAY" '{
+              title: $t, app: "ubudian", priority: "soon", impact: $i, dedupeKey: $k, source: "daily-maintenance-fetch",
+              notes: ("Payload " + $d + ": " + $line),
+              steps: [
+                {text: "Check the routine runs", url: "https://claude.ai/code/scheduled"},
+                {text: "Check the bus fetch and apply runs", url: "https://github.com/Benji-cpu/ubudian-events-bus/actions"}
+              ],
+              links: [{label: "Curation", url: "https://theubudian.life/admin/curation"}]
+            }' > /tmp/handover.json
+            curl -fsS -X POST -H "Authorization: Bearer $CRM_HANDOVER_SECRET" -H "Content-Type: application/json" \
+              --data @/tmp/handover.json "$CRM_HANDOVER_URL" || echo "CRM handover failed (non-fatal)"
+            exit 0
+          fi
           if [ "$STALE" = "true" ]; then
             TITLE="Ubudian: nothing published for 48h — the agenda is going stale"
             PRIORITY="blocking"

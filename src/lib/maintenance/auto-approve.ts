@@ -90,7 +90,16 @@ export interface PendingEventRow {
   external_ticket_url?: string | null;
   organizer_contact?: string | null;
   organizer_instagram?: string | null;
+  moderation_reason?: string | null;
 }
+
+/**
+ * Stamped by `/api/cron/events-bus/ingest` on events the events-desk routine
+ * parsed and judged itself (Claude, applying the same editorial rules). The gate
+ * treats it as the moderation verdict and spends no Gemini call on the row.
+ * The structural screen and the duplicate checks still run.
+ */
+export const ROUTINE_VERDICT_OK = "routine_ok";
 
 export type ScreenResult = { ok: true } | { ok: false; reason: string };
 
@@ -252,6 +261,11 @@ export interface AutoApproveOptions {
   maxElapsedMs?: number;
   /** Parallel moderation calls. Gemini flash-lite tolerates this comfortably. */
   moderationConcurrency?: number;
+  /**
+   * Only consider these pending ids (the events-bus ingest publishes the
+   * routine's events straight after inserting them, through this same gate).
+   */
+  onlyIds?: string[];
 }
 
 /**
@@ -311,12 +325,17 @@ export async function autoApprovePending(
   const supabase = createAdminClient();
   const today = nowInBali().dateStr;
 
-  const { data, error } = await supabase
+  let pendingQuery = supabase
     .from("events")
     .select(
-      "id, title, description, short_description, category, venue_name, start_date, end_date, start_time, is_recurring, recurrence_rule, content_flags, quality_score, organizer_name, source_url, external_ticket_url, organizer_contact, organizer_instagram",
+      "id, title, description, short_description, category, venue_name, start_date, end_date, start_time, is_recurring, recurrence_rule, content_flags, quality_score, organizer_name, source_url, external_ticket_url, organizer_contact, organizer_instagram, moderation_reason",
     )
-    .eq("status", "pending")
+    .eq("status", "pending");
+  if (options.onlyIds) {
+    if (options.onlyIds.length === 0) return result;
+    pendingQuery = pendingQuery.in("id", options.onlyIds);
+  }
+  const { data, error } = await pendingQuery
     .or(`start_date.gte.${today},end_date.gte.${today},is_recurring.eq.true`)
     // One-offs first, then by date. `start_date` alone is the wrong order: a
     // recurring event's start_date is its *seed*, often months old, so sorting
@@ -437,6 +456,9 @@ export async function autoApprovePending(
   // call means "hold", below.
   const verdicts = await mapWithConcurrency(shortlist, moderationConcurrency, async (event) => {
     if (Date.now() - startedAt > maxElapsedMs) return null;
+    if (event.moderation_reason === ROUTINE_VERDICT_OK) {
+      return { ok: true as const, notes: ROUTINE_VERDICT_OK };
+    }
     return moderateEvent({
       title: event.title,
       description: event.description || event.short_description || event.title,
@@ -494,7 +516,7 @@ export async function autoApprovePending(
           status: "approved",
           auto_approved_at: now,
           ai_approved_at: now,
-          moderation_reason: "auto_gate",
+          moderation_reason: event.moderation_reason === ROUTINE_VERDICT_OK ? "auto_gate:routine" : "auto_gate",
         })
         .eq("id", event.id)
         // Re-assert the precondition so a concurrent admin decision wins.
