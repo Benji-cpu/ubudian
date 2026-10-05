@@ -6,6 +6,8 @@ import { applyReconfirm } from "@/lib/specials/reconfirm";
 const schema = z.object({
   token: z.string().uuid(),
   stopped: z.array(z.string().uuid()).max(50).default([]),
+  // Days picked for deals whose source gave none: { [specialId]: [0..6] }.
+  days: z.record(z.string().uuid(), z.array(z.number().int().min(0).max(6)).max(7)).default({}),
 });
 
 /** A venue taps "still running" on its private link. The token is the only credential. */
@@ -23,7 +25,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const result = await applyReconfirm(body.token, body.stopped);
+    const result = await applyReconfirm(body.token, body.stopped, body.days);
     if (!result) return NextResponse.json({ data: null, error: "This link isn't valid any more." }, { status: 404 });
     return NextResponse.json({ data: result, error: null });
   } catch (err) {

@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 vi.mock("@/lib/supabase/admin", () => ({ createAdminClient: () => ({}) }));
 vi.mock("@/lib/email", () => ({ sendTransactionalEmail: vi.fn() }));
-import { isDueForReconfirm, groupForReconfirm, type ReconfirmRow } from "@/lib/specials/reconfirm";
+import { isDueForReconfirm, groupForReconfirm, daysUpdates, type ReconfirmRow } from "@/lib/specials/reconfirm";
 import { buildSpecialReconfirmEmailHtml } from "@/lib/email/special-reconfirm-email";
 
 const today = "2026-10-05";
@@ -55,5 +55,22 @@ describe("reconfirm rules", () => {
     expect(html).not.toContain("<script>");
     expect(html).toContain("&lt;b&gt;Bar&lt;/b&gt;");
     expect(html).toContain("https://theubudian.life/tonight/confirm/x");
+  });
+
+  it("lets a venue date only its own kept deals that had no days", () => {
+    const specials = [
+      { id: "u1", days_stated: false },
+      { id: "u2", days_stated: false },
+      { id: "s1", days_stated: true },
+    ];
+    const updates = daysUpdates(specials, ["u1", "s1"], {
+      u1: [5, 1, 1, 9],
+      u2: [3],
+      s1: [2],
+      other: [4],
+    });
+    // u2 was taken down, s1 already had days, "other" isn't this venue's; 9 isn't a day.
+    expect(updates).toEqual([{ id: "u1", weekdays: [1, 5] }]);
+    expect(daysUpdates(specials, ["u1"], { u1: [] })).toEqual([]);
   });
 });

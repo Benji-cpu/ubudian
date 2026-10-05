@@ -24,7 +24,15 @@ describe("POST /api/specials/reconfirm", () => {
     mockApply.mockResolvedValue({ confirmed: 2, stopped: 0 });
     const res = await POST(req({ token }));
     expect(res.status).toBe(200);
-    expect(mockApply).toHaveBeenCalledWith(token, []);
+    expect(mockApply).toHaveBeenCalledWith(token, [], {});
+  });
+
+  it("passes the days a venue picked, and rejects a day that isn't one", async () => {
+    mockApply.mockResolvedValue({ confirmed: 1, stopped: 0, dated: 1 });
+    const id = "11111111-1111-4111-8111-111111111111";
+    expect((await POST(req({ token, days: { [id]: [1, 5] } }))).status).toBe(200);
+    expect(mockApply).toHaveBeenCalledWith(token, [], { [id]: [1, 5] });
+    expect((await POST(req({ token, days: { [id]: [7] } }))).status).toBe(400);
   });
 
   it("404s an unknown token", async () => {

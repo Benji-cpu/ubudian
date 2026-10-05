@@ -119,10 +119,35 @@ export async function getVenueByToken(token: string): Promise<VenueSpecials | nu
   return { venueName, specials: (data ?? []) as Special[] };
 }
 
-export type ApplyResult = { confirmed: number; stopped: number };
+export type ApplyResult = { confirmed: number; stopped: number; dated: number };
 
-/** Keep every special at the venue for another 30 days, except the stopped ones, which are hidden. */
-export async function applyReconfirm(token: string, stoppedIds: string[]): Promise<ApplyResult | null> {
+/**
+ * Days a venue picked for deals whose source gave none. Only kept deals at this
+ * venue that are still "days not stated" can be dated this way; anything else
+ * (a stated deal, another venue's id, an empty or bad pick) is ignored.
+ */
+export function daysUpdates(
+  specials: Pick<Special, "id" | "days_stated">[],
+  keepIds: string[],
+  days: Record<string, number[]> = {}
+): { id: string; weekdays: number[] }[] {
+  const undated = new Set(specials.filter((s) => s.days_stated === false).map((s) => s.id));
+  const kept = new Set(keepIds);
+  return Object.entries(days)
+    .filter(([id]) => undated.has(id) && kept.has(id))
+    .map(([id, picked]) => ({ id, weekdays: [...new Set(picked)].filter((d) => Number.isInteger(d) && d >= 0 && d <= 6).sort((a, b) => a - b) }))
+    .filter((u) => u.weekdays.length > 0);
+}
+
+/**
+ * Keep every special at the venue for another 30 days, except the stopped ones,
+ * which are hidden. Days picked for "days not stated" deals are saved as stated.
+ */
+export async function applyReconfirm(
+  token: string,
+  stoppedIds: string[],
+  days: Record<string, number[]> = {}
+): Promise<ApplyResult | null> {
   const venue = await getVenueByToken(token);
   if (!venue) return null;
   const ids = new Set(venue.specials.map((s) => s.id));
@@ -149,5 +174,13 @@ export async function applyReconfirm(token: string, stoppedIds: string[]): Promi
       .in("id", stopped);
     if (error) throw new Error(`specials stop: ${error.message}`);
   }
-  return { confirmed: keep.length, stopped: stopped.length };
+  const dated = daysUpdates(venue.specials, keep, days);
+  for (const u of dated) {
+    const { error } = await supabase
+      .from("specials")
+      .update({ weekdays: u.weekdays, days_stated: true, updated_at: new Date().toISOString() })
+      .eq("id", u.id);
+    if (error) throw new Error(`specials days: ${error.message}`);
+  }
+  return { confirmed: keep.length, stopped: stopped.length, dated: dated.length };
 }

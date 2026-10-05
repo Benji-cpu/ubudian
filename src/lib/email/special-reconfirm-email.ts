@@ -21,7 +21,7 @@ export function buildSpecialReconfirmEmailHtml(opts: {
 <tr><td align="center">
 <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#ffffff;border-radius:8px;overflow:hidden;">
   <tr><td style="padding:32px;">
-    <p style="margin:0;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:${GOLD};font-family:Georgia,serif;">Tonight in Ubud</p>
+    <p style="margin:0;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:${GOLD};font-family:Georgia,serif;">Ubud deals</p>
     <h1 style="margin:8px 0 0;font-size:24px;line-height:1.3;color:${GREEN};font-family:Georgia,serif;font-weight:500;">Still running at ${esc(venueName)}?</h1>
     <p style="margin:14px 0 0;font-size:15px;line-height:1.6;color:${CHARCOAL};font-family:Georgia,serif;">Your listing on The Ubudian comes off on ${esc(fmtEmailDate(expiresOn))} unless you tell us it's still on:</p>
     <ul style="margin:10px 0 0;padding-left:20px;font-size:15px;color:${CHARCOAL};font-family:Georgia,serif;">${list}</ul>
@@ -32,7 +32,7 @@ export function buildSpecialReconfirmEmailHtml(opts: {
     </tr></table>
     <p style="margin:18px 0 0;font-size:13px;line-height:1.6;color:${CHARCOAL}99;font-family:Georgia,serif;">One tap keeps it up for another month. If something has stopped, you can say so on the same page. Listing stays free.</p>
   </td></tr>
-  <tr><td style="padding:18px 32px;border-top:1px solid ${CREAM};font-size:11px;color:${CHARCOAL}88;font-family:Georgia,serif;">You're getting this because you listed a deal on theubudian.life.</td></tr>
+  <tr><td style="padding:18px 32px;border-top:1px solid ${CREAM};font-size:11px;color:${CHARCOAL}88;font-family:Georgia,serif;">You're getting this because your deal is listed on theubudian.life.</td></tr>
 </table>
 </td></tr>
 </table>
