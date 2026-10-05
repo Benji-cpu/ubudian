@@ -188,10 +188,10 @@ export function buildDealsBlockHtml(deals: Special[], siteUrl: string): string {
     })
     .join("");
 
-  // Said once for every deal, rather than per row: Bali menu prices often add tax and service ("++").
+  // Said once for every deal, rather than per row: Bali menu prices often add tax and service .
   const priceNote = `
   <tr><td style="padding:6px 32px 0;">
-    <p style="margin:0;font-size:12px;color:${CHARCOAL}88;font-family:Georgia,serif;">Restaurant prices in Bali often add tax and service (shown as ++).</p>
+    <p style="margin:0;font-size:12px;color:${CHARCOAL}88;font-family:Georgia,serif;">Restaurant prices in Bali often add tax and service on top.</p>
   </td></tr>`;
 
   return `
