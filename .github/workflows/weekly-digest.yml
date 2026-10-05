@@ -30,7 +30,7 @@ jobs:
         env:
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
           ONLY: ${{ inputs.only }}
-          DEALS: ${{ inputs.deals }}
+          DEALS: ${{ inputs.deals || '1' }}
         run: |
           set -euo pipefail
           query=""
