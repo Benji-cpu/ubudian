@@ -36,6 +36,7 @@ import {
 import { checkLiveness, type Liveness } from "@/lib/maintenance/liveness";
 import { nowInBali } from "@/lib/events/bali-time";
 import { sendDueReconfirms, type ReconfirmRunResult } from "@/lib/specials/reconfirm";
+import { expireStalePending } from "@/lib/venue/review";
 
 // The gate makes up to AUTO_APPROVE_MAX_PER_RUN Gemini calls on top of the
 // link-health sweep, so this route needs more than the platform default.
@@ -202,6 +203,15 @@ export async function GET(request: Request) {
     return { due: 0, venues: 0, sent: 0, failed: 0 };
   });
 
+  // Venue submissions: nothing waits forever, and the payload shows the queue's age
+  // so a stalled daily review is visible (the routine is the publisher).
+  const dealsReview = dryRun
+    ? null
+    : await expireStalePending().catch((err) => {
+        errors.push(`expireStalePending: ${err?.message ?? String(err)}`);
+        return null;
+      });
+
   const payload = {
     startedAt,
     finishedAt: new Date().toISOString(),
@@ -229,6 +239,7 @@ export async function GET(request: Request) {
       clearedStaleCtas: staleSweep.clearedCtas,
     },
     specialsReconfirm,
+    dealsReview,
     telegramWebhook,
     linkHealth,
     review,

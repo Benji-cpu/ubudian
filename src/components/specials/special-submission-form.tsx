@@ -81,14 +81,15 @@ export function SpecialSubmissionForm() {
     return (
       <div className="rounded-xl border border-brand-gold/20 bg-card p-8 text-center">
         <CheckCircle2 className="mx-auto h-10 w-10 text-brand-deep-green dark:text-brand-gold" />
-        <h2 className="mt-4 font-serif text-2xl text-brand-deep-green dark:text-brand-gold">Your deal is live</h2>
+        <h2 className="mt-4 font-serif text-2xl text-brand-deep-green dark:text-brand-gold">Thanks, we&apos;ve got it</h2>
         <p className="mt-2 text-muted-foreground">
-          It shows on Ubud deals on the days it runs. We&apos;ll check with you in a month to keep it
-          listed.
+          Updates go live within 24 hours. Once it&apos;s up, it shows on Ubud deals on the days it runs,
+          and we&apos;ll check with you each month to keep it listed. Want to edit it later?{" "}
+          <Link href="/venue" className="underline underline-offset-4">Sign in to My venue</Link>.
         </p>
         <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
           <Button asChild>
-            <Link href="/deals">See it on Ubud deals</Link>
+            <Link href="/deals">See Ubud deals</Link>
           </Button>
           <Button variant="outline" onClick={() => { form.reset(); setStatus("idle"); }}>
             Add another deal

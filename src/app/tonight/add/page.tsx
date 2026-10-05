@@ -27,7 +27,7 @@ export default function AddSpecialPage() {
         <div className="mb-8 rounded-md border bg-muted/50 p-4 text-sm text-muted-foreground">
           <ul className="list-disc space-y-1 pl-5">
             <li>One deal per form: a 2-for-1, a set lunch, a happy hour, a weekly night. Add as many as you run.</li>
-            <li>It goes live as soon as you send it. Free, now and later.</li>
+            <li>Updates go live within 24 hours, once our daily check has read it. Free, now and later.</li>
             <li>Once a month we message you to check it&apos;s still running. If we don&apos;t hear back, it comes off.</li>
           </ul>
         </div>

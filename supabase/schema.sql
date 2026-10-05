@@ -44,6 +44,26 @@ CREATE TABLE bookings (
   PRIMARY KEY (id)
 );
 
+CREATE TABLE deal_venues (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  name text NOT NULL,
+  area text,
+  address text,
+  website_url text,
+  instagram_handle text,
+  google_maps_url text,
+  contact_name text,
+  contact_phone text,
+  contact_email text,
+  research_notes jsonb,
+  researched_at timestamp with time zone,
+  owner_user_id uuid,
+  claimed_at timestamp with time zone,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  PRIMARY KEY (id)
+);
+
 CREATE TABLE dedup_matches (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   event_a_id uuid NOT NULL,
@@ -570,6 +590,11 @@ CREATE TABLE specials (
   confirm_token uuid NOT NULL DEFAULT gen_random_uuid(),
   reconfirm_sent_at timestamp with time zone,
   days_stated boolean NOT NULL DEFAULT true,
+  venue_id uuid,
+  pending_changes jsonb,
+  submitted_by_user_id uuid,
+  review_note text,
+  reviewed_at timestamp with time zone,
   PRIMARY KEY (id)
 );
 
@@ -764,11 +789,12 @@ CREATE TABLE venue_coordinates (
   PRIMARY KEY (id)
 );
 
--- RLS policies (84); bodies live in the migrations.
+-- RLS policies (85); bodies live in the migrations.
 --   blog_posts: Admins can manage blog posts [ALL] {public}
 --   blog_posts: Published blog posts are viewable by everyone [SELECT] {public}
 --   bookings: Admins can manage bookings [ALL] {public}
 --   bookings: Users can read own bookings [SELECT] {authenticated}
+--   deal_venues: deal_venues_admin_all [ALL] {public}
 --   dedup_matches: Admins can manage dedup matches [ALL] {public}
 --   event_sources: Admins can manage event sources [ALL] {public}
 --   events: Admins can manage events [ALL] {public}

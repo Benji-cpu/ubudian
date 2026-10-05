@@ -2,7 +2,12 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 
 const mockInsert = vi.fn();
 vi.mock("@/lib/supabase/admin", () => ({
-  createAdminClient: () => ({ from: () => ({ insert: mockInsert }) }),
+  createAdminClient: () => ({
+    from: (table: string) =>
+      table === "deal_venues"
+        ? { select: () => ({ ilike: () => ({ maybeSingle: async () => ({ data: { id: "venue-1" } }) }) }) }
+        : { insert: mockInsert },
+  }),
 }));
 vi.mock("@/lib/rate-limit", () => ({
   rateLimit: () => ({ success: true, remaining: 4, resetAt: Date.now() + 3600000 }),
@@ -39,7 +44,8 @@ describe("POST /api/specials/submit", () => {
     const res = await POST(req(valid));
     expect(res.status).toBe(200);
     const row = mockInsert.mock.calls[0][0];
-    expect(row.status).toBe("live");
+    expect(row.status).toBe("pending");
+    expect(row.venue_id).toBe("venue-1");
     expect(row.source).toBe("form");
     expect(row.weekdays).toEqual([2]);
     expect(row.instagram_handle).toBe("warungtest");

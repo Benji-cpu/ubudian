@@ -12,6 +12,28 @@ import { specialSubmissionSchema } from "@/lib/specials/schema";
  * reconfirmed. Free text can't carry links, which is the spam guard; the
  * private contact fields are only for reconfirming.
  */
+/** Link the deal to its venue record, creating one (unowned) if it's new. */
+async function venueIdFor(
+  supabase: ReturnType<typeof createAdminClient>,
+  d: { venue_name: string; venue_area?: string; instagram_handle?: string; contact_name: string; contact_phone: string; contact_email?: string }
+): Promise<string | null> {
+  const { data: found } = await supabase.from("deal_venues").select("id").ilike("name", d.venue_name.trim()).maybeSingle();
+  if (found) return (found as { id: string }).id;
+  const { data: made } = await supabase
+    .from("deal_venues")
+    .insert({
+      name: d.venue_name.trim(),
+      area: d.venue_area || null,
+      instagram_handle: d.instagram_handle ? d.instagram_handle.replace(/^@/, "") : null,
+      contact_name: d.contact_name,
+      contact_phone: d.contact_phone,
+      contact_email: d.contact_email ? d.contact_email.toLowerCase() : null,
+    })
+    .select("id")
+    .maybeSingle();
+  return (made as { id: string } | null)?.id ?? null;
+}
+
 export async function POST(request: Request) {
   const ip = getClientIp(request);
   const { success } = rateLimit(`special-submit:${ip}`, { limit: 5, windowSeconds: 3600 });
@@ -47,7 +69,9 @@ export async function POST(request: Request) {
     weekdays: [...new Set(data.weekdays)].sort((a, b) => a - b),
     start_time: data.start_time || null,
     end_time: data.end_time || null,
-    status: "live",
+    // Reviewed daily before it shows (Ben, 5 Oct): see .claude/agents/deals-reviewer.md.
+    status: "pending",
+    venue_id: await venueIdFor(supabase, data),
     source: "form",
     contact_name: data.contact_name,
     contact_phone: data.contact_phone,
