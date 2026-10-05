@@ -100,7 +100,7 @@ export function SpecialSubmissionForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8" noValidate>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 [&_input::placeholder]:text-muted-foreground/45 [&_textarea::placeholder]:text-muted-foreground/45" noValidate>
         <fieldset className="space-y-5">
           <legend className="font-serif text-xl text-brand-deep-green dark:text-brand-gold">The special</legend>
           <FormField
