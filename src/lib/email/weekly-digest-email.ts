@@ -4,6 +4,9 @@ import { formatEventTime } from "@/lib/utils";
 import { buildDealsBlockHtml, buildPreheader } from "@/lib/email/weekly-deals";
 import type { ArchetypeId, Event, Special } from "@/types";
 
+/** Events listed under "Also on this week" when the desk has picks. */
+const ALSO_ON_LIMIT = 3;
+
 const plain = (t: string) => t.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
 
 /**
@@ -36,8 +39,13 @@ export function buildWeeklyDigestEmailHtml(opts: {
   unsubUrl: string;
   weekLabel: string;
   deals?: Special[];
+  /** The events desk's picks for the week, each with a one-line why. Empty/absent = today's layout. */
+  picks?: { event: Event; why: string }[];
 }): string {
-  const { archetype, events, siteUrl, unsubUrl, weekLabel, deals = [] } = opts;
+  const { archetype, events: allEvents, siteUrl, unsubUrl, weekLabel, deals = [], picks = [] } = opts;
+  const pickIds = new Set(picks.map((p) => p.event.id));
+  // With picks, the rest of the list is a short "Also on" so the email doesn't grow.
+  const events = picks.length > 0 ? allEvents.filter((e) => !pickIds.has(e.id)).slice(0, ALSO_ON_LIMIT) : allEvents;
   const withDeals = deals.length > 0;
   const a = archetype ? ARCHETYPES[archetype] : null;
 
@@ -48,36 +56,36 @@ export function buildWeeklyDigestEmailHtml(opts: {
     : a
       ? `Picked for ${esc(a.name)} — what's moving in the valley this week.`
       : `What's moving in the valley this week.`;
-  const eventsHeading =
-    withDeals && events.length > 0
-      ? `
+  const heading = (text: string) => `
   <tr><td style="padding:22px 32px 4px;">
-    <p style="margin:0;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:${GOLD};font-family:Georgia,serif;">What's on</p>
-  </td></tr>`
-      : "";
+    <p style="margin:0;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:${GOLD};font-family:Georgia,serif;">${text}</p>
+  </td></tr>`;
+  const picksHeading = picks.length > 0 ? heading("This week's picks") : "";
+  const eventsHeading =
+    events.length > 0 && (withDeals || picks.length > 0) ? heading(picks.length > 0 ? "Also on this week" : "What's on") : "";
 
-  const rows = events
-    .map((e) => {
-      const when = [fmtEmailDate(e.start_date), formatEventTime(e.start_time, e.end_time)]
-        .filter(Boolean)
-        .join(" · ");
-      const where = e.venue_name ? ` · ${esc(e.venue_name)}` : "";
-      const blurb = eventBlurb(e);
-      const blurbHtml = blurb
-        ? `
-    <p style="margin:6px 0 0;font-size:13px;line-height:1.5;color:${CHARCOAL};font-family:Georgia,serif;">${esc(blurb)}</p>`
-        : "";
-      return `
+  const eventRow = (e: Event, why?: string) => {
+    const when = [fmtEmailDate(e.start_date), formatEventTime(e.start_time, e.end_time)]
+      .filter(Boolean)
+      .join(" · ");
+    const where = e.venue_name ? ` · ${esc(e.venue_name)}` : "";
+    const line = why || eventBlurb(e);
+    const lineHtml = line
+      ? `
+    <p style="margin:6px 0 0;font-size:13px;line-height:1.5;color:${CHARCOAL};font-family:Georgia,serif;">${esc(line)}</p>`
+      : "";
+    return `
   <tr><td style="padding:14px 32px;border-top:1px solid ${GOLD}22;">
     <a href="${siteUrl}/events/${e.slug}" style="text-decoration:none;">
       <p style="margin:0;font-size:17px;color:${GREEN};font-family:Georgia,serif;font-weight:500;">${esc(e.title)}</p>
     </a>
-    <p style="margin:4px 0 0;font-size:13px;color:${CHARCOAL}aa;font-family:Georgia,serif;">${esc(when)}${where}</p>${blurbHtml}
+    <p style="margin:4px 0 0;font-size:13px;color:${CHARCOAL}aa;font-family:Georgia,serif;">${esc(when)}${where}</p>${lineHtml}
   </td></tr>`;
-    })
-    .join("");
+  };
+  const pickRows = picks.map((p) => eventRow(p.event, p.why)).join("");
+  const rows = events.map((e) => eventRow(e)).join("");
 
-  const preheader = withDeals ? buildPreheader(deals, events.length) : "";
+  const preheader = withDeals ? buildPreheader(deals, picks.length + events.length) : "";
   const preheaderHtml = preheader
     ? `<div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">${esc(preheader)}</div>`
     : "";
@@ -100,6 +108,8 @@ ${preheaderHtml}
     <p style="margin:0;font-size:14px;line-height:1.6;color:${CHARCOAL};font-family:Georgia,serif;">${intro}</p>
   </td></tr>
   ${buildDealsBlockHtml(deals, siteUrl)}
+  ${picksHeading}
+  ${pickRows}
   ${eventsHeading}
   ${rows}
   <tr><td style="padding:24px 32px;">

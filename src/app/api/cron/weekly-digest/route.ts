@@ -9,6 +9,7 @@ import { buildSpread } from "@/lib/quiz/build-spread";
 import { buildWeeklyDigestEmailHtml } from "@/lib/email/weekly-digest-email";
 import { issueNumberFor, pickWeeklyDeals } from "@/lib/email/weekly-deals";
 import { spreadAcrossWeek } from "@/lib/email/week-spread";
+import { getWeekPicks } from "@/lib/events/picks";
 import { getLiveSpecials } from "@/lib/specials/queries";
 import { unsubscribeUrl } from "@/lib/email/unsubscribe";
 import { NEWSLETTER_FROM, sendTransactionalEmail } from "@/lib/email";
@@ -17,6 +18,9 @@ import { ARCHETYPE_IDS } from "@/lib/quiz-data";
 import type { ArchetypeId, Event } from "@/types";
 
 export const maxDuration = 60;
+
+/** How many of the events desk's picks the email carries. */
+const WEEK_PICKS_LIMIT = 5;
 
 /**
  * The weekly email — runs Wednesday mornings (Bali) via GitHub Actions
@@ -33,6 +37,9 @@ export const maxDuration = 60;
  * ?deals=1 opens the issue with this week's live deals (src/lib/email/weekly-deals.ts).
  * It stays opt-in until Ben's yes on the first deals issue to the list; the
  * scheduled workflow does not pass it yet.
+ * ?picks=1 leads the events with the events desk's picks for the week (src/lib/events/picks.ts,
+ * written by an AI routine). Opt-in until a person has read the first week's "why" lines;
+ * the workflow does not pass it yet.
  */
 export async function POST(request: Request) {
   const authHeader = request.headers.get("authorization");
@@ -43,6 +50,7 @@ export async function POST(request: Request) {
   const url = new URL(request.url);
   const only = url.searchParams.get("only")?.toLowerCase().trim() || null;
   const includeDeals = url.searchParams.get("deals") === "1";
+  const includePicks = url.searchParams.get("picks") === "1";
 
   const bali = nowInBali();
   const [y, m, d] = bali.dateStr.split("-").map(Number);
@@ -82,6 +90,11 @@ export async function POST(request: Request) {
     toStr
   );
 
+  // The events desk's picks for the week (empty until the routine has run): the email then keeps its usual list.
+  const weekPicks = includePicks
+    ? (await getWeekPicks(supabase)).slice(0, WEEK_PICKS_LIMIT).map(({ event, why }) => ({ event, why }))
+    : [];
+
   const issueNumber = issueNumberFor(bali.dateStr);
   const deals = includeDeals
     ? pickWeeklyDeals(await getLiveSpecials(), bali.dayOfWeek, undefined, issueNumber)
@@ -107,7 +120,7 @@ export async function POST(request: Request) {
       ? buildSpread(archetype, weekEvents, { eventLimit: 5 }).events
       : spreadAcrossWeek(weekEvents, 5, bali.dateStr, issueNumber);
 
-    if (picks.length === 0 && deals.length === 0) {
+    if (picks.length === 0 && weekPicks.length === 0 && deals.length === 0) {
       skippedEmpty++;
       continue;
     }
@@ -139,6 +152,7 @@ export async function POST(request: Request) {
       unsubUrl,
       weekLabel,
       deals,
+      picks: weekPicks,
     });
     const subject = deals.length > 0 ? "This week in Ubud: deals and what's on" : "This week in Ubud";
     const ok = await sendTransactionalEmail(recipient.email, subject, html, {

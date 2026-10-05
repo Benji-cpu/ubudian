@@ -16,6 +16,7 @@ import { buildWeeklyDigestEmailHtml } from "@/lib/email/weekly-digest-email";
 import { issueNumberFor, pickWeeklyDeals, buildPreheader } from "@/lib/email/weekly-deals";
 import { spreadAcrossWeek } from "@/lib/email/week-spread";
 import { getLiveSpecials } from "@/lib/specials/queries";
+import { getWeekPicks } from "@/lib/events/picks";
 import { SITE_URL } from "@/lib/constants";
 import type { Event } from "@/types";
 
@@ -26,7 +27,8 @@ async function main() {
   const day = new Date(y, m - 1, d);
   const toStr = addDays(day, 6).toISOString().slice(0, 10);
 
-  const { data, error } = await createAdminClient()
+  const db = createAdminClient();
+  const { data, error } = await db
     .from("events")
     .select("*")
     .eq("status", "approved")
@@ -38,6 +40,8 @@ async function main() {
   const deals = pickWeeklyDeals(await getLiveSpecials(), day.getDay(), undefined, issue);
   const picks = spreadAcrossWeek(weekEvents, 5, dateStr, issue);
 
+  const deskPicks = (await getWeekPicks(db, new Date(`${dateStr}T01:00:00Z`))).slice(0, 5).map(({ event, why }) => ({ event, why }));
+
   const html = buildWeeklyDigestEmailHtml({
     archetype: null,
     events: picks,
@@ -45,9 +49,10 @@ async function main() {
     unsubUrl: `${SITE_URL}/api/email/unsubscribe?preview=1`,
     weekLabel: `Week of ${day.toLocaleDateString("en-GB", { day: "numeric", month: "long" })}`,
     deals,
+    picks: deskPicks,
   });
   writeFileSync(out, html);
-  console.log(`${out}: ${deals.length} deals, ${picks.length} events`);
+  console.log(`${out}: ${deals.length} deals, ${deskPicks.length} desk picks, ${picks.length} events`);
   console.log(`preheader: ${buildPreheader(deals, picks.length)}`);
   for (const s of deals) console.log(`  deal: ${s.venue_name} — ${s.title}`);
   for (const e of picks) console.log(`  event: ${e.start_date} ${e.title}`);
