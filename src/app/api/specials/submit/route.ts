@@ -66,6 +66,7 @@ export async function POST(request: Request) {
     title: data.title,
     description: data.description || null,
     price_idr: data.price_idr ?? null,
+    normal_price_idr: data.normal_price_idr ?? null,
     weekdays: [...new Set(data.weekdays)].sort((a, b) => a - b),
     start_time: data.start_time || null,
     end_time: data.end_time || null,

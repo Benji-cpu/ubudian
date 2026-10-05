@@ -21,6 +21,7 @@ function toDraft(d: OwnerDeal): DealDraft {
     title: v.title ?? "",
     description: v.description ?? "",
     price: v.price_idr ? String(v.price_idr) : "",
+    normal_price: v.normal_price_idr ? String(v.normal_price_idr) : "",
     weekdays: v.weekdays ?? [],
     start_time: v.start_time?.slice(0, 5) ?? "",
     end_time: v.end_time?.slice(0, 5) ?? "",

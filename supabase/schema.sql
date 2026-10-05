@@ -44,6 +44,14 @@ CREATE TABLE bookings (
   PRIMARY KEY (id)
 );
 
+CREATE TABLE curation_reports (
+  month text NOT NULL,
+  markdown text NOT NULL,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  emailed_at timestamp with time zone,
+  PRIMARY KEY (month)
+);
+
 CREATE TABLE deal_venues (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   name text NOT NULL,
@@ -75,6 +83,26 @@ CREATE TABLE dedup_matches (
   resolved_at timestamp with time zone,
   metadata jsonb DEFAULT '{}'::jsonb,
   created_at timestamp with time zone DEFAULT now(),
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE event_picks (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  week_start date NOT NULL,
+  event_id uuid NOT NULL,
+  rank smallint NOT NULL,
+  why text NOT NULL,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE event_signals (
+  id bigint NOT NULL DEFAULT nextval('event_signals_id_seq'::regclass),
+  event_id uuid NOT NULL,
+  kind text NOT NULL,
+  anon_id text NOT NULL,
+  day date NOT NULL DEFAULT ((now() AT TIME ZONE 'Asia/Makassar'::text))::date,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
   PRIMARY KEY (id)
 );
 
@@ -561,6 +589,17 @@ CREATE TABLE site_settings (
   PRIMARY KEY (id)
 );
 
+CREATE TABLE source_suggestions (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  body text NOT NULL,
+  handles text[] NOT NULL DEFAULT '{}'::text[],
+  urls text[] NOT NULL DEFAULT '{}'::text[],
+  ip_hash text,
+  status text NOT NULL DEFAULT 'new'::text,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  PRIMARY KEY (id)
+);
+
 CREATE TABLE specials (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   venue_name text NOT NULL,
@@ -595,6 +634,7 @@ CREATE TABLE specials (
   submitted_by_user_id uuid,
   review_note text,
   reviewed_at timestamp with time zone,
+  normal_price_idr integer,
   PRIMARY KEY (id)
 );
 
@@ -789,13 +829,14 @@ CREATE TABLE venue_coordinates (
   PRIMARY KEY (id)
 );
 
--- RLS policies (85); bodies live in the migrations.
+-- RLS policies (86); bodies live in the migrations.
 --   blog_posts: Admins can manage blog posts [ALL] {public}
 --   blog_posts: Published blog posts are viewable by everyone [SELECT] {public}
 --   bookings: Admins can manage bookings [ALL] {public}
 --   bookings: Users can read own bookings [SELECT] {authenticated}
 --   deal_venues: deal_venues_admin_all [ALL] {public}
 --   dedup_matches: Admins can manage dedup matches [ALL] {public}
+--   event_picks: picks are public [SELECT] {public}
 --   event_sources: Admins can manage event sources [ALL] {public}
 --   events: Admins can manage events [ALL] {public}
 --   events: Approved events are viewable by everyone [SELECT] {public}

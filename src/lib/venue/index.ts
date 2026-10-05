@@ -19,6 +19,7 @@ export type OwnerDeal = {
   title: string;
   description: string | null;
   price_idr: number | null;
+  normal_price_idr: number | null;
   weekdays: number[];
   days_stated: boolean;
   start_time: string | null;
@@ -31,7 +32,7 @@ export type OwnerDeal = {
 
 const VENUE_COLS = "id, name, area, instagram_handle, owner_user_id";
 const OWNER_DEAL_COLS =
-  "id, title, description, price_idr, weekdays, days_stated, start_time, end_time, status, pending_changes, review_note, expires_on";
+  "id, title, description, price_idr, normal_price_idr, weekdays, days_stated, start_time, end_time, status, pending_changes, review_note, expires_on";
 
 export async function getOwnedVenues(userId: string): Promise<DealVenue[]> {
   const { data } = await createAdminClient().from("deal_venues").select(VENUE_COLS).eq("owner_user_id", userId).order("name");

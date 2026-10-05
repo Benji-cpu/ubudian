@@ -24,8 +24,11 @@ import { cn } from "@/lib/utils";
 
 // The form takes the price as typed text; the API takes a number.
 const formSchema = specialSubmissionSchema
-  .omit({ price_idr: true })
-  .extend({ price: z.string().trim().regex(/^[\d.,]*$/, "Numbers only, e.g. 135000").optional().or(z.literal("")) });
+  .omit({ price_idr: true, normal_price_idr: true })
+  .extend({
+    price: z.string().trim().regex(/^[\d.,]*$/, "Numbers only, e.g. 135000").optional().or(z.literal("")),
+    normal_price: z.string().trim().regex(/^[\d.,]*$/, "Numbers only, e.g. 190000").optional().or(z.literal("")),
+  });
 
 type FormValues = z.infer<typeof formSchema>;
 
@@ -47,6 +50,7 @@ export function SpecialSubmissionForm() {
       title: "",
       description: "",
       price: "",
+      normal_price: "",
       weekdays: [],
       start_time: "",
       end_time: "",
@@ -60,13 +64,14 @@ export function SpecialSubmissionForm() {
   async function onSubmit(values: FormValues) {
     setStatus("loading");
     setErrorMessage("");
-    const { price, ...rest } = values;
+    const { price, normal_price, ...rest } = values;
     const digits = (price ?? "").replace(/[.,]/g, "");
+    const normalDigits = (normal_price ?? "").replace(/[.,]/g, "");
     try {
       const res = await fetch("/api/specials/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...rest, price_idr: digits ? Number(digits) : null }),
+        body: JSON.stringify({ ...rest, price_idr: digits ? Number(digits) : null, normal_price_idr: normalDigits ? Number(normalDigits) : null }),
       });
       const json = await res.json();
       if (!res.ok || json.error) throw new Error(json.error || "Something went wrong.");
@@ -111,7 +116,7 @@ export function SpecialSubmissionForm() {
               <FormItem>
                 <FormLabel>What is it?</FormLabel>
                 <FormControl>
-                  <Input placeholder="Pasta + a glass of wine" {...field} />
+                  <Input placeholder="2-for-1 pizza night" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -126,6 +131,20 @@ export function SpecialSubmissionForm() {
                 <FormControl>
                   <Input inputMode="numeric" placeholder="135000" {...field} />
                 </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="normal_price"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Your normal price in IDR (we need this to list it)</FormLabel>
+                <FormControl>
+                  <Input inputMode="numeric" placeholder="190000" {...field} />
+                </FormControl>
+                <FormDescription>What the same thing costs without the deal. We list deals at least 25% below it.</FormDescription>
                 <FormMessage />
               </FormItem>
             )}

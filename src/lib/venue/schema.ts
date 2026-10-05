@@ -6,6 +6,7 @@ export const venueDealSchema = specialSubmissionSchema.pick({
   title: true,
   description: true,
   price_idr: true,
+  normal_price_idr: true,
   weekdays: true,
   start_time: true,
   end_time: true,
@@ -28,7 +29,7 @@ export const newVenueSchema = specialSubmissionSchema
 export type NewVenueInput = z.infer<typeof newVenueSchema>;
 
 /** The fields an edit may change; anything else in pending_changes is ignored. */
-export const EDITABLE_DEAL_FIELDS = ["title", "description", "price_idr", "weekdays", "start_time", "end_time"] as const;
+export const EDITABLE_DEAL_FIELDS = ["title", "description", "price_idr", "normal_price_idr", "weekdays", "start_time", "end_time"] as const;
 
 /** Normalise form input into the columns `specials` stores. */
 export function dealColumns(d: VenueDealInput) {
@@ -36,6 +37,7 @@ export function dealColumns(d: VenueDealInput) {
     title: d.title,
     description: d.description || null,
     price_idr: d.price_idr ?? null,
+    normal_price_idr: d.normal_price_idr ?? null,
     weekdays: [...new Set(d.weekdays)].sort((a, b) => a - b),
     start_time: d.start_time || null,
     end_time: d.end_time || null,

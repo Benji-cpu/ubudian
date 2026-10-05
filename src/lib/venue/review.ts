@@ -28,7 +28,7 @@ export type ReviewItem = {
 };
 
 const ROW_COLS =
-  "id, status, venue_name, venue_area, instagram_handle, website_url, source_url, title, description, price_idr, weekdays, start_time, end_time, pending_changes, review_note, updated_at, created_at";
+  "id, status, venue_name, venue_area, instagram_handle, website_url, source_url, title, description, price_idr, normal_price_idr, weekdays, start_time, end_time, pending_changes, review_note, updated_at, created_at";
 
 type Row = Record<string, unknown> & { id: string; status: string; pending_changes: Record<string, unknown> | null };
 
