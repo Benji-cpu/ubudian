@@ -83,8 +83,8 @@ export function SpecialSubmissionForm() {
         <CheckCircle2 className="mx-auto h-10 w-10 text-brand-deep-green dark:text-brand-gold" />
         <h2 className="mt-4 font-serif text-2xl text-brand-deep-green dark:text-brand-gold">Your deal is live</h2>
         <p className="mt-2 text-muted-foreground">
-          It shows on Tonight in Ubud on the days it runs. We&apos;ll check with you on WhatsApp in a
-          month to keep it listed.
+          It shows on Ubud deals on the days it runs. We&apos;ll check with you in a month to keep it
+          listed.
         </p>
         <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
           <Button asChild>

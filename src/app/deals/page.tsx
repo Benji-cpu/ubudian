@@ -65,55 +65,46 @@ export default async function DealsPage() {
         )}
       </section>
 
-      {week.length > 0 && (
+      {(week.length > 0 || everyDay.length > 0 || askDays.length > 0) && (
         <section className="bg-brand-warm-cream px-4 py-12 dark:bg-transparent">
           <div className="mx-auto max-w-3xl sm:px-2">
             <h2 className="font-serif text-2xl text-brand-deep-green dark:text-brand-gold sm:text-3xl">
               The rest of the week
             </h2>
-            {week.map((d) => (
-              <div key={d.day} className="mt-8">
-                <h3 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-                  {WEEKDAY_NAMES[d.day]}
-                </h3>
-                <div className="mt-3 space-y-4">
+            <div className="mt-6 divide-y divide-brand-gold/20 border-y border-brand-gold/20">
+              {week.map((d) => (
+                <DayGroup key={d.day} label={WEEKDAY_NAMES[d.day]} count={d.items.length}>
                   {d.items.map((s) => (
                     <SpecialCard key={s.id} special={s} showDays={false} />
                   ))}
+                </DayGroup>
+              ))}
+              {everyDay.length > 0 && (
+                <DayGroup label="Every day" count={everyDay.length}>
+                  {everyDay.map((s) => (
+                    <SpecialCard key={s.id} special={s} showDays={false} />
+                  ))}
+                </DayGroup>
+              )}
+            </div>
+
+            {askDays.length > 0 && (
+              <div className="mt-12">
+                <h2 className="font-serif text-xl text-brand-deep-green dark:text-brand-gold sm:text-2xl">
+                  Days to confirm: ask the venue
+                </h2>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Real deals whose source gives no days yet. We&apos;ve asked each venue; check with them before you go.
+                </p>
+                <div className="mt-4 border-y border-brand-gold/20">
+                  <DayGroup label="Show them" count={askDays.length}>
+                    {askDays.map((s) => (
+                      <SpecialCard key={s.id} special={s} showDays={false} />
+                    ))}
+                  </DayGroup>
                 </div>
               </div>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {everyDay.length > 0 && (
-        <section className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
-          <h2 className="font-serif text-2xl text-brand-deep-green dark:text-brand-gold sm:text-3xl">
-            Every day
-          </h2>
-          <div className="mt-6 space-y-4">
-            {everyDay.map((s) => (
-              <SpecialCard key={s.id} special={s} showDays={false} />
-            ))}
-          </div>
-        </section>
-      )}
-
-      {askDays.length > 0 && (
-        <section className="bg-brand-warm-cream px-4 py-12 dark:bg-transparent">
-          <div className="mx-auto max-w-3xl sm:px-2">
-            <h2 className="font-serif text-2xl text-brand-deep-green dark:text-brand-gold sm:text-3xl">
-              Ask which days
-            </h2>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Real deals whose source gives the hours but not the days. Check before you go.
-            </p>
-            <div className="mt-6 space-y-4">
-              {askDays.map((s) => (
-                <SpecialCard key={s.id} special={s} />
-              ))}
-            </div>
+            )}
           </div>
         </section>
       )}
@@ -141,5 +132,21 @@ export default async function DealsPage() {
         </div>
       </section>
     </div>
+  );
+}
+
+/** A folded day: the name and count show; the deals open on tap. No JS needed. */
+function DayGroup({ label, count, children }: { label: string; count: number; children: React.ReactNode }) {
+  return (
+    <details className="group py-1">
+      <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 py-3 [&::-webkit-details-marker]:hidden">
+        <span className="font-serif text-lg text-brand-deep-green dark:text-brand-gold">{label}</span>
+        <span className="flex items-center gap-2 text-sm text-muted-foreground">
+          {count} {count === 1 ? "deal" : "deals"}
+          <span aria-hidden className="transition-transform group-open:rotate-180">⌄</span>
+        </span>
+      </summary>
+      <div className="space-y-4 pb-5 pt-1">{children}</div>
+    </details>
   );
 }

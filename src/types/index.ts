@@ -711,7 +711,7 @@ export interface PipelineHealthLog {
   created_at: string;
 }
 
-// Restaurant specials ("Tonight in Ubud"). Contact columns are private and
+// Restaurant deals ("Ubud deals", table `specials`). Contact columns are private and
 // never selected for public pages — see PUBLIC_SPECIAL_COLUMNS.
 export interface Special {
   id: string;
