@@ -464,7 +464,8 @@ export interface ArchetypeResult {
   name: string;
   tagline: string;
   description: string;
-  hero_image: string;
+  /** null = no real photo yet; pages show a plain deep-green block (Ben, 6 Oct). */
+  hero_image: string | null;
   color: string;
   content_keywords: {
     event_categories: string[];
