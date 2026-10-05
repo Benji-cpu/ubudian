@@ -169,7 +169,7 @@ export default async function HomePage() {
           </p>
           <NewsletterSignup variant="dark" source="home" className="mx-auto mt-6 max-w-md" />
           <Link href="/newsletter" className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-white/70 hover:text-white">
-            See this week&apos;s issue <ArrowRight className="h-4 w-4" />
+            What&apos;s in it <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
       </section>
@@ -178,7 +178,7 @@ export default async function HomePage() {
       <section className="mx-auto max-w-5xl px-4 pb-16 sm:px-6">
         <div className="grid gap-3 sm:grid-cols-3">
           {[
-            { href: "/retreats", title: "Retreats", body: "Free self-guided days around Ubud." },
+            { href: "/retreats", title: "Day plans", body: "Free self-guided days around Ubud, at your own pace." },
             { href: "/quiz", title: "Find your Ubud", body: "Six questions, a plan that fits you." },
             { href: "/tonight/add", title: "Run a venue?", body: "List your deal free. It shows on the days it runs." },
           ].map((c) => (

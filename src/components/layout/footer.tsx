@@ -34,7 +34,7 @@ export async function Footer() {
             {SITE_NAME}
           </h3>
           <p className="mt-2 text-sm text-brand-off-white/80">
-            The edgy, messy, transformative heart of Ubud
+            Ubud&apos;s deals and gatherings, checked daily. Free.
           </p>
         </div>
 
