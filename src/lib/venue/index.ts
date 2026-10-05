@@ -3,8 +3,8 @@ import { nowInBali } from "@/lib/events/bali-time";
 import { addDaysToDateStr, SPECIAL_LIFETIME_DAYS } from "@/lib/specials";
 import { dealColumns, type NewVenueInput, type VenueDealInput } from "./schema";
 
-/** Shown wherever a venue submits or edits. Keep it true: the daily review publishes. */
-export const REVIEW_PROMISE = "Updates go live within 24 hours";
+/** Shown wherever a venue submits or edits. Keep it true: the nightly review publishes most by morning, but a flagged deal waits for an admin and a routine can miss a night, so never promise a fixed time. */
+export const REVIEW_PROMISE = "We check new and changed deals every night; most are live by the next morning";
 
 export type DealVenue = {
   id: string;

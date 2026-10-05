@@ -68,7 +68,7 @@ export function VenueDeals({ venue, deals }: { venue: DealVenue; deals: OwnerDea
                 onCancel={() => setEditing(null)}
                 onSubmit={async (body) => {
                   const err = await send(`${base}/${d.id}`, "PATCH", body);
-                  if (!err) done("Saved. Updates go live within 24 hours.");
+                  if (!err) done("Saved. We check changes every night; most are live by the next morning.");
                   return err;
                 }}
               />
@@ -121,7 +121,7 @@ export function VenueDeals({ venue, deals }: { venue: DealVenue; deals: OwnerDea
               onCancel={deals.length ? () => setEditing(null) : undefined}
               onSubmit={async (body) => {
                 const err = await send(base, "POST", body);
-                if (!err) done("Sent. Updates go live within 24 hours.");
+                if (!err) done("Sent. We check new deals every night; most are live by the next morning.");
                 return err;
               }}
             />

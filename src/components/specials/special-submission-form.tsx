@@ -83,7 +83,7 @@ export function SpecialSubmissionForm() {
         <CheckCircle2 className="mx-auto h-10 w-10 text-brand-deep-green dark:text-brand-gold" />
         <h2 className="mt-4 font-serif text-2xl text-brand-deep-green dark:text-brand-gold">Thanks, we&apos;ve got it</h2>
         <p className="mt-2 text-muted-foreground">
-          Updates go live within 24 hours. Once it&apos;s up, it shows on Ubud deals on the days it runs,
+          We check new and changed deals every night; most are live by the next morning. Once it&apos;s up, it shows on Ubud deals on the days it runs,
           and we&apos;ll check with you each month to keep it listed. Want to edit it later?{" "}
           <Link href="/venue" className="underline underline-offset-4">Sign in to My venue</Link>.
         </p>
