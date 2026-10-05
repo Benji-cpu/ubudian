@@ -23,11 +23,13 @@ const UA =
 // Targeted ICP search terms. NB: the generic "ubud" term is deliberately omitted —
 // it dragged in restaurants, day-passes, nightlife and tourist activities. Venue +
 // modality terms keep the harvest dead-centre our universe.
-const SEARCH_TERMS = ["yoga barn", "sayuri", "ecstatic dance", "breathwork", "sound healing", "sound bath", "ecstatic", "tantra", "cacao", "kirtan", "paradiso", "dissolve", "contact improv", "5rhythms", "movement medicine", "shamanic", "ceremony", "womens circle", "mens circle"];
+const SEARCH_TERMS = ["yoga barn", "sayuri", "ecstatic dance", "breathwork", "sound healing", "sound bath", "ecstatic", "tantra", "cacao", "kirtan", "paradiso", "dissolve", "contact improv", "5rhythms", "movement medicine", "shamanic", "ceremony", "womens circle", "mens circle",
+  // Added 5 Oct 2026: modality/gathering terms. Measured: 30 events in the next 7 days vs 18 before.
+  "meditation", "healing", "full moon", "new moon", "workshop", "festival", "gathering", "dance", "sound journey", "yoga", "retreat", "reiki", "qigong", "satsang", "community"];
 const LOCALITIES = ["Ubud", "Gianyar", "Peliatan", "Mas", "Sayan", "Campuhan", "Penestanan", "Nyuh Kuning", "Keliki", "Lodtunduh", "Tegallalang", "Kedewatan", "Singakerta"];
 const KNOWN_VENUES = ["The Yoga Barn", "Yoga Barn", "Sayuri", "Askara Sound Temple", "Paradiso Ubud"];
-const MAX_LIST_PAGES = 20;
-const MAX_EVENTS = 60;
+const MAX_LIST_PAGES = 40;
+const MAX_EVENTS = 120;
 const FETCH_DELAY_MS = 300;
 
 const JUNK = /\b(deposit payment|gift voucher|gift card|seating reservation|drink charge|private event payments?|booking fee)\b/i;

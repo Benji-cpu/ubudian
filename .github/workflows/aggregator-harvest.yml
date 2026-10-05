@@ -2,7 +2,7 @@ name: aggregator-harvest
 
 # Daily harvest of the plain-fetch aggregators (no browser needed) → POST to
 # /api/cron/curator-ingest in small chunks. Currently: Megatix (moved off the
-# timing-out Vercel cron). Each source runs in its own continue-on-error step so
+# timing-out Vercel cron) and Pyramids of Chi's own calendar (added 5 Oct 2026). Each source runs in its own continue-on-error step so
 # one source failing can't block the others.
 #
 # Why chunked: the curator-ingest route geocodes + dedups per event under a 60s
@@ -26,7 +26,7 @@ concurrency:
 jobs:
   harvest:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
     env:
       CRON_SECRET: ${{ secrets.CRON_SECRET }}
       INGEST_URL: https://theubudian.life/api/cron/curator-ingest
@@ -68,3 +68,9 @@ jobs:
         run: |
           node scripts/scrape/megatix-harvest.mjs --out /tmp/megatix.json
           bash /tmp/post_chunks.sh /tmp/megatix.json
+
+      - name: Pyramids of Chi
+        continue-on-error: true
+        run: |
+          node scripts/scrape/pyramids-harvest.mjs --out /tmp/pyramids.json
+          bash /tmp/post_chunks.sh /tmp/pyramids.json

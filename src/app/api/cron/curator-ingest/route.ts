@@ -41,6 +41,7 @@ const ALLOWED_SLUGS = new Set([
   "blissbase",
   "soulwise",
   "instagram-public",
+  "pyramids-of-chi",
 ]);
 
 export async function POST(request: Request) {

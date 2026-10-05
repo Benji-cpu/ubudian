@@ -32,7 +32,10 @@ export type ModerationResult =
   | { ok: true; notes?: string }
   | { ok: false; flag: ModerationFlag; reason: string };
 
-const MODEL = "gemini-2.5-flash-lite";
+// Tried in order. On the free tier each model has its own 20 requests/day, so a
+// model that 429s (or is retired, 404) hands the call to the next one instead of
+// holding the event. Measured 5 Oct 2026: these three answer on this key.
+const MODELS = ["gemini-2.5-flash-lite", "gemini-3.1-flash-lite", "gemini-3.5-flash-lite"];
 
 const SYSTEM_PROMPT = `You are the content safety gate for The Ubudian, a community events platform for Ubud, Bali.
 
@@ -83,6 +86,28 @@ function getClient(): GoogleGenAI {
   return genAI;
 }
 
+async function generateWithFallback(prompt: string): Promise<string> {
+  let lastErr: unknown;
+  for (const model of MODELS) {
+    try {
+      const response = await getClient().models.generateContent({
+        model,
+        contents: prompt,
+        config: {
+          systemInstruction: SYSTEM_PROMPT,
+          responseMimeType: "application/json",
+          responseSchema: RESPONSE_SCHEMA,
+          temperature: 0,
+        },
+      });
+      return (response.text ?? "").trim();
+    } catch (err) {
+      lastErr = err;
+    }
+  }
+  throw lastErr;
+}
+
 /**
  * Run the moderation gate. Never throws — on any internal error,
  * returns { ok: true } with a note, because failing open is safer than
@@ -92,17 +117,7 @@ export async function moderateEvent(input: ModerationInput): Promise<ModerationR
   const prompt = buildPrompt(input);
 
   try {
-    const response = await getClient().models.generateContent({
-      model: MODEL,
-      contents: prompt,
-      config: {
-        systemInstruction: SYSTEM_PROMPT,
-        responseMimeType: "application/json",
-        responseSchema: RESPONSE_SCHEMA,
-        temperature: 0,
-      },
-    });
-    const raw = (response.text ?? "").trim();
+    const raw = await generateWithFallback(prompt);
     const parsed = JSON.parse(raw) as {
       flag: "ok" | ModerationFlag;
       reason: string;
