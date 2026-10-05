@@ -5,12 +5,20 @@ export const SITE_URL =
   (process.env.NEXT_PUBLIC_SITE_URL?.trim()) || "http://localhost:4000";
 
 export const NAV_LINKS = [
-  { label: "Tonight", href: "/tonight" },
-  { label: "Quiz", href: "/quiz" },
-  { label: "Guides", href: "/guides" },
+  { label: "Deals", href: "/tonight" },
   { label: "Events", href: "/events" },
-  { label: "Ubud Retreats", href: "/retreats" },
+  { label: "Retreats", href: "/retreats" },
+  { label: "Guides", href: "/guides" },
+  { label: "Quiz", href: "/quiz" },
   { label: "About", href: "/about" },
+] as const;
+
+/** The phone tab bar: the four things people come back for. */
+export const TAB_LINKS = [
+  { label: "Today", href: "/", icon: "Sun" },
+  { label: "Deals", href: "/tonight", icon: "Tag" },
+  { label: "Events", href: "/events", icon: "CalendarDays" },
+  { label: "Weekly", href: "/#newsletter", icon: "Mail" },
 ] as const;
 
 export type AdminNavItem =

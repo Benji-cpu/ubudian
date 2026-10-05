@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
-import { Source_Sans_3, Lora } from "next/font/google";
+import { Inter, Lora } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+import { TabBar } from "@/components/layout/tab-bar";
 import { Toaster } from "@/components/ui/sonner";
 import { FeedbackFab } from "@/components/feedback/feedback-fab";
 import { ActivityTrailInstaller } from "@/components/feedback/activity-trail-installer";
@@ -14,10 +15,11 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { SITE_NAME, SITE_DESCRIPTION, SITE_URL } from "@/lib/constants";
 import "./globals.css";
 
-const sourceSans = Source_Sans_3({
-  variable: "--font-source-sans",
+// Inter for everything readable (the todo.today-style app look, 5 Oct 2026);
+// Lora survives only as the wordmark face (`font-display`).
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
-  weight: ["300", "400", "600"],
 });
 
 const lora = Lora({
@@ -46,12 +48,13 @@ export default function RootLayout({
       <head>
         <link rel="alternate" type="application/rss+xml" title="The Ubudian" href="/feed.xml" />
       </head>
-      <body className={`${sourceSans.variable} ${lora.variable} overflow-x-hidden antialiased`}>
+      <body className={`${inter.variable} ${lora.variable} overflow-x-hidden antialiased`}>
         <ThemeProvider>
           <div className="flex min-h-screen flex-col">
             <Header />
             <main className="flex-1 pt-14">{children}</main>
             <Footer />
+            <TabBar />
           </div>
           <Toaster />
           <FeedbackFab />

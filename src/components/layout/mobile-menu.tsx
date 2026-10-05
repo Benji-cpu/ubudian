@@ -96,7 +96,7 @@ export function MobileMenu({
         <Button
           variant="ghost"
           size="icon"
-          className="text-brand-off-white hover:bg-brand-off-white/10 hover:text-brand-gold md:hidden"
+          className="text-foreground/80 hover:bg-foreground/5 hover:text-foreground md:hidden"
         >
           <Menu className="h-5 w-5" />
           <span className="sr-only">Open menu</span>
@@ -115,7 +115,7 @@ export function MobileMenu({
             </button>
           </SheetClose>
         </div>
-        <SheetTitle className="flex items-center justify-center gap-2 text-center font-serif text-2xl font-normal text-brand-gold">
+        <SheetTitle className="flex items-center justify-center gap-2 text-center font-display text-2xl font-normal text-brand-gold">
           <Image
             src="/brand/logo.svg"
             alt=""

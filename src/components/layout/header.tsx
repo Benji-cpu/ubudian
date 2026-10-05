@@ -5,102 +5,42 @@ import { getCurrentProfile } from "@/lib/auth";
 import { getSiteSettings } from "@/lib/site-settings";
 import { UserMenu } from "./user-menu";
 import { MobileMenu } from "./mobile-menu";
+import { HeaderNav } from "./header-nav";
 import { Button } from "@/components/ui/button";
-import { Shield } from "lucide-react";
 import { ThemeToggle } from "./theme-toggle";
 
+/**
+ * Light, app-style header (UI refresh 5 Oct 2026, after todo.today): the
+ * wordmark, the sections as quiet links with the current one marked, and one
+ * call to action — the weekly email.
+ */
 export async function Header() {
-  const [profile, settings] = await Promise.all([
-    getCurrentProfile(),
-    getSiteSettings(),
-  ]);
+  const [profile, settings] = await Promise.all([getCurrentProfile(), getSiteSettings()]);
 
   return (
-    <header
-      className="fixed top-0 z-50 w-full border-b border-brand-gold/15 bg-brand-deep-green backdrop-blur-[12px] dark:border-brand-gold/25 dark:bg-background/85"
-    >
-      <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        {/* Logo */}
-        <Link
-          href="/"
-          className="flex items-center gap-2 py-2 font-serif text-2xl font-normal tracking-wide text-brand-gold"
-        >
-          <Image
-            src="/brand/logo.svg"
-            alt=""
-            width={32}
-            height={32}
-            priority
-            className="h-7 w-7 sm:h-8 sm:w-8"
-          />
-          <span>{SITE_NAME}</span>
+    <header className="fixed top-0 z-50 w-full border-b border-border/70 bg-background/85 backdrop-blur-xl supports-[backdrop-filter]:bg-background/70">
+      <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+        <Link href="/" className="flex shrink-0 items-center gap-2">
+          <Image src="/brand/logo.svg" alt="" width={28} height={28} priority className="h-7 w-7" />
+          <span className="font-display text-xl text-brand-deep-green dark:text-brand-gold">{SITE_NAME}</span>
         </Link>
 
-        {/* Desktop Nav */}
-        <nav className="hidden items-center gap-6 md:flex">
-          <Link
-            href="/tonight"
-            className="text-xs font-semibold uppercase tracking-widest text-brand-gold transition-colors duration-300 hover:text-brand-off-white"
-          >
-            Tonight
-          </Link>
-          <Link
-            href="/quiz"
-            className="text-xs font-semibold uppercase tracking-widest text-brand-off-white transition-colors duration-300 hover:text-brand-gold"
-          >
-            Quiz
-          </Link>
-          {settings.guides_enabled && (
-            <Link
-              href="/guides"
-              className="text-xs font-semibold uppercase tracking-widest text-brand-off-white transition-colors duration-300 hover:text-brand-gold"
-            >
-              Guides
-            </Link>
-          )}
-          <Link
-            href="/events"
-            className="text-xs font-semibold uppercase tracking-widest text-brand-off-white transition-colors duration-300 hover:text-brand-gold"
-          >
-            Events
-          </Link>
-          <Link
-            href="/retreats"
-            className="text-xs font-semibold uppercase tracking-widest text-brand-off-white transition-colors duration-300 hover:text-brand-gold"
-          >
-            Retreats
-          </Link>
-          <Link
-            href="/about"
-            className="text-xs font-semibold uppercase tracking-widest text-brand-off-white transition-colors duration-300 hover:text-brand-gold"
-          >
-            About
-          </Link>
-          {profile?.role === "admin" && (
-            <Link
-              href="/admin"
-              className="flex items-center gap-1 text-xs font-semibold uppercase tracking-widest text-brand-gold transition-colors duration-300 hover:text-brand-off-white"
-            >
-              <Shield className="h-3.5 w-3.5" />
-              Admin
-            </Link>
-          )}
-        </nav>
+        <HeaderNav guidesEnabled={settings.guides_enabled} isAdmin={profile?.role === "admin"} />
 
-        {/* Right side: Auth + Mobile */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           <ThemeToggle />
+          <Button asChild size="sm" className="hidden md:inline-flex">
+            <Link href="/#newsletter">Get the weekly</Link>
+          </Button>
           {profile ? (
             <UserMenu profile={profile} />
           ) : (
-            <Button
-              asChild
-              variant="ghost"
-              size="sm"
-              className="hidden border border-brand-gold/30 bg-transparent text-brand-off-white hover:bg-brand-gold/10 hover:text-brand-gold dark:bg-transparent dark:text-brand-off-white dark:hover:bg-brand-gold/10 dark:hover:text-brand-gold md:inline-flex"
+            <Link
+              href="/login"
+              className="hidden px-2 text-sm font-medium text-foreground/70 transition-colors hover:text-foreground md:inline"
             >
-              <Link href="/login">Sign In</Link>
-            </Button>
+              Sign in
+            </Link>
           )}
           <MobileMenu profile={profile} settings={settings} />
         </div>

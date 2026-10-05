@@ -30,7 +30,7 @@ export async function Footer() {
             height={56}
             className="mx-auto h-14 w-14"
           />
-          <h3 className="mt-4 font-serif text-2xl font-normal text-brand-gold">
+          <h3 className="mt-4 font-display text-2xl font-normal text-brand-gold">
             {SITE_NAME}
           </h3>
           <p className="mt-2 text-sm text-brand-off-white/80">

@@ -7,8 +7,11 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-source-sans);
-  --font-serif: var(--font-lora);
+  --font-sans: var(--font-inter);
+  /* `font-serif` used to be Lora on every heading; the app look is all-sans.
+     Lora is kept for the wordmark only, as `font-display`. */
+  --font-serif: var(--font-inter);
+  --font-display: var(--font-lora);
   --font-mono: var(--font-geist-mono);
 
   /* V3 Temple Garden palette — values set in :root / .dark */
@@ -65,7 +68,7 @@
 }
 
 :root {
-  --radius: 0.125rem;
+  --radius: 0.75rem;
   --brand-deep-green: #2C4A3E;
   --brand-mid-green: #3A5F50;
   --brand-sage: #8BAF8A;
@@ -78,7 +81,7 @@
   --brand-terracotta: #B85C3F;
   --brand-charcoal: #2D2D2D;
   --brand-charcoal-light: #4A4A4A;
-  --background: #FAF5EC;
+  --background: #FBFAF7;
   --foreground: #2D2D2D;
   --card: #FFFFFF;
   --card-foreground: #2D2D2D;
@@ -93,8 +96,8 @@
   --accent: #B85C3F;
   --accent-foreground: #FFFFFF;
   --destructive: oklch(0.577 0.245 27.325);
-  --border: #D6CFC5;
-  --input: #D6CFC5;
+  --border: #E7E2DA;
+  --input: #DDD7CE;
   --ring: #2C4A3E;
   --chart-1: #2C4A3E;
   --chart-2: #B85C3F;
@@ -165,7 +168,8 @@
     @apply bg-background text-foreground font-sans;
   }
   h1, h2, h3, h4, h5, h6 {
-    @apply font-serif;
+    @apply font-sans;
+    letter-spacing: -0.02em;
   }
 }
 
