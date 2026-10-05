@@ -1,14 +1,16 @@
 import { NextResponse } from "next/server";
 import { applyDecisions, decisionsSchema, listForReview } from "@/lib/venue/review";
+import { isDealsReviewAuthorised } from "@/lib/venue/review-auth";
 
 /**
  * The daily deals review (git-as-bus, like the curator):
  *   GET  → what's waiting, public fields only (deals-review-fetch.yml commits it)
  *   POST → the routine's decisions (deals-review-apply.yml posts them)
- * Both need `Authorization: Bearer ${CRON_SECRET}`.
+ * Both need `Authorization: Bearer <dealsReviewToken(CRON_SECRET)>`, a derived key (never CRON_SECRET itself).
  */
 function authorised(request: Request) {
-  return request.headers.get("authorization") === `Bearer ${process.env.CRON_SECRET}`;
+  // Its own derived key, NOT the site-wide CRON_SECRET (Reviewer §15): see review-auth.ts.
+  return isDealsReviewAuthorised(request.headers.get("authorization"));
 }
 
 export async function GET(request: Request) {
