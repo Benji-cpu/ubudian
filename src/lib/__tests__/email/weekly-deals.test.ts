@@ -150,8 +150,12 @@ describe("dealBlurb source note", () => {
 
 describe("buildDealsBlockHtml", () => {
   it("says once that prices often add tax and service", () => {
-    const html = buildDealsBlockHtml([deal({}), deal({ venue_name: "B" })], "https://theubudian.life");
+    const html = buildDealsBlockHtml([deal({ price_idr: 95000 }), deal({ venue_name: "B", price_idr: 80000 })], "https://theubudian.life");
     expect(html.match(/often add tax and service/g)).toHaveLength(1);
+  });
+  it("leaves the note out when no price is shown", () => {
+    const html = buildDealsBlockHtml([deal({ title: "2-for-1 pizza", price_idr: null, description: null })], "https://theubudian.life");
+    expect(html).not.toContain("tax and service");
   });
 
   it("is empty with no deals", () => {
