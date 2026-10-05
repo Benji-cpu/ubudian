@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getVenueByToken } from "@/lib/specials/reconfirm";
 import { ReconfirmForm } from "@/components/specials/reconfirm-form";
@@ -28,6 +29,15 @@ export default async function ConfirmSpecialsPage({ params }: { params: Promise<
       </section>
       <section className="mx-auto max-w-2xl px-4 py-10 sm:px-6">
         <ReconfirmForm token={token} specials={venue.specials} />
+        <p className="mt-8 text-center text-sm text-muted-foreground">
+          Want to edit your deals yourself?{" "}
+          <Link
+            href={`/venue?claim=${encodeURIComponent(token)}`}
+            className="font-medium text-brand-terracotta underline-offset-4 hover:underline"
+          >
+            Manage my deals →
+          </Link>
+        </p>
       </section>
     </div>
   );
