@@ -35,6 +35,7 @@ import {
 } from "@/lib/maintenance/expiry";
 import { checkLiveness, type Liveness } from "@/lib/maintenance/liveness";
 import { nowInBali } from "@/lib/events/bali-time";
+import { sendDueReconfirms, type ReconfirmRunResult } from "@/lib/specials/reconfirm";
 
 // The gate makes up to AUTO_APPROVE_MAX_PER_RUN Gemini calls on top of the
 // link-health sweep, so this route needs more than the platform default.
@@ -195,6 +196,12 @@ export async function GET(request: Request) {
     };
   });
 
+  // Tonight in Ubud: email each venue a week before its special lapses.
+  const specialsReconfirm: ReconfirmRunResult = await sendDueReconfirms({ dryRun }).catch((err) => {
+    errors.push(`sendDueReconfirms: ${err?.message ?? String(err)}`);
+    return { due: 0, venues: 0, sent: 0, failed: 0 };
+  });
+
   const payload = {
     startedAt,
     finishedAt: new Date().toISOString(),
@@ -221,6 +228,7 @@ export async function GET(request: Request) {
       archivedStaleLinkEvents: staleSweep.archived,
       clearedStaleCtas: staleSweep.clearedCtas,
     },
+    specialsReconfirm,
     telegramWebhook,
     linkHealth,
     review,

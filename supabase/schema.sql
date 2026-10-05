@@ -567,6 +567,8 @@ CREATE TABLE specials (
   not_honoured_count integer NOT NULL DEFAULT 0,
   created_at timestamp with time zone NOT NULL DEFAULT now(),
   updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  confirm_token uuid NOT NULL DEFAULT gen_random_uuid(),
+  reconfirm_sent_at timestamp with time zone,
   PRIMARY KEY (id)
 );
 
