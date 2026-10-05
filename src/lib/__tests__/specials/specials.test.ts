@@ -7,6 +7,8 @@ import {
   formatHours,
   formatIdr,
   addDaysToDateStr,
+  isOnNow,
+  formatCheckedOn,
 } from "@/lib/specials";
 import type { Special } from "@/types";
 
@@ -24,6 +26,7 @@ const base: Special = {
   weekdays: [],
   start_time: null,
   end_time: null,
+  source_url: null,
   expires_on: "2026-11-04",
   confirmed_at: "2026-10-05T00:00:00Z",
 };
@@ -69,5 +72,17 @@ describe("specials helpers", () => {
 
   it("adds days across a month end", () => {
     expect(addDaysToDateStr("2026-10-05", 30)).toBe("2026-11-04");
+  });
+
+  it("is on now only between its start and end on a day it runs", () => {
+    expect(isOnNow({ weekdays: [2], start_time: "16:00:00", end_time: "19:00:00" }, tue6pm)).toBe(true);
+    expect(isOnNow({ weekdays: [2], start_time: "19:00:00", end_time: "22:00:00" }, tue6pm)).toBe(false);
+    expect(isOnNow({ weekdays: [3], start_time: "16:00:00", end_time: "19:00:00" }, tue6pm)).toBe(false);
+    expect(isOnNow({ weekdays: [], start_time: null, end_time: null }, tue6pm)).toBe(true);
+  });
+
+  it("formats the check date in Bali time", () => {
+    // 20:00 UTC on 4 Oct is 04:00 on 5 Oct in Bali.
+    expect(formatCheckedOn("2026-10-04T20:00:00Z")).toBe("5 Oct");
   });
 });

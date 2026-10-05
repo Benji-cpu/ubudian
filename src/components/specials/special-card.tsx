@@ -1,6 +1,6 @@
 import { Clock, MapPin, Instagram, Globe } from "lucide-react";
 import type { Special } from "@/types";
-import { formatHours, formatIdr, formatWeekdays } from "@/lib/specials";
+import { formatCheckedOn, formatHours, formatIdr, formatWeekdays } from "@/lib/specials";
 
 function mapsHref(s: Special): string {
   if (s.google_maps_url) return s.google_maps_url;
@@ -8,7 +8,16 @@ function mapsHref(s: Special): string {
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`;
 }
 
-export function SpecialCard({ special, showDays = true }: { special: Special; showDays?: boolean }) {
+export function SpecialCard({
+  special,
+  showDays = true,
+  onNow = false,
+}: {
+  special: Special;
+  showDays?: boolean;
+  /** Running at this moment: shows a badge, so "where can I go now" is one glance. */
+  onNow?: boolean;
+}) {
   const hours = formatHours(special.start_time, special.end_time);
   const price = formatIdr(special.price_idr);
   const handle = special.instagram_handle?.replace(/^@/, "");
@@ -23,7 +32,14 @@ export function SpecialCard({ special, showDays = true }: { special: Special; sh
               <span className="font-normal normal-case tracking-normal text-muted-foreground"> · {special.venue_area}</span>
             ) : null}
           </p>
-          <h3 className="mt-1 font-serif text-xl text-brand-deep-green dark:text-brand-gold">{special.title}</h3>
+          <h3 className="mt-1 font-serif text-xl text-brand-deep-green dark:text-brand-gold">
+            {special.title}
+            {onNow ? (
+              <span className="ml-2 inline-block translate-y-[-2px] rounded-full bg-brand-terracotta px-2 py-0.5 align-middle font-sans text-[11px] font-semibold uppercase tracking-wider text-white">
+                On now
+              </span>
+            ) : null}
+          </h3>
         </div>
         {price ? (
           <span className="shrink-0 rounded-full bg-brand-gold/15 px-3 py-1 text-sm font-semibold text-brand-deep-green dark:text-brand-gold">
@@ -73,6 +89,23 @@ export function SpecialCard({ special, showDays = true }: { special: Special; sh
           </a>
         ) : null}
       </div>
+
+      <p className="mt-3 text-xs text-muted-foreground/80">
+        {special.source_url ? (
+          <>
+            <a
+              href={special.source_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline underline-offset-2 hover:text-brand-deep-green dark:hover:text-brand-gold"
+            >
+              Source
+            </a>
+            {" · "}
+          </>
+        ) : null}
+        Checked {formatCheckedOn(special.confirmed_at)}
+      </p>
     </article>
   );
 }

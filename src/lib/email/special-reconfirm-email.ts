@@ -1,7 +1,7 @@
 import { GREEN, GOLD, CREAM, CHARCOAL, esc, fmtEmailDate } from "@/lib/email/brand";
 
 /**
- * "Is your special still running?" — sent a week before a listing lapses.
+ * "Is your deal still running?" — sent a week before a listing lapses.
  * The button opens a page with a confirm button (a POST), so a mail
  * scanner following the link can't confirm on the venue's behalf.
  */
@@ -32,7 +32,7 @@ export function buildSpecialReconfirmEmailHtml(opts: {
     </tr></table>
     <p style="margin:18px 0 0;font-size:13px;line-height:1.6;color:${CHARCOAL}99;font-family:Georgia,serif;">One tap keeps it up for another month. If something has stopped, you can say so on the same page. Listing stays free.</p>
   </td></tr>
-  <tr><td style="padding:18px 32px;border-top:1px solid ${CREAM};font-size:11px;color:${CHARCOAL}88;font-family:Georgia,serif;">You're getting this because you listed a special on theubudian.life/tonight.</td></tr>
+  <tr><td style="padding:18px 32px;border-top:1px solid ${CREAM};font-size:11px;color:${CHARCOAL}88;font-family:Georgia,serif;">You're getting this because you listed a deal on theubudian.life.</td></tr>
 </table>
 </td></tr>
 </table>

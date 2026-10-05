@@ -81,7 +81,7 @@ export function SpecialSubmissionForm() {
     return (
       <div className="rounded-xl border border-brand-gold/20 bg-card p-8 text-center">
         <CheckCircle2 className="mx-auto h-10 w-10 text-brand-deep-green dark:text-brand-gold" />
-        <h2 className="mt-4 font-serif text-2xl text-brand-deep-green dark:text-brand-gold">Your special is live</h2>
+        <h2 className="mt-4 font-serif text-2xl text-brand-deep-green dark:text-brand-gold">Your deal is live</h2>
         <p className="mt-2 text-muted-foreground">
           It shows on Tonight in Ubud on the days it runs. We&apos;ll check with you on WhatsApp in a
           month to keep it listed.
@@ -91,7 +91,7 @@ export function SpecialSubmissionForm() {
             <Link href="/tonight">See it on Tonight in Ubud</Link>
           </Button>
           <Button variant="outline" onClick={() => { form.reset(); setStatus("idle"); }}>
-            Add another special
+            Add another deal
           </Button>
         </div>
       </div>
@@ -102,7 +102,7 @@ export function SpecialSubmissionForm() {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 [&_input::placeholder]:text-muted-foreground/45 [&_textarea::placeholder]:text-muted-foreground/45" noValidate>
         <fieldset className="space-y-5">
-          <legend className="font-serif text-xl text-brand-deep-green dark:text-brand-gold">The special</legend>
+          <legend className="font-serif text-xl text-brand-deep-green dark:text-brand-gold">The deal</legend>
           <FormField
             control={form.control}
             name="title"
@@ -268,7 +268,7 @@ export function SpecialSubmissionForm() {
         <fieldset className="space-y-5">
           <legend className="font-serif text-xl text-brand-deep-green dark:text-brand-gold">How we reach you</legend>
           <p className="text-sm text-muted-foreground">
-            Never shown on the site. We only use it to check once a month that the special is still running.
+            Never shown on the site. We only use it to check once a month that the deal is still running.
           </p>
           <div className="grid gap-4 sm:grid-cols-2">
             <FormField
@@ -327,7 +327,7 @@ export function SpecialSubmissionForm() {
 
         <Button type="submit" size="lg" className="w-full" disabled={status === "loading"}>
           {status === "loading" ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-          Publish my special
+          Publish my deal
         </Button>
       </form>
     </Form>

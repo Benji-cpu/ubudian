@@ -4,7 +4,7 @@ import { parseTimeToMinutes } from "@/lib/events/bali-time";
 
 /** Everything a public page may show. Never add the contact_* columns here. */
 export const PUBLIC_SPECIAL_COLUMNS =
-  "id, venue_name, venue_area, venue_address, google_maps_url, instagram_handle, website_url, title, description, price_idr, weekdays, start_time, end_time, expires_on, confirmed_at";
+  "id, venue_name, venue_area, venue_address, google_maps_url, instagram_handle, website_url, title, description, price_idr, weekdays, start_time, end_time, source_url, expires_on, confirmed_at";
 
 /** A special lapses this many days after it was last confirmed. */
 export const SPECIAL_LIFETIME_DAYS = 30;
@@ -42,6 +42,23 @@ export function specialsForToday<T extends Special>(rows: T[], now: BaliNow): T[
   return rows
     .filter((s) => isStillOnToday(s, now))
     .sort((a, b) => startKey(a) - startKey(b) || a.venue_name.localeCompare(b.venue_name));
+}
+
+/** Running right now: today, and between its start and end (open-ended counts). */
+export function isOnNow(
+  special: Pick<Special, "weekdays" | "start_time" | "end_time">,
+  now: BaliNow
+): boolean {
+  if (!isStillOnToday(special, now)) return false;
+  const start = parseTimeToMinutes(special.start_time);
+  return start === null || start <= now.timeMinutes;
+}
+
+/** "5 Oct" — the Bali date a deal was last checked. */
+export function formatCheckedOn(confirmedAt: string): string {
+  return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", timeZone: "Asia/Makassar" }).format(
+    new Date(confirmedAt)
+  );
 }
 
 function startKey(s: Pick<Special, "start_time">): number {

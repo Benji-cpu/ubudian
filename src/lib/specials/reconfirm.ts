@@ -72,7 +72,7 @@ export async function sendDueReconfirms({ dryRun = false } = {}): Promise<Reconf
     const first = group[0];
     const ok = await sendTransactionalEmail(
       first.contact_email!,
-      `Is your special at ${first.venue_name} still running?`,
+      `Is your deal at ${first.venue_name} still running?`,
       buildSpecialReconfirmEmailHtml({
         venueName: first.venue_name,
         titles: group.map((r) => r.title),

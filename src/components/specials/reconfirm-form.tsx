@@ -18,7 +18,7 @@ export function ReconfirmForm({ token, specials }: { token: string; specials: Sp
       <p className="text-center text-muted-foreground">
         Nothing is listed for you right now.{" "}
         <Link href="/tonight/add" className="font-medium text-brand-deep-green underline underline-offset-4">
-          Add a special
+          Add a deal
         </Link>
         .
       </p>
@@ -51,15 +51,15 @@ export function ReconfirmForm({ token, specials }: { token: string; specials: Sp
         <h2 className="mt-4 font-serif text-2xl text-brand-deep-green dark:text-brand-gold">Thank you</h2>
         <p className="mt-2 text-muted-foreground">
           {kept > 0
-            ? `${kept === 1 ? "Your special stays" : `${kept} specials stay`} on Tonight in Ubud for another month.`
-            : "We've taken your specials down."}
+            ? `${kept === 1 ? "Your deal stays" : `${kept} deals stay`} on The Ubudian for another month.`
+            : "We've taken your deals down."}
         </p>
         <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
           <Button asChild>
             <Link href="/tonight">See Tonight in Ubud</Link>
           </Button>
           <Button asChild variant="outline">
-            <Link href="/tonight/add">Add a new special</Link>
+            <Link href="/tonight/add">Add a new deal</Link>
           </Button>
         </div>
       </div>

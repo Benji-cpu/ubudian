@@ -728,6 +728,9 @@ export interface Special {
   weekdays: number[];
   start_time: string | null;
   end_time: string | null;
+  /** Public page the deal was read from (the venue's own page where possible). */
+  source_url: string | null;
   expires_on: string;
+  /** When it was last checked: against its source when seeded, or by the venue. */
   confirmed_at: string;
 }
