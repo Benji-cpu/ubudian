@@ -8,7 +8,7 @@ export function DealsTodayRail({ deals }: { deals: Special[] }) {
   if (deals.length === 0) {
     return (
       <p className="mt-4 rounded-2xl border border-dashed p-6 text-muted-foreground">
-        No deals listed for the rest of today.{" "}
+        No food deals left today.{" "}
         <Link href="/deals" className="font-medium text-foreground underline underline-offset-4">
           See this week&apos;s
         </Link>

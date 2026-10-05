@@ -13,9 +13,9 @@ import { SITE_URL } from "@/lib/constants";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Ubud deals — 2-for-1s, happy hours and weekly food nights",
+  title: "Ubud deals — breakfast sets, 2-for-1 pizza and good food for less",
   description:
-    "Every food and drink deal we've found in Ubud, by day: 2-for-1 pizza nights, happy hours, set lunches. Each one sourced, and re-checked every month.",
+    "Food, café and wellness deals in Ubud, by day: breakfast boards, a vegan buffet, 2-for-1 pizza night. No drink deals.",
   alternates: { canonical: `${SITE_URL}/deals` },
 };
 
@@ -23,7 +23,6 @@ export default async function DealsPage() {
   const now = nowInBali();
   const deals = await getLiveSpecials();
   const today = specialsForToday(deals, now);
-  const venues = new Set(deals.map((d) => d.venue_name)).size;
 
   // The rest of the week, starting tomorrow, so "Tuesday" is always the next one.
   const week = Array.from({ length: 6 }, (_, i) => (now.dayOfWeek + 1 + i) % 7)
@@ -36,15 +35,11 @@ export default async function DealsPage() {
     <div>
       <section className="bg-brand-deep-green px-4 py-14 text-center sm:py-20">
         <div className="mx-auto max-w-3xl">
-          <p className="text-xs font-semibold uppercase tracking-widest text-brand-gold">
-            {deals.length} deals at {venues} places
-          </p>
           <h1 className="mt-3 font-serif text-4xl font-medium tracking-tight text-brand-off-white sm:text-5xl">
             Ubud deals
           </h1>
           <p className="mt-4 text-lg text-brand-off-white/80">
-            2-for-1s, happy hours and weekly food nights, each one taken from the venue&apos;s own
-            page, a dated guide, or sent in by the venue, and re-checked with the venue every month.
+            Breakfast boards, a vegan buffet, 2-for-1 pizza night: good food for less around Ubud.
             Tell them The Ubudian sent you.
           </p>
         </div>
@@ -62,7 +57,7 @@ export default async function DealsPage() {
           </div>
         ) : (
           <p className="mt-4 rounded-xl border border-dashed border-brand-gold/30 p-6 text-muted-foreground">
-            Nothing left running today. Tomorrow&apos;s deals are below.
+            Quiet today. This week&apos;s deals are below.
           </p>
         )}
       </section>
@@ -125,10 +120,10 @@ export default async function DealsPage() {
 
       <section className="bg-brand-pale-green px-4 py-14 text-center">
         <div className="mx-auto max-w-xl">
-          <h2 className="font-serif text-2xl text-brand-deep-green sm:text-3xl">Run a restaurant or bar in Ubud?</h2>
+          <h2 className="font-serif text-2xl text-brand-deep-green sm:text-3xl">Run a restaurant or café in Ubud?</h2>
           <p className="mt-3 text-brand-charcoal-light">
-            List your deal for free. It shows here on the days it runs, and we check it with you
-            once a month so nothing goes stale.
+            List your food, café or wellness deal for free. It shows here on the days it runs,
+            and we check it with you once a month so nothing goes stale. We don&apos;t list drink deals.
           </p>
           <Button asChild size="lg" className="mt-6">
             <Link href="/tonight/add">Add your deal</Link>

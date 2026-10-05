@@ -14,10 +14,10 @@ import { getLiveSpecials } from "@/lib/specials/queries";
 import { SITE_URL, SITE_NAME, SITE_DESCRIPTION } from "@/lib/constants";
 
 export const metadata: Metadata = {
-  title: "The Ubudian — today's deals and gatherings in Ubud",
+  title: "The Ubudian — what's on in Ubud today",
   description: SITE_DESCRIPTION,
   openGraph: {
-    title: "The Ubudian — today's deals and gatherings in Ubud",
+    title: "The Ubudian — what's on in Ubud today",
     description: SITE_DESCRIPTION,
     url: SITE_URL,
     siteName: SITE_NAME,
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "The Ubudian — today's deals and gatherings in Ubud",
+    title: "The Ubudian — what's on in Ubud today",
     description: SITE_DESCRIPTION,
   },
 };
@@ -67,15 +67,15 @@ function SectionHead({ title, href, cta }: { title: string; href: string; cta: s
 
 /**
  * "Ubud, today" — the app-style home (UI refresh, 5 Oct 2026, after
- * todo.today): one short photo hero with live counts, then the three things
- * people come back for, each owned by its own room: deals (Ubudian · deals),
- * gatherings (Ubudian · events) and the weekly email (Ubudian · newsletter).
+ * todo.today): one short photo hero, then the three things people come back
+ * for, each owned by its own room: gatherings (Ubudian · events), food deals
+ * (Ubudian · deals) and the weekly email (Ubudian · newsletter). Gatherings
+ * lead and the hero carries no counts (Ben, 6 Oct: counts read like a coupon site).
  */
 export default async function HomePage() {
   const now = nowInBali();
   const live = await getLiveSpecials();
   const dealsToday = specialsForToday(live, now);
-  const venues = new Set(live.map((d) => d.venue_name)).size;
 
   return (
     <>
@@ -101,12 +101,12 @@ export default async function HomePage() {
             Ubud, <span className="text-brand-gold">today.</span>
           </h1>
           <p className="mt-4 max-w-xl text-lg text-white/80">
-            The good deals and the gatherings worth going to, in one place. Free.
+            The gatherings worth going to, and good food for less. Free.
           </p>
           <div className="mt-7 flex flex-wrap gap-3">
             <Button asChild size="lg" className="bg-white text-brand-charcoal hover:bg-white/90">
-              <Link href="/deals">
-                Today&apos;s deals <ArrowRight className="h-4 w-4" />
+              <Link href="/events">
+                What&apos;s on today <ArrowRight className="h-4 w-4" />
               </Link>
             </Button>
             <Button
@@ -115,37 +115,14 @@ export default async function HomePage() {
               variant="outline"
               className="border-white/40 bg-transparent text-white hover:bg-white/10 hover:text-white"
             >
-              <Link href="/events">What&apos;s on</Link>
+              <Link href="/deals">Food deals</Link>
             </Button>
           </div>
-          <dl className="mt-10 flex gap-8 text-white">
-            <div>
-              <dt className="sr-only">Deals today</dt>
-              <dd className="text-2xl font-semibold">{dealsToday.length}</dd>
-              <dd className="text-xs text-white/65">Deals today</dd>
-            </div>
-            <div className="border-l border-white/20 pl-8">
-              <dt className="sr-only">Venues</dt>
-              <dd className="text-2xl font-semibold">{venues}</dd>
-              <dd className="text-xs text-white/65">Venues listed</dd>
-            </div>
-            <div className="border-l border-white/20 pl-8">
-              <dt className="sr-only">Cost to use</dt>
-              <dd className="text-2xl font-semibold">Free</dd>
-              <dd className="text-xs text-white/65">To use</dd>
-            </div>
-          </dl>
         </div>
       </section>
 
-      {/* Deals */}
-      <section className="mx-auto max-w-5xl px-4 pt-12 sm:px-6">
-        <SectionHead title="Deals today" href="/deals" cta="This week" />
-        <DealsTodayRail deals={dealsToday} />
-      </section>
-
       {/* Gatherings */}
-      <section className="mx-auto max-w-5xl px-4 pt-14 sm:px-6">
+      <section className="mx-auto max-w-5xl px-4 pt-12 sm:px-6">
         <SectionHead title="What's on" href="/events" cta="All events" />
         <Suspense
           fallback={
@@ -160,12 +137,18 @@ export default async function HomePage() {
         </Suspense>
       </section>
 
+      {/* Deals */}
+      <section className="mx-auto max-w-5xl px-4 pt-14 sm:px-6">
+        <SectionHead title="Food deals today" href="/deals" cta="This week" />
+        <DealsTodayRail deals={dealsToday} />
+      </section>
+
       {/* Weekly email */}
       <section id="newsletter" className="mx-auto max-w-5xl scroll-mt-20 px-4 py-14 sm:px-6">
         <div className="rounded-3xl bg-brand-deep-green px-6 py-10 text-center sm:px-12">
           <h2 className="text-2xl font-semibold text-white sm:text-3xl">The week in Ubud, once a week</h2>
           <p className="mx-auto mt-3 max-w-md text-white/75">
-            The best deals and what&apos;s on, in one short email. No spam, unsubscribe any time.
+            What&apos;s on and the best food deals, in one short email. No spam, unsubscribe any time.
           </p>
           <NewsletterSignup variant="dark" source="home" className="mx-auto mt-6 max-w-md" />
           <Link href="/newsletter" className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-white/70 hover:text-white">
@@ -180,7 +163,7 @@ export default async function HomePage() {
           {[
             { href: "/retreats", title: "Day plans", body: "Free self-guided days around Ubud, at your own pace." },
             { href: "/quiz", title: "Find your Ubud", body: "Six questions, a plan that fits you." },
-            { href: "/tonight/add", title: "Run a venue?", body: "List your deal free. It shows on the days it runs." },
+            { href: "/tonight/add", title: "Run a café?", body: "List your food or wellness deal free. It shows on the days it runs." },
           ].map((c) => (
             <Link
               key={c.href}

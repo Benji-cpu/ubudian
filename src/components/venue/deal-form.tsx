@@ -59,7 +59,7 @@ export function DealForm({
     <form onSubmit={submit} className="space-y-4 [&_input::placeholder]:text-muted-foreground/45 [&_textarea::placeholder]:text-muted-foreground/45">
       <div className="space-y-1.5">
         <Label htmlFor="deal-title">What is it?</Label>
-        <Input id="deal-title" required value={d.title} onChange={(e) => set("title", e.target.value)} placeholder="2-for-1 cocktails" />
+        <Input id="deal-title" required value={d.title} onChange={(e) => set("title", e.target.value)} placeholder="2-for-1 pizza night" />
       </div>
       <div className="space-y-1.5">
         <Label htmlFor="deal-price">Price in IDR (optional)</Label>

@@ -1,6 +1,6 @@
 import { Clock, MapPin, Instagram, Globe } from "lucide-react";
 import type { Special } from "@/types";
-import { formatCheckedOn, formatDays, formatHours, formatIdr } from "@/lib/specials";
+import { formatDays, formatHours, formatIdr } from "@/lib/specials";
 
 function mapsHref(s: Special): string {
   if (s.google_maps_url) return s.google_maps_url;
@@ -90,22 +90,6 @@ export function SpecialCard({
         ) : null}
       </div>
 
-      <p className="mt-3 text-xs text-muted-foreground/80">
-        {special.source_url ? (
-          <>
-            <a
-              href={special.source_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline underline-offset-2 hover:text-brand-deep-green dark:hover:text-brand-gold"
-            >
-              Source
-            </a>
-            {" · "}
-          </>
-        ) : null}
-        Checked {formatCheckedOn(special.confirmed_at)}
-      </p>
     </article>
   );
 }
