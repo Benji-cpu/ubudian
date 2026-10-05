@@ -69,8 +69,14 @@ export async function POST(request: Request) {
       continue;
     }
     const e = item.event;
+    // One weekly line-up post can announce six events, and the pipeline treats an
+    // exact source_url match as the same event. A fragment keeps each its own URL
+    // (the link still opens the post) while re-sending the same event stays a duplicate.
+    const slug = e.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 40);
+    const sourceUrl = `${e.source_url.replace(/#.*$/, "")}#${e.start_date}-${slug}`;
     const parsed: ParsedEvent = {
       ...e,
+      source_url: sourceUrl,
       description: scrubCopy(e.description),
       short_description: scrubCopy(e.short_description),
       end_date: e.end_date ?? e.start_date,
@@ -78,7 +84,7 @@ export async function POST(request: Request) {
       organizer_instagram: e.organizer_instagram ?? null,
       // Ingest copies the cover below, after it has an id to name the file by.
       cover_image_url: e.cover_image_url ?? null,
-      source_event_id: `${e.source_url}#${e.start_date}T${e.start_time ?? ""}`,
+      source_event_id: `${sourceUrl}T${e.start_time ?? ""}`,
     };
     accepted.push({ ref: item.ref, ok: item.verdict.ok, reason: item.verdict.reason, parsed });
   }
