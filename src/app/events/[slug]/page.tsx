@@ -12,6 +12,7 @@ import { rolledForward } from "@/lib/events/buckets";
 import { EventMap } from "@/components/events/event-map";
 import Link from "next/link";
 import { HowToGetIn } from "@/components/events/how-to-get-in";
+import { NewsletterSignup } from "@/components/layout/newsletter-signup";
 import { FacilitatorCard } from "@/components/events/facilitator-card";
 import { SaveEventButton } from "@/components/dashboard/save-event-button";
 import { Button } from "@/components/ui/button";
@@ -299,6 +300,14 @@ export default async function EventPage({ params }: EventPageProps) {
             </Button>
           </div>
         )}
+
+        {/* Weekly email sign-up: where people decide to come back. */}
+        <section className="mx-auto max-w-md px-4 pt-10 text-center sm:px-6">
+          <p className="text-sm font-medium text-foreground">
+            Get the week&apos;s best deals and what&apos;s on, every Wednesday.
+          </p>
+          <NewsletterSignup source="event" className="mx-auto mt-3 max-w-md" />
+        </section>
 
         {/* Related Events */}
         {related.length > 0 && (
