@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Loader2, CheckCircle2 } from "lucide-react";
@@ -72,6 +73,13 @@ export function NewsletterSignup({ className, variant = "light", source }: Newsl
           <CheckCircle2 className="h-5 w-5" />
           <p className="text-sm font-medium">{message}</p>
         </div>
+        <p className={`mt-2 text-center text-sm ${isDark ? "text-brand-off-white/80" : "text-muted-foreground"}`}>
+          Don&apos;t wait for Wednesday:{" "}
+          <Link href="/deals" className="font-medium underline">
+            this week&apos;s deals are here
+          </Link>
+          .
+        </p>
       </div>
     );
   }

@@ -85,6 +85,13 @@ ${preheaderHtml}
       </td>
     </tr></table>
   </td></tr>
+  <tr><td style="padding:4px 32px 22px;">
+    <p style="margin:0;font-size:13px;line-height:1.6;color:${CHARCOAL};font-family:Georgia,serif;">
+      Know someone in Ubud who'd like this?
+      <a href="https://wa.me/?text=${encodeURIComponent(`Ubud's best deals and what's on, one email every Wednesday: ${siteUrl}/newsletter`)}" style="color:${GREEN};">Share it on WhatsApp</a>.
+      They can sign up at <a href="${siteUrl}/newsletter" style="color:${GREEN};">theubudian.life/newsletter</a>.
+    </p>
+  </td></tr>
   ${emailFooter(unsubUrl)}
 </table>
 </td></tr>
