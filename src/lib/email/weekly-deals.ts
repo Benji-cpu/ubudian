@@ -50,12 +50,14 @@ export const MAX_HAPPY_HOURS = 2;
  *  - one deal per venue, the venue's most distinctive;
  *  - deals on particular days first, spread across the week from the send
  *    day (one per day before a second on any day), then every-day deals, and
- *    at most MAX_HAPPY_HOURS plain happy hours, last.
+ *    at most MAX_HAPPY_HOURS plain happy hours, last;
+ *  - rotated by `issueNumber`, so next week's issue leads with different ones.
  */
 export function pickWeeklyDeals(
   specials: Special[],
   dayOfWeek: number,
-  limit = WEEKLY_DEAL_LIMIT
+  limit = WEEKLY_DEAL_LIMIT,
+  issueNumber = 0
 ): Special[] {
   const rank = (s: Special) => (isPlainHappyHour(s) ? 2 : 0) + (hasSetDays(s) ? 0 : 1);
   const bestPerVenue = new Map<string, Special>();
@@ -89,7 +91,22 @@ export function pickWeeklyDeals(
   const hh = happyHours
     .sort((a, b) => Number(hasSetDays(b)) - Number(hasSetDays(a)) || a.venue_name.localeCompare(b.venue_name))
     .slice(0, MAX_HAPPY_HOURS);
-  return [...spread, ...everyDay, ...hh].slice(0, limit);
+  // Each issue starts `limit` further down the list, so consecutive issues
+  // don't repeat the same deals (issue 0 = 7 Oct 2026).
+  const ordered = [...spread, ...everyDay, ...hh];
+  return rotate(ordered, issueNumber * limit).slice(0, limit);
+}
+
+function rotate<T>(items: T[], by: number): T[] {
+  if (items.length === 0) return items;
+  const k = ((by % items.length) + items.length) % items.length;
+  return [...items.slice(k), ...items.slice(0, k)];
+}
+
+/** Weekly issues since the first deals issue (Wed 7 Oct 2026 = 0). */
+export function issueNumberFor(dateStr: string): number {
+  const days = (Date.parse(`${dateStr}T00:00:00Z`) - Date.parse("2026-10-07T00:00:00Z")) / 86_400_000;
+  return Math.max(0, Math.floor((days + 3) / 7));
 }
 
 /**

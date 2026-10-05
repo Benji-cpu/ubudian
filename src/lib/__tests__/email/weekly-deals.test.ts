@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildDealsBlockHtml, buildPreheader, dealBlurb, dealSourceUrl, pickWeeklyDeals } from "@/lib/email/weekly-deals";
+import { buildDealsBlockHtml, buildPreheader, dealBlurb, dealSourceUrl, issueNumberFor, pickWeeklyDeals } from "@/lib/email/weekly-deals";
 import type { Special } from "@/types";
 
 function deal(overrides: Partial<Special>): Special {
@@ -148,5 +148,24 @@ describe("buildDealsBlockHtml", () => {
     expect(html).toContain("Sun, Tue · 16:00–18:00 · IDR 135k");
     expect(html).not.toContain("<b>2-for-1</b>");
     expect(html).toContain("https://theubudian.life/deals");
+  });
+});
+
+describe("issue rotation", () => {
+  it("numbers issues from Wed 7 Oct 2026, whichever weekday the run lands", () => {
+    expect(issueNumberFor("2026-10-07")).toBe(0);
+    expect(issueNumberFor("2026-10-06")).toBe(0);
+    expect(issueNumberFor("2026-10-14")).toBe(1);
+    expect(issueNumberFor("2026-10-21")).toBe(2);
+  });
+
+  it("gives the next issue different deals when there are enough", () => {
+    const pool = Array.from({ length: 12 }, (_, i) =>
+      deal({ venue_name: `V${String(i).padStart(2, "0")}`, title: "Taco night", weekdays: [i % 7] })
+    );
+    const first = pickWeeklyDeals(pool, 3, 6, 0).map((d) => d.venue_name);
+    const second = pickWeeklyDeals(pool, 3, 6, 1).map((d) => d.venue_name);
+    expect(second.filter((v) => first.includes(v))).toHaveLength(0);
+    expect(pickWeeklyDeals(pool, 3, 6)).toEqual(pickWeeklyDeals(pool, 3, 6, 0));
   });
 });

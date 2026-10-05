@@ -7,7 +7,7 @@ import { visibleListings } from "@/lib/events/listing-checks";
 import { digestRecipients, type DigestProfile, type DigestSubscriber } from "@/lib/email/digest-recipients";
 import { buildSpread } from "@/lib/quiz/build-spread";
 import { buildWeeklyDigestEmailHtml } from "@/lib/email/weekly-digest-email";
-import { pickWeeklyDeals } from "@/lib/email/weekly-deals";
+import { issueNumberFor, pickWeeklyDeals } from "@/lib/email/weekly-deals";
 import { spreadAcrossWeek } from "@/lib/email/week-spread";
 import { getLiveSpecials } from "@/lib/specials/queries";
 import { unsubscribeUrl } from "@/lib/email/unsubscribe";
@@ -82,7 +82,10 @@ export async function POST(request: Request) {
     toStr
   );
 
-  const deals = includeDeals ? pickWeeklyDeals(await getLiveSpecials(), bali.dayOfWeek) : [];
+  const issueNumber = issueNumberFor(bali.dateStr);
+  const deals = includeDeals
+    ? pickWeeklyDeals(await getLiveSpecials(), bali.dayOfWeek, undefined, issueNumber)
+    : [];
 
   const recipients = digestRecipients(
     (profilesRes.data ?? []) as DigestProfile[],
@@ -102,7 +105,7 @@ export async function POST(request: Request) {
 
     const picks = archetype
       ? buildSpread(archetype, weekEvents, { eventLimit: 5 }).events
-      : spreadAcrossWeek(weekEvents, 5, bali.dateStr);
+      : spreadAcrossWeek(weekEvents, 5, bali.dateStr, issueNumber);
 
     if (picks.length === 0 && deals.length === 0) {
       skippedEmpty++;

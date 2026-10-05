@@ -23,15 +23,16 @@ function hostKey(e: Event): string {
  * events before untimed; never the same event, organiser or venue twice.
  * Day-long courses and trainings are only used if the week is too thin
  * without them, and nothing that started before the window's first day.
+ * `issueNumber` rotates each day's list so consecutive issues differ.
  */
-export function spreadAcrossWeek(events: Event[], limit: number, fromDate?: string): Event[] {
+export function spreadAcrossWeek(events: Event[], limit: number, fromDate?: string, issueNumber = 0): Event[] {
   const inWindow = fromDate ? events.filter((e) => (e.start_date ?? "") >= fromDate) : events;
   const evenings = inWindow.filter((e) => !isCourse(e));
-  const picked = roundRobin(evenings, limit, [], new Set(), new Set());
+  const picked = roundRobin(evenings, limit, [], new Set(), new Set(), issueNumber);
   if (picked.length < limit) {
     const ids = new Set(picked.map((e) => e.id));
     const hosts = new Set(picked.map(hostKey));
-    roundRobin(inWindow.filter(isCourse), limit, picked, ids, hosts);
+    roundRobin(inWindow.filter(isCourse), limit, picked, ids, hosts, issueNumber);
   }
   return picked.sort((a, b) => (a.start_date ?? "").localeCompare(b.start_date ?? ""));
 }
@@ -41,7 +42,8 @@ function roundRobin(
   limit: number,
   picked: Event[],
   seenIds: Set<string>,
-  seenHosts: Set<string>
+  seenHosts: Set<string>,
+  issueNumber = 0
 ): Event[] {
   const byDay = new Map<string, Event[]>();
   for (const e of events) {
@@ -49,7 +51,15 @@ function roundRobin(
     if (!byDay.has(day)) byDay.set(day, []);
     byDay.get(day)!.push(e);
   }
-  for (const list of byDay.values()) list.sort((a, b) => preference(a) - preference(b));
+  // Weekly classes recur every issue: start each day's list further along
+  // each week so the same Wednesday class doesn't lead every time.
+  for (const [day, list] of byDay) {
+    list.sort((a, b) => preference(a) - preference(b));
+    if (list.length > 1 && issueNumber > 0) {
+      const k = issueNumber % list.length;
+      byDay.set(day, [...list.slice(k), ...list.slice(0, k)]);
+    }
+  }
   const days = [...byDay.keys()].sort();
   while (picked.length < limit) {
     let tookAny = false;
