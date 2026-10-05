@@ -2,9 +2,9 @@ name: weekly-digest
 
 on:
   schedule:
-    # 23:06 UTC Tuesday = 07:06 WITA Wednesday — the digest lands with
-    # Wednesday-morning coffee in Bali. Off-minute dodges the on-the-hour
-    # GH Actions cron pile-up.
+    # 23:06 UTC Tuesday = 07:06 WITA Wednesday. GitHub's queue runs it 60–95
+    # min late, so it actually lands ~08:05–08:40 Bali. Off-minute dodges the
+    # on-the-hour GH Actions cron pile-up.
     - cron: "6 23 * * 2"
   workflow_dispatch:
     inputs:

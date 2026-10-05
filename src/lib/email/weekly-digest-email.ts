@@ -24,8 +24,8 @@ export function buildWeeklyDigestEmailHtml(opts: {
 
   const intro = withDeals
     ? a
-      ? `The week's best deals, then what's on — picked for ${esc(a.name)}.`
-      : `The week's best deals, then what's on in the valley.`
+      ? `This week's deals, then what's on — picked for ${esc(a.name)}.`
+      : `This week's deals, then what's on in the valley.`
     : a
       ? `Picked for ${esc(a.name)} — what's moving in the valley this week.`
       : `What's moving in the valley this week.`;
