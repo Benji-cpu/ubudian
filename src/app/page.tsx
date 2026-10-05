@@ -130,9 +130,9 @@ export default async function HomePage() {
               <dd className="text-xs text-white/65">Venues listed</dd>
             </div>
             <div className="border-l border-white/20 pl-8">
-              <dt className="sr-only">Price</dt>
+              <dt className="sr-only">Cost to use</dt>
               <dd className="text-2xl font-semibold">Free</dd>
-              <dd className="text-xs text-white/65">Always</dd>
+              <dd className="text-xs text-white/65">To use</dd>
             </div>
           </dl>
         </div>
