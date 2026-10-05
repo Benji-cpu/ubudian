@@ -196,7 +196,7 @@ export async function GET(request: Request) {
     };
   });
 
-  // Tonight in Ubud: email each venue a week before its special lapses.
+  // Ubud deals: email each venue a week before its deals lapse.
   const specialsReconfirm: ReconfirmRunResult = await sendDueReconfirms({ dryRun }).catch((err) => {
     errors.push(`sendDueReconfirms: ${err?.message ?? String(err)}`);
     return { due: 0, venues: 0, sent: 0, failed: 0 };
