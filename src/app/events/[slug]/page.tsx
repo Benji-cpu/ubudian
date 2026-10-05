@@ -113,7 +113,7 @@ export default async function EventPage({ params }: EventPageProps) {
     if (queryEmbedding) {
       const { data: matches } = await supabase.rpc("match_events_by_embedding", {
         query_embedding: queryEmbedding,
-        match_count: 6,
+        match_count: 10,
         exclude_id: e.id,
       });
       const ids = ((matches ?? []) as { id: string }[]).map((m) => m.id);
@@ -124,7 +124,9 @@ export default async function EventPage({ params }: EventPageProps) {
           .in("id", ids)
           .eq("status", "approved");
         const order = new Map(ids.map((id, i) => [id, i] as const));
-        related = visibleListings((rel ?? []) as Event[])
+        // Roll recurring rows to their next date and drop past one-offs; the
+        // embedding match knows nothing about time ("Sep 4" showed in October).
+        related = rolledForward(visibleListings((rel ?? []) as Event[]))
           .sort((a, b) => (order.get(a.id) ?? 99) - (order.get(b.id) ?? 99))
           .slice(0, 4);
         related.forEach((r) => delete (r as unknown as Record<string, unknown>).embedding);
@@ -144,7 +146,7 @@ export default async function EventPage({ params }: EventPageProps) {
         .order("start_date", { ascending: true })
         .limit(8);
       if (relatedError) console.error("Related events query error:", relatedError);
-      related = visibleListings((relatedEvents ?? []) as Event[]).slice(0, 4);
+      related = rolledForward(visibleListings((relatedEvents ?? []) as Event[])).slice(0, 4);
       related.forEach((r) => delete (r as unknown as Record<string, unknown>).embedding);
     }
   } catch {
