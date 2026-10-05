@@ -54,9 +54,9 @@ export async function Footer() {
         {/* Newsletter */}
         <div className="mx-auto mt-10 max-w-md text-center">
           <p className="text-sm text-brand-off-white/80">
-            One email a week — ceremonies, workshops, and sound journeys.
+            One email a week: the best deals and what&apos;s on.
           </p>
-          <NewsletterSignup variant="dark" className="mt-4" />
+          <NewsletterSignup variant="dark" source="footer" className="mt-4" />
         </div>
 
         {/* Social / Info */}

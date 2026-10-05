@@ -30,7 +30,7 @@ export async function Header() {
         <div className="flex items-center gap-1.5">
           <ThemeToggle />
           <Button asChild size="sm" className="hidden md:inline-flex">
-            <Link href="/#newsletter">Get the weekly</Link>
+            <Link href="/newsletter">Get the weekly</Link>
           </Button>
           {profile ? (
             <UserMenu profile={profile} />

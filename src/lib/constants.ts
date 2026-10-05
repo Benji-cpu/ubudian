@@ -18,7 +18,7 @@ export const TAB_LINKS = [
   { label: "Today", href: "/", icon: "Sun" },
   { label: "Deals", href: "/deals", icon: "Tag" },
   { label: "Events", href: "/events", icon: "CalendarDays" },
-  { label: "Weekly", href: "/#newsletter", icon: "Mail" },
+  { label: "Weekly", href: "/newsletter", icon: "Mail" },
 ] as const;
 
 export type AdminNavItem =

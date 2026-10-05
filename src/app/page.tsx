@@ -167,7 +167,10 @@ export default async function HomePage() {
           <p className="mx-auto mt-3 max-w-md text-white/75">
             The best deals and what&apos;s on, in one short email. No spam, unsubscribe any time.
           </p>
-          <NewsletterSignup variant="dark" className="mx-auto mt-6 max-w-md" />
+          <NewsletterSignup variant="dark" source="home" className="mx-auto mt-6 max-w-md" />
+          <Link href="/newsletter" className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-white/70 hover:text-white">
+            See this week&apos;s issue <ArrowRight className="h-4 w-4" />
+          </Link>
         </div>
       </section>
 
