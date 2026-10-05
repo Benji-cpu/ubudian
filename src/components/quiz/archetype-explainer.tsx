@@ -98,7 +98,7 @@ export function ArchetypeExplainer({
             New here
           </span>
           <p className="mt-1 font-serif text-lg leading-snug text-brand-deep-green dark:text-brand-gold">
-            Not sure where to start? A 1-minute quiz picks for you.
+            Not sure where to start? A short quiz picks for you.
           </p>
           <p className="mt-1 hidden max-w-xl text-sm leading-relaxed text-foreground/70 sm:block">
             Five kinds of evening in Ubud. Answer a few questions and this list
