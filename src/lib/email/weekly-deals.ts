@@ -145,17 +145,20 @@ export function buildPreheader(deals: Special[], eventCount: number): string {
   return full.length <= 140 ? full : preheaderFor(deals.slice(0, 1), eventCount);
 }
 
+const DAY_IN_TITLE = /\b(mon|tues|wednes|thurs|fri|satur|sun)day\b/i;
+
 function preheaderFor(deals: Special[], eventCount: number): string {
   const parts = deals.map((d) => {
     const label = formatWeekdays(d.weekdays);
-    const days = hasSetDays(d) ? ` on ${/^(Weekdays|Weekends)$/.test(label) ? label.toLowerCase() : label}` : "";
+    const soft = /^(Weekdays|Weekends)$/.test(label) ? label.toLowerCase() : label;
+    // "Sunday cookout … on Sun" says it twice; "Sun, Tue" reads as "Sun and Tue".
+    const days = hasSetDays(d) && !DAY_IN_TITLE.test(d.title) ? ` on ${soft.replace(/, ([^,]+)$/, " and $1")}` : "";
     return `${d.title} at ${d.venue_name}${days}`;
   });
-  const events = eventCount > 0 ? `${eventCount} thing${eventCount === 1 ? "" : "s"} on in Ubud this week` : "";
-  const text = [...parts, events].filter(Boolean);
-  if (text.length === 0) return "";
-  const joined = text.length > 1 ? `${text.slice(0, -1).join(", ")}, and ${text[text.length - 1]}.` : `${text[0]}.`;
-  return joined.charAt(0).toUpperCase() + joined.slice(1);
+  const events = eventCount > 0 ? `Plus ${eventCount} thing${eventCount === 1 ? "" : "s"} on in Ubud this week.` : "";
+  if (parts.length === 0) return events;
+  const deal = parts.join(", ").replace(/^./, (c) => c.toUpperCase());
+  return [`${deal}.`, events].filter(Boolean).join(" ");
 }
 
 function clip(text: string, max: number): string {
@@ -185,19 +188,17 @@ export function buildDealsBlockHtml(deals: Special[], siteUrl: string): string {
     })
     .join("");
 
-  // "++" is how Bali menus write "plus tax and service"; say so once if any deal uses it.
-  const plusPlus = deals.some((s) => /\+\+/.test(`${s.title} ${s.description ?? ""}`))
-    ? `
+  // Said once for every deal, rather than per row: Bali menu prices often add tax and service ("++").
+  const priceNote = `
   <tr><td style="padding:6px 32px 0;">
-    <p style="margin:0;font-size:12px;color:${CHARCOAL}88;font-family:Georgia,serif;">++ = plus tax and service</p>
-  </td></tr>`
-    : "";
+    <p style="margin:0;font-size:12px;color:${CHARCOAL}88;font-family:Georgia,serif;">Restaurant prices in Bali often add tax and service (shown as ++).</p>
+  </td></tr>`;
 
   return `
   <tr><td style="padding:22px 32px 4px;">
     <p style="margin:0;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:${GOLD};font-family:Georgia,serif;">This week's deals</p>
   </td></tr>
-  ${rows}${plusPlus}
+  ${rows}${priceNote}
   <tr><td style="padding:10px 32px 4px;">
     <a href="${siteUrl}${DEALS_PATH}" style="font-size:14px;color:${GREEN};font-family:Georgia,serif;">Every deal in Ubud →</a>
   </td></tr>`;

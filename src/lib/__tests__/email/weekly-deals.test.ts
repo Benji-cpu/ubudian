@@ -128,7 +128,7 @@ describe("buildPreheader", () => {
         ],
         5
       )
-    ).toBe("2-for-1 pizza at Milk & Madu on Sun, Tue, all-you-can-eat at Kraton on Mon, Thu, and 5 things on in Ubud this week.");
+    ).toBe("2-for-1 pizza at Milk & Madu on Sun and Tue, all-you-can-eat at Kraton on Mon and Thu. Plus 5 things on in Ubud this week.");
   });
 });
 
@@ -136,6 +136,7 @@ describe("buildPreheader day wording", () => {
   it("lowercases weekdays but keeps a day name's capital", () => {
     expect(buildPreheader([deal({ title: "Brunch", venue_name: "A", weekdays: [1, 2, 3, 4, 5] })], 0)).toBe("Brunch at A on weekdays.");
     expect(buildPreheader([deal({ title: "Roast", venue_name: "B", weekdays: [0] })], 0)).toBe("Roast at B on Sun.");
+    expect(buildPreheader([deal({ title: "Sunday cookout", venue_name: "C", weekdays: [0] })], 2)).toBe("Sunday cookout at C. Plus 2 things on in Ubud this week.");
   });
 });
 
@@ -148,12 +149,9 @@ describe("dealBlurb source note", () => {
 });
 
 describe("buildDealsBlockHtml", () => {
-  it("explains ++ once when a deal uses it", () => {
-    const html = buildDealsBlockHtml(
-      [deal({ description: "Adults IDR 488k++, welcome drink and BBQ buffet." }), deal({ venue_name: "B", description: "IDR 55k++ a glass of wine." })],
-      "https://theubudian.life"
-    );
-    expect(html.match(/\+\+ = plus tax and service/g)).toHaveLength(1);
+  it("says once that prices often add tax and service", () => {
+    const html = buildDealsBlockHtml([deal({}), deal({ venue_name: "B" })], "https://theubudian.life");
+    expect(html.match(/often add tax and service/g)).toHaveLength(1);
   });
 
   it("is empty with no deals", () => {
