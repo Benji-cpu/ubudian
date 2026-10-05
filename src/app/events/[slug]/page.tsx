@@ -10,6 +10,7 @@ import { EventCard } from "@/components/events/event-card";
 import { EventHero } from "@/components/events/event-hero";
 import { rolledForward } from "@/lib/events/buckets";
 import { EventMap } from "@/components/events/event-map";
+import Link from "next/link";
 import { HowToGetIn } from "@/components/events/how-to-get-in";
 import { FacilitatorCard } from "@/components/events/facilitator-card";
 import { SaveEventButton } from "@/components/dashboard/save-event-button";
@@ -194,6 +195,12 @@ export default async function EventPage({ params }: EventPageProps) {
 
         {/* How to get in — tickets, the organiser, or the door */}
         <HowToGetIn event={e} />
+        <p className="mx-auto mt-3 max-w-3xl px-4 text-sm text-muted-foreground sm:px-6">
+          Making a night of it?{" "}
+          <Link href="/deals" className="font-medium text-brand-deep-green underline underline-offset-4">
+            Today&apos;s food and drink deals in Ubud
+          </Link>
+        </p>
 
         {/* Inline ticket CTA (desktop) */}
         {e.external_ticket_url && isSafeUrl(e.external_ticket_url) && (

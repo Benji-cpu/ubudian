@@ -269,6 +269,12 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
       <RefreshOnFocus />
 
       <EventsHero totalCount={heroCount} />
+      <p className="mx-auto mt-3 max-w-5xl px-4 text-sm text-muted-foreground sm:px-6">
+        Eating out first?{" "}
+        <Link href="/deals" className="font-medium text-brand-deep-green underline underline-offset-4">
+          Today&apos;s food and drink deals in Ubud
+        </Link>
+      </p>
 
       {spotlight && (
         <div className="mt-2">
