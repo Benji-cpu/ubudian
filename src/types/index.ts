@@ -726,6 +726,8 @@ export interface Special {
   price_idr: number | null;
   /** 0 = Sunday … 6 = Saturday. Empty = every day. */
   weekdays: number[];
+  /** false = the source gives no days; weekdays is empty but does NOT mean every day. */
+  days_stated?: boolean;
   start_time: string | null;
   end_time: string | null;
   /** Public page the deal was read from (the venue's own page where possible). */

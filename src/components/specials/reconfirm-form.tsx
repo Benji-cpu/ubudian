@@ -5,7 +5,7 @@ import Link from "next/link";
 import { CheckCircle2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { formatHours, formatIdr, formatWeekdays } from "@/lib/specials";
+import { formatDays, formatHours, formatIdr } from "@/lib/specials";
 import type { Special } from "@/types";
 
 export function ReconfirmForm({ token, specials }: { token: string; specials: Special[] }) {
@@ -71,7 +71,7 @@ export function ReconfirmForm({ token, specials }: { token: string; specials: Sp
       <ul className="space-y-3">
         {specials.map((s) => {
           const on = running.has(s.id);
-          const meta = [formatWeekdays(s.weekdays), formatHours(s.start_time, s.end_time), formatIdr(s.price_idr)]
+          const meta = [formatDays(s), formatHours(s.start_time, s.end_time), formatIdr(s.price_idr)]
             .filter(Boolean)
             .join(" · ");
           return (

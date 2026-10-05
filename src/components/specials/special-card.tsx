@@ -1,6 +1,6 @@
 import { Clock, MapPin, Instagram, Globe } from "lucide-react";
 import type { Special } from "@/types";
-import { formatCheckedOn, formatHours, formatIdr, formatWeekdays } from "@/lib/specials";
+import { formatCheckedOn, formatDays, formatHours, formatIdr } from "@/lib/specials";
 
 function mapsHref(s: Special): string {
   if (s.google_maps_url) return s.google_maps_url;
@@ -56,7 +56,7 @@ export function SpecialCard({
         {(showDays || hours) && (
           <span className="inline-flex items-center gap-1.5">
             <Clock className="h-4 w-4" aria-hidden />
-            {[showDays ? formatWeekdays(special.weekdays) : null, hours].filter(Boolean).join(" · ")}
+            {[showDays ? formatDays(special) : null, hours].filter(Boolean).join(" · ")}
           </span>
         )}
         <a

@@ -4,7 +4,7 @@ import { parseTimeToMinutes } from "@/lib/events/bali-time";
 
 /** Everything a public page may show. Never add the contact_* columns here. */
 export const PUBLIC_SPECIAL_COLUMNS =
-  "id, venue_name, venue_area, venue_address, google_maps_url, instagram_handle, website_url, title, description, price_idr, weekdays, start_time, end_time, source_url, expires_on, confirmed_at";
+  "id, venue_name, venue_area, venue_address, google_maps_url, instagram_handle, website_url, title, description, price_idr, weekdays, days_stated, start_time, end_time, source_url, expires_on, confirmed_at";
 
 /** A special lapses this many days after it was last confirmed. */
 export const SPECIAL_LIFETIME_DAYS = 30;
@@ -20,14 +20,23 @@ export const WEEKDAY_NAMES = [
   "Saturday",
 ] as const;
 
-/** Runs on this weekday (0 = Sunday). An empty list means every day. */
-export function runsOn(special: Pick<Special, "weekdays">, dayOfWeek: number): boolean {
+/** Its source gives no days, so it can't be placed on any day. */
+export function daysUnknown(special: { days_stated?: boolean }): boolean {
+  return special.days_stated === false;
+}
+
+/**
+ * Runs on this weekday (0 = Sunday). An empty list means every day — unless the
+ * source gave no days, in which case we can't say it runs on any particular one.
+ */
+export function runsOn(special: Pick<Special, "weekdays"> & { days_stated?: boolean }, dayOfWeek: number): boolean {
+  if (daysUnknown(special)) return false;
   return special.weekdays.length === 0 || special.weekdays.includes(dayOfWeek);
 }
 
 /** Still worth heading out for: runs today and hasn't finished yet. */
 export function isStillOnToday(
-  special: Pick<Special, "weekdays" | "end_time">,
+  special: Pick<Special, "weekdays" | "end_time"> & { days_stated?: boolean },
   now: BaliNow
 ): boolean {
   if (!runsOn(special, now.dayOfWeek)) return false;
@@ -46,7 +55,7 @@ export function specialsForToday<T extends Special>(rows: T[], now: BaliNow): T[
 
 /** Running right now: today, and between its start and end (open-ended counts). */
 export function isOnNow(
-  special: Pick<Special, "weekdays" | "start_time" | "end_time">,
+  special: Pick<Special, "weekdays" | "start_time" | "end_time"> & { days_stated?: boolean },
   now: BaliNow
 ): boolean {
   if (!isStillOnToday(special, now)) return false;
@@ -63,6 +72,11 @@ export function formatCheckedOn(confirmedAt: string): string {
 
 function startKey(s: Pick<Special, "start_time">): number {
   return parseTimeToMinutes(s.start_time) ?? 24 * 60;
+}
+
+/** formatWeekdays, but honest about a deal whose source gives no days. Prefer this. */
+export function formatDays(special: Pick<Special, "weekdays"> & { days_stated?: boolean }): string {
+  return daysUnknown(special) ? "Days not stated" : formatWeekdays(special.weekdays);
 }
 
 /** "Tue, Thu" / "Every day" / "Weekdays" / "Weekends". */

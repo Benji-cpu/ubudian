@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { SpecialCard } from "@/components/specials/special-card";
 import { NewsletterSignup } from "@/components/layout/newsletter-signup";
 import { nowInBali } from "@/lib/events/bali-time";
-import { isOnNow, runsOn, specialsForToday, WEEKDAY_NAMES } from "@/lib/specials";
+import { daysUnknown, isOnNow, runsOn, specialsForToday, WEEKDAY_NAMES } from "@/lib/specials";
 import { getLiveSpecials } from "@/lib/specials/queries";
 import { SITE_URL } from "@/lib/constants";
 
@@ -28,7 +28,8 @@ export default async function DealsPage() {
   const week = Array.from({ length: 6 }, (_, i) => (now.dayOfWeek + 1 + i) % 7)
     .map((day) => ({ day, items: deals.filter((d) => d.weekdays.length > 0 && runsOn(d, day)) }))
     .filter((d) => d.items.length > 0);
-  const everyDay = deals.filter((d) => d.weekdays.length === 0);
+  const everyDay = deals.filter((d) => d.weekdays.length === 0 && !daysUnknown(d));
+  const askDays = deals.filter((d) => daysUnknown(d));
 
   return (
     <div>
@@ -95,6 +96,24 @@ export default async function DealsPage() {
             {everyDay.map((s) => (
               <SpecialCard key={s.id} special={s} showDays={false} />
             ))}
+          </div>
+        </section>
+      )}
+
+      {askDays.length > 0 && (
+        <section className="bg-brand-warm-cream px-4 py-12 dark:bg-transparent">
+          <div className="mx-auto max-w-3xl sm:px-2">
+            <h2 className="font-serif text-2xl text-brand-deep-green dark:text-brand-gold sm:text-3xl">
+              Ask which days
+            </h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Real deals whose source gives the hours but not the days. Check before you go.
+            </p>
+            <div className="mt-6 space-y-4">
+              {askDays.map((s) => (
+                <SpecialCard key={s.id} special={s} />
+              ))}
+            </div>
           </div>
         </section>
       )}

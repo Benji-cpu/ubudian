@@ -9,6 +9,7 @@ import {
   addDaysToDateStr,
   isOnNow,
   formatCheckedOn,
+  formatDays,
 } from "@/lib/specials";
 import type { Special } from "@/types";
 
@@ -24,6 +25,7 @@ const base: Special = {
   description: null,
   price_idr: null,
   weekdays: [],
+  days_stated: true,
   start_time: null,
   end_time: null,
   source_url: null,
@@ -84,5 +86,14 @@ describe("specials helpers", () => {
   it("formats the check date in Bali time", () => {
     // 20:00 UTC on 4 Oct is 04:00 on 5 Oct in Bali.
     expect(formatCheckedOn("2026-10-04T20:00:00Z")).toBe("5 Oct");
+  });
+
+  it("a deal whose source gives no days never lands on a day, and says so", () => {
+    const unknown = { weekdays: [], days_stated: false, start_time: "17:00:00", end_time: "20:00:00" };
+    expect(runsOn(unknown, 2)).toBe(false);
+    expect(isOnNow(unknown, tue6pm)).toBe(false);
+    expect(specialsForToday([{ ...base, ...unknown }], tue6pm)).toHaveLength(0);
+    expect(formatDays(unknown)).toBe("Days not stated");
+    expect(formatDays({ weekdays: [], days_stated: true })).toBe("Every day");
   });
 });
