@@ -97,6 +97,7 @@ Dry run before trusting a rule change: `npx tsx scripts/auto-approve.ts --limit=
 
 - `/venue`: Google sign-in; `/venue?claim=<confirm_token>` binds `deal_venues.owner_user_id` (first claim wins). Owners add, edit and take down deals.
 - **Every venue submission waits for review** (`specials.status='pending'`), including `/tonight/add`. An edit to a LIVE deal waits in `specials.pending_changes` while the live version stays up. Taking down is immediate. Copy everywhere a venue submits: "Updates go live within 24 hours" (`REVIEW_PROMISE`, `src/lib/venue/index.ts`).
+- **The review route has its own key** (`src/lib/venue/review-auth.ts`): an HMAC derived one-way from `CRON_SECRET`, set in the bus repo as `DEALS_REVIEW_SECRET` (`npx tsx --env-file=.env.local scripts/deals-review-token.ts | gh secret set DEALS_REVIEW_SECRET -R Benji-cpu/ubudian-deals-bus`). The route rejects `CRON_SECRET` itself, so the site-wide secret never leaves Vercel and local env. Rotating `CRON_SECRET` changes the derived key: reset the bus secret the same way.
 - The daily deals review (table above; its bus is the PRIVATE repo `Benji-cpu/ubudian-deals-bus`, never this public one) is the publisher; `/admin/deals` shows what's waiting/flagged with Publish/Reject by hand. Nightly `daily-maintenance` hides anything pending > 14 days (`expireStalePending`) and reports `dealsReview` in its payload. Decision logic: `src/lib/venue/review.ts` (`updateFor`, unit-tested).
 
 ## Architecture
