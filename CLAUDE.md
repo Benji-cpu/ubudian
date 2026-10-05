@@ -64,7 +64,7 @@ Three backbones. Vercel Cron is capped at **2 jobs on Hobby and both slots are u
 
 - **Structural screen first** (free, deterministic, unit-tested): venue ≥3 chars, **a way in** (ticket link, organiser contact/Instagram, or a named venue — not an area like "Outside Ubud"/"Penestanan"; `wayIn()` in `src/lib/events/listing-checks.ts`), category in `EVENT_CATEGORIES` and not the `Other` fallback, body ≥40 chars (`short_description` counts), no `content_flags`, `quality_score` ≥0.4 when present, live recurrence, future date. Then `moderateEvent()` on the survivors — this is the **only** place ingested content is moderated; `pipeline.ts` applies just the keyword ICP filter.
 - **One card per gathering.** A candidate that `sameGathering()` matches against a live row (same named venue, same start time, a shared day, a shared distinctive title word) is archived `duplicate_of:<id>`; a new weekly row never displaces a live one-off. Built for todo.today listing each week of a series under that week's facilitator ("Friday Ecstatic Dance w/ DION", "… w/ Karunika") — one Friday dance was four cards.
-- **Bounded**: `AUTO_APPROVE_MAX_PER_RUN = 25`, 25s budget, 5 moderation calls in flight.
+- **Bounded**: `AUTO_APPROVE_MAX_PER_RUN = 40`, 25s budget, 5 moderation calls in flight. `moderateEvent` falls back across `gemini-2.5-flash-lite` → `3.1-flash-lite` → `3.5-flash-lite` (own free quota each) before holding.
 - **Reversible**: every auto-publish stamps `events.auto_approved_at`. Undo the lot with `UPDATE events SET status='pending', auto_approved_at=NULL WHERE auto_approved_at IS NOT NULL`.
 - **No review queue, deliberately.** Anything declined stays `pending` and expires as it always has. Do not add a "needs review" surface — an unstaffed queue is what broke this system the first time.
 - **Ordering is one-offs first, then by date.** Sorting by `start_date` alone puts every recurring event's months-old seed date ahead of the one-off happening on Friday, which is the event about to expire.
@@ -78,7 +78,7 @@ Three backbones. Vercel Cron is capped at **2 jobs on Hobby and both slots are u
 
 **Public pages apply the same rules at read time** (`visibleListings()` / `isPublicListing()` in `listing-checks.ts`): never-moderated rows (`moderation_reason='auto_gate:unmoderated'`) and rows with no way in are hidden, and a gathering shows one card. Every public event read — `/events`, homepage, hubs, quiz, dashboard, related events, RSS, sitemap, the weekly email and the quiz spread — passes through it; the detail page 404s what `isPublicListing` rejects. Nothing is written: `supabase/migrations/20260927120000_walk_cleanup.sql` (unapplied) tidies the rows themselves if Ben runs it. A new public event read must use it too.
 
-Dry run before trusting a rule change: `npx tsx scripts/auto-approve.ts --limit=250` (add `--apply` to publish), or `GET /api/cron/daily-maintenance?dryRun=true` with the `CRON_SECRET` bearer.
+Dry run before trusting a rule change: `npx tsx scripts/auto-approve.ts --limit=250` (add `--apply` to publish). **A dry run spends real moderation quota** — on 5 Oct a 60-row dry run used the day's free calls on all three models and the `--apply` right after held everything; run `--apply` directly, or dry-run with a small `--limit`, or `GET /api/cron/daily-maintenance?dryRun=true` with the `CRON_SECRET` bearer.
 
 ## Ubud deals (restaurant deals, since 2026-10-05)
 

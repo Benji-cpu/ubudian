@@ -40,7 +40,9 @@ import { EVENT_CATEGORIES } from "@/lib/constants";
 import { wayIn, sameGathering, type SlotFields } from "@/lib/events/listing-checks";
 
 /** Most events one run may publish. Deliberately small — see rule 2 above. */
-export const AUTO_APPROVE_MAX_PER_RUN = 25;
+// 40 since 5 Oct 2026: moderation now falls back across three flash-lite models,
+// each with its own free daily quota, and two new sources feed the gate.
+export const AUTO_APPROVE_MAX_PER_RUN = 40;
 
 /** Wall-clock budget. The route also does link-health, so leave it room. */
 const MAX_ELAPSED_MS = 25_000;
