@@ -13,9 +13,9 @@ import { SITE_URL } from "@/lib/constants";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Ubud deals — breakfast sets, 2-for-1 pizza and good food for less",
+  title: "Ubud deals — real savings on food and wellness",
   description:
-    "Food, café and wellness deals in Ubud, by day: breakfast boards, a vegan buffet, 2-for-1 pizza night. No drink deals.",
+    "Food and wellness deals in Ubud that are at least 25% off the normal price: 2-for-1 pizza, spa mornings, a free coffee with breakfast. No drink deals.",
   alternates: { canonical: `${SITE_URL}/deals` },
 };
 
@@ -39,8 +39,8 @@ export default async function DealsPage() {
             Ubud deals
           </h1>
           <p className="mt-4 text-lg text-brand-off-white/80">
-            Breakfast boards, a vegan buffet, 2-for-1 pizza night: good food for less around Ubud.
-            Tell them The Ubudian sent you.
+            Only real savings: at least a quarter off the normal price, like 2-for-1 pizza or a
+            free coffee with breakfast. Tell them The Ubudian sent you.
           </p>
         </div>
       </section>
@@ -122,7 +122,7 @@ export default async function DealsPage() {
         <div className="mx-auto max-w-xl">
           <h2 className="font-serif text-2xl text-brand-deep-green sm:text-3xl">Run a restaurant or café in Ubud?</h2>
           <p className="mt-3 text-brand-charcoal-light">
-            List your food, café or wellness deal for free. It shows here on the days it runs,
+            List your food or wellness deal for free if it&apos;s at least 25% off your normal price. It shows here on the days it runs,
             and we check it with you once a month so nothing goes stale. We don&apos;t list drink deals.
           </p>
           <Button asChild size="lg" className="mt-6">

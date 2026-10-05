@@ -27,7 +27,7 @@ export default function AddSpecialPage() {
         <div className="mb-8 rounded-md border bg-muted/50 p-4 text-sm text-muted-foreground">
           <ul className="list-disc space-y-1 pl-5">
             <li>One deal per form: a 2-for-1, a breakfast or lunch set, a weekly food night, a wellness offer. Add as many as you run.</li>
-            <li>We list food, café and wellness deals at IDR 200k a person or less. We don&apos;t list drink deals.</li>
+            <li>We list food and wellness deals that are at least 25% off your normal price (a 2-for-1, a free item, kids eat free). Tell us the normal price. We don&apos;t list drink deals.</li>
             <li>We check new and changed deals every night; most are live by the next morning. Free, now and later.</li>
             <li>Once a month we message you to check it&apos;s still running. If we don&apos;t hear back, it comes off.</li>
           </ul>
