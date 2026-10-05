@@ -15,7 +15,7 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Ubud deals — 2-for-1s, happy hours and weekly food nights",
   description:
-    "Every food and drink deal we've found in Ubud, by day: 2-for-1 pizza nights, happy hours, set lunches. Each one sourced and checked every month.",
+    "Every food and drink deal we've found in Ubud, by day: 2-for-1 pizza nights, happy hours, set lunches. Each one sourced, and re-checked every month.",
   alternates: { canonical: `${SITE_URL}/deals` },
 };
 
@@ -44,7 +44,8 @@ export default async function DealsPage() {
           </h1>
           <p className="mt-4 text-lg text-brand-off-white/80">
             2-for-1s, happy hours and weekly food nights, each one taken from the venue&apos;s own
-            page or a dated guide and checked every month. Tell them The Ubudian sent you.
+            page, a dated guide, or sent in by the venue, and re-checked with the venue every month.
+            Tell them The Ubudian sent you.
           </p>
         </div>
       </section>
