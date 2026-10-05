@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { SpecialCard } from "@/components/specials/special-card";
 import { NewsletterSignup } from "@/components/layout/newsletter-signup";
+import { ChannelFollow } from "@/components/whatsapp/channel-follow";
 import { nowInBali } from "@/lib/events/bali-time";
 import { daysUnknown, isOnNow, runsOn, specialsForToday, WEEKDAY_NAMES } from "@/lib/specials";
 import { getLiveSpecials } from "@/lib/specials/queries";
@@ -116,6 +117,8 @@ export default async function DealsPage() {
           </h2>
           <p className="mt-2 text-sm text-muted-foreground">One short email. Unsubscribe any time.</p>
           <NewsletterSignup source="deals" className="mx-auto mt-6 max-w-md" />
+          {/* Renders nothing until WHATSAPP_CHANNEL_URL is set. */}
+          <ChannelFollow className="mx-auto mt-8 max-w-md" />
         </div>
       </section>
 
