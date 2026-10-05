@@ -128,7 +128,7 @@ describe("buildPreheader", () => {
         ],
         5
       )
-    ).toBe("2-for-1 pizza at Milk & Madu on Sun and Tue, all-you-can-eat at Kraton on Mon and Thu. Plus 5 things on in Ubud this week.");
+    ).toBe("2-for-1 pizza at Milk & Madu on Sun and Tue; all-you-can-eat at Kraton on Mon and Thu. Plus 5 things on in Ubud this week.");
   });
 });
 

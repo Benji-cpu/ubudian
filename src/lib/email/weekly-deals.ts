@@ -157,7 +157,7 @@ function preheaderFor(deals: Special[], eventCount: number): string {
   });
   const events = eventCount > 0 ? `Plus ${eventCount} thing${eventCount === 1 ? "" : "s"} on in Ubud this week.` : "";
   if (parts.length === 0) return events;
-  const deal = parts.join(", ").replace(/^./, (c) => c.toUpperCase());
+  const deal = parts.join("; ").replace(/^./, (c) => c.toUpperCase());
   return [`${deal}.`, events].filter(Boolean).join(" ");
 }
 
