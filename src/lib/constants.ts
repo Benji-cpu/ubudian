@@ -29,6 +29,7 @@ export const ADMIN_NAV_LINKS: AdminNavItem[] = [
   { type: "link", label: "Dashboard", href: "/admin", icon: "LayoutDashboard" },
   { type: "link", label: "Analytics", href: "/admin/analytics", icon: "BarChart3" },
   { type: "link", label: "Events", href: "/admin/events", icon: "Calendar" },
+  { type: "link", label: "Deals", href: "/admin/deals", icon: "Tag" },
   { type: "link", label: "Sources", href: "/admin/sources", icon: "Zap" },
   { type: "divider" },
   { type: "link", label: "Newsletter", href: "/admin/content", icon: "FileText" },
