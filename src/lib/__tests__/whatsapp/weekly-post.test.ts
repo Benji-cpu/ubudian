@@ -1,5 +1,12 @@
 import { describe, it, expect } from "vitest";
-import { buildWeeklyPost, buildTodayPost, MAX_GATHERINGS } from "@/lib/whatsapp/weekly-post";
+import {
+  buildWeeklyPost,
+  buildTodayPost,
+  isWalkInGathering,
+  rotateWeeklyDeals,
+  MAX_GATHERINGS,
+  MAX_SPECIALS,
+} from "@/lib/whatsapp/weekly-post";
 import type { Special } from "@/types";
 
 const special = (over: Partial<Special>): Special => ({
@@ -133,5 +140,43 @@ describe("buildTodayPost", () => {
     expect(post).not.toContain("Morning Yoga");
     expect(post).not.toContain("Tomorrow");
     expect(post).toContain("Free. Every deal links to where we found it");
+  });
+});
+
+describe("rotateWeeklyDeals", () => {
+  const venues = Array.from({ length: 19 }, (_, i) =>
+    special({ id: String(i), venue_name: `Venue ${String(i).padStart(2, "0")}`, weekdays: [i % 7] }),
+  );
+  const wednesdays = ["2026-10-07", "2026-10-14", "2026-10-21", "2026-10-28"];
+  const weekOf = (d: string) => rotateWeeklyDeals(venues, { dateStr: d, dayOfWeek: 3, timeMinutes: 540 });
+
+  it("never repeats last week's venues while there are enough to go round", () => {
+    for (let i = 1; i < wednesdays.length; i++) {
+      const prev = new Set(weekOf(wednesdays[i - 1]).map((s) => s.venue_name));
+      const shared = weekOf(wednesdays[i]).filter((s) => prev.has(s.venue_name));
+      // 19 venues, MAX_SPECIALS (8) a week: two consecutive weeks need 16, so no overlap.
+      expect(MAX_SPECIALS * 2).toBeLessThanOrEqual(19);
+      expect(shared).toHaveLength(0);
+    }
+  });
+
+  it("gives every eligible venue a turn within three weeks", () => {
+    const seen = new Set(wednesdays.slice(0, 3).flatMap((d) => weekOf(d).map((s) => s.venue_name)));
+    expect(seen.size).toBe(19);
+  });
+
+  it("is the same post if built twice in one week", () => {
+    expect(weekOf("2026-10-07").map((s) => s.id)).toEqual(weekOf("2026-10-07").map((s) => s.id));
+  });
+});
+
+describe("isWalkInGathering", () => {
+  it("skips private or secret venues, whole areas and retreats", () => {
+    expect(isWalkInGathering(event({ venue_name: "Private villa in Ubud" }))).toBe(false);
+    expect(isWalkInGathering(event({ venue_name: "Secret Healing Sanctuary" }))).toBe(false);
+    expect(isWalkInGathering(event({ venue_name: "Ubud, Bali" }))).toBe(false);
+    expect(isWalkInGathering(event({ title: "Sacred Bali Retreat: The Healing Experience" }))).toBe(false);
+    expect(isWalkInGathering({ ...event({}), category: "Retreat & Training" })).toBe(false);
+    expect(isWalkInGathering(event({ title: "Ecstatic Dance", venue_name: "Paradiso Ubud" }))).toBe(true);
   });
 });
