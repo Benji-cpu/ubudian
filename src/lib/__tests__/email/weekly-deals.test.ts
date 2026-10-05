@@ -128,24 +128,39 @@ describe("buildPreheader", () => {
         ],
         5
       )
-    ).toBe("2-for-1 pizza at Milk & Madu on Sun, Tue, all-you-can-eat at Kraton on Mon, Thu, and 5 things on this week.");
+    ).toBe("2-for-1 pizza at Milk & Madu on Sun, Tue, all-you-can-eat at Kraton on Mon, Thu, and 5 things on in Ubud this week.");
+  });
+});
+
+describe("dealBlurb source note", () => {
+  it("strips a trailing source note from a real description", () => {
+    expect(
+      dealBlurb({ title: "Brunch", description: "IDR 400k a person; beer and cocktail add-ons (Honeycombers, 5 Jan 2026)." })
+    ).toBe("IDR 400k a person; beer and cocktail add-ons.");
   });
 });
 
 describe("buildDealsBlockHtml", () => {
+  it("explains ++ once when a deal uses it", () => {
+    const html = buildDealsBlockHtml(
+      [deal({ description: "Adults IDR 488k++, welcome drink and BBQ buffet." }), deal({ venue_name: "B", description: "IDR 55k++ a glass of wine." })],
+      "https://theubudian.life"
+    );
+    expect(html.match(/\+\+ = plus tax and service/g)).toHaveLength(1);
+  });
+
   it("is empty with no deals", () => {
     expect(buildDealsBlockHtml([], "https://theubudian.life")).toBe("");
   });
 
-  it("shows the source link, the checked date and escapes text", () => {
+  it("shows 12-hour times, no source line, and escapes text", () => {
     const html = buildDealsBlockHtml(
       [deal({ title: "Tacos <b>2-for-1</b>", weekdays: [0, 2], price_idr: 135000 })],
       "https://theubudian.life"
     );
     expect(html).toContain("This week's deals");
-    expect(html).toContain('href="https://venue.example"');
-    expect(html).toContain("checked 3 Oct");
-    expect(html).toContain("Sun, Tue · 16:00–18:00 · IDR 135k");
+    expect(html).not.toContain("checked");
+    expect(html).toContain("Sun, Tue · 4 PM – 6 PM · IDR 135k");
     expect(html).not.toContain("<b>2-for-1</b>");
     expect(html).toContain("https://theubudian.life/deals");
   });

@@ -5,7 +5,7 @@ import { buildDealsBlockHtml, buildPreheader } from "@/lib/email/weekly-deals";
 import type { ArchetypeId, Event, Special } from "@/types";
 
 /**
- * "This week in your Ubud" — the weekly email. Personalised via the
+ * "This week in Ubud" — the weekly email. Personalised via the
  * reader's archetype when they have one; otherwise it leads with the week itself.
  * With `deals`, the issue opens on this week's deals and the events follow
  * under "What's on".
@@ -70,7 +70,7 @@ ${preheaderHtml}
 <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#ffffff;border-radius:8px;overflow:hidden;">
   <tr><td style="background:${GREEN};padding:28px 32px;">
     <p style="margin:0;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:${GOLD};font-family:Georgia,serif;">${esc(weekLabel)}</p>
-    <h1 style="margin:8px 0 0;font-size:24px;line-height:1.3;color:${CREAM};font-family:Georgia,serif;font-weight:500;">This week in your Ubud</h1>
+    <h1 style="margin:8px 0 0;font-size:24px;line-height:1.3;color:${CREAM};font-family:Georgia,serif;font-weight:500;">This week in Ubud</h1>
   </td></tr>
   <tr><td style="padding:20px 32px 6px;">
     <p style="margin:0;font-size:14px;line-height:1.6;color:${CHARCOAL};font-family:Georgia,serif;">${intro}</p>

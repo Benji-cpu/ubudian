@@ -1,5 +1,5 @@
 import { GREEN, GOLD, CHARCOAL, esc } from "@/lib/email/brand";
-import { daysUnknown, formatDays, formatHours, formatIdr, formatWeekdays } from "@/lib/specials";
+import { daysUnknown, formatDays, formatIdr, formatWeekdays } from "@/lib/specials";
 import type { Special } from "@/types";
 
 /** Where the deals live on the site. One constant, so a rename is one line. */
@@ -118,7 +118,24 @@ export function dealBlurb(special: Pick<Special, "title" | "description">): stri
   if (!desc) return null;
   const core = desc.replace(/\([^)]*\)/g, "").replace(/[.\s]+$/, "").trim();
   if (core.length < 25 || core.toLowerCase() === special.title.trim().toLowerCase()) return null;
-  return desc;
+  // A trailing "(Honeycombers, 5 Jan 2026)" is our note on where we found it, not the reader's.
+  return desc.replace(/\s*\([^)]*\)\s*(?=[.\s]*$)/, "").trim();
+}
+
+/** 17:00 → "5 PM", 17:30 → "5:30 PM": the same 12-hour style the events use. */
+function time12(t: string): string {
+  const [h, m] = t.slice(0, 5).split(":");
+  const hour = parseInt(h, 10);
+  const h12 = hour % 12 || 12;
+  return `${m === "00" ? h12 : `${h12}:${m}`} ${hour >= 12 ? "PM" : "AM"}`;
+}
+
+/** "5–7 PM"-style hours for the email; the site's 24-hour `formatHours` stays on /deals. */
+function emailHours(start: string | null, end: string | null): string | null {
+  if (start && end) return `${time12(start)} – ${time12(end)}`;
+  if (start) return `from ${time12(start)}`;
+  if (end) return `until ${time12(end)}`;
+  return null;
 }
 
 /** The inbox preview line: the first two deals, then the event count. */
@@ -130,18 +147,15 @@ export function buildPreheader(deals: Special[], eventCount: number): string {
 
 function preheaderFor(deals: Special[], eventCount: number): string {
   const parts = deals.map((d) => {
-    const days = hasSetDays(d) ? ` on ${formatWeekdays(d.weekdays)}` : "";
+    const label = formatWeekdays(d.weekdays);
+    const days = hasSetDays(d) ? ` on ${/^[A-Z][a-z]+$/.test(label) ? label.toLowerCase() : label}` : "";
     return `${d.title} at ${d.venue_name}${days}`;
   });
-  const events = eventCount > 0 ? `${eventCount} thing${eventCount === 1 ? "" : "s"} on this week` : "";
+  const events = eventCount > 0 ? `${eventCount} thing${eventCount === 1 ? "" : "s"} on in Ubud this week` : "";
   const text = [...parts, events].filter(Boolean);
   if (text.length === 0) return "";
   const joined = text.length > 1 ? `${text.slice(0, -1).join(", ")}, and ${text[text.length - 1]}.` : `${text[0]}.`;
   return joined.charAt(0).toUpperCase() + joined.slice(1);
-}
-
-function shortDate(iso: string): string {
-  return new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "Asia/Makassar" });
 }
 
 function clip(text: string, max: number): string {
@@ -155,10 +169,9 @@ export function buildDealsBlockHtml(deals: Special[], siteUrl: string): string {
   const rows = deals
     .map((s) => {
       const where = [s.venue_name, s.venue_area].filter(Boolean).map((v) => esc(v as string)).join(" · ");
-      const when = [formatDays(s), formatHours(s.start_time, s.end_time), formatIdr(s.price_idr)]
+      const when = [formatDays(s), emailHours(s.start_time, s.end_time), formatIdr(s.price_idr)]
         .filter(Boolean)
         .join(" · ");
-      const source = dealSourceUrl(s) as string;
       const blurb = dealBlurb(s);
       const desc = blurb
         ? `<p style="margin:6px 0 0;font-size:13px;line-height:1.5;color:${CHARCOAL};font-family:Georgia,serif;">${esc(clip(blurb, 160))}</p>`
@@ -168,16 +181,23 @@ export function buildDealsBlockHtml(deals: Special[], siteUrl: string): string {
     <p style="margin:0;font-size:17px;color:${GREEN};font-family:Georgia,serif;font-weight:500;">${esc(s.title)}</p>
     <p style="margin:4px 0 0;font-size:13px;color:${CHARCOAL}aa;font-family:Georgia,serif;">${where}${when ? ` · ${esc(when)}` : ""}</p>
     ${desc}
-    <p style="margin:6px 0 0;font-size:12px;color:${CHARCOAL}88;font-family:Georgia,serif;"><a href="${esc(source)}" style="color:${GREEN};">Source</a> · checked ${esc(shortDate(s.confirmed_at))}</p>
   </td></tr>`;
     })
     .join("");
+
+  // "++" is how Bali menus write "plus tax and service"; say so once if any deal uses it.
+  const plusPlus = deals.some((s) => /\+\+/.test(`${s.title} ${s.description ?? ""}`))
+    ? `
+  <tr><td style="padding:6px 32px 0;">
+    <p style="margin:0;font-size:12px;color:${CHARCOAL}88;font-family:Georgia,serif;">++ = plus tax and service</p>
+  </td></tr>`
+    : "";
 
   return `
   <tr><td style="padding:22px 32px 4px;">
     <p style="margin:0;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:${GOLD};font-family:Georgia,serif;">This week's deals</p>
   </td></tr>
-  ${rows}
+  ${rows}${plusPlus}
   <tr><td style="padding:10px 32px 4px;">
     <a href="${siteUrl}${DEALS_PATH}" style="font-size:14px;color:${GREEN};font-family:Georgia,serif;">Every deal in Ubud →</a>
   </td></tr>`;

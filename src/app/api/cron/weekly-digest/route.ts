@@ -140,7 +140,7 @@ export async function POST(request: Request) {
       weekLabel,
       deals,
     });
-    const subject = deals.length > 0 ? "This week in Ubud: deals and what's on" : "This week in your Ubud";
+    const subject = deals.length > 0 ? "This week in Ubud: deals and what's on" : "This week in Ubud";
     const ok = await sendTransactionalEmail(recipient.email, subject, html, {
       unsubUrl,
     });
