@@ -148,7 +148,7 @@ export function buildPreheader(deals: Special[], eventCount: number): string {
 function preheaderFor(deals: Special[], eventCount: number): string {
   const parts = deals.map((d) => {
     const label = formatWeekdays(d.weekdays);
-    const days = hasSetDays(d) ? ` on ${/^[A-Z][a-z]+$/.test(label) ? label.toLowerCase() : label}` : "";
+    const days = hasSetDays(d) ? ` on ${/^(Weekdays|Weekends)$/.test(label) ? label.toLowerCase() : label}` : "";
     return `${d.title} at ${d.venue_name}${days}`;
   });
   const events = eventCount > 0 ? `${eventCount} thing${eventCount === 1 ? "" : "s"} on in Ubud this week` : "";

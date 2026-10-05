@@ -132,6 +132,13 @@ describe("buildPreheader", () => {
   });
 });
 
+describe("buildPreheader day wording", () => {
+  it("lowercases weekdays but keeps a day name's capital", () => {
+    expect(buildPreheader([deal({ title: "Brunch", venue_name: "A", weekdays: [1, 2, 3, 4, 5] })], 0)).toBe("Brunch at A on weekdays.");
+    expect(buildPreheader([deal({ title: "Roast", venue_name: "B", weekdays: [0] })], 0)).toBe("Roast at B on Sun.");
+  });
+});
+
 describe("dealBlurb source note", () => {
   it("strips a trailing source note from a real description", () => {
     expect(

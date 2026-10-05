@@ -4,13 +4,23 @@ import { formatEventTime } from "@/lib/utils";
 import { buildDealsBlockHtml, buildPreheader } from "@/lib/email/weekly-deals";
 import type { ArchetypeId, Event, Special } from "@/types";
 
-/** One plain line on what an event is, so a title like "Contact Class with Sima" isn't a mystery. */
-export function eventBlurb(e: Pick<Event, "short_description" | "description">): string {
-  const text = (e.short_description || e.description || "").replace(/\s+/g, " ").trim();
-  if (!text) return "";
-  const firstSentence = text.match(/^.+?[.!?](?=\s|$)/)?.[0] ?? text;
-  const line = firstSentence.length <= 140 ? firstSentence : `${text.slice(0, 139).trimEnd()}…`;
-  return line;
+const plain = (t: string) => t.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+
+/**
+ * One plain line on what an event is, so a title like "Contact Class with Sima" isn't a mystery.
+ * Empty when the text only repeats the title (it then adds nothing).
+ */
+export function eventBlurb(e: Pick<Event, "title" | "short_description" | "description">): string {
+  for (const source of [e.short_description, e.description]) {
+    const text = (source ?? "").replace(/\s+/g, " ").trim();
+    if (!text) continue;
+    const firstSentence = text.match(/^.+?[.!?](?=\s|$)/)?.[0] ?? text;
+    const line = firstSentence.length <= 140 ? firstSentence : `${text.slice(0, 139).trimEnd()}…`;
+    const t = plain(e.title);
+    const l = plain(line);
+    if (l && l !== t && !t.startsWith(l) && !l.startsWith(t)) return line;
+  }
+  return "";
 }
 
 /**
