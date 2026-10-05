@@ -63,8 +63,9 @@ export function EventCard({ event, saveButton, hideDate }: EventCardProps) {
 
         {/* Content */}
         <div className="min-w-0 flex-1">
-          <div className="flex items-start gap-2">
-            <h3 className="font-serif text-lg font-medium leading-snug tracking-tight text-brand-deep-green line-clamp-2 flex-1 transition-colors">
+          {/* Phone: the badge sits above the title so it never squeezes it. */}
+          <div className="flex flex-col-reverse items-start gap-1 sm:flex-row sm:gap-2">
+            <h3 className="w-full font-serif text-lg font-medium leading-snug tracking-tight text-brand-deep-green line-clamp-2 sm:w-auto sm:flex-1 transition-colors">
               {event.title}
             </h3>
             {timeSensitivity ? (
