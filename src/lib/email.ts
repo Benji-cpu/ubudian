@@ -2,7 +2,12 @@ import { Resend } from "resend";
 
 let resend: Resend | null = null;
 
-function getResend(): Resend {
+/** Default sender for one-off mail (event approvals, venue pings, receipts). */
+export const DEFAULT_FROM = "The Ubudian <hello@theubudian.life>";
+/** Sender for everything a subscriber gets: welcome, weekly issue, quiz spread. */
+export const NEWSLETTER_FROM = "The Ubudian <newsletter@theubudian.life>";
+
+export function getResend(): Resend {
   if (!resend) {
     resend = new Resend(process.env.RESEND_API_KEY);
   }
@@ -22,7 +27,7 @@ export async function sendTransactionalEmail(
   to: string,
   subject: string,
   html: string,
-  opts: { unsubUrl?: string } = {}
+  opts: { unsubUrl?: string; from?: string; replyTo?: string } = {}
 ): Promise<boolean> {
   if (!process.env.RESEND_API_KEY) {
     console.warn("[email] RESEND_API_KEY not configured, skipping email to", to);
@@ -34,8 +39,9 @@ export async function sendTransactionalEmail(
     const { error } = await r.emails.send({
       // theubudian.life is the Resend-verified domain (added 2026-06-10;
       // the old .com from-address was never verified, so every send bounced).
-      from: "The Ubudian <hello@theubudian.life>",
+      from: opts.from ?? DEFAULT_FROM,
       to,
+      ...(opts.replyTo && { replyTo: opts.replyTo }),
       subject,
       html,
       ...(opts.unsubUrl && {

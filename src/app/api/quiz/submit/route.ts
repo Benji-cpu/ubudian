@@ -4,7 +4,7 @@ import { queryWithRetry } from "@/lib/supabase/retry";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
 import { buildSpread } from "@/lib/quiz/build-spread";
 import { buildSpreadEmailHtml } from "@/lib/email/spread-email";
-import { sendTransactionalEmail } from "@/lib/email";
+import { NEWSLETTER_FROM, sendTransactionalEmail } from "@/lib/email";
 import { SITE_URL } from "@/lib/constants";
 import { unsubscribeUrl } from "@/lib/email/unsubscribe";
 import { visibleListings } from "@/lib/events/listing-checks";
@@ -154,7 +154,7 @@ export async function POST(request: Request) {
               spreadEmail,
               "Your Ubud spirit + a spread picked for you",
               html,
-              { unsubUrl }
+              { unsubUrl, from: NEWSLETTER_FROM }
             );
           }
         } catch (err) {

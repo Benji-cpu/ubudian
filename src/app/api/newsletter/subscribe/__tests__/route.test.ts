@@ -9,6 +9,7 @@ vi.mock("@/lib/supabase/admin", () => ({
 }));
 
 vi.mock("@/lib/email", () => ({
+  NEWSLETTER_FROM: "The Ubudian <newsletter@theubudian.life>",
   sendTransactionalEmail: vi.fn().mockResolvedValue(true),
 }));
 

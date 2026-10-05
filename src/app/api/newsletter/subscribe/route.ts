@@ -1,7 +1,7 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { queryWithRetry } from "@/lib/supabase/retry";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
-import { sendTransactionalEmail } from "@/lib/email";
+import { NEWSLETTER_FROM, sendTransactionalEmail } from "@/lib/email";
 import { newsletterWelcome } from "@/lib/email-templates";
 import { unsubscribeUrl } from "@/lib/email/unsubscribe";
 import { SITE_URL } from "@/lib/constants";
@@ -83,7 +83,7 @@ export async function POST(request: Request) {
       normalizedEmail,
       "Welcome to The Ubudian!",
       newsletterWelcome(unsubUrl),
-      { unsubUrl }
+      { unsubUrl, from: NEWSLETTER_FROM }
     );
 
     return NextResponse.json({ success: true });

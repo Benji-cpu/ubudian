@@ -11,7 +11,7 @@ import { issueNumberFor, pickWeeklyDeals } from "@/lib/email/weekly-deals";
 import { spreadAcrossWeek } from "@/lib/email/week-spread";
 import { getLiveSpecials } from "@/lib/specials/queries";
 import { unsubscribeUrl } from "@/lib/email/unsubscribe";
-import { sendTransactionalEmail } from "@/lib/email";
+import { NEWSLETTER_FROM, sendTransactionalEmail } from "@/lib/email";
 import { SITE_URL } from "@/lib/constants";
 import { ARCHETYPE_IDS } from "@/lib/quiz-data";
 import type { ArchetypeId, Event } from "@/types";
@@ -143,6 +143,7 @@ export async function POST(request: Request) {
     const subject = deals.length > 0 ? "This week in Ubud: deals and what's on" : "This week in Ubud";
     const ok = await sendTransactionalEmail(recipient.email, subject, html, {
       unsubUrl,
+      from: NEWSLETTER_FROM,
     });
     if (ok) {
       sent++;
