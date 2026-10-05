@@ -52,6 +52,9 @@ Three backbones. Vercel Cron is capped at **2 jobs on Hobby and both slots are u
 | `weekly-digest` | GH Actions | `6 23 * * 2` | **The** weekly email: active `newsletter_subscribers` + profiles with an archetype or a save, one per address (`src/lib/email/digest-recipients.ts`). Idempotent per address per ISO week; `?only=` to test |
 | `curator-ingest` | GH Actions | on push to `curator/inbox/**` | POSTs the curator's inbox to `/api/cron/curator-ingest` |
 | **daily curator** | Claude trigger `trig_01637DsCbz5qGn6r5RTP4hhi` | `47 19 * * *` — **paused since 2026-09-21 (Ben)** | Walks curated sources, writes `curator/inbox/$TODAY.json`. Agent: `.claude/agents/daily-curator.md` |
+| `deals-review-fetch` | GH Actions | `33 17 * * *` | Commits `deals-review/pending/$TODAY.json` (public fields only) when venue submissions are waiting |
+| **daily deals review** | Claude trigger `trig_01DBDg8gXKS7TkzroPH1RCS7` | `13 20 * * *` (04:13 Bali) — **live since 2026-10-05** | Decides publish / flag / reject, commits `deals-review/decisions/$DATE.json`. Agent: `.claude/agents/deals-reviewer.md`. Its connector list (Gmail, Drive…) was auto-attached and can't be cleared by API; the agent file forbids using them and allowed_tools excludes them |
+| `deals-review-apply` | GH Actions | on push to `deals-review/decisions/**` | POSTs the decisions to `/api/cron/deals-review` |
 | **nightly digest** | Claude trigger `trig_01CnuNJSs8m8wdVyeVrDHrKq` | `17 21 * * *` — **paused since 2026-09-21 (Ben)** | Reads the newest unreported payload, commits `digests/*.md`. Agent: `.claude/agents/nightly-routine.md` |
 
 **GitHub's scheduled-cron queue runs 60–95 minutes late, consistently.** Measured over 20 consecutive `daily-maintenance-fetch` runs: scheduled `19:02`, actually fired `20:09`–`20:37`, all green. Any design that assumes a GH cron fires near its stated minute will break. This one did: the nightly digest agent used to fire 15 minutes after the workflow and produced **34 false "payload missing" stubs in 51 days** before the trigger moved to `21:17` and the agent learned to read the newest payload rather than today's.
@@ -90,6 +93,12 @@ Dry run before trusting a rule change: `npx tsx scripts/auto-approve.ts --limit=
 - **Reconfirm loop** (`src/lib/specials/reconfirm.ts`): each row has a private `confirm_token`; `/tonight/confirm/<token>` lists every live special at that venue and one POST (`/api/specials/reconfirm`) keeps them 30 more days or hides the unticked ones. The nightly `daily-maintenance` run emails venues with a `contact_email` 7 days before lapse (one mail per venue, not again within 5 days, 20 per run); `scripts/specials-reconfirm.ts` runs it by hand (dry run unless `--apply`). Seeded venues have no email: their link goes out in the first WhatsApp message. **The repo is public — never commit a confirm link.**
 - Form submissions go live at once. The spam guard is no links in free text, plus the `website` honeypot and 5/hour/IP.
 - Seed rows (`source='seed'`) come from venues' own public pages; prices the sources disagree on stay NULL. **Nobody is contacted without Ben's yes.** No price for a paid listing appears on any public page until a restaurant asks.
+
+## Venue self-serve (/venue, since 2026-10-05)
+
+- `/venue`: Google sign-in; `/venue?claim=<confirm_token>` binds `deal_venues.owner_user_id` (first claim wins). Owners add, edit and take down deals.
+- **Every venue submission waits for review** (`specials.status='pending'`), including `/tonight/add`. An edit to a LIVE deal waits in `specials.pending_changes` while the live version stays up. Taking down is immediate. Copy everywhere a venue submits: "Updates go live within 24 hours" (`REVIEW_PROMISE`, `src/lib/venue/index.ts`).
+- The daily deals review (table above) is the publisher; `/admin/deals` shows what's waiting/flagged with Publish/Reject by hand. Nightly `daily-maintenance` hides anything pending > 14 days (`expireStalePending`) and reports `dealsReview` in its payload. Decision logic: `src/lib/venue/review.ts` (`updateFor`, unit-tested).
 
 ## Architecture
 
