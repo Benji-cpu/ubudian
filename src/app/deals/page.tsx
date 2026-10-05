@@ -94,7 +94,7 @@ export default async function DealsPage() {
                   Days to confirm: ask the venue
                 </h2>
                 <p className="mt-2 text-sm text-muted-foreground">
-                  Real deals whose source gives no days yet. We&apos;ve asked each venue; check with them before you go.
+                  Real deals whose source gives no days yet. Check the days with the venue before you go.
                 </p>
                 <div className="mt-4 border-y border-brand-gold/20">
                   <DayGroup label="Show them" count={askDays.length}>
