@@ -56,7 +56,7 @@ export function ReconfirmForm({ token, specials }: { token: string; specials: Sp
         </p>
         <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
           <Button asChild>
-            <Link href="/tonight">See Tonight in Ubud</Link>
+            <Link href="/deals">See Ubud deals</Link>
           </Button>
           <Button asChild variant="outline">
             <Link href="/tonight/add">Add a new deal</Link>

@@ -80,9 +80,9 @@ Three backbones. Vercel Cron is capped at **2 jobs on Hobby and both slots are u
 
 Dry run before trusting a rule change: `npx tsx scripts/auto-approve.ts --limit=250` (add `--apply` to publish), or `GET /api/cron/daily-maintenance?dryRun=true` with the `CRON_SECRET` bearer.
 
-## Tonight in Ubud (restaurant specials, since 2026-10-05)
+## Ubud deals (restaurant deals, since 2026-10-05)
 
-`/tonight` is the hook page: today's specials (by Bali weekday and hours), today's gatherings (`FeaturedEvents`) and the rest of the week. `/tonight/add` is the free restaurant intake form → `POST /api/specials/submit`. Plan: `Code/handovers/2026-10-05-ubudian-growth.md`; first-30 venue research: `docs/tonight/`.
+**Call them "deals" in anything a visitor or venue reads — Ben dislikes "promos and specials".** Internal names (`specials` table, `src/lib/specials/`) stay. `/deals` is the page: today's deals first (Bali weekday and hours, "On now" badge), then the rest of the week, then every-day deals; each card shows its public source and the date it was last checked. `/tonight` 308s to `/deals`. `/tonight/add` (free intake form → `POST /api/specials/submit`) and `/tonight/confirm/<token>` keep their paths because venues hold links to them. Plan: `Code/handovers/2026-10-05-ubudian-growth.md`; first-30 venue research: `docs/tonight/`.
 
 - **Table `specials`**: one recurring deal at one venue. `weekdays smallint[]` uses 0 = Sunday (same as `BaliNow.dayOfWeek`); empty = every day. `status` is `live | hidden`.
 - **Freshness is by rule, no queue**: `expires_on` = last confirmed + 30 days; public reads (`getLiveSpecials()`, `src/lib/specials/queries.ts`) drop it after that. Reconfirming means bumping `confirmed_at` and `expires_on`.

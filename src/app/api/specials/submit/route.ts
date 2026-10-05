@@ -60,5 +60,5 @@ export async function POST(request: Request) {
     return NextResponse.json({ data: null, error: "Couldn't save your special. Please try again." }, { status: 500 });
   }
 
-  return NextResponse.json({ data: { ok: true, url: "/tonight" }, error: null });
+  return NextResponse.json({ data: { ok: true, url: "/deals" }, error: null });
 }

@@ -88,7 +88,7 @@ export function SpecialSubmissionForm() {
         </p>
         <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
           <Button asChild>
-            <Link href="/tonight">See it on Tonight in Ubud</Link>
+            <Link href="/deals">See it on Ubud deals</Link>
           </Button>
           <Button variant="outline" onClick={() => { form.reset(); setStatus("idle"); }}>
             Add another deal
