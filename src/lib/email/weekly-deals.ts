@@ -3,19 +3,20 @@ import { formatHours, formatIdr, formatWeekdays } from "@/lib/specials";
 import type { Special } from "@/types";
 
 /** Where the deals live on the site. One constant, so a rename is one line. */
-export const DEALS_PATH = "/tonight";
+export const DEALS_PATH = "/deals";
 
 /** How many deals one issue carries. */
 export const WEEKLY_DEAL_LIMIT = 6;
 
 /**
- * The deal's public source: the venue's own site, then its Instagram, then
- * its Maps listing. A deal with none of them is never mailed (every deal we
- * show needs a public source and a date).
+ * The deal's public source: the page the deal was found on (`source_url`),
+ * then the venue's own site, its Instagram, its Maps listing. A deal with none
+ * of them is never mailed (every deal we show needs a public source and a date).
  */
 export function dealSourceUrl(
-  special: Pick<Special, "website_url" | "instagram_handle" | "google_maps_url">
+  special: Pick<Special, "source_url" | "website_url" | "instagram_handle" | "google_maps_url">
 ): string | null {
+  if (special.source_url) return special.source_url;
   if (special.website_url) return special.website_url;
   const handle = special.instagram_handle?.replace(/^@/, "").trim();
   if (handle) return `https://www.instagram.com/${handle}/`;
@@ -83,7 +84,7 @@ export function buildDealsBlockHtml(deals: Special[], siteUrl: string): string {
     <p style="margin:0;font-size:17px;color:${GREEN};font-family:Georgia,serif;font-weight:500;">${esc(s.title)}</p>
     <p style="margin:4px 0 0;font-size:13px;color:${CHARCOAL}aa;font-family:Georgia,serif;">${where}${when ? ` · ${esc(when)}` : ""}</p>
     ${desc}
-    <p style="margin:6px 0 0;font-size:12px;color:${CHARCOAL}88;font-family:Georgia,serif;"><a href="${esc(source)}" style="color:${GREEN};">Venue's page</a> · checked ${esc(shortDate(s.confirmed_at))}</p>
+    <p style="margin:6px 0 0;font-size:12px;color:${CHARCOAL}88;font-family:Georgia,serif;"><a href="${esc(source)}" style="color:${GREEN};">Source</a> · checked ${esc(shortDate(s.confirmed_at))}</p>
   </td></tr>`;
     })
     .join("");
@@ -94,6 +95,6 @@ export function buildDealsBlockHtml(deals: Special[], siteUrl: string): string {
   </td></tr>
   ${rows}
   <tr><td style="padding:10px 32px 4px;">
-    <a href="${siteUrl}${DEALS_PATH}" style="font-size:14px;color:${GREEN};font-family:Georgia,serif;">Every deal in Ubud tonight →</a>
+    <a href="${siteUrl}${DEALS_PATH}" style="font-size:14px;color:${GREEN};font-family:Georgia,serif;">Every deal in Ubud →</a>
   </td></tr>`;
 }

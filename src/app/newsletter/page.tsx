@@ -76,7 +76,7 @@ export default async function NewsletterPage() {
           <p className="mt-6 text-sm text-muted-foreground">
             Plus the week&apos;s events.{" "}
             <Link href={DEALS_PATH} className="font-medium text-brand-deep-green underline dark:text-brand-gold">
-              See every deal tonight
+              See every deal
             </Link>
           </p>
         </section>

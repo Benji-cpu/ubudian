@@ -11,6 +11,7 @@ function deal(overrides: Partial<Special>): Special {
     google_maps_url: null,
     instagram_handle: null,
     website_url: "https://venue.example",
+    source_url: null,
     title: "2-for-1 cocktails",
     description: null,
     price_idr: null,
@@ -24,7 +25,10 @@ function deal(overrides: Partial<Special>): Special {
 }
 
 describe("dealSourceUrl", () => {
-  it("prefers the website, then Instagram, then Maps", () => {
+  it("prefers the deal's own source, then the website, Instagram, Maps", () => {
+    expect(dealSourceUrl(deal({ source_url: "https://venue.example/happy-hour" }))).toBe(
+      "https://venue.example/happy-hour"
+    );
     expect(dealSourceUrl(deal({}))).toBe("https://venue.example");
     expect(dealSourceUrl(deal({ website_url: null, instagram_handle: "@milkmadu" }))).toBe(
       "https://www.instagram.com/milkmadu/"
@@ -92,6 +96,6 @@ describe("buildDealsBlockHtml", () => {
     expect(html).toContain("checked 3 Oct");
     expect(html).toContain("Sun, Tue · 16:00–18:00 · IDR 135k");
     expect(html).not.toContain("<b>2-for-1</b>");
-    expect(html).toContain("https://theubudian.life/tonight");
+    expect(html).toContain("https://theubudian.life/deals");
   });
 });
