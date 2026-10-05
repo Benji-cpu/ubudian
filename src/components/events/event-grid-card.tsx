@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { formatEventTime, isRecentlyAddedEvent } from "@/lib/utils";
 import { formatEventDateLine } from "@/lib/events/format";
 import { getTimeSensitivityLabel } from "@/lib/events/discovery";
+import { echoesTitle } from "@/lib/events/echoes-title";
 import { isFreeEvent, formatPriceInfo } from "@/lib/price-parser";
 import { categoryShortLabel } from "@/lib/constants";
 import { EventCardPlaceholder } from "./event-card-placeholder";
@@ -121,7 +122,7 @@ export function EventGridCard({
             )}
           </div>
 
-          {event.short_description && (
+          {event.short_description && !echoesTitle(event.short_description, event.title) && (
             <p className="mt-2.5 text-sm leading-relaxed text-foreground/75 line-clamp-2">
               {event.short_description}
             </p>

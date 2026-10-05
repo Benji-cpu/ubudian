@@ -35,7 +35,9 @@ import { MapPin, SlidersHorizontal, X } from "lucide-react";
 // (the third chip) is NOT a category — it's a one-off-events filter handled via
 // the `festivals` param. Every other category lives inside the Filters sheet.
 const DANCE = "Dance & Movement";
-const TANTRA = "Tantra & Intimacy";
+// Quick chips are the two broadest, family-safe rooms. Tantra stays one tap
+// away in the Filters sheet (every category is listed there).
+const CEREMONY = "Ceremony & Sound";
 
 const SORT_OPTIONS = [
   { value: "date", label: "Soonest first" },
@@ -173,7 +175,7 @@ export function EventFilters({ resultCount }: EventFiltersProps = {}) {
     (activeFreeOnly ? 1 : 0) +
     (activeVenue ? 1 : 0) +
     // A category that isn't one of the two visible chips is "hidden" in the sheet.
-    (activeCategory && activeCategory !== DANCE && activeCategory !== TANTRA ? 1 : 0);
+    (activeCategory && activeCategory !== DANCE && activeCategory !== CEREMONY ? 1 : 0);
 
   // Active-filter pills (the removable strip). Modes (view/sort) are excluded.
   const activePills: { label: string; onClear: () => void }[] = [];
@@ -260,11 +262,11 @@ export function EventFilters({ resultCount }: EventFiltersProps = {}) {
         <Button
           variant="outline"
           size="sm"
-          onClick={() => toggleCategoryChip(TANTRA)}
-          aria-pressed={activeCategory === TANTRA}
-          className={cn(chipBase, activeCategory === TANTRA && chipActiveGreen)}
+          onClick={() => toggleCategoryChip(CEREMONY)}
+          aria-pressed={activeCategory === CEREMONY}
+          className={cn(chipBase, activeCategory === CEREMONY && chipActiveGreen)}
         >
-          Tantra
+          Sound &amp; ceremony
         </Button>
         <Button
           variant="outline"

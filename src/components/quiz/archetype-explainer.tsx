@@ -98,11 +98,11 @@ export function ArchetypeExplainer({
             New here
           </span>
           <p className="mt-1 font-serif text-lg leading-snug text-brand-deep-green dark:text-brand-gold">
-            Every gathering in the valley — tuned to your spirit.
+            Not sure where to start? A 1-minute quiz picks for you.
           </p>
           <p className="mt-1 hidden max-w-xl text-sm leading-relaxed text-foreground/70 sm:block">
-            Five ways people move through Ubud. Find yours and the feed — plus
-            your curated journeys — reshape around it.
+            Five kinds of evening in Ubud. Answer a few questions and this list
+            puts the ones that suit you first.
           </p>
           <div className="mt-3 hidden flex-wrap gap-x-4 gap-y-1.5 sm:flex">
             {ARCHETYPE_IDS.map((id) => (
