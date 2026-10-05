@@ -80,6 +80,16 @@ Three backbones. Vercel Cron is capped at **2 jobs on Hobby and both slots are u
 
 Dry run before trusting a rule change: `npx tsx scripts/auto-approve.ts --limit=250` (add `--apply` to publish), or `GET /api/cron/daily-maintenance?dryRun=true` with the `CRON_SECRET` bearer.
 
+## Tonight in Ubud (restaurant specials, since 2026-10-05)
+
+`/tonight` is the hook page: today's specials (by Bali weekday and hours), today's gatherings (`FeaturedEvents`) and the rest of the week. `/tonight/add` is the free restaurant intake form → `POST /api/specials/submit`. Plan: `Code/handovers/2026-10-05-ubudian-growth.md`; first-30 venue research: `docs/tonight/`.
+
+- **Table `specials`**: one recurring deal at one venue. `weekdays smallint[]` uses 0 = Sunday (same as `BaliNow.dayOfWeek`); empty = every day. `status` is `live | hidden`.
+- **Freshness is by rule, no queue**: `expires_on` = last confirmed + 30 days; public reads (`getLiveSpecials()`, `src/lib/specials/queries.ts`) drop it after that. Reconfirming means bumping `confirmed_at` and `expires_on`.
+- **`contact_*` columns are private.** Public pages select `PUBLIC_SPECIAL_COLUMNS` only; never add a contact column to it. There is no anon RLS read policy on purpose.
+- Form submissions go live at once. The spam guard is no links in free text, plus the `website` honeypot and 5/hour/IP.
+- Seed rows (`source='seed'`) come from venues' own public pages; prices the sources disagree on stay NULL. **Nobody is contacted without Ben's yes.** No price for a paid listing appears on any public page until a restaurant asks.
+
 ## Architecture
 
 - `/src/app` — Pages and API routes (App Router). Section indexes sit in an `(index)` route group (`events/(index)/page.tsx` → `/events`) so their `loading.tsx` scopes to the index and stops wrapping the sibling `[slug]` segment. **A `loading.tsx` above a page turns its `notFound()` into a streamed 200** — a root `loading.tsx` was doing that to the entire site.

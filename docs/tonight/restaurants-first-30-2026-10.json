@@ -1,0 +1,914 @@
+[
+  {
+    "name": "The Blue Door",
+    "area": "Ubud town (Jl. Monkey Forest)",
+    "website": "https://thebluedoorbali.com",
+    "instagram": "@thebluedoorbali",
+    "specials": [
+      {
+        "title": "Chicks & Free Beer",
+        "description": "Fried chicken with a free beer",
+        "price_idr": null,
+        "weekdays": [
+          "mon"
+        ],
+        "start_time": "12:00",
+        "end_time": "21:00"
+      },
+      {
+        "title": "Pasta & Wine",
+        "description": "Pasta with selected wine",
+        "price_idr": 135000,
+        "weekdays": [
+          "tue"
+        ],
+        "start_time": "12:00",
+        "end_time": "21:00"
+      },
+      {
+        "title": "Beer & Burger",
+        "description": "Burger and beer pairing",
+        "price_idr": 185000,
+        "weekdays": [
+          "wed"
+        ],
+        "start_time": "12:00",
+        "end_time": "21:00"
+      },
+      {
+        "title": "Steak & Wine",
+        "description": "Steak with wine",
+        "price_idr": 265000,
+        "weekdays": [
+          "thu"
+        ],
+        "start_time": "12:00",
+        "end_time": "21:00"
+      },
+      {
+        "title": "Beer & Pizza",
+        "description": "Pizza and beer",
+        "price_idr": 170000,
+        "weekdays": [
+          "fri"
+        ],
+        "start_time": "12:00",
+        "end_time": "21:00"
+      },
+      {
+        "title": "Espetada & Wine",
+        "description": "Portuguese meat skewer with wine",
+        "price_idr": 225000,
+        "weekdays": [
+          "sat"
+        ],
+        "start_time": "12:00",
+        "end_time": "21:00"
+      },
+      {
+        "title": "Sunday Roast",
+        "description": "Beef or chicken roast, price is a 'from' price",
+        "price_idr": 190000,
+        "weekdays": [
+          "sun"
+        ],
+        "start_time": "12:00",
+        "end_time": "21:00"
+      },
+      {
+        "title": "Longest Happy Hour in Ubud (weekdays)",
+        "description": "Discounted beer, wine, cocktails. Bali Buddies (27 Aug 2026) quotes 2 cocktails for 150k and beer buckets for 150k, 12:00-19:00 daily; the venue page says 11:00-19:00 weekdays",
+        "price_idr": 150000,
+        "weekdays": [
+          "mon",
+          "tue",
+          "wed",
+          "thu",
+          "fri"
+        ],
+        "start_time": "11:00",
+        "end_time": "19:00"
+      },
+      {
+        "title": "Longest Happy Hour in Ubud (weekends)",
+        "description": "Same happy hour, weekend hours per venue page",
+        "price_idr": null,
+        "weekdays": [
+          "sat",
+          "sun"
+        ],
+        "start_time": "10:00",
+        "end_time": "19:00"
+      },
+      {
+        "title": "Ladies' Night",
+        "description": "Club Lounge, free entry, 2 cocktails 'all night'. Venue ladies-night page says IDR 180k for two; Bali Buddies (6 Apr 2026) says 150k. Doors 21:00",
+        "price_idr": 180000,
+        "weekdays": [
+          "thu"
+        ],
+        "start_time": "21:00",
+        "end_time": null
+      }
+    ],
+    "source_url": "https://thebluedoorbali.com/weekly-food-specials-in-ubud/",
+    "source_seen": "Page undated; Bali Buddies guides updated 6 Apr and 27 Aug 2026 repeat the happy hour and ladies night",
+    "confidence": "high",
+    "contact": "WhatsApp +6281239740739, hello@thebluedoorbali.com (venue site)",
+    "priority": 1
+  },
+  {
+    "name": "No Más",
+    "area": "Ubud town (Jl. Monkey Forest)",
+    "website": "https://nomasubud.com",
+    "instagram": "@nomasubud",
+    "specials": [
+      {
+        "title": "Happy hour cocktails",
+        "description": "Five listed cocktails (Koral, Commando, Low & Slow, Llap Llap Beauty, Rosita) at 95,000 plus tax each. Page gives no days; Finn's guide says daily, an older Honeycombers piece quoted a different price and 19:00-23:00",
+        "price_idr": 95000,
+        "weekdays": [],
+        "start_time": "17:00",
+        "end_time": "20:00"
+      }
+    ],
+    "source_url": "https://nomasubud.com/drink-deals",
+    "source_seen": "Page undated; Finn's guide and Bali Holiday Secrets (Dec 2025) list No Más as live-music/happy-hour venue",
+    "confidence": "high",
+    "contact": "WhatsApp +6281337572686, phone +623619080800 (venue site)",
+    "priority": 1
+  },
+  {
+    "name": "Indus Restaurant",
+    "area": "Sanggingan / Campuhan valley, Ubud (Jl. Raya Sanggingan, Kedewatan)",
+    "website": "https://indusbali.com",
+    "instagram": "@indusrestaurant",
+    "specials": [
+      {
+        "title": "Happy hour",
+        "description": "Two cocktails for IDR 150k++ on the valley terrace",
+        "price_idr": 150000,
+        "weekdays": [],
+        "start_time": "16:00",
+        "end_time": "18:00"
+      },
+      {
+        "title": "Ubud Valley Dining lunch",
+        "description": "Two-course lunch",
+        "price_idr": 195000,
+        "weekdays": [],
+        "start_time": "11:00",
+        "end_time": "15:00"
+      },
+      {
+        "title": "Saturday Latin Jazz Night",
+        "description": "Live Latin jazz, salsa, merengue, bachata with dinner on the terrace; no price stated",
+        "price_idr": null,
+        "weekdays": [
+          "sat"
+        ],
+        "start_time": "19:00",
+        "end_time": "21:15"
+      },
+      {
+        "title": "Friday seafood special",
+        "description": "Fresh seafood from 17:00; no detail or price stated",
+        "price_idr": null,
+        "weekdays": [
+          "fri"
+        ],
+        "start_time": "17:00",
+        "end_time": null
+      }
+    ],
+    "source_url": "https://indusbali.com/events/",
+    "source_seen": "Pages current to spring 2026 (mention a 29 May 2026 guest-chef dinner)",
+    "confidence": "high",
+    "contact": "WhatsApp +6282138773739, indus@casalunabali.com (venue site)",
+    "priority": 1
+  },
+  {
+    "name": "Cantina Rooftop",
+    "area": "Sayan (Jl. Raya Campuhan)",
+    "website": "https://cantinarooftopbali.com",
+    "instagram": "@cantinarooftop.bali",
+    "specials": [
+      {
+        "title": "Sundown Sundays",
+        "description": "2-for-1 cocktails 17:00-18:00 with jazz on vinyl and temple views, per venue homepage. Third-party guides say 2-for-1 cocktails daily 16:00-18:00 but the venue page only names Sundays",
+        "price_idr": null,
+        "weekdays": [
+          "sun"
+        ],
+        "start_time": "17:00",
+        "end_time": "18:00"
+      }
+    ],
+    "source_url": "https://cantinarooftopbali.com/",
+    "source_seen": "Homepage undated; listed in 2026 guides",
+    "confidence": "high",
+    "contact": "WhatsApp +6282340956464, welcome@cantinarooftopbali.com (venue site)",
+    "priority": 1
+  },
+  {
+    "name": "Folk Pool & Gardens",
+    "area": "Ubud town (Jl. Monkey Forest)",
+    "website": "https://www.folkubud.com",
+    "instagram": null,
+    "specials": [
+      {
+        "title": "Chill & Cheers Pay1Get2 cocktails",
+        "description": "Buy one cocktail, get two, IDR 180k++ per purchase (a Bali Buddies guide of 27 Aug 2026 quotes older 125k cocktails, 3-6pm)",
+        "price_idr": 180000,
+        "weekdays": [],
+        "start_time": "16:00",
+        "end_time": "19:00"
+      },
+      {
+        "title": "Sunday Cookout",
+        "description": "Poolside grilled mains with music, mains from IDR 85k++",
+        "price_idr": 85000,
+        "weekdays": [
+          "sun"
+        ],
+        "start_time": "15:00",
+        "end_time": "21:00"
+      },
+      {
+        "title": "Popcorn Club free movie nights",
+        "description": "Outdoor films at the pool; venue page lists Tue, Fri, Sun, other guides say Tue and Sat/Sun",
+        "price_idr": null,
+        "weekdays": [
+          "tue",
+          "fri",
+          "sun"
+        ],
+        "start_time": "19:00",
+        "end_time": "21:00"
+      }
+    ],
+    "source_url": "https://www.folkubud.com/offers",
+    "source_seen": "Offers page undated; Bali Buddies (27 Aug 2026) and Finn's list the venue",
+    "confidence": "high",
+    "contact": "WhatsApp +6281337572686, phone +623619080800, folkcafeubud@gmail.com (venue site)",
+    "priority": 1
+  },
+  {
+    "name": "Milk & Madu (Ubud)",
+    "area": "Ubud town (Jl. Suweta)",
+    "website": "https://milkandmadu.com",
+    "instagram": "@milkandmadu",
+    "specials": [
+      {
+        "title": "241 Pizza Nights",
+        "description": "'Double the pizza, same price', all branches incl. Ubud; third-party reviews say large + small free, unconfirmed",
+        "price_idr": null,
+        "weekdays": [
+          "tue",
+          "sun"
+        ],
+        "start_time": "16:00",
+        "end_time": null
+      },
+      {
+        "title": "Live music (Ubud)",
+        "description": "Venue page lists Tue and Fri 18:00-21:00; Sat and Sun 11:00-14:00 and 18:00-21:00",
+        "price_idr": null,
+        "weekdays": [
+          "tue",
+          "fri",
+          "sat",
+          "sun"
+        ],
+        "start_time": "18:00",
+        "end_time": "21:00"
+      }
+    ],
+    "source_url": "https://milkandmadu.com/",
+    "source_seen": "Homepage undated; Tripadvisor review titles confirm a 2-for-1 pizza night",
+    "confidence": "high",
+    "contact": "Group WhatsApp +6287769714072 (Uluwatu) and +6281915783006 (Seminyak); no Ubud-specific number on page",
+    "priority": 1
+  },
+  {
+    "name": "Casa Luna",
+    "area": "Ubud town (Jl. Raya Ubud)",
+    "website": "https://casalunabali.com",
+    "instagram": "@casalunabali",
+    "specials": [
+      {
+        "title": "Happy hour",
+        "description": "Buy one cocktail, get one free",
+        "price_idr": null,
+        "weekdays": [],
+        "start_time": "17:00",
+        "end_time": "19:00"
+      },
+      {
+        "title": "Sunday Jazz Club",
+        "description": "Live jazz by Bali musicians, no cover, dinner served; start time not stated",
+        "price_idr": null,
+        "weekdays": [
+          "sun"
+        ],
+        "start_time": null,
+        "end_time": null
+      }
+    ],
+    "source_url": "https://casalunabali.com/",
+    "source_seen": "Homepage undated; same group as Indus",
+    "confidence": "high",
+    "contact": "WhatsApp +6281338239921, reservations@casalunabali.com (venue site)",
+    "priority": 1
+  },
+  {
+    "name": "Copper Kitchen, Bar & Rooftop",
+    "area": "Ubud town (Jl. Bisma 68, Bisma Eight)",
+    "website": "https://www.copperubud.com",
+    "instagram": "@copperubud",
+    "specials": [
+      {
+        "title": "Happy hour Pay 1 Get 2",
+        "description": "Signature cocktails, IDR 190k++ per purchase (price from a search-result summary of the venue page, not seen on the page itself; page shows a 2025 happy-hour flyer)",
+        "price_idr": 190000,
+        "weekdays": [],
+        "start_time": "17:00",
+        "end_time": "19:00"
+      }
+    ],
+    "source_url": "https://www.copperubud.com/menu",
+    "source_seen": "Venue page references a 2025 flyer; Bali Holiday Secrets 29 Dec 2025 lists a 2-for-1 happy hour",
+    "confidence": "high",
+    "contact": "WhatsApp +6281339512571, phone +623614792888, copper@bisma-eight.com (venue site)",
+    "priority": 1
+  },
+  {
+    "name": "Lokal Bar Ubud",
+    "area": "Ubud town (Jl. Monkey Forest, Gg. Beji)",
+    "website": "https://lokalbarubud.com",
+    "instagram": "@lokalbarubud",
+    "specials": [
+      {
+        "title": "Welcome shot of arak",
+        "description": "Free welcome shot of arak, per venue site",
+        "price_idr": null,
+        "weekdays": [
+          "mon",
+          "wed"
+        ],
+        "start_time": "18:00",
+        "end_time": "20:00"
+      },
+      {
+        "title": "Pay 2 get 3 cocktails",
+        "description": "Longest happy hour (Bali Buddies 4 Aug 2026, Pinstripe blog, Finn's)",
+        "price_idr": null,
+        "weekdays": [
+          "sat"
+        ],
+        "start_time": "15:00",
+        "end_time": "20:00"
+      },
+      {
+        "title": "10% off cocktails",
+        "description": "Per Pinstripe's Ubud nightlife blog, not on venue site",
+        "price_idr": null,
+        "weekdays": [
+          "fri",
+          "sun"
+        ],
+        "start_time": "17:00",
+        "end_time": "19:00"
+      },
+      {
+        "title": "Live band",
+        "description": "Daily live music, no cover mentioned",
+        "price_idr": null,
+        "weekdays": [],
+        "start_time": "19:00",
+        "end_time": "22:00"
+      }
+    ],
+    "source_url": "https://lokalbarubud.com/",
+    "source_seen": "Venue site undated; Bali Buddies article updated 4 Aug 2026 repeats the Mon/Wed and Sat deals",
+    "confidence": "high",
+    "contact": "WhatsApp +6287824077995, ubudlokalbar@gmail.com (venue site)",
+    "priority": 1
+  },
+  {
+    "name": "Ibu Susu Bar & Kitchen",
+    "area": "Ubud town (Jl. Monkey Forest)",
+    "website": "https://ibususu.com",
+    "instagram": "@ibu_susu_ubud",
+    "specials": [
+      {
+        "title": "Happy hour",
+        "description": "Cocktails at IDR 65k++ each per venue site (a guide quotes 70k)",
+        "price_idr": 65000,
+        "weekdays": [],
+        "start_time": "16:00",
+        "end_time": "19:00"
+      }
+    ],
+    "source_url": "https://ibususu.com/",
+    "source_seen": "Site undated (mentions a June Hendrick's collaboration)",
+    "confidence": "high",
+    "contact": "WhatsApp +6281338968223, info@ibususu.com (venue site)",
+    "priority": 2
+  },
+  {
+    "name": "Laughing Buddha Bar",
+    "area": "Ubud town (Jl. Monkey Forest)",
+    "website": "https://laughingbuddhabar.com",
+    "instagram": null,
+    "specials": [
+      {
+        "title": "Cocktail happy hour",
+        "description": "Third-party summaries: 2-for-1 on classic cocktails 16:00-20:00 (Finn's), or buy 2 get 1 free 16:00-20:00 and 23:00-01:00; wording differs by source",
+        "price_idr": null,
+        "weekdays": [],
+        "start_time": "16:00",
+        "end_time": "20:00"
+      },
+      {
+        "title": "Live music nightly",
+        "description": "Live bands, about 19:30-22:30 per listings",
+        "price_idr": null,
+        "weekdays": [],
+        "start_time": "19:30",
+        "end_time": "22:30"
+      }
+    ],
+    "source_url": "https://finnsbeachclub.com/guides/best-happy-hours-ubud/",
+    "source_seen": "Finn's guide undated ('at time of press'); venue's own domain returned unrelated gambling content when fetched, so not used",
+    "confidence": "medium",
+    "contact": "Phone +62361970928 / +6281958970928 (third-party listing, not from a venue page)",
+    "priority": 2
+  },
+  {
+    "name": "Why Not Restaurant & Bar",
+    "area": "Ubud town (Jl. Bisma 8)",
+    "website": null,
+    "instagram": null,
+    "specials": [
+      {
+        "title": "Buy 2 get 3 cocktails",
+        "description": "Time-restricted 3-for-2 cocktail deal, best on Saturday nights",
+        "price_idr": null,
+        "weekdays": [],
+        "start_time": null,
+        "end_time": null
+      },
+      {
+        "title": "Live band",
+        "description": "Live music Tuesday to Saturday from 20:00 (listing summary)",
+        "price_idr": null,
+        "weekdays": [
+          "tue",
+          "wed",
+          "thu",
+          "fri",
+          "sat"
+        ],
+        "start_time": "20:00",
+        "end_time": null
+      }
+    ],
+    "source_url": "https://www.baliholidaysecrets.com/best-bars-in-ubud/",
+    "source_seen": "Bali Holiday Secrets, updated 29 Dec 2025",
+    "confidence": "medium",
+    "contact": "None found",
+    "priority": 2
+  },
+  {
+    "name": "CP Lounge",
+    "area": "Ubud town (Jl. Monkey Forest 15)",
+    "website": "https://www.cp-lounge.com",
+    "instagram": null,
+    "specials": [
+      {
+        "title": "Buy 2 get 3rd free cocktails",
+        "description": "Third-party: buy two cocktails get the third free, 13:00-20:00, plus 10% off food in happy hour (Finn's guide says 1pm-8pm, 'at time of press')",
+        "price_idr": null,
+        "weekdays": [],
+        "start_time": "13:00",
+        "end_time": "20:00"
+      },
+      {
+        "title": "Free live music and karaoke",
+        "description": "Venue site: live acoustic 17:45-20:45, karaoke lounge 19:00-23:30, live bands 21:00-23:45, all free entry, daily/nightly",
+        "price_idr": null,
+        "weekdays": [],
+        "start_time": "17:45",
+        "end_time": "23:45"
+      }
+    ],
+    "source_url": "https://www.cp-lounge.com/",
+    "source_seen": "Venue site undated; deal details from Finn's guide",
+    "confidence": "medium",
+    "contact": "None found on page",
+    "priority": 2
+  },
+  {
+    "name": "Warung Citta Ovest",
+    "area": "Ubud town (Jl. Dewisita)",
+    "website": "https://www.warungcitta.com",
+    "instagram": null,
+    "specials": [
+      {
+        "title": "Happy hour pizza + beer",
+        "description": "Margherita pizza plus a small Bintang. Sources conflict on price (Rp 55,000 vs 50,000) and hours (15:00-17:00 vs 15:00-18:00), so price left blank",
+        "price_idr": null,
+        "weekdays": [],
+        "start_time": "15:00",
+        "end_time": "17:00"
+      }
+    ],
+    "source_url": "https://finnsbeachclub.com/guides/best-happy-hours-ubud/",
+    "source_seen": "Finn's guide undated; venue site blocked (HTTP 403) so not verified",
+    "confidence": "medium",
+    "contact": "None found",
+    "priority": 2
+  },
+  {
+    "name": "Bella by Sage",
+    "area": "Penestanan / Sayan",
+    "website": null,
+    "instagram": null,
+    "specials": [
+      {
+        "title": "Happy hour 50% off food",
+        "description": "Daily, 50 percent off all food items, per a search-result summary of a vegan guide; not confirmed on a venue page",
+        "price_idr": null,
+        "weekdays": [],
+        "start_time": "14:00",
+        "end_time": "16:00"
+      }
+    ],
+    "source_url": "https://thymewithtina.com/top-10-best-vegan-restaurants-in-ubud-bali/",
+    "source_seen": "Undated summary; low confidence until checked on their Instagram",
+    "confidence": "low",
+    "contact": "None found",
+    "priority": 2
+  },
+  {
+    "name": "Pinstripe Cocktail Bar (Viceroy Bali)",
+    "area": "Petulu, Ubud district (Jl. Lanyahan, Br. Nagi) - outside the listed neighbourhoods",
+    "website": "https://www.pinstripebar.com",
+    "instagram": "@pinstripebar",
+    "specials": [
+      {
+        "title": "Taco Tequila Tuesday",
+        "description": "Tacos with margarita specials, no price stated",
+        "price_idr": null,
+        "weekdays": [
+          "tue"
+        ],
+        "start_time": "17:00",
+        "end_time": "21:00"
+      },
+      {
+        "title": "Wine Wednesday",
+        "description": "Curated wines with simple pairings, no price stated",
+        "price_idr": null,
+        "weekdays": [
+          "wed"
+        ],
+        "start_time": "17:00",
+        "end_time": "21:00"
+      }
+    ],
+    "source_url": "https://www.pinstripebar.com/blog/midweek-in-ubud/",
+    "source_seen": "Blog undated; bar open 16:00-23:30, food 17:00-21:00 (times shown are the food hours)",
+    "confidence": "high",
+    "contact": "WhatsApp +6285963105757, bar@pinstripebar.com (venue site)",
+    "priority": 3
+  },
+  {
+    "name": "Sage Ubud",
+    "area": "Ubud (address given as Monkey Forest Rd in one guide, Jl. Nyuh Bulan 1 in another)",
+    "website": null,
+    "instagram": null,
+    "specials": [
+      {
+        "title": "Happy hour",
+        "description": "Rotating craft cocktail and Bintang menu, daily",
+        "price_idr": null,
+        "weekdays": [],
+        "start_time": "16:00",
+        "end_time": "19:00"
+      }
+    ],
+    "source_url": "https://finnsbeachclub.com/guides/best-happy-hours-ubud/",
+    "source_seen": "Finn's guide undated ('at time of press')",
+    "confidence": "medium",
+    "contact": "None found",
+    "priority": 3
+  },
+  {
+    "name": "Oops Restaurant & Bar",
+    "area": "Ubud town (Jl. Raya Ubud)",
+    "website": null,
+    "instagram": null,
+    "specials": [
+      {
+        "title": "Two-for-one mojito",
+        "description": "Buy 1 get 1 free mojito; one summary gives 17:00-21:00, Finn's says check Instagram",
+        "price_idr": null,
+        "weekdays": [],
+        "start_time": "17:00",
+        "end_time": "21:00"
+      }
+    ],
+    "source_url": "https://finnsbeachclub.com/guides/best-happy-hours-ubud/",
+    "source_seen": "Finn's guide undated",
+    "confidence": "medium",
+    "contact": "None found",
+    "priority": 3
+  },
+  {
+    "name": "Sawah Terrace (Mandapa, Ritz-Carlton Reserve)",
+    "area": "Kedewatan, Ubud district",
+    "website": null,
+    "instagram": null,
+    "specials": [
+      {
+        "title": "Sunday brunch",
+        "description": "IDR 850k per person including water, coffee, tea",
+        "price_idr": 850000,
+        "weekdays": [
+          "sun"
+        ],
+        "start_time": "12:30",
+        "end_time": "15:30"
+      }
+    ],
+    "source_url": "https://balibuddies.com/best-bali-brunch-venues/",
+    "source_seen": "Bali Buddies, updated 15 Apr 2026",
+    "confidence": "medium",
+    "contact": "None found",
+    "priority": 3
+  },
+  {
+    "name": "Apéritif",
+    "area": "Ubud (Tjampuhan)",
+    "website": "https://www.aperitif.com",
+    "instagram": "@aperitifbali",
+    "specials": [
+      {
+        "title": "Sunday brunch",
+        "description": "IDR 1,250,000++ per person; not shown on the venue's own homepage",
+        "price_idr": 1250000,
+        "weekdays": [
+          "sun"
+        ],
+        "start_time": "11:00",
+        "end_time": "14:00"
+      }
+    ],
+    "source_url": "https://balibuddies.com/best-bali-brunch-venues/",
+    "source_seen": "Bali Buddies, updated 15 Apr 2026",
+    "confidence": "medium",
+    "contact": "Phone +623619082777, res@aperitif.com (venue site)",
+    "priority": 3
+  },
+  {
+    "name": "Sokasi Farmers Brunch (Four Seasons Sayan)",
+    "area": "Sayan",
+    "website": null,
+    "instagram": null,
+    "specials": [
+      {
+        "title": "Sunday Farmers Brunch",
+        "description": "IDR 850k++ per adult",
+        "price_idr": 850000,
+        "weekdays": [
+          "sun"
+        ],
+        "start_time": "11:30",
+        "end_time": "15:30"
+      }
+    ],
+    "source_url": "https://balibuddies.com/best-bali-brunch-venues/",
+    "source_seen": "Bali Buddies, updated 15 Apr 2026",
+    "confidence": "medium",
+    "contact": "None found",
+    "priority": 3
+  },
+  {
+    "name": "Uma Cucina (COMO Uma Ubud)",
+    "area": "Sanggingan / Kedewatan, Ubud (Jl. Raya Sanggingan)",
+    "website": null,
+    "instagram": null,
+    "specials": [
+      {
+        "title": "Sunday brunch",
+        "description": "Italian-inspired all-you-can-eat; IDR 400k per person, plus IDR 400k for alcoholic drinks add-on (page undated)",
+        "price_idr": 400000,
+        "weekdays": [
+          "sun"
+        ],
+        "start_time": "11:30",
+        "end_time": "15:30"
+      }
+    ],
+    "source_url": "https://balibuddies.com/happening/como-signature-sunday-brunches/",
+    "source_seen": "Undated Bali Buddies event page; also listed in the April 2026 brunch roundup",
+    "confidence": "medium",
+    "contact": "Phone (0361) 972448 (third-party page)",
+    "priority": 3
+  },
+  {
+    "name": "Mingle Cafe Bar",
+    "area": "Ubud town (Jl. Dewisita)",
+    "website": null,
+    "instagram": null,
+    "specials": [
+      {
+        "title": "2-for-1 cocktails",
+        "description": "Happy hour nightly per reviews; hours quoted as 15:00/16:00-21:00; review prices vary so none recorded",
+        "price_idr": null,
+        "weekdays": [],
+        "start_time": "16:00",
+        "end_time": "21:00"
+      }
+    ],
+    "source_url": "https://www.tripadvisor.com/ShowUserReviews-g297701-d2097062-r495538187-Mingle_Cafe_Bar-Ubud_Gianyar_Regency_Bali.html",
+    "source_seen": "Tripadvisor reviews, undated",
+    "confidence": "low",
+    "contact": "None found",
+    "priority": 3
+  },
+  {
+    "name": "Divya Bar Ubud",
+    "area": "Ubud town (Jl. Monkey Forest 68)",
+    "website": "https://www.divyabar.com",
+    "instagram": "@divyaubud",
+    "specials": [
+      {
+        "title": "Happy Monday",
+        "description": "Promo name on the site, details on a page not retrieved; reviews mention all-day happy hour",
+        "price_idr": null,
+        "weekdays": [
+          "mon"
+        ],
+        "start_time": null,
+        "end_time": null
+      }
+    ],
+    "source_url": "https://www.divyabar.com/",
+    "source_seen": "Site undated and shows stale events (2023)",
+    "confidence": "low",
+    "contact": "Phone +62811-373-9400, hello@divyabar.com (venue site)",
+    "priority": 3
+  },
+  {
+    "name": "Puzzle Bar & Grill",
+    "area": "Ubud town (Jl. Monkey Forest 23)",
+    "website": null,
+    "instagram": "@puzzlebarubud",
+    "specials": [
+      {
+        "title": "Happy hour",
+        "description": "One guide says IDR 60k for two cocktails; Instagram bio advertises happy hour, weekly live music and deals",
+        "price_idr": null,
+        "weekdays": [],
+        "start_time": null,
+        "end_time": null
+      }
+    ],
+    "source_url": "https://www.instagram.com/puzzlebarubud/",
+    "source_seen": "Instagram bio only, undated",
+    "confidence": "low",
+    "contact": "None found",
+    "priority": 3
+  },
+  {
+    "name": "Pizza Cult",
+    "area": "Ubud town (Jl. Sri Wedari 16)",
+    "website": null,
+    "instagram": null,
+    "specials": [
+      {
+        "title": "2-for-1 pizza",
+        "description": "Per reviews 16:00-18:00 on Thursday; says 'BOGO nights, check Instagram'",
+        "price_idr": null,
+        "weekdays": [
+          "thu"
+        ],
+        "start_time": "16:00",
+        "end_time": "18:00"
+      }
+    ],
+    "source_url": "https://www.happycow.net/reviews/pizza-cult-ubud-251052",
+    "source_seen": "Review-based, undated",
+    "confidence": "low",
+    "contact": "Phone +6281353060788 (listing)",
+    "priority": 3
+  },
+  {
+    "name": "Napi Orti",
+    "area": "Ubud town (Jl. Jembawan 34)",
+    "website": null,
+    "instagram": null,
+    "specials": [
+      {
+        "title": "All-night happy hour",
+        "description": "Cocktails IDR 50k from 19:00, daily",
+        "price_idr": 50000,
+        "weekdays": [],
+        "start_time": "19:00",
+        "end_time": null
+      }
+    ],
+    "source_url": "https://qr2order.net/restaurants-deals/indonesia/bali/ubud",
+    "source_seen": "Deals aggregator, undated",
+    "confidence": "low",
+    "contact": "None found",
+    "priority": 3
+  },
+  {
+    "name": "Kakiang Bakery & Cafe",
+    "area": "Pengosekan (Jl. Raya Pengosekan)",
+    "website": "https://kakiangbakery.com",
+    "instagram": null,
+    "specials": [
+      {
+        "title": "Beer bucket and popcorn",
+        "description": "All day, daily",
+        "price_idr": 100000,
+        "weekdays": [],
+        "start_time": null,
+        "end_time": null
+      },
+      {
+        "title": "Pizza + 2 iced java tea",
+        "description": "Couple package, daily",
+        "price_idr": 100000,
+        "weekdays": [],
+        "start_time": null,
+        "end_time": null
+      },
+      {
+        "title": "Lunch package",
+        "description": "One selected meal plus iced tea",
+        "price_idr": 49000,
+        "weekdays": [],
+        "start_time": "11:00",
+        "end_time": "14:00"
+      }
+    ],
+    "source_url": "https://qr2order.net/restaurants-deals/indonesia/bali/ubud",
+    "source_seen": "Deals aggregator, undated",
+    "confidence": "low",
+    "contact": "None found",
+    "priority": 3
+  },
+  {
+    "name": "Taco Fiesta",
+    "area": "Ubud town (Jl. Bisma 33)",
+    "website": null,
+    "instagram": "@tacofiestabaliofficial",
+    "specials": [
+      {
+        "title": "Live music nights",
+        "description": "Instagram bio: Tuesday 'The Blues La Fiesta', Saturday also (text cut off). A search summary calls Tuesday 'Taco Tuesday'; no deal confirmed",
+        "price_idr": null,
+        "weekdays": [
+          "tue",
+          "sat"
+        ],
+        "start_time": null,
+        "end_time": null
+      }
+    ],
+    "source_url": "https://www.instagram.com/tacofiestabaliofficial/",
+    "source_seen": "Instagram bio, undated",
+    "confidence": "low",
+    "contact": "None found",
+    "priority": 3
+  },
+  {
+    "name": "Chupacabras",
+    "area": "Sayan",
+    "website": null,
+    "instagram": null,
+    "specials": [
+      {
+        "title": "All-you-can-eat beef brunch",
+        "description": "Eight curated dishes, IDR 795k++, wine packages extra",
+        "price_idr": 795000,
+        "weekdays": [
+          "sat"
+        ],
+        "start_time": "12:00",
+        "end_time": "16:00"
+      }
+    ],
+    "source_url": "https://www.nowbali.co.id/feast-on-an-all-you-can-eat-beef-brunch-at-chupacabras/",
+    "source_seen": "NOW! Bali, 24 Oct 2024",
+    "confidence": "low",
+    "contact": "None found",
+    "priority": 3
+  }
+]
