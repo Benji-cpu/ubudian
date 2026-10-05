@@ -50,7 +50,7 @@ export default async function NewsletterPage() {
       {preview.length > 0 && (
         <section className="mx-auto max-w-2xl px-4 py-12 sm:px-6">
           <h2 className="font-serif text-2xl text-brand-deep-green dark:text-brand-gold">
-            In this week&apos;s issue
+            Deals on now
           </h2>
           <ul className="mt-6 space-y-4">
             {preview.map((deal) => {
@@ -74,7 +74,7 @@ export default async function NewsletterPage() {
             })}
           </ul>
           <p className="mt-6 text-sm text-muted-foreground">
-            Plus the week&apos;s events.{" "}
+            Each Wednesday&apos;s email brings the week&apos;s deals and events.{" "}
             <Link href={DEALS_PATH} className="font-medium text-brand-deep-green underline dark:text-brand-gold">
               See every deal
             </Link>
