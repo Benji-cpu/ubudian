@@ -17,6 +17,15 @@ ALTER TABLE deal_venues ADD COLUMN IF NOT EXISTS lng double precision;
 ALTER TABLE deal_venues ADD COLUMN IF NOT EXISTS next_check_on date;
 -- Set when a check finds the venue has closed; the row stays so it is never re-added.
 ALTER TABLE deal_venues ADD COLUMN IF NOT EXISTS closed_at timestamptz;
+-- Outreach (Code/handovers/2026-10-06-deals-outreach-plan.md): each venue's private page link,
+-- where its contact came from, when and how we last wrote, and its opt-out. One message per group.
+ALTER TABLE deal_venues ADD COLUMN IF NOT EXISTS invite_token uuid NOT NULL DEFAULT gen_random_uuid();
+ALTER TABLE deal_venues ADD COLUMN IF NOT EXISTS contact_source_url text;
+ALTER TABLE deal_venues ADD COLUMN IF NOT EXISTS contact_channel text CHECK (contact_channel IS NULL OR contact_channel IN ('email','instagram','in_person','whatsapp_inbound'));
+ALTER TABLE deal_venues ADD COLUMN IF NOT EXISTS last_contacted_at timestamptz;
+ALTER TABLE deal_venues ADD COLUMN IF NOT EXISTS opted_out_at timestamptz;
+ALTER TABLE deal_venues ADD COLUMN IF NOT EXISTS group_key text;
+CREATE UNIQUE INDEX IF NOT EXISTS deal_venues_invite_key ON deal_venues (invite_token);
 CREATE UNIQUE INDEX IF NOT EXISTS deal_venues_osm_key ON deal_venues (osm_id) WHERE osm_id IS NOT NULL;
 CREATE INDEX IF NOT EXISTS deal_venues_check_idx ON deal_venues (next_check_on NULLS FIRST, researched_at NULLS FIRST);
 
