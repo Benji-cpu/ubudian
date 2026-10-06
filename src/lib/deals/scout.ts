@@ -139,6 +139,18 @@ export const findingsSchema = z.object({
         result: z.enum(["specials", "nothing", "closed", "unreachable"]),
         note: text(500),
         specials: z.array(foundSpecial).max(10).default([]),
+        /** Public ways to reach the venue, each with where it was found. Never guessed. */
+        contact: z
+          .object({
+            email: z.string().email().max(200).nullable(),
+            email_source_url: z.string().url().max(500).nullable(),
+            instagram_handle: z.string().regex(/^[A-Za-z0-9_.]{1,30}$/).nullable(),
+            contact_name: z.string().trim().max(80).nullable(),
+            contact_name_source_url: z.string().url().max(500).nullable(),
+            website_url: z.string().url().max(500).nullable(),
+          })
+          .partial()
+          .optional(),
         /** For reconfirm items: is each live deal still on the venue's own page? */
         renew: z.array(z.object({ special_id: z.string().uuid(), still_running: z.boolean(), source_url: z.string().url().max(500).nullable() })).max(10).default([]),
       })
@@ -151,15 +163,19 @@ export const NOTE_FOUND_PASSES = "Found by our check of your public pages. We'll
 export const NOTE_FOUND_FAILS = "Not listed: we list food, café and wellness deals at least 25% below your normal price. Add your normal price and we'll look again.";
 export const NOTE_NOT_RUNNING = "Taken down: we couldn't find this offer on your pages any more. Add it again if it's still running.";
 
-export type ScoutReport = { venues: number; specialsAdded: number; duplicates: number; closed: number; renewed: number; takenDown: number; unknownVenues: number };
+export type ScoutReport = { venues: number; contactsAdded: number; specialsAdded: number; duplicates: number; closed: number; renewed: number; takenDown: number; unknownVenues: number };
 
 export async function apply(input: Findings, now: Date = new Date()): Promise<ScoutReport> {
   const supabase = createAdminClient();
   const today = nowInBali(now).dateStr;
-  const report: ScoutReport = { venues: 0, specialsAdded: 0, duplicates: 0, closed: 0, renewed: 0, takenDown: 0, unknownVenues: 0 };
+  const report: ScoutReport = { venues: 0, contactsAdded: 0, specialsAdded: 0, duplicates: 0, closed: 0, renewed: 0, takenDown: 0, unknownVenues: 0 };
 
   for (const f of input.findings) {
-    const { data: venue } = await supabase.from("deal_venues").select("id, name, area, website_url, instagram_handle").eq("id", f.venue_id).maybeSingle();
+    const { data: venue } = await supabase
+      .from("deal_venues")
+      .select("id, name, area, website_url, instagram_handle, contact_email, contact_name")
+      .eq("id", f.venue_id)
+      .maybeSingle();
     if (!venue) {
       report.unknownVenues += 1;
       continue;
@@ -177,6 +193,18 @@ export async function apply(input: Findings, now: Date = new Date()): Promise<Sc
       })
       .eq("id", venue.id);
     if (f.result === "closed") report.closed += 1;
+
+    // Fill in contacts we don't have yet; never overwrite one we (or the venue) already set.
+    const c = f.contact ?? {};
+    const fill: Record<string, string> = {};
+    if (c.email && c.email_source_url && !venue.contact_email) Object.assign(fill, { contact_email: c.email.toLowerCase(), contact_source_url: c.email_source_url });
+    if (c.contact_name && c.contact_name_source_url && !venue.contact_name) fill.contact_name = c.contact_name;
+    if (c.instagram_handle && !venue.instagram_handle) fill.instagram_handle = c.instagram_handle;
+    if (c.website_url && !venue.website_url) fill.website_url = c.website_url;
+    if (Object.keys(fill).length) {
+      await supabase.from("deal_venues").update(fill).eq("id", venue.id);
+      report.contactsAdded += 1;
+    }
 
     // Keep every special found, listed or not; skip one already on file under the same title.
     const { data: existing } = await supabase.from("specials").select("title").eq("venue_id", venue.id);
