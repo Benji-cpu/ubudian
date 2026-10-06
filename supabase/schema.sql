@@ -1,5 +1,5 @@
 -- The Ubudian — public schema snapshot.
--- Generated 2026-10-05 by scripts/dump-schema.ts from the live database.
+-- Generated 2026-10-06 by scripts/dump-schema.ts from the live database.
 -- Reference only: supabase/migrations/ is the source of truth. Do not hand-edit; regenerate.
 
 CREATE TABLE blog_posts (
@@ -69,6 +69,19 @@ CREATE TABLE deal_venues (
   claimed_at timestamp with time zone,
   created_at timestamp with time zone NOT NULL DEFAULT now(),
   updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  category text,
+  source text NOT NULL DEFAULT 'manual'::text,
+  osm_id text,
+  lat double precision,
+  lng double precision,
+  next_check_on date,
+  closed_at timestamp with time zone,
+  invite_token uuid NOT NULL DEFAULT gen_random_uuid(),
+  contact_source_url text,
+  contact_channel text,
+  last_contacted_at timestamp with time zone,
+  opted_out_at timestamp with time zone,
+  group_key text,
   PRIMARY KEY (id)
 );
 
@@ -635,6 +648,7 @@ CREATE TABLE specials (
   review_note text,
   reviewed_at timestamp with time zone,
   normal_price_idr integer,
+  research_note text,
   PRIMARY KEY (id)
 );
 
