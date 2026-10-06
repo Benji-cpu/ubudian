@@ -35,8 +35,8 @@ function DealBox({ d, children }: { d: InviteDeal; children?: React.ReactNode })
 }
 
 const IDEAS: Record<string, string> = {
-  cafe: "a free drink with breakfast before 9",
-  warung: "a free es teh with nasi campur",
+  cafe: "25% off breakfast before 9",
+  warung: "a free dessert with nasi campur",
   restaurant: "2-for-1 mains on a quiet night",
   spa: "25% off weekday mornings",
   yoga: "a free class with a 5-class card",
@@ -71,8 +71,7 @@ export default async function VenueInvitePage({ params }: { params: Promise<{ to
           </p>
           <h1 className="mt-2 font-serif text-3xl font-medium text-brand-deep-green sm:text-4xl">{invite.name} on The Ubudian</h1>
           <p className="mt-3 text-muted-foreground">
-            The Ubudian is a free guide to Ubud&apos;s food and wellness deals, shown on the days they run, next to the
-            week&apos;s yoga, dance and ceremonies. Google Maps lists everywhere; we show only real deals.
+            The Ubudian is a free website that lists Ubud&apos;s food and wellness deals, on the days they run.
           </p>
         </div>
       </section>
