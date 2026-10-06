@@ -36,12 +36,13 @@ export default async function CardsPage({ searchParams }: { searchParams: Promis
             <div>
               <p className="text-xs font-semibold uppercase tracking-widest text-[#B85C3F]">The Ubudian</p>
               <p className="mt-2 font-serif text-2xl leading-tight">{shortName(c.name)}</p>
-              <p className="mt-1 text-sm">Your free page. Scan to add your deals.</p>
+              <p className="mt-1 text-sm">Ubud&rsquo;s food and wellness deals website. Your page is ready. Scan with your phone camera to add your deal.</p>
             </div>
-            <div className="mx-auto w-40" dangerouslySetInnerHTML={{ __html: c.qr }} />
+            <div className="mx-auto w-36" dangerouslySetInnerHTML={{ __html: c.qr }} />
             <div className="text-sm">
-              <p>Free deals guide for Ubud. No fees, no commission.</p>
-              <p>Gratis, tanpa komisi. Pasang promo Anda di The Ubudian.</p>
+              <p>Deals of 25% or more off, for food and wellness (not drinks). Free, no commission.</p>
+              <p>Promo diskon 25% atau lebih, untuk makanan dan wellness (bukan minuman). Gratis, tanpa komisi.</p>
+              <p className="mt-1 text-xs">theubudian.life</p>
               {wa && <p className="mt-1 font-medium">Questions? WhatsApp Ben: {wa}</p>}
               <VisitedButton venueId={c.id} />
             </div>

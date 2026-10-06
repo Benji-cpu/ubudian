@@ -63,13 +63,13 @@ export function dmText(v: Pick<OutreachVenue, "name" | "invite_token">, knownTit
   const deal = knownTitle ? knownTitle.charAt(0).toLowerCase() + knownTitle.slice(1) : null;
   const ask = deal
     ? isLive
-      ? `I've listed your ${deal} for free. Do you run any other deals or specials?`
-      : `I saw your ${deal} and would love to list it. Is it still on, and do you run anything else?`
-    : "Do you run any deals or specials? Something that saves guests 25% or more on food, café or wellness (no drinks).";
+      ? `I have listed your ${deal} on the site, free. Do you have any other deals?`
+      : `I saw your ${deal} and would like to list it. Is it still available? Do you have any other deals?`
+    : "Do you have a deal for guests? For example 25% or more off a meal or a wellness session. Food and wellness only, not drinks.";
   return [
-    `Hi ${shortName(v.name)} team! I'm Ben, based in Ubud. I run The Ubudian (theubudian.life), a free website that lists Ubud's food and wellness deals.`,
+    `Hi ${shortName(v.name)} team! I'm Ben, I live in Ubud. I run The Ubudian (theubudian.life), a website that shows Ubud's food and wellness deals to locals and visitors.`,
     ask,
-    `Tell me here and I'll list it for free: theubudian.life/v/${v.invite_token} (or just reply).`,
+    `Listing is free, with no commission. You can add your deal here: theubudian.life/v/${v.invite_token} (or just reply to me).`,
     "Not interested? Just say so and I won't message again.",
   ].join(" ");
 }
