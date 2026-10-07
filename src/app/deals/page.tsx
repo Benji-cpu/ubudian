@@ -24,10 +24,11 @@ export default async function DealsPage() {
   const deals = await getLiveSpecials();
   const today = specialsForToday(deals, now);
 
-  // The rest of the week, starting tomorrow, so "Tuesday" is always the next one.
-  const week = Array.from({ length: 6 }, (_, i) => (now.dayOfWeek + 1 + i) % 7)
-    .map((day) => ({ day, items: deals.filter((d) => d.weekdays.length > 0 && runsOn(d, day)) }))
-    .filter((d) => d.items.length > 0);
+  // The rest of the week: each deal once, with its days, soonest first from tomorrow
+  // (listing it under every day it runs showed one breakfast card five times).
+  const daysUntil = (d: (typeof deals)[number]) =>
+    Math.min(...Array.from({ length: 6 }, (_, i) => i).filter((i) => runsOn(d, (now.dayOfWeek + 1 + i) % 7)), 99);
+  const week = deals.filter((d) => d.weekdays.length > 0).sort((a, b) => daysUntil(a) - daysUntil(b));
   const everyDay = deals.filter((d) => d.weekdays.length === 0 && !daysUnknown(d));
   const askDays = deals.filter((d) => daysUnknown(d));
 
@@ -40,7 +41,7 @@ export default async function DealsPage() {
           </h1>
           <p className="mt-4 text-lg text-brand-off-white/80">
             Only real savings: at least a quarter off the normal price, like 2-for-1 pizza or a
-            free coffee with breakfast. Tell them The Ubudian sent you.
+            free coffee with breakfast.
           </p>
         </div>
       </section>
@@ -69,13 +70,13 @@ export default async function DealsPage() {
               The rest of the week
             </h2>
             <div className="mt-6 divide-y divide-brand-gold/20 border-y border-brand-gold/20">
-              {week.map((d) => (
-                <DayGroup key={d.day} label={WEEKDAY_NAMES[d.day]} count={d.items.length}>
-                  {d.items.map((s) => (
-                    <SpecialCard key={s.id} special={s} showDays={false} />
+              {week.length > 0 && (
+                <DayGroup label="On set days" count={week.length}>
+                  {week.map((s) => (
+                    <SpecialCard key={s.id} special={s} showDays />
                   ))}
                 </DayGroup>
-              ))}
+              )}
               {everyDay.length > 0 && (
                 <DayGroup label="Every day" count={everyDay.length}>
                   {everyDay.map((s) => (
@@ -91,10 +92,10 @@ export default async function DealsPage() {
                   Days to confirm: ask the venue
                 </h2>
                 <p className="mt-2 text-sm text-muted-foreground">
-                  Real deals whose source gives no days yet. Check the days with the venue before you go.
+                  We don&apos;t know which days these run yet. Check with the venue before you go.
                 </p>
                 <div className="mt-4 border-y border-brand-gold/20">
-                  <DayGroup label="Show them" count={askDays.length}>
+                  <DayGroup label="Ask the venue" count={askDays.length}>
                     {askDays.map((s) => (
                       <SpecialCard key={s.id} special={s} showDays={false} />
                     ))}
