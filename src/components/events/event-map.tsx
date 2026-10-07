@@ -94,7 +94,7 @@ export function EventMap({ event }: EventMapProps) {
       event.venue_map_url && isSafeUrl(event.venue_map_url)
         ? event.venue_map_url
         : place
-          ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${place}, Ubud, Bali`)}`
+          ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(/ubud/i.test(place) ? `${place}, Bali` : `${place}, Ubud, Bali`)}`
           : null;
     return (
       <div className="rounded-xl border border-brand-gold/20 bg-brand-cream/40 p-6 text-center">
