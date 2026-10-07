@@ -11,11 +11,11 @@ export const metadata: Metadata = {
 };
 export const dynamic = "force-dynamic";
 
-/** Ben's WhatsApp, shown only on these private pages (env, so the public repo never holds it). */
+/** The team's WhatsApp, shown only on these private pages (env, so the public repo never holds it). */
 function whatsappHref(venue: string): string | null {
   const n = process.env.VENUE_CONTACT_WHATSAPP?.replace(/\D/g, "");
   if (!n) return null;
-  return `https://wa.me/${n}?text=${encodeURIComponent(`Hi Ben, it's ${venue} about The Ubudian`)}`;
+  return `https://wa.me/${n}?text=${encodeURIComponent(`Hi, it's ${venue} about The Ubudian`)}`;
 }
 
 function when(d: InviteDeal): string {
@@ -126,10 +126,10 @@ export default async function VenueInvitePage({ params }: { params: Promise<{ to
             href={wa}
             className="block rounded-lg border border-brand-deep-green/30 p-3 text-center font-medium text-brand-deep-green"
           >
-            Easier to chat? WhatsApp Ben
+            Easier to chat? WhatsApp us
           </a>
         )}
-        <p className="text-center text-sm text-muted-foreground">Gratis, tanpa komisi. Tanya? WhatsApp Ben.</p>
+        <p className="text-center text-sm text-muted-foreground">Gratis, tanpa komisi. Tanya? WhatsApp kami.</p>
         <OptOut token={token} />
         <p className="text-center text-xs text-muted-foreground">Only you have this link. Nothing shows on the site until you send it.</p>
       </section>

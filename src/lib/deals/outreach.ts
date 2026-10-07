@@ -63,14 +63,14 @@ export function dmText(v: Pick<OutreachVenue, "name" | "invite_token">, knownTit
   const deal = knownTitle ? knownTitle.charAt(0).toLowerCase() + knownTitle.slice(1) : null;
   const ask = deal
     ? isLive
-      ? `I have listed your ${deal} on the site, free. Do you have any other deals?`
-      : `I saw your ${deal} and would like to list it. Is it still available? Do you have any other deals?`
+      ? `We have listed your ${deal} on the site, free. Do you have any other deals?`
+      : `We saw your ${deal} and would like to list it. Is it still available? Do you have any other deals?`
     : "Do you have a deal for guests? For example 25% or more off a meal or a wellness session. Food and wellness only, not drinks.";
   return [
-    `Hi ${shortName(v.name)} team! I'm Ben, I live in Ubud. I run The Ubudian (theubudian.life), a website that shows Ubud's food and wellness deals to locals and visitors.`,
+    `Hi ${shortName(v.name)} team! This is The Ubudian (theubudian.life), a website that shows Ubud's food and wellness deals to locals and visitors.`,
     ask,
-    `Listing is free, with no commission. You can add your deal here: theubudian.life/v/${v.invite_token} (or just reply to me).`,
-    "Not interested? Just say so and I won't message again.",
+    `Listing is free, with no commission. You can add your deal here: theubudian.life/v/${v.invite_token} (or just reply here).`,
+    "Not interested? Just say so and we won't message again.",
   ].join(" ");
 }
 
