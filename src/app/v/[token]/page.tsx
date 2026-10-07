@@ -11,12 +11,8 @@ export const metadata: Metadata = {
 };
 export const dynamic = "force-dynamic";
 
-/** The team's WhatsApp, shown only on these private pages (env, so the public repo never holds it). */
-function whatsappHref(venue: string): string | null {
-  const n = process.env.VENUE_CONTACT_WHATSAPP?.replace(/\D/g, "");
-  if (!n) return null;
-  return `https://wa.me/${n}?text=${encodeURIComponent(`Hi, it's ${venue} about The Ubudian`)}`;
-}
+/** Email only (Ben, 7 Oct): no phone number on venue pages. */
+const CONTACT_EMAIL = "theubudianlife@gmail.com";
 
 function when(d: InviteDeal): string {
   return [d.days_stated ? formatDays(d) : null, formatHours(d.start_time, d.end_time), formatIdr(d.price_idr)]
@@ -47,7 +43,6 @@ export default async function VenueInvitePage({ params }: { params: Promise<{ to
   const { token } = await params;
   const invite = await getInvite(token);
   if (!invite) notFound();
-  const wa = whatsappHref(invite.name);
   const idea = IDEAS[invite.category ?? ""] ?? IDEAS.restaurant;
 
   if (invite.optedOut) {
@@ -121,15 +116,13 @@ export default async function VenueInvitePage({ params }: { params: Promise<{ to
           </div>
         </div>
 
-        {wa && (
-          <a
-            href={wa}
-            className="block rounded-lg border border-brand-deep-green/30 p-3 text-center font-medium text-brand-deep-green"
-          >
-            Easier to chat? WhatsApp us
-          </a>
-        )}
-        <p className="text-center text-sm text-muted-foreground">Gratis, tanpa komisi. Tanya? WhatsApp kami.</p>
+        <a
+          href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(`${invite.name} on The Ubudian`)}`}
+          className="block rounded-lg border border-brand-deep-green/30 p-3 text-center font-medium text-brand-deep-green"
+        >
+          Easier by email? Write to {CONTACT_EMAIL}
+        </a>
+        <p className="text-center text-sm text-muted-foreground">Gratis, tanpa komisi. Tanya? Email kami.</p>
         <OptOut token={token} />
         <p className="text-center text-xs text-muted-foreground">Only you have this link. Nothing shows on the site until you send it.</p>
       </section>

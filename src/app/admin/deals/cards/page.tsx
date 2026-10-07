@@ -16,7 +16,6 @@ export default async function CardsPage({ searchParams }: { searchParams: Promis
   const { area } = await searchParams;
   if (!area) redirect("/admin/deals/outreach");
   const venues = await cardVenues(area);
-  const wa = process.env.VENUE_CONTACT_WHATSAPP?.replace(/^\+?62(\d{3})(\d{4})(\d+)$/, "+62 $1 $2 $3") ?? "";
   const cards = await Promise.all(
     venues.map(async (v) => ({
       ...v,
@@ -43,7 +42,7 @@ export default async function CardsPage({ searchParams }: { searchParams: Promis
               <p>Deals of 25% or more off, for food and wellness (not drinks). Free, no commission.</p>
               <p>Promo diskon 25% atau lebih, untuk makanan dan wellness (bukan minuman). Gratis, tanpa komisi.</p>
               <p className="mt-1 text-xs">theubudian.life</p>
-              {wa && <p className="mt-1 font-medium">Questions? WhatsApp us: {wa}</p>}
+              <p className="mt-1 font-medium">Questions? theubudianlife@gmail.com</p>
               <VisitedButton venueId={c.id} />
             </div>
           </div>
