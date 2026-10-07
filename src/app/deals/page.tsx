@@ -28,7 +28,11 @@ export default async function DealsPage() {
   // (listing it under every day it runs showed one breakfast card five times).
   const daysUntil = (d: (typeof deals)[number]) =>
     Math.min(...Array.from({ length: 6 }, (_, i) => i).filter((i) => runsOn(d, (now.dayOfWeek + 1 + i) % 7)), 99);
-  const week = deals.filter((d) => d.weekdays.length > 0).sort((a, b) => daysUntil(a) - daysUntil(b));
+  // A set-day deal still on today, with no other day this week, is already in "Today": skip the repeat.
+  const todayIds = new Set(today.map((d) => d.id));
+  const week = deals
+    .filter((d) => d.weekdays.length > 0 && !(todayIds.has(d.id) && daysUntil(d) === 99))
+    .sort((a, b) => daysUntil(a) - daysUntil(b));
   const everyDay = deals.filter((d) => d.weekdays.length === 0 && !daysUnknown(d));
   const askDays = deals.filter((d) => daysUnknown(d));
 
@@ -71,7 +75,7 @@ export default async function DealsPage() {
             </h2>
             <div className="mt-6 divide-y divide-brand-gold/20 border-y border-brand-gold/20">
               {week.length > 0 && (
-                <DayGroup label="On set days" count={week.length}>
+                <DayGroup label="On other days" count={week.length}>
                   {week.map((s) => (
                     <SpecialCard key={s.id} special={s} showDays />
                   ))}
