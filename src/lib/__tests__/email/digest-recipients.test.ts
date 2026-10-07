@@ -44,4 +44,16 @@ describe("digestRecipients", () => {
     );
     expect(r).toEqual([]);
   });
+
+  it("never mails test or placeholder addresses", () => {
+    const r = digestRecipients(
+      [profile({ email: "test-admin@theubudian.test", primary_archetype: "seeker" })],
+      [
+        { email: "e2e-test@example.com", status: "active", archetype: null },
+        { email: "real@gmail.com", status: "active", archetype: null },
+      ],
+      new Set(),
+    );
+    expect(r).toEqual([{ email: "real@gmail.com", archetype: null }]);
+  });
 });

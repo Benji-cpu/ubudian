@@ -16,6 +16,11 @@ export type DigestRecipient = { email: string; archetype: string | null };
 
 const norm = (e: string) => e.toLowerCase().trim();
 
+/** Test and placeholder addresses (e2e rows, .test and example domains) are never mailed. */
+export function isTestAddress(email: string): boolean {
+  return /@(?:[a-z0-9-]+\.)*(?:test|example\.(?:com|org|net))$/.test(norm(email));
+}
+
 export function digestRecipients(
   profiles: DigestProfile[],
   subscribers: DigestSubscriber[],
@@ -34,6 +39,6 @@ export function digestRecipients(
   }
 
   return [...byEmail]
-    .filter(([email]) => !stopped.has(email))
+    .filter(([email]) => !stopped.has(email) && !isTestAddress(email))
     .map(([email, archetype]) => ({ email, archetype }));
 }
