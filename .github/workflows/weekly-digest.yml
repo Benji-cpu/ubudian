@@ -36,6 +36,7 @@ jobs:
           query=""
           if [ -n "${ONLY:-}" ]; then query="only=$(printf %s "$ONLY" | jq -sRr @uri)"; fi
           if [ "${DEALS:-}" = "1" ]; then query="${query:+$query&}deals=1"; fi
+          query="${query:+$query&}picks=1"
           response=$(curl -fsS -X POST \
             -H "Authorization: Bearer ${CRON_SECRET}" \
             "https://theubudian.life/api/cron/weekly-digest${query:+?$query}")

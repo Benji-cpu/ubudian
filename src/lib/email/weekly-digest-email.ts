@@ -64,8 +64,9 @@ export function buildWeeklyDigestEmailHtml(opts: {
   const eventsHeading =
     events.length > 0 && (withDeals || picks.length > 0) ? heading(picks.length > 0 ? "Also on this week" : "What's on") : "";
 
+  // Picks promise a day only: the desk's times aren't confirmed, so they stay on the event page.
   const eventRow = (e: Event, why?: string) => {
-    const when = [fmtEmailDate(e.start_date), formatEventTime(e.start_time, e.end_time)]
+    const when = [fmtEmailDate(e.start_date), why ? null : formatEventTime(e.start_time, e.end_time)]
       .filter(Boolean)
       .join(" · ");
     const where = e.venue_name ? ` · ${esc(e.venue_name)}` : "";
