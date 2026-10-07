@@ -66,7 +66,7 @@ export function InterestButton({ eventId, initialCount }: { eventId: string; ini
       </button>
       <span className="text-sm text-muted-foreground">
         {count >= SHOW_COUNT_FROM ? `${count} people interested. ` : ""}
-        It helps us pick the week&apos;s best.
+        Not a booking, and no reminder. It helps us pick the week&apos;s best.
       </span>
     </div>
   );

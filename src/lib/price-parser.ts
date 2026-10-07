@@ -85,8 +85,9 @@ export function matchesPriceBracket(
 ): boolean {
   const parsed = parsePriceFromText(priceInfo);
 
-  // Unparseable → show in all brackets
-  if (parsed === null) return true;
+  // Unparseable → show in every paid bracket, but never under "free": a
+  // listing with no stated price isn't known to be free.
+  if (parsed === null) return bracket !== "free";
 
   switch (bracket) {
     case "free":

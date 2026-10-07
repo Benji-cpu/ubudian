@@ -89,20 +89,24 @@ export function EventMap({ event }: EventMapProps) {
 
   // Fallback: no coordinates
   if (event.latitude == null || event.longitude == null) {
-    const mapUrl = event.venue_map_url && isSafeUrl(event.venue_map_url) ? event.venue_map_url : null;
+    const place = [event.venue_name, event.venue_address].filter(Boolean).join(", ");
+    const mapUrl =
+      event.venue_map_url && isSafeUrl(event.venue_map_url)
+        ? event.venue_map_url
+        : place
+          ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${place}, Ubud, Bali`)}`
+          : null;
     return (
       <div className="rounded-xl border border-brand-gold/20 bg-brand-cream/40 p-6 text-center">
         <MapPin className="mx-auto h-6 w-6 text-brand-gold" />
         <p className="mt-2 text-sm text-muted-foreground">
-          {event.venue_name
-            ? `Map pending for ${event.venue_name}.`
-            : "No coordinates available for this venue yet."}
+          {place || "Venue to be confirmed."}
         </p>
         {mapUrl && (
           <Button asChild variant="outline" className="mt-4">
             <a href={mapUrl} target="_blank" rel="noopener noreferrer">
               <ExternalLink className="mr-2 h-4 w-4" />
-              View on Google Maps
+              Find on Google Maps
             </a>
           </Button>
         )}

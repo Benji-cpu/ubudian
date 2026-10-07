@@ -72,10 +72,11 @@ describe("parsePriceFromText", () => {
 });
 
 describe("matchesPriceBracket", () => {
-  it("unparseable prices match ALL brackets", () => {
+  it("unparseable prices match every bracket except free", () => {
     for (const bracket of PRICE_BRACKETS) {
-      expect(matchesPriceBracket(null, bracket.value)).toBe(true);
-      expect(matchesPriceBracket("TBA", bracket.value)).toBe(true);
+      const expected = bracket.value !== "free";
+      expect(matchesPriceBracket(null, bracket.value)).toBe(expected);
+      expect(matchesPriceBracket("TBA", bracket.value)).toBe(expected);
     }
   });
 

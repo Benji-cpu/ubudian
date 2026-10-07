@@ -45,7 +45,7 @@ export function SuggestSource() {
           Drop their Instagram handle or a link. We check every week and add the ones that run events here.
         </p>
         {state === "done" ? (
-          <p className="mt-3 text-sm font-medium text-brand-deep-green">Thanks, got it.</p>
+          <p className="mt-3 text-sm font-medium text-brand-deep-green">Thanks, got it. We&apos;ll look at it in our weekly check.</p>
         ) : (
           <form onSubmit={submit} className="mt-3 flex flex-col gap-2 sm:flex-row">
             <Input

@@ -18,6 +18,7 @@ import { generateFingerprint } from "./fingerprint";
 import { getAdapter } from "./source-adapter";
 import { validateAndNormalizeDate } from "./date-validator";
 import { logHealthEvent } from "./health-utils";
+import { tidyShortDescription } from "@/lib/events/summary";
 import { logActivity } from "./activity-log";
 import { enrichFromUrls, applyEnrichment } from "./url-enricher";
 import { geocodeVenue } from "@/lib/geocoding";
@@ -927,7 +928,7 @@ export async function createEventFromParsed(
           title: parsed.title,
           slug,
           description: parsed.description || parsed.title,
-          short_description: parsed.short_description || null,
+          short_description: tidyShortDescription(parsed.short_description || null, parsed.description || null),
           category,
           venue_name: normalizedVenue || parsed.venue_name || null,
           venue_address: parsed.venue_address || null,

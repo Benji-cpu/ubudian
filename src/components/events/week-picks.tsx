@@ -12,7 +12,7 @@ export function WeekPicks({ picks }: { picks: WeekPick[] }) {
         This week&apos;s picks
       </h2>
       <p className="mt-1 text-sm text-muted-foreground">
-        Chosen every Wednesday from everything on this week.
+        Our pick of what&apos;s on, chosen every Wednesday.
       </p>
       <ol className="mt-4 grid gap-3 sm:grid-cols-2">
         {picks.map(({ event, why }) => {

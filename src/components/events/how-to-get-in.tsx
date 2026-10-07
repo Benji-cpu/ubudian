@@ -35,7 +35,7 @@ export function HowToGetIn({ event }: { event: Event }) {
           <p className="mt-2 flex items-start gap-2 text-sm text-foreground/85">
             <MessageCircle className="mt-0.5 h-4 w-4 shrink-0 text-brand-gold" />
             <span className="min-w-0 break-words">
-              Ask the organiser{event.organizer_name ? ` (${event.organizer_name})` : ""}:{" "}
+              {`Ask the organiser${event.organizer_name ? ` (${event.organizer_name})` : ""}: `}
               {way.contact && (contactHref(way.contact) ? (
                 <a href={contactHref(way.contact)!} target="_blank" rel="noopener noreferrer" className="font-medium text-primary underline underline-offset-2">
                   {way.contact}
@@ -51,7 +51,7 @@ export function HowToGetIn({ event }: { event: Event }) {
                   rel="noopener noreferrer"
                   className="font-medium text-primary underline underline-offset-2"
                 >
-                  @{way.instagram.replace(/^@/, "")}
+                  {`@${way.instagram.replace(/^@/, "")}`}
                 </a>
               )}
               {price ? ` · ${price}` : ""}
