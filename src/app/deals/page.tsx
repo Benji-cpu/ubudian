@@ -33,7 +33,8 @@ export default async function DealsPage() {
   const week = deals
     .filter((d) => d.weekdays.length > 0 && !(todayIds.has(d.id) && daysUntil(d) === 99))
     .sort((a, b) => daysUntil(a) - daysUntil(b));
-  const everyDay = deals.filter((d) => d.weekdays.length === 0 && !daysUnknown(d));
+  // Every-day deals still on are already under Today; this group keeps the ones whose hours have passed.
+  const everyDay = deals.filter((d) => d.weekdays.length === 0 && !daysUnknown(d) && !todayIds.has(d.id));
   const askDays = deals.filter((d) => daysUnknown(d));
 
   return (
