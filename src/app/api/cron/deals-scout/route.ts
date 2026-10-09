@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { apply, findingsSchema, todo } from "@/lib/deals/scout";
+import { apply, parseFindings, todo } from "@/lib/deals/scout";
 import { isDealsReviewAuthorised } from "@/lib/venue/review-auth";
 
 /**
@@ -20,8 +20,8 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   if (!authorised(request)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  const parsed = findingsSchema.safeParse(await request.json().catch(() => null));
-  if (!parsed.success) return NextResponse.json({ error: parsed.error.issues[0]?.message ?? "Invalid findings" }, { status: 400 });
-  const report = await apply(parsed.data);
-  return NextResponse.json({ data: report, error: null });
+  const parsed = parseFindings(await request.json().catch(() => null));
+  if (!parsed) return NextResponse.json({ error: "Invalid findings" }, { status: 400 });
+  const report = await apply(parsed.findings);
+  return NextResponse.json({ data: { ...report, skipped: parsed.skipped }, error: null });
 }

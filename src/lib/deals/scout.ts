@@ -120,7 +120,8 @@ const foundSpecial = z.object({
   price_idr: idr,
   normal_price_idr: idr,
   weekdays: z.array(z.number().int().min(0).max(6)).max(7),
-  days_stated: z.boolean(),
+  /** The routine sometimes sends null or "unknown" when the page names no days: only a real true counts. */
+  days_stated: z.unknown().transform((v) => v === true),
   start_time: time,
   end_time: time,
   source_url: z.string().url().max(500),
@@ -130,33 +131,45 @@ const foundSpecial = z.object({
   reason: text(300),
 });
 
+const findingSchema = z.object({
+  venue_id: z.string().uuid(),
+  result: z.enum(["specials", "nothing", "closed", "unreachable"]),
+  note: text(500),
+  specials: z.array(foundSpecial).max(10).default([]),
+  /** Public ways to reach the venue, each with where it was found. Never guessed. */
+  contact: z
+    .object({
+      email: z.string().email().max(200).nullable(),
+      email_source_url: z.string().url().max(500).nullable(),
+      instagram_handle: z.string().regex(/^[A-Za-z0-9_.]{1,30}$/).nullable(),
+      contact_name: z.string().trim().max(80).nullable(),
+      contact_name_source_url: z.string().url().max(500).nullable(),
+      website_url: z.string().url().max(500).nullable(),
+    })
+    .partial()
+    .optional(),
+  /** For reconfirm items: is each live deal still on the venue's own page? */
+  renew: z.array(z.object({ special_id: z.string().uuid(), still_running: z.boolean(), source_url: z.string().url().max(500).nullable() })).max(10).default([]),
+});
+
 export const findingsSchema = z.object({
   checkedAt: z.string(),
-  findings: z
-    .array(
-      z.object({
-        venue_id: z.string().uuid(),
-        result: z.enum(["specials", "nothing", "closed", "unreachable"]),
-        note: text(500),
-        specials: z.array(foundSpecial).max(10).default([]),
-        /** Public ways to reach the venue, each with where it was found. Never guessed. */
-        contact: z
-          .object({
-            email: z.string().email().max(200).nullable(),
-            email_source_url: z.string().url().max(500).nullable(),
-            instagram_handle: z.string().regex(/^[A-Za-z0-9_.]{1,30}$/).nullable(),
-            contact_name: z.string().trim().max(80).nullable(),
-            contact_name_source_url: z.string().url().max(500).nullable(),
-            website_url: z.string().url().max(500).nullable(),
-          })
-          .partial()
-          .optional(),
-        /** For reconfirm items: is each live deal still on the venue's own page? */
-        renew: z.array(z.object({ special_id: z.string().uuid(), still_running: z.boolean(), source_url: z.string().url().max(500).nullable() })).max(10).default([]),
-      })
-    )
-    .max(100),
+  findings: z.array(findingSchema).max(1000),
 });
+
+/** One bad finding must not throw away the other 39: keep the valid ones, report the rest. */
+export function parseFindings(raw: unknown): { findings: Findings; skipped: { index: number; issue: string }[] } | null {
+  const head = z.object({ checkedAt: z.string(), findings: z.array(z.unknown()).max(1000) }).safeParse(raw);
+  if (!head.success) return null;
+  const findings: Findings["findings"] = [];
+  const skipped: { index: number; issue: string }[] = [];
+  head.data.findings.forEach((f, index) => {
+    const r = findingSchema.safeParse(f);
+    if (r.success) findings.push(r.data);
+    else skipped.push({ index, issue: `${r.error.issues[0]?.path.join(".")}: ${r.error.issues[0]?.message}` });
+  });
+  return { findings: { checkedAt: head.data.checkedAt, findings }, skipped };
+}
 export type Findings = z.infer<typeof findingsSchema>;
 
 export const NOTE_FOUND_PASSES = "Found by our check of your public pages. We'll list it once you confirm it's still running.";
