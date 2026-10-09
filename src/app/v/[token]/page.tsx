@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Globe, Instagram, MapPin } from "lucide-react";
 import { notFound } from "next/navigation";
 import { getInvite, type InviteDeal } from "@/lib/deals/invite";
 import { formatDays, formatHours, formatIdr } from "@/lib/specials";
+import { dealExamples } from "@/lib/deals/examples";
+import { REVIEW_PROMISE } from "@/lib/venue";
 import { InviteForm, FoundYes, OptOut } from "./invite-form";
 
 export const metadata: Metadata = {
@@ -30,20 +33,15 @@ function DealBox({ d, children }: { d: InviteDeal; children?: React.ReactNode })
   );
 }
 
-const IDEAS: Record<string, string> = {
-  cafe: "25% off breakfast before 9",
-  warung: "a free dessert with nasi campur",
-  restaurant: "2-for-1 mains on a quiet night",
-  spa: "25% off weekday mornings",
-  yoga: "a free class with a 5-class card",
-  bar: "half-price food before 6",
-};
+const KIND: Record<string, string> = { cafe: "Café", restaurant: "Restaurant", warung: "Warung", bakery: "Bakery", spa: "Spa", yoga: "Yoga", bar: "Bar & kitchen" };
+const kindOf = (c: string | null) => (c ? (KIND[c.toLowerCase()] ?? c.charAt(0).toUpperCase() + c.slice(1)) : null);
 
 export default async function VenueInvitePage({ params }: { params: Promise<{ token: string }> }) {
   const { token } = await params;
   const invite = await getInvite(token);
   if (!invite) notFound();
-  const idea = IDEAS[invite.category ?? ""] ?? IDEAS.restaurant;
+  const examples = dealExamples(invite.category);
+  const hasDeal = invite.live.length + invite.found.length + invite.waiting.length > 0;
 
   if (invite.optedOut) {
     return (
@@ -57,21 +55,57 @@ export default async function VenueInvitePage({ params }: { params: Promise<{ to
     );
   }
 
+  const linkCls = "inline-flex items-center gap-1.5 underline-offset-4 hover:text-brand-deep-green hover:underline";
   return (
     <div>
-      <section className="bg-brand-cream px-4 py-12">
-        <div className="mx-auto max-w-xl">
+      <section className="bg-brand-cream py-10 sm:py-12">
+        <div className="mx-auto max-w-xl px-4">
           <p className="text-xs font-semibold uppercase tracking-widest text-brand-terracotta">
-            {invite.contactName ? `For ${invite.contactName} · ` : ""}Your private page
+            {invite.contactName ? `For ${invite.contactName} · ` : ""}Your page on The Ubudian
           </p>
-          <h1 className="mt-2 font-serif text-3xl font-medium text-brand-deep-green sm:text-4xl">{invite.name} on The Ubudian</h1>
-          <p className="mt-3 text-muted-foreground">
-            The Ubudian is a free website that lists Ubud&apos;s food and wellness deals, on the days they run.
+          <h1 className="mt-2 font-serif text-3xl font-medium text-brand-deep-green sm:text-4xl">{invite.name}</h1>
+          <p className="mt-1 text-muted-foreground">{[kindOf(invite.category), invite.area].filter(Boolean).join(" · ")}</p>
+          <p className="mt-4 text-brand-charcoal">
+            People in Ubud use The Ubudian to decide where to eat and what to do this week, and they come to the deals page for offers like the ones below. Add yours and it shows here and on the deals page.
           </p>
         </div>
       </section>
 
-      <section className="mx-auto max-w-xl space-y-6 px-4 py-10">
+      <section className="mx-auto max-w-xl space-y-6 px-4 py-8">
+        <div>
+          <p className="mb-2 text-sm font-medium text-muted-foreground">How guests will see you</p>
+          <article className="rounded-xl border border-brand-gold/20 bg-card p-5 shadow-sm">
+            <p className="text-xs font-semibold uppercase tracking-widest text-brand-terracotta">
+              {invite.name}
+              {invite.area ? <span className="font-normal normal-case tracking-normal text-muted-foreground"> · {invite.area}</span> : null}
+            </p>
+            {invite.live[0] ? (
+              <h2 className="mt-1 font-serif text-xl text-brand-deep-green">{invite.live[0].title}</h2>
+            ) : (
+              <div className="mt-2 rounded-lg border-2 border-dashed border-brand-gold/50 px-3 py-2">
+                <p className="font-serif text-lg text-brand-deep-green">Your guest deal here</p>
+                <p className="text-sm text-muted-foreground">For example: {examples[0].charAt(0).toLowerCase() + examples[0].slice(1)}</p>
+              </div>
+            )}
+            <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
+              <a href={invite.mapsUrl} target="_blank" rel="noopener noreferrer" className={linkCls}>
+                <MapPin className="h-4 w-4" aria-hidden />
+                Directions
+              </a>
+              {invite.instagramHandle ? (
+                <a href={`https://instagram.com/${encodeURIComponent(invite.instagramHandle)}`} target="_blank" rel="noopener noreferrer" className={linkCls}>
+                  <Instagram className="h-4 w-4" aria-hidden />@{invite.instagramHandle}
+                </a>
+              ) : invite.websiteUrl ? (
+                <a href={invite.websiteUrl} target="_blank" rel="noopener noreferrer" className={linkCls}>
+                  <Globe className="h-4 w-4" aria-hidden />
+                  Website
+                </a>
+              ) : null}
+            </div>
+          </article>
+        </div>
+
         {invite.live.length > 0 && (
           <div className="space-y-3">
             <h2 className="font-serif text-xl text-brand-deep-green">Listed now</h2>
@@ -100,31 +134,33 @@ export default async function VenueInvitePage({ params }: { params: Promise<{ to
 
         {invite.waiting.length > 0 && (
           <p className="rounded-lg bg-muted p-3 text-sm">
-            Thank you: {invite.waiting.length === 1 ? "your deal is" : `${invite.waiting.length} deals are`} with us. We check new deals every night; most are live by the next morning.
+            Thank you: {invite.waiting.length === 1 ? "your deal is" : `${invite.waiting.length} deals are`} with us. {REVIEW_PROMISE}.
           </p>
         )}
 
         <div className="rounded-xl border bg-card p-5">
-          <h2 className="font-serif text-xl text-brand-deep-green">
-            {invite.live.length + invite.found.length > 0 ? "Any other deals or specials?" : "What deals or specials do you run?"}
-          </h2>
+          <h2 className="font-serif text-xl text-brand-deep-green">{hasDeal ? "Add another deal" : "Add your deal"}</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Any day, any time. For example: {idea}. We list food, café and wellness deals that save at least 25% (no drink deals). Free: no fees, no commission, no ads.
+            Tap an example or write your own. We list food, café and wellness deals that save guests at least 25% (no drink deals). Free: no fees, no commission. {REVIEW_PROMISE}.
           </p>
           <div className="mt-4">
-            <InviteForm token={token} />
+            <InviteForm token={token} examples={examples} />
           </div>
         </div>
 
-        <a
-          href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(`${invite.name} on The Ubudian`)}`}
-          className="block rounded-lg border border-brand-deep-green/30 p-3 text-center font-medium text-brand-deep-green"
-        >
-          Easier by email? Write to {CONTACT_EMAIL}
-        </a>
+        <p className="text-center text-sm text-muted-foreground">
+          Easier by email? Reply to our email, or write to{" "}
+          <a
+            href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(`${invite.name} on The Ubudian`)}`}
+            className="font-medium text-brand-deep-green underline underline-offset-4"
+          >
+            {CONTACT_EMAIL}
+          </a>
+          .
+        </p>
         <p className="text-center text-sm text-muted-foreground">Gratis, tanpa komisi. Tanya? Email kami.</p>
         <OptOut token={token} />
-        <p className="text-center text-xs text-muted-foreground">Only you have this link. Nothing shows on the site until you send it.</p>
+        <p className="text-center text-xs text-muted-foreground">Only you have this link. Nothing shows on the site until you send a deal.</p>
       </section>
     </div>
   );

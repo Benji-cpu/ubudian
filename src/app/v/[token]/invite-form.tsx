@@ -28,7 +28,7 @@ const toIdr = (v: string) => {
 // Monday first, the way a venue reads its week.
 const DAY_ORDER = [1, 2, 3, 4, 5, 6, 0];
 
-export function InviteForm({ token }: { token: string }) {
+export function InviteForm({ token, examples = [] }: { token: string; examples?: string[] }) {
   const [state, setState] = useState<State>("idle");
   const [error, setError] = useState("");
   const [days, setDays] = useState<number[]>([]);
@@ -71,8 +71,22 @@ export function InviteForm({ token }: { token: string }) {
   return (
     <form onSubmit={submit} className="space-y-4">
       <div>
-        <label className="text-sm font-medium" htmlFor="title">The deal</label>
-        <Input id="title" required minLength={3} maxLength={80} value={f.title} onChange={set("title")} placeholder="e.g. 2-for-1 pizza, or 30% off massages before noon" />
+        <label className="text-sm font-medium" htmlFor="title">Your deal</label>
+        {examples.length > 0 && (
+          <div className="mt-2 flex flex-wrap gap-2">
+            {examples.map((x) => (
+              <button
+                key={x}
+                type="button"
+                onClick={() => setF({ ...f, title: x })}
+                className={cn("rounded-full border px-3 py-1 text-left text-sm", f.title === x ? "border-brand-deep-green bg-brand-deep-green text-white" : "border-brand-gold/40 bg-brand-cream/60")}
+              >
+                {x}
+              </button>
+            ))}
+          </div>
+        )}
+        <Input id="title" className="mt-2" required minLength={3} maxLength={80} value={f.title} onChange={set("title")} placeholder={examples.length ? "Tap one above, or write your own" : "e.g. 2-for-1 pizza, or 30% off massages before noon"} />
       </div>
       <div>
         <p className="text-sm font-medium">Which days? <span className="font-normal text-muted-foreground">(none = every day)</span></p>

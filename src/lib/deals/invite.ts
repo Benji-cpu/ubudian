@@ -31,6 +31,10 @@ export type Invite = {
   name: string;
   area: string | null;
   category: string | null;
+  address: string | null;
+  websiteUrl: string | null;
+  instagramHandle: string | null;
+  mapsUrl: string;
   contactName: string | null;
   optedOut: boolean;
   /** Live now: the venue can confirm or change them through the existing reconfirm page. */
@@ -48,7 +52,7 @@ export async function getInvite(token: string): Promise<Invite | null> {
   const supabase = createAdminClient();
   const { data: v } = await supabase
     .from("deal_venues")
-    .select("id, name, area, category, contact_name, opted_out_at")
+    .select("id, name, area, category, address, website_url, instagram_handle, google_maps_url, lat, lng, contact_name, opted_out_at")
     .eq("invite_token", token)
     .maybeSingle();
   if (!v) return null;
@@ -60,6 +64,14 @@ export async function getInvite(token: string): Promise<Invite | null> {
     name: v.name,
     area: v.area,
     category: v.category,
+    address: v.address,
+    websiteUrl: v.website_url,
+    instagramHandle: v.instagram_handle?.replace(/^@/, "") || null,
+    mapsUrl:
+      v.google_maps_url ??
+      (v.lat != null && v.lng != null
+        ? `https://www.google.com/maps/search/?api=1&query=${v.lat},${v.lng}`
+        : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent([v.name, v.address || v.area, "Ubud"].filter(Boolean).join(", "))}`),
     contactName: v.contact_name,
     optedOut: !!v.opted_out_at,
     live: rows.filter((d) => d.status === "live" && d.expires_on >= today),
