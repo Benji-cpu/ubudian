@@ -66,7 +66,7 @@ export default async function VenueInvitePage({ params }: { params: Promise<{ to
           <h1 className="mt-2 font-serif text-3xl font-medium text-brand-deep-green sm:text-4xl">{invite.name}</h1>
           <p className="mt-1 text-muted-foreground">{[kindOf(invite.category), invite.area].filter(Boolean).join(" · ")}</p>
           <p className="mt-4 text-brand-charcoal">
-            People in Ubud use The Ubudian to decide where to eat and what to do this week, and they come to the deals page for offers like the ones below. Add yours and it shows here and on the deals page.
+            The Ubudian is a website that helps people in Ubud decide where to eat and what to do this week. Its deals page shows offers from local places. Add your deal and it appears on your page and on the deals page.
           </p>
         </div>
       </section>
