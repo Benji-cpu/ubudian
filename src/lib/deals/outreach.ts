@@ -80,6 +80,12 @@ export async function cardVenues(area: string): Promise<OutreachVenue[]> {
   return (data ?? []).filter((v) => !SKIP.test(v.name));
 }
 
+/** The same cards for a hand-picked walk (the walk-in kit's clusters), by venue id. */
+export async function cardVenuesByIds(ids: string[]): Promise<OutreachVenue[]> {
+  const { data } = await uncontacted().in("id", ids).order("name").returns<OutreachVenue[]>();
+  return data ?? [];
+}
+
 export async function markContacted(venueId: string, channel: "instagram" | "in_person") {
   const now = new Date().toISOString();
   await createAdminClient()

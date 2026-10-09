@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import QRCode from "qrcode";
 import { isAdmin } from "@/lib/auth";
-import { cardVenues, shortName } from "@/lib/deals/outreach";
+import { cardVenues, cardVenuesByIds, shortName } from "@/lib/deals/outreach";
 import { VisitedButton } from "./visited-button";
 
 export const metadata = { title: "Walk-in cards — Admin", robots: { index: false, follow: false } };
@@ -11,11 +11,12 @@ export const dynamic = "force-dynamic";
  * Printable cards, four to an A4 page: each venue's name and a QR code to its own
  * private page (/v/<token>). Print, cut, and hand one over on a walk.
  */
-export default async function CardsPage({ searchParams }: { searchParams: Promise<{ area?: string }> }) {
+export default async function CardsPage({ searchParams }: { searchParams: Promise<{ area?: string; ids?: string }> }) {
   if (!(await isAdmin())) redirect("/");
-  const { area } = await searchParams;
-  if (!area) redirect("/admin/deals/outreach");
-  const venues = await cardVenues(area);
+  const { area, ids } = await searchParams;
+  const idList = (ids ?? "").split(",").filter((i) => /^[0-9a-f-]{36}$/.test(i)).slice(0, 12);
+  if (!area && !idList.length) redirect("/admin/deals/outreach");
+  const venues = idList.length ? await cardVenuesByIds(idList) : await cardVenues(area!);
   const cards = await Promise.all(
     venues.map(async (v) => ({
       ...v,
@@ -27,7 +28,7 @@ export default async function CardsPage({ searchParams }: { searchParams: Promis
     <div>
       <style>{`@media print { header, nav, aside, footer, .no-print { display: none !important; } .card { break-inside: avoid; } @page { size: A4; margin: 10mm; } }`}</style>
       <p className="no-print mb-4 text-sm text-muted-foreground">
-        {cards.length} cards for {area}. Print (four to a page), cut, hand one over. Then tap &ldquo;Mark visited&rdquo; under that card.
+        {cards.length} cards for {idList.length ? "this walk" : area}. Print (four to a page), cut, hand one over. Then tap &ldquo;Mark visited&rdquo; under that card.
       </p>
       <div className="grid grid-cols-1 gap-4 print:grid-cols-2 sm:grid-cols-2">
         {cards.map((c) => (
