@@ -4,7 +4,10 @@ import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Loader2, CheckCircle2 } from "lucide-react";
+import { Loader2, CheckCircle2, Share2 } from "lucide-react";
+import { SITE_URL } from "@/lib/constants";
+
+const SHARE_TEXT = `A free weekly email with Ubud's best deals and what's on: ${SITE_URL}/newsletter`;
 
 interface NewsletterSignupProps {
   className?: string;
@@ -79,6 +82,17 @@ export function NewsletterSignup({ className, variant = "light", source }: Newsl
             this week&apos;s deals are here
           </Link>
           .
+        </p>
+        <p className="mt-2 text-center">
+          <a
+            href={`https://wa.me/?text=${encodeURIComponent(SHARE_TEXT)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`inline-flex items-center gap-1.5 text-sm font-medium underline ${isDark ? "text-brand-gold" : "text-brand-deep-green"}`}
+          >
+            <Share2 className="h-4 w-4" />
+            Know someone who&apos;d like it? Send it on WhatsApp
+          </a>
         </p>
       </div>
     );

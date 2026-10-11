@@ -48,6 +48,12 @@ export default async function DealsPage() {
             Only real savings: at least a quarter off the normal price, like 2-for-1 pizza or a
             free coffee with breakfast.
           </p>
+          <div className="mx-auto mt-8 max-w-md text-left">
+            <p className="mb-2 text-center text-sm text-brand-off-white/70">
+              Get the week&apos;s best deals by email every Wednesday. Free.
+            </p>
+            <NewsletterSignup variant="dark" source="deals_top" />
+          </div>
         </div>
       </section>
 

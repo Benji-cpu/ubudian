@@ -346,6 +346,15 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
         </section>
       )}
 
+      <section className="mx-auto max-w-7xl px-4 pb-5 sm:px-6 sm:pb-8 lg:px-8">
+        <div className="flex flex-col gap-3 rounded-lg border border-brand-gold/20 bg-brand-gold/5 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm text-foreground">
+            Get the week&apos;s best deals and what&apos;s on, by email every Wednesday. Free.
+          </p>
+          <NewsletterSignup source="events_top" className="w-full sm:max-w-sm" />
+        </div>
+      </section>
+
       {/* Content */}
       <section className="mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:px-8">
         {isFeedView ? (
