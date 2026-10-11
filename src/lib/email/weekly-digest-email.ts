@@ -52,7 +52,7 @@ export function buildWeeklyDigestEmailHtml(opts: {
   const intro = withDeals
     ? a
       ? `This week's deals, then what's on — picked for ${esc(a.name)}.`
-      : `This week's deals, then what's on in the valley.`
+      : `This week's deals, then what's on in Ubud.`
     : a
       ? `Picked for ${esc(a.name)} — what's moving in the valley this week.`
       : `What's moving in the valley this week.`;
@@ -116,7 +116,7 @@ ${preheaderHtml}
   <tr><td style="padding:24px 32px;">
     <table role="presentation" cellpadding="0" cellspacing="0"><tr>
       <td style="background:${GREEN};border-radius:6px;">
-        <a href="${siteUrl}/events" style="display:inline-block;padding:12px 28px;font-size:14px;color:${CREAM};text-decoration:none;font-family:Georgia,serif;">Browse the full agenda</a>
+        <a href="${siteUrl}/events" style="display:inline-block;padding:12px 28px;font-size:14px;color:${CREAM};text-decoration:none;font-family:Georgia,serif;">See all events</a>
       </td>
     </tr></table>
   </td></tr>

@@ -153,12 +153,17 @@ function preheaderFor(deals: Special[], eventCount: number): string {
     const soft = /^(Weekdays|Weekends)$/.test(label) ? label.toLowerCase() : label;
     // "Sunday cookout … on Sun" says it twice; "Sun, Tue" reads as "Sun and Tue".
     const days = hasSetDays(d) && !DAY_IN_TITLE.test(d.title) ? ` on ${soft.replace(/, ([^,]+)$/, " and $1")}` : "";
-    return `${d.title} at ${d.venue_name}${days}`;
+    return `${d.title} at ${venueLabel(d.venue_name, d.venue_area)}${days}`;
   });
   const events = eventCount > 0 ? `Plus ${eventCount} thing${eventCount === 1 ? "" : "s"} on in Ubud this week.` : "";
   if (parts.length === 0) return events;
   const deal = parts.join("; ").replace(/^./, (c) => c.toUpperCase());
   return [`${deal}.`, events].filter(Boolean).join(" ");
+}
+
+/** "Chai of the Tiger (Tebesaya)" in area "Tebesaya" would print the area twice. */
+function venueLabel(name: string, area: string | null): string {
+  return name.replace(/\s*\(([^)]*)\)\s*$/, (m, inner: string) => (area && inner.trim().toLowerCase() === area.trim().toLowerCase() ? "" : m));
 }
 
 function clip(text: string, max: number): string {
@@ -171,8 +176,10 @@ export function buildDealsBlockHtml(deals: Special[], siteUrl: string): string {
 
   const rows = deals
     .map((s) => {
-      const where = [s.venue_name, s.venue_area].filter(Boolean).map((v) => esc(v as string)).join(" · ");
-      const when = [formatDays(s), emailHours(s.start_time, s.end_time), formatIdr(s.price_idr)]
+      const where = [venueLabel(s.venue_name, s.venue_area), s.venue_area].filter(Boolean).map((v) => esc(v as string)).join(" · ");
+      // A "50% off" deal with one price chip ("IDR 21k") reads as the price of everything in it: leave it to the description.
+      const showPrice = !/\d\s?%\s?off/i.test(s.title);
+      const when = [formatDays(s), emailHours(s.start_time, s.end_time), showPrice ? formatIdr(s.price_idr) : null]
         .filter(Boolean)
         .join(" · ");
       const blurb = dealBlurb(s);
@@ -203,6 +210,6 @@ export function buildDealsBlockHtml(deals: Special[], siteUrl: string): string {
   </td></tr>
   ${rows}${priceNote}
   <tr><td style="padding:10px 32px 4px;">
-    <a href="${siteUrl}${DEALS_PATH}" style="font-size:14px;color:${GREEN};font-family:Georgia,serif;">Every deal in Ubud →</a>
+    <a href="${siteUrl}${DEALS_PATH}" style="font-size:14px;color:${GREEN};font-family:Georgia,serif;">See all deals →</a>
   </td></tr>`;
 }
