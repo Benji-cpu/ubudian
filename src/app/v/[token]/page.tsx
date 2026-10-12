@@ -6,6 +6,7 @@ import { getInvite, type InviteDeal } from "@/lib/deals/invite";
 import { formatDays, formatHours, formatIdr } from "@/lib/specials";
 import { dealExamples } from "@/lib/deals/examples";
 import { REVIEW_PROMISE } from "@/lib/venue";
+import { NewsletterSignup } from "@/components/layout/newsletter-signup";
 import { InviteForm, FoundYes, OptOut } from "./invite-form";
 
 export const metadata: Metadata = {
@@ -146,6 +147,14 @@ export default async function VenueInvitePage({ params }: { params: Promise<{ to
           <div className="mt-4">
             <InviteForm token={token} examples={examples} />
           </div>
+        </div>
+
+        <div className="rounded-xl border bg-card p-5">
+          <h2 className="font-serif text-xl text-brand-deep-green">See what guests get</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Deals on this page go in our free email every Wednesday, along with what&apos;s on in Ubud. Get it yourself and see how {invite.name} looks to readers.
+          </p>
+          <NewsletterSignup source="venue_page" className="mt-4" />
         </div>
 
         <p className="text-center text-sm text-muted-foreground">
