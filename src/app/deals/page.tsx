@@ -125,17 +125,8 @@ export default async function DealsPage() {
         </section>
       )}
 
-      <section className="border-t border-brand-gold/20 px-4 py-12 text-center">
-        <div className="mx-auto max-w-xl">
-          <h2 className="font-serif text-2xl text-brand-deep-green dark:text-brand-gold">
-            Ubud&apos;s best deals and what&apos;s on, every Wednesday
-          </h2>
-          <p className="mt-2 text-sm text-muted-foreground">One short email. Free. Unsubscribe any time.</p>
-          <NewsletterSignup source="deals" className="mx-auto mt-6 max-w-md" />
-          {/* Renders nothing until WHATSAPP_CHANNEL_URL is set. */}
-          <ChannelFollow className="mx-auto mt-8 max-w-md" />
-        </div>
-      </section>
+      {/* The sign-up is at the top of the page and in the footer. Renders nothing until WHATSAPP_CHANNEL_URL is set. */}
+      <ChannelFollow className="mx-auto my-8 max-w-md px-4" />
 
       <section className="bg-brand-pale-green px-4 py-14 text-center">
         <div className="mx-auto max-w-xl">
