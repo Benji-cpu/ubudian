@@ -11,7 +11,7 @@ import { NOTE_FOUND_PASSES } from "./scout";
 export const IG_PER_DAY = 15;
 
 /** Resorts and fine dining, cut by the Reviewer on 6 Oct: unlikely to run a 25% deal. */
-const SKIP = /viceroy|cascades|ap[ée]ritif|kayon|kepitu|k club|kraton|locavore|wedja|sayan valley|como|mandapa|four seasons/i;
+const SKIP = /viceroy|cascades|ap[ée]ritif|kayon|kepitu|k club|kraton|locavore|wedja|sayan valley|como|mandapa|four seasons|anomali|starbucks|chatime|mixue|barber|salon|laundry|gym\b|fitness|school/i;
 /** Path words from a pasted Instagram link, not a venue's handle (The Chowk's OSM tag was "profilecard"). */
 const JUNK_HANDLE = /^(profilecard|p|explore|reel|reels|stories|accounts|share)$/i;
 const CENTRAL = ["Ubud centre", "Ubud town", "Padangtegal", "Ubud north (Jl. Suweta)", "Tebesaya", "Pengosekan", "Peliatan", "Penestanan", "Campuhan", "Nyuh Kuning", "Sanggingan"];
@@ -43,8 +43,11 @@ function uncontacted() {
 
 export async function instagramQueue(limit = IG_PER_DAY): Promise<(OutreachVenue & { text: string })[]> {
   const { data } = await uncontacted().not("instagram_handle", "is", null).returns<OutreachVenue[]>();
+  const seen = new Set<string>();
   const picked = (data ?? [])
     .filter((v) => !SKIP.test(v.name) && !JUNK_HANDLE.test(v.instagram_handle ?? ""))
+    // Two venue rows can share one Instagram account (Balifornia): DM it once.
+    .filter((v) => !seen.has(v.instagram_handle!.toLowerCase()) && !!seen.add(v.instagram_handle!.toLowerCase()))
     .sort((a, b) => rank(a.area) - rank(b.area) || a.name.localeCompare(b.name))
     .slice(0, limit);
   if (!picked.length) return [];
