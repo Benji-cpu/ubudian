@@ -176,7 +176,7 @@ export default async function AboutPage() {
             One email a week — so you never hear about the good ceremony after
             it already happened.
           </p>
-          <NewsletterSignup variant="dark" className="mx-auto mt-6 max-w-md" />
+          <NewsletterSignup variant="dark" source="about" className="mx-auto mt-6 max-w-md" />
           <p className="mt-2 text-sm text-brand-off-white/60">
             No spam, unsubscribe anytime.
           </p>

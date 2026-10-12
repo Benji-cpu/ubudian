@@ -446,6 +446,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
           </p>
           <NewsletterSignup
             variant="dark"
+            source="events"
             className="mx-auto mt-6 max-w-md text-left"
           />
         </div>

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getPlaceBySlug, getRelatedPlaces } from "@/lib/places/queries";
 import { PlaceDetail } from "@/components/places/place-detail";
 import { PlaceCard } from "@/components/places/place-card";
+import { NewsletterSignup } from "@/components/layout/newsletter-signup";
 import { MentionedInGuides } from "@/components/cross-links/mentioned-in-guides";
 
 interface PageProps {
@@ -54,6 +55,16 @@ export default async function PlacePage({ params }: PageProps) {
           </div>
         </section>
       )}
+
+      <section className="border-t border-brand-gold/20 px-4 py-12 text-center">
+        <div className="mx-auto max-w-xl">
+          <h2 className="font-serif text-2xl text-brand-deep-green dark:text-brand-gold">
+            Ubud&apos;s best deals and what&apos;s on, every Wednesday
+          </h2>
+          <p className="mt-2 text-sm text-muted-foreground">One short email. Free. Unsubscribe any time.</p>
+          <NewsletterSignup source="place" className="mx-auto mt-6 max-w-md" />
+        </div>
+      </section>
     </>
   );
 }

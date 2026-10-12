@@ -475,7 +475,7 @@ export default async function JourneyPage({ params }: JourneyPageProps) {
             One email a week with new threads, the events that matter this week,
             and the rituals quietly shaping Ubud&apos;s conscious community.
           </p>
-          <NewsletterSignup className="mx-auto mt-6 max-w-md" />
+          <NewsletterSignup source="retreat" className="mx-auto mt-6 max-w-md" />
         </div>
       </section>
 
