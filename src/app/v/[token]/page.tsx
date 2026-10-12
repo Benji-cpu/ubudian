@@ -150,9 +150,9 @@ export default async function VenueInvitePage({ params }: { params: Promise<{ to
         </div>
 
         <div className="rounded-xl border bg-card p-5">
-          <h2 className="font-serif text-xl text-brand-deep-green">See what guests get</h2>
+          <h2 className="font-serif text-xl text-brand-deep-green">See what our readers get</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Deals on this page go in our free email every Wednesday, along with what&apos;s on in Ubud. Get it yourself and see how {invite.name} looks to readers.
+            Our free email goes out every Wednesday with a few of the week&apos;s deals and what&apos;s on in Ubud. Deals added here can be included. Sign up to see it as readers do.
           </p>
           <NewsletterSignup source="venue_page" className="mt-4" />
         </div>
