@@ -54,7 +54,7 @@ export function NewsletterSignup({ className, variant = "light", source }: Newsl
       }
 
       setStatus("success");
-      setMessage("You're in. The first one lands Wednesday morning.");
+      setMessage("You're in. One email every Wednesday morning.");
       setEmail("");
       try {
         localStorage.setItem("ubudian_subscribed", "true");

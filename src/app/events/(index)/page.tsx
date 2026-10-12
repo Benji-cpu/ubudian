@@ -353,13 +353,6 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
           </p>
           <div className="w-full sm:max-w-sm">
             <NewsletterSignup source="events_top" />
-            <p className="mt-2 text-sm text-muted-foreground">
-              Not sure what suits you?{" "}
-              <Link href="/quiz" className="font-medium text-brand-deep-green underline dark:text-brand-gold">
-                Take the 90-second quiz
-              </Link>
-              .
-            </p>
           </div>
         </div>
       </section>
@@ -450,8 +443,8 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
             Never miss the good ones.
           </p>
           <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-[#FAF5EC]/70">
-            One email a week — the ceremonies, dance floors, and circles worth
-            clearing an evening for, before they fill up.
+            One email a week, every Wednesday: the best deals, then the
+            ceremonies, dance floors and circles worth clearing an evening for.
           </p>
           <NewsletterSignup
             variant="dark"

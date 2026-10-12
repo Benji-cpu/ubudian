@@ -15,7 +15,7 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Ubud deals — real savings on food and wellness",
   description:
-    "Food and wellness deals in Ubud that are at least 25% off the normal price: 2-for-1 pizza, spa mornings, a free coffee with breakfast. No drink deals.",
+    "Food and wellness deals in Ubud that are at least 25% off the normal price: 2-for-1 pizza, spa mornings, 30% off a set lunch. No drink deals.",
   alternates: { canonical: `${SITE_URL}/deals` },
 };
 
@@ -46,15 +46,15 @@ export default async function DealsPage() {
           </h1>
           <p className="mt-4 text-lg text-brand-off-white/80">
             Only real savings: at least a quarter off the normal price, like 2-for-1 pizza or a
-            free coffee with breakfast.
+            spa morning at 30% off.
           </p>
           <div className="mx-auto mt-8 max-w-md text-left">
             <p className="mb-2 text-center text-sm text-brand-off-white/70">
-              Get the week&apos;s best deals by email every Wednesday. Free.
+              Get the week&apos;s best deals and what&apos;s on, by email every Wednesday. Free.
             </p>
             <NewsletterSignup variant="dark" source="deals_top" />
             <p className="mt-3 text-center text-sm text-brand-off-white/70">
-              Not sure what suits you?{" "}
+              Want events picked for you too?{" "}
               <Link href="/quiz" className="font-medium text-brand-gold underline">
                 Take the 90-second quiz
               </Link>
@@ -128,9 +128,9 @@ export default async function DealsPage() {
       <section className="border-t border-brand-gold/20 px-4 py-12 text-center">
         <div className="mx-auto max-w-xl">
           <h2 className="font-serif text-2xl text-brand-deep-green dark:text-brand-gold">
-            Get the week&apos;s best deals every Wednesday
+            Ubud&apos;s best deals and what&apos;s on, every Wednesday
           </h2>
-          <p className="mt-2 text-sm text-muted-foreground">One short email. Unsubscribe any time.</p>
+          <p className="mt-2 text-sm text-muted-foreground">One short email. Free. Unsubscribe any time.</p>
           <NewsletterSignup source="deals" className="mx-auto mt-6 max-w-md" />
           {/* Renders nothing until WHATSAPP_CHANNEL_URL is set. */}
           <ChannelFollow className="mx-auto mt-8 max-w-md" />
