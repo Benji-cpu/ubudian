@@ -53,6 +53,13 @@ export default async function DealsPage() {
               Get the week&apos;s best deals by email every Wednesday. Free.
             </p>
             <NewsletterSignup variant="dark" source="deals_top" />
+            <p className="mt-3 text-center text-sm text-brand-off-white/70">
+              Not sure what suits you?{" "}
+              <Link href="/quiz" className="font-medium text-brand-gold underline">
+                Take the 90-second quiz
+              </Link>
+              .
+            </p>
           </div>
         </div>
       </section>

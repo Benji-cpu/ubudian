@@ -351,7 +351,16 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
           <p className="text-sm text-foreground">
             Get the week&apos;s best deals and what&apos;s on, by email every Wednesday. Free.
           </p>
-          <NewsletterSignup source="events_top" className="w-full sm:max-w-sm" />
+          <div className="w-full sm:max-w-sm">
+            <NewsletterSignup source="events_top" />
+            <p className="mt-2 text-sm text-muted-foreground">
+              Not sure what suits you?{" "}
+              <Link href="/quiz" className="font-medium text-brand-deep-green underline dark:text-brand-gold">
+                Take the 90-second quiz
+              </Link>
+              .
+            </p>
+          </div>
         </div>
       </section>
 
