@@ -6,6 +6,8 @@ on:
     # min late, so it actually lands ~08:05–08:40 Bali. Off-minute dodges the
     # on-the-hour GH Actions cron pile-up.
     - cron: "6 23 * * 2"
+    # Monday 03:00 UTC = 11:00 WITA: dry-run the coming issue (no send) so a thin or broken one shows up red a day early.
+    - cron: "0 3 * * 1"
   workflow_dispatch:
     inputs:
       only:
@@ -31,13 +33,25 @@ jobs:
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
           ONLY: ${{ inputs.only }}
           DEALS: ${{ inputs.deals || '1' }}
+          PREFLIGHT: ${{ github.event.schedule == '0 3 * * 1' }}
         run: |
           set -euo pipefail
           query=""
           if [ -n "${ONLY:-}" ]; then query="only=$(printf %s "$ONLY" | jq -sRr @uri)"; fi
           if [ "${DEALS:-}" = "1" ]; then query="${query:+$query&}deals=1"; fi
           query="${query:+$query&}picks=1"
+          if [ "${PREFLIGHT}" = "true" ]; then query="${query}&dry=1"; fi
           response=$(curl -fsS -X POST \
             -H "Authorization: Bearer ${CRON_SECRET}" \
-            "https://theubudian.life/api/cron/weekly-digest${query:+?$query}")
+            "https://theubudian.life/api/cron/weekly-digest?${query}")
           echo "Response: ${response}"
+          # A red run is the alarm.
+          if [ "${PREFLIGHT}" = "true" ]; then
+            # Preflight: fail if the coming issue would be thin (no deals, no picks and under 3 events).
+            echo "${response}" | jq -e '.data | ((.deals | length) > 0) or ((.picks | length) > 0) or (.events >= 3)' > /dev/null \
+              || { echo "::error::Coming issue is thin: ${response}"; exit 1; }
+          else
+            # Send: fail if nobody got it, or more than 1 in 5 failed (a re-run that only skips duplicates is fine).
+            echo "${response}" | jq -e '.data | (.recipients == 0) or (.skipped_duplicate > 0 and .sent == 0) or (.sent > 0 and (.failed * 5) <= .recipients)' > /dev/null \
+              || { echo "::error::Weekly email problem: ${response}"; exit 1; }
+          fi

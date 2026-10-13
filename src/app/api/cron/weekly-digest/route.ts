@@ -35,11 +35,11 @@ const WEEK_PICKS_LIMIT = 5;
  *
  * Test param: ?only=<email> restricts sends to that address.
  * ?deals=1 opens the issue with this week's live deals (src/lib/email/weekly-deals.ts).
- * It stays opt-in until Ben's yes on the first deals issue to the list; the
- * scheduled workflow does not pass it yet.
+ * The scheduled workflow passes it (Ben's yes on the first deals issue, 5 Oct).
+ * ?dry=1 builds the issue's contents and counts and returns them without sending or touching
+ * the ledger (the Monday preflight in the workflow reads it).
  * ?picks=1 leads the events with the events desk's picks for the week (src/lib/events/picks.ts,
- * written by an AI routine). Opt-in until a person has read the first week's "why" lines;
- * the workflow does not pass it yet.
+ * written by an AI routine). The workflow passes it since the Reviewer passed the first week's "why" lines.
  */
 export async function POST(request: Request) {
   const authHeader = request.headers.get("authorization");
@@ -51,6 +51,7 @@ export async function POST(request: Request) {
   const only = url.searchParams.get("only")?.toLowerCase().trim() || null;
   const includeDeals = url.searchParams.get("deals") === "1";
   const includePicks = url.searchParams.get("picks") === "1";
+  const dryRun = url.searchParams.get("dry") === "1";
 
   const bali = nowInBali();
   const [y, m, d] = bali.dateStr.split("-").map(Number);
@@ -105,6 +106,20 @@ export async function POST(request: Request) {
     (subscribersRes.data ?? []) as DigestSubscriber[],
     saverIds
   ).filter((r) => !only || r.email === only);
+
+  if (dryRun) {
+    return NextResponse.json({
+      data: {
+        dry: true,
+        week: weekKey,
+        recipients: recipients.length,
+        deals: deals.map((x) => `${x.venue_name}: ${x.title}`),
+        picks: weekPicks.map((x) => x.event.title),
+        events: weekEvents.length,
+      },
+      error: null,
+    });
+  }
 
   let sent = 0;
   let skippedDuplicate = 0;
