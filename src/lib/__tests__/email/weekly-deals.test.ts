@@ -193,3 +193,13 @@ describe("issue rotation", () => {
     expect(pickWeeklyDeals(pool, 3, 6)).toEqual(pickWeeklyDeals(pool, 3, 6, 0));
   });
 });
+
+describe("pickWeeklyDeals tie-break", () => {
+  it("picks the same deal for a venue whatever the row order, preferring the bigger stated saving", () => {
+    const samosa = deal({ id: "s", venue_name: "Chai", title: "Chai and samosa special only 35k++" });
+    const momos = deal({ id: "m", venue_name: "Chai", title: "Steamed momos 50% off until 15 October" });
+    expect(pickWeeklyDeals([samosa, momos], 3).map((d) => d.id)).toEqual(["m"]);
+    expect(pickWeeklyDeals([momos, samosa], 3).map((d) => d.id)).toEqual(["m"]);
+  });
+});
+

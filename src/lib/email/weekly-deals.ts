@@ -53,6 +53,17 @@ export const MAX_HAPPY_HOURS = 2;
  *    at most MAX_HAPPY_HOURS plain happy hours, last;
  *  - rotated by `issueNumber`, so next week's issue leads with different ones.
  */
+/** The "N% off" a deal's title states (0 if none): the tie-break between two deals of one venue. */
+function percentOff(special: Pick<Special, "title">): number {
+  const m = special.title.match(/(\d{1,3})\s*%\s*off/i);
+  return m ? Number(m[1]) : 0;
+}
+
+/** Negative when `a` is the better pick for its venue: distinctive first, then the bigger stated saving, then by title so the choice never depends on row order. */
+function betterForVenue(a: Special, b: Special, rank: (s: Special) => number): number {
+  return rank(a) - rank(b) || percentOff(b) - percentOff(a) || a.title.localeCompare(b.title);
+}
+
 export function pickWeeklyDeals(
   specials: Special[],
   dayOfWeek: number,
@@ -65,7 +76,7 @@ export function pickWeeklyDeals(
     if (dealSourceUrl(s) === null || daysUnknown(s)) continue;
     const key = s.venue_name.trim().toLowerCase();
     const held = bestPerVenue.get(key);
-    if (!held || rank(s) < rank(held)) bestPerVenue.set(key, s);
+    if (!held || betterForVenue(s, held, rank) < 0) bestPerVenue.set(key, s);
   }
   const pool = [...bestPerVenue.values()].sort((a, b) => a.venue_name.localeCompare(b.venue_name));
 
