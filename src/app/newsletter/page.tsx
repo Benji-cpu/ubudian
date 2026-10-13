@@ -21,7 +21,11 @@ export const metadata: Metadata = {
  * chats. It previews real deals from this week's issue so the promise is
  * concrete, and tags sign-ups `newsletter_page`.
  */
-export default async function NewsletterPage() {
+const FROM_SOURCES = new Set(["poster", "partner", "venue_share", "facebook", "reddit"]);
+
+export default async function NewsletterPage({ searchParams }: { searchParams: Promise<{ from?: string }> }) {
+  const { from } = await searchParams;
+  const source = from && FROM_SOURCES.has(from) ? from : "newsletter_page";
   const preview = pickWeeklyDeals(await getLiveSpecials(), nowInBali().dayOfWeek, 3);
 
   return (
@@ -40,7 +44,7 @@ export default async function NewsletterPage() {
           </p>
           <NewsletterSignup
             variant="dark"
-            source="newsletter_page"
+            source={source}
             className="mx-auto mt-8 max-w-md text-left"
           />
           <p className="mt-3 text-sm text-brand-off-white/60">One email a week. Unsubscribe in one tap.</p>
