@@ -40,10 +40,15 @@ jobs:
           if [ -n "${ONLY:-}" ]; then query="only=$(printf %s "$ONLY" | jq -sRr @uri)"; fi
           if [ "${DEALS:-}" = "1" ]; then query="${query:+$query&}deals=1"; fi
           query="${query:+$query&}picks=1"
-          if [ "${PREFLIGHT}" = "true" ]; then query="${query}&dry=1"; fi
+          if [ "${PREFLIGHT}" = "true" ]; then query="${query}&dry=1&html=1&asof=$(date -u -d '+2 days' +%F)"; fi
           response=$(curl -fsS -X POST \
             -H "Authorization: Bearer ${CRON_SECRET}" \
             "https://theubudian.life/api/cron/weekly-digest?${query}")
+          # Keep the rendered sample as a file (not in the log) for the Reviewer.
+          if [ "${PREFLIGHT}" = "true" ]; then
+            echo "${response}" | jq -r '.data.html // empty' > issue-preview.html
+            response=$(echo "${response}" | jq -c 'del(.data.html)')
+          fi
           echo "Response: ${response}"
           # A red run is the alarm.
           if [ "${PREFLIGHT}" = "true" ]; then
@@ -55,3 +60,10 @@ jobs:
             echo "${response}" | jq -e '.data | (.recipients == 0) or (.skipped_duplicate > 0 and .sent == 0) or (.sent > 0 and (.failed * 5) <= .recipients)' > /dev/null \
               || { echo "::error::Weekly email problem: ${response}"; exit 1; }
           fi
+      - name: Keep the coming issue for the Reviewer
+        if: ${{ github.event.schedule == '0 3 * * 1' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: coming-issue
+          path: issue-preview.html
+

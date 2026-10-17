@@ -37,7 +37,8 @@ const WEEK_PICKS_LIMIT = 5;
  * ?deals=1 opens the issue with this week's live deals (src/lib/email/weekly-deals.ts).
  * The scheduled workflow passes it (Ben's yes on the first deals issue, 5 Oct).
  * ?dry=1 builds the issue's contents and counts and returns them without sending or touching
- * the ledger (the Monday preflight in the workflow reads it).
+ * the ledger (the Monday preflight in the workflow reads it); with &html=1 it also returns a
+ * sample of the rendered email for the Reviewer; &asof=YYYY-MM-DD dates it for the coming Wednesday.
  * ?picks=1 leads the events with the events desk's picks for the week (src/lib/events/picks.ts,
  * written by an AI routine). The workflow passes it since the Reviewer passed the first week's "why" lines.
  */
@@ -52,8 +53,12 @@ export async function POST(request: Request) {
   const includeDeals = url.searchParams.get("deals") === "1";
   const includePicks = url.searchParams.get("picks") === "1";
   const dryRun = url.searchParams.get("dry") === "1";
+  const withHtml = url.searchParams.get("html") === "1";
 
-  const bali = nowInBali();
+  // A dry run may be dated for the coming Wednesday (?asof=YYYY-MM-DD); a real send never is.
+  const asOf = dryRun ? url.searchParams.get("asof") : null;
+  const clock = asOf && /^\d{4}-\d{2}-\d{2}$/.test(asOf) ? new Date(`${asOf}T08:00:00+08:00`) : new Date();
+  const bali = nowInBali(clock);
   const [y, m, d] = bali.dateStr.split("-").map(Number);
   const today = new Date(y, m - 1, d);
   const toStr = ymd(addDays(today, 6));
@@ -93,7 +98,7 @@ export async function POST(request: Request) {
 
   // The events desk's picks for the week (empty until the routine has run): the email then keeps its usual list.
   const weekPicks = includePicks
-    ? (await getWeekPicks(supabase)).slice(0, WEEK_PICKS_LIMIT).map(({ event, why }) => ({ event, why }))
+    ? (await getWeekPicks(supabase, clock)).slice(0, WEEK_PICKS_LIMIT).map(({ event, why }) => ({ event, why }))
     : [];
 
   const issueNumber = issueNumberFor(bali.dateStr);
@@ -116,6 +121,18 @@ export async function POST(request: Request) {
         deals: deals.map((x) => `${x.venue_name}: ${x.title}`),
         picks: weekPicks.map((x) => x.event.title),
         events: weekEvents.length,
+        // A reader-less sample of the issue (no archetype, placeholder unsubscribe link) for the Reviewer.
+        ...(withHtml && {
+          html: buildWeeklyDigestEmailHtml({
+            archetype: null,
+            events: spreadAcrossWeek(weekEvents, 5, bali.dateStr, issueNumber),
+            siteUrl: SITE_URL,
+            unsubUrl: `${SITE_URL}/unsubscribe`,
+            weekLabel,
+            deals,
+            picks: weekPicks,
+          }),
+        }),
       },
       error: null,
     });
