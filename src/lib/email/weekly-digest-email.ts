@@ -8,6 +8,16 @@ import type { ArchetypeId, Event, Special } from "@/types";
 const ALSO_ON_LIMIT = 3;
 
 /** "Cacao Ceremony. w/ Siti" and "Dance w/ Eduardo" read as "with" in an email: the abbreviation and the stray full stop are the listing's, not the reader's. */
+/**
+ * A pick's "why" line without any sentence that states a time ("Saturday 7.30pm, Rp 300K."):
+ * the desk's times aren't confirmed, so the email promises a day only and the event page carries the time.
+ */
+export function pickLineWithoutTimes(why: string): string {
+  const timey = /\b\d{1,2}(?:[:.]\d{2})?\s?(?:am|pm)\b|\bfrom\s+\d{1,2}\b|\b\d{1,2}:\d{2}\b/i;
+  const kept = why.split(/(?<=[.!?])\s+/).filter((sentence) => !timey.test(sentence));
+  return kept.join(" ").trim();
+}
+
 export function eventEmailTitle(title: string): string {
   return title.replace(/\.\s+(?=w\/)/i, " ").replace(/\bw\/\s?/gi, "with ");
 }
@@ -75,7 +85,7 @@ export function buildWeeklyDigestEmailHtml(opts: {
       .filter(Boolean)
       .join(" · ");
     const where = e.venue_name ? ` · ${esc(e.venue_name)}` : "";
-    const line = why || eventBlurb(e);
+    const line = (why ? pickLineWithoutTimes(why) : "") || eventBlurb(e);
     const lineHtml = line
       ? `
     <p style="margin:6px 0 0;font-size:13px;line-height:1.5;color:${CHARCOAL};font-family:Georgia,serif;">${esc(line)}</p>`

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildWeeklyDigestEmailHtml } from "@/lib/email/weekly-digest-email";
+import { pickLineWithoutTimes, buildWeeklyDigestEmailHtml } from "@/lib/email/weekly-digest-email";
 import type { Event } from "@/types";
 
 const ev = (id: string, extra: Partial<Event> = {}) =>
@@ -29,5 +29,29 @@ describe("weekly email with the events desk's picks", () => {
     const e = ev("a");
     const html = buildWeeklyDigestEmailHtml({ ...base, events: [e], picks: [{ event: e, why: "<b>bold</b>" }] });
     expect(html).not.toContain("<b>bold</b>");
+  });
+});
+
+describe("pickLineWithoutTimes", () => {
+  it("drops sentences that state a time and keeps the rest", () => {
+    expect(
+      pickLineWithoutTimes("Live music around a cacao ceremony at The Yoga Barn. Saturday 7.30pm, Rp 300-350K."),
+    ).toBe("Live music around a cacao ceremony at The Yoga Barn.");
+    expect(pickLineWithoutTimes("A free talk on calming the nervous system. Sunday 5pm.")).toBe(
+      "A free talk on calming the nervous system.",
+    );
+  });
+  it("leaves a line with no time alone", () => {
+    expect(pickLineWithoutTimes("A women's writing circle: writing and sharing in a small group.")).toBe(
+      "A women's writing circle: writing and sharing in a small group.",
+    );
+  });
+  it("falls back to the event blurb when every sentence had a time", () => {
+    const html = buildWeeklyDigestEmailHtml({
+      ...base,
+      events: [],
+      picks: [{ event: ev("a", { short_description: "Barefoot dance at the studio." }), why: "Friday 6pm, Rp 185K." }],
+    });
+    expect(html).not.toContain("6pm");
   });
 });
