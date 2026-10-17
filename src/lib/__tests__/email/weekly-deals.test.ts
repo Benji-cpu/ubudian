@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { dealTitle, buildDealsBlockHtml, buildPreheader, dealBlurb, dealSourceUrl, issueNumberFor, pickWeeklyDeals } from "@/lib/email/weekly-deals";
+import { dealTitle, plainDealText, buildDealsBlockHtml, buildPreheader, dealBlurb, dealSourceUrl, issueNumberFor, pickWeeklyDeals } from "@/lib/email/weekly-deals";
 import type { Special } from "@/types";
 
 function deal(overrides: Partial<Special>): Special {
@@ -208,5 +208,19 @@ describe("dealTitle", () => {
     expect(dealTitle({ title: "MONDAY | Curry Cure" })).toBe("Curry Cure");
     expect(dealTitle({ title: "Sunday cookout" })).toBe("Sunday cookout");
     expect(dealTitle({ title: "TUESDAY |" })).toBe("TUESDAY |");
+  });
+});
+
+describe("plainDealText", () => {
+  it("drops ++, matches the IDR style and writes hours in 12-hour style", () => {
+    expect(plainDealText("Chai and samosa special only 35k++")).toBe("Chai and samosa special only 35k");
+    expect(plainDealText("vegetarian curries for just Rp110K++")).toBe("vegetarian curries for just IDR 110k");
+    expect(plainDealText("mention the 10:00–14:00 offer")).toBe("mention the 10 AM – 2 PM offer");
+    expect(plainDealText("2-for-1 pizza")).toBe("2-for-1 pizza");
+  });
+
+  it("is applied to deal titles and blurbs", () => {
+    expect(dealTitle({ title: "Chai special only 35k++" })).toBe("Chai special only 35k");
+    expect(dealBlurb({ title: "Curry Cure", description: "Start the week with something comforting. Enjoy our vegetarian curries for just Rp110K++" })).toContain("IDR 110k");
   });
 });

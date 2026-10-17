@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { eventBlurb } from "@/lib/email/weekly-digest-email";
+import { eventBlurb, eventEmailTitle } from "@/lib/email/weekly-digest-email";
 
 describe("eventBlurb", () => {
   it("prefers the short description", () => {
@@ -26,5 +26,13 @@ describe("eventBlurb repeats", () => {
     expect(
       eventBlurb({ title: "Lyre Sound Circle", short_description: "Lyre Sound Circle.", description: "An intuitive music session on the lyre. Bring a mat." })
     ).toBe("An intuitive music session on the lyre.");
+  });
+});
+
+describe("eventEmailTitle", () => {
+  it("writes w/ as with and drops the stray full stop before it", () => {
+    expect(eventEmailTitle("Cacao Ceremony & Medicine Song. w/ Siti Naturaleza")).toBe("Cacao Ceremony & Medicine Song with Siti Naturaleza");
+    expect(eventEmailTitle("Contact Class w/ Sima")).toBe("Contact Class with Sima");
+    expect(eventEmailTitle("5Rhythms with Sophie")).toBe("5Rhythms with Sophie");
   });
 });

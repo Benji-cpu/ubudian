@@ -7,6 +7,11 @@ import type { ArchetypeId, Event, Special } from "@/types";
 /** Events listed under "Also on this week" when the desk has picks. */
 const ALSO_ON_LIMIT = 3;
 
+/** "Cacao Ceremony. w/ Siti" and "Dance w/ Eduardo" read as "with" in an email: the abbreviation and the stray full stop are the listing's, not the reader's. */
+export function eventEmailTitle(title: string): string {
+  return title.replace(/\.\s+(?=w\/)/i, " ").replace(/\bw\/\s?/gi, "with ");
+}
+
 const plain = (t: string) => t.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
 
 /**
@@ -78,7 +83,7 @@ export function buildWeeklyDigestEmailHtml(opts: {
     return `
   <tr><td style="padding:14px 32px;border-top:1px solid ${GOLD}22;">
     <a href="${siteUrl}/events/${e.slug}" style="text-decoration:none;">
-      <p style="margin:0;font-size:17px;color:${GREEN};font-family:Georgia,serif;font-weight:500;">${esc(e.title)}</p>
+      <p style="margin:0;font-size:17px;color:${GREEN};font-family:Georgia,serif;font-weight:500;">${esc(eventEmailTitle(e.title))}</p>
     </a>
     <p style="margin:4px 0 0;font-size:13px;color:${CHARCOAL}aa;font-family:Georgia,serif;">${esc(when)}${where}</p>${lineHtml}
   </td></tr>`;

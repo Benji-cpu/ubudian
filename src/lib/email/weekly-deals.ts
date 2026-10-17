@@ -130,7 +130,7 @@ export function dealBlurb(special: Pick<Special, "title" | "description">): stri
   const core = desc.replace(/\([^)]*\)/g, "").replace(/[.\s]+$/, "").trim();
   if (core.length < 25 || core.toLowerCase() === special.title.trim().toLowerCase()) return null;
   // A trailing "(Honeycombers, 5 Jan 2026)" is our note on where we found it, not the reader's.
-  return desc.replace(/\s*\([^)]*\)\s*(?=[.\s]*$)/, "").trim();
+  return plainDealText(desc.replace(/\s*\([^)]*\)\s*(?=[.\s]*$)/, "").trim());
 }
 
 /** 17:00 → "5 PM", 17:30 → "5:30 PM": the same 12-hour style the events use. */
@@ -139,6 +139,18 @@ function time12(t: string): string {
   const hour = parseInt(h, 10);
   const h12 = hour % 12 || 12;
   return `${m === "00" ? h12 : `${h12}:${m}`} ${hour >= 12 ? "PM" : "AM"}`;
+}
+
+/**
+ * Venue-written deal text in the email's own plain style: "35k++" and "Rp110K++" lose the "++"
+ * (the note under the deals says Bali prices often add tax and service), "Rp110K" reads "IDR 110k"
+ * like the price line, and "10:00–14:00" reads "10 AM – 2 PM" like the hours line.
+ */
+export function plainDealText(text: string): string {
+  return text
+    .replace(/(\d[\d.,]*\s?[kK]?)\+\+/g, "$1")
+    .replace(/\bRp\.?\s?(\d[\d.,]*)\s?[kK]\b/g, "IDR $1k")
+    .replace(/\b(\d{1,2}):(\d{2})\s?[–-]\s?(\d{1,2}):(\d{2})\b/g, (_m, h1, m1, h2, m2) => `${time12(`${h1.padStart(2, "0")}:${m1}`)} – ${time12(`${h2.padStart(2, "0")}:${m2}`)}`);
 }
 
 /** "5–7 PM"-style hours for the email; the site's 24-hour `formatHours` stays on /deals. */
@@ -159,7 +171,7 @@ export function buildPreheader(deals: Special[], eventCount: number): string {
 /** "MONDAY | Curry Cure" -> "Curry Cure": the days are shown on their own, so a venue's day label only reads as shouting in an email. */
 export function dealTitle(special: Pick<Special, "title">): string {
   const t = special.title.replace(/^\s*(?:mon|tues|wednes|thurs|fri|satur|sun)day\s*\|\s*/i, "").trim();
-  return t || special.title;
+  return plainDealText(t || special.title);
 }
 
 const DAY_IN_TITLE = /\b(mon|tues|wednes|thurs|fri|satur|sun)day\b/i;
