@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildDealsBlockHtml, buildPreheader, dealBlurb, dealSourceUrl, issueNumberFor, pickWeeklyDeals } from "@/lib/email/weekly-deals";
+import { dealTitle, buildDealsBlockHtml, buildPreheader, dealBlurb, dealSourceUrl, issueNumberFor, pickWeeklyDeals } from "@/lib/email/weekly-deals";
 import type { Special } from "@/types";
 
 function deal(overrides: Partial<Special>): Special {
@@ -203,3 +203,10 @@ describe("pickWeeklyDeals tie-break", () => {
   });
 });
 
+describe("dealTitle", () => {
+  it("drops a leading day label and keeps everything else", () => {
+    expect(dealTitle({ title: "MONDAY | Curry Cure" })).toBe("Curry Cure");
+    expect(dealTitle({ title: "Sunday cookout" })).toBe("Sunday cookout");
+    expect(dealTitle({ title: "TUESDAY |" })).toBe("TUESDAY |");
+  });
+});

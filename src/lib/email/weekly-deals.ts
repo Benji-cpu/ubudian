@@ -156,6 +156,12 @@ export function buildPreheader(deals: Special[], eventCount: number): string {
   return full.length <= 140 ? full : preheaderFor(deals.slice(0, 1), eventCount);
 }
 
+/** "MONDAY | Curry Cure" -> "Curry Cure": the days are shown on their own, so a venue's day label only reads as shouting in an email. */
+export function dealTitle(special: Pick<Special, "title">): string {
+  const t = special.title.replace(/^\s*(?:mon|tues|wednes|thurs|fri|satur|sun)day\s*\|\s*/i, "").trim();
+  return t || special.title;
+}
+
 const DAY_IN_TITLE = /\b(mon|tues|wednes|thurs|fri|satur|sun)day\b/i;
 
 function preheaderFor(deals: Special[], eventCount: number): string {
@@ -163,8 +169,8 @@ function preheaderFor(deals: Special[], eventCount: number): string {
     const label = formatWeekdays(d.weekdays);
     const soft = /^(Weekdays|Weekends)$/.test(label) ? label.toLowerCase() : label;
     // "Sunday cookout … on Sun" says it twice; "Sun, Tue" reads as "Sun and Tue".
-    const days = hasSetDays(d) && !DAY_IN_TITLE.test(d.title) ? ` on ${soft.replace(/, ([^,]+)$/, " and $1")}` : "";
-    return `${d.title} at ${venueLabel(d.venue_name, d.venue_area)}${days}`;
+    const days = hasSetDays(d) && !DAY_IN_TITLE.test(dealTitle(d)) ? ` on ${soft.replace(/, ([^,]+)$/, " and $1")}` : "";
+    return `${dealTitle(d)} at ${venueLabel(d.venue_name, d.venue_area)}${days}`;
   });
   const events = eventCount > 0 ? `Plus ${eventCount} thing${eventCount === 1 ? "" : "s"} on in Ubud this week.` : "";
   if (parts.length === 0) return events;
@@ -199,7 +205,7 @@ export function buildDealsBlockHtml(deals: Special[], siteUrl: string): string {
         : "";
       return `
   <tr><td style="padding:14px 32px;border-top:1px solid ${GOLD}22;">
-    <p style="margin:0;font-size:17px;color:${GREEN};font-family:Georgia,serif;font-weight:500;">${esc(s.title)}</p>
+    <p style="margin:0;font-size:17px;color:${GREEN};font-family:Georgia,serif;font-weight:500;">${esc(dealTitle(s))}</p>
     <p style="margin:4px 0 0;font-size:13px;color:${CHARCOAL}aa;font-family:Georgia,serif;">${where}${when ? ` · ${esc(when)}` : ""}</p>
     ${desc}
   </td></tr>`;
