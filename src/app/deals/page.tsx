@@ -45,8 +45,8 @@ export default async function DealsPage() {
             Ubud deals
           </h1>
           <p className="mt-4 text-lg text-brand-off-white/80">
-            Only real savings: at least a quarter off the normal price, like 2-for-1 pizza or a
-            spa morning at 30% off.
+            Only real savings: a quarter or more off the normal price, like 2-for-1 pizza or a
+            spa morning at 30% off. Each deal shows its own saving.
           </p>
           <div className="mx-auto mt-8 max-w-md text-left">
             <p className="mb-2 text-center text-sm text-brand-off-white/70">
