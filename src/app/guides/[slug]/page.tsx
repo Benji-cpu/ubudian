@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { NewsletterSignup } from "@/components/layout/newsletter-signup";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { queryWithRetry } from "@/lib/supabase/retry";
@@ -95,22 +96,44 @@ export default async function GuideDetailPage({ params }: GuideDetailPageProps) 
 
   if (guide.tier === "practical") {
     return (
-      <PracticalGuide
-        guide={guide}
-        resolved={resolved}
-        profileId={profileId}
-        initialSaved={initialSaved}
-      />
+      <>
+        <PracticalGuide
+          guide={guide}
+          resolved={resolved}
+          profileId={profileId}
+          initialSaved={initialSaved}
+        />
+      <section className="border-t border-brand-gold/20 px-4 py-12 text-center">
+        <div className="mx-auto max-w-xl">
+          <h2 className="font-serif text-2xl text-brand-deep-green dark:text-brand-gold">
+            Ubud&apos;s best deals and what&apos;s on, every Wednesday
+          </h2>
+          <p className="mt-2 text-sm text-muted-foreground">One short email. Free. Unsubscribe any time.</p>
+          <NewsletterSignup source="guide" className="mx-auto mt-6 max-w-md" />
+        </div>
+      </section>
+      </>
     );
   }
   return (
-    <IntentGuide
-      guide={guide}
-      resolved={resolved}
-      linkedRetreat={linkedRetreat}
-      relatedGuides={relatedGuides}
-      profileId={profileId}
-      initialSaved={initialSaved}
-    />
+    <>
+      <IntentGuide
+        guide={guide}
+        resolved={resolved}
+        linkedRetreat={linkedRetreat}
+        relatedGuides={relatedGuides}
+        profileId={profileId}
+        initialSaved={initialSaved}
+      />
+      <section className="border-t border-brand-gold/20 px-4 py-12 text-center">
+        <div className="mx-auto max-w-xl">
+          <h2 className="font-serif text-2xl text-brand-deep-green dark:text-brand-gold">
+            Ubud&apos;s best deals and what&apos;s on, every Wednesday
+          </h2>
+          <p className="mt-2 text-sm text-muted-foreground">One short email. Free. Unsubscribe any time.</p>
+          <NewsletterSignup source="guide" className="mx-auto mt-6 max-w-md" />
+        </div>
+      </section>
+    </>
   );
 }
