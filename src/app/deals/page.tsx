@@ -15,7 +15,7 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Ubud deals — real savings on food and wellness",
   description:
-    "Food and wellness deals in Ubud that are at least 25% off the normal price: 2-for-1 pizza, spa mornings, 30% off a set lunch. No drink deals.",
+    "Food and wellness deals in Ubud, usually a quarter or more off the normal price: 2-for-1 pizza, spa mornings, 30% off a set lunch. No drink deals. Free weekly email.",
   alternates: { canonical: `${SITE_URL}/deals` },
 };
 
