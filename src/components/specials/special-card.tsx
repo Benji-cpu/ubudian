@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Clock, MapPin, Instagram, Globe, ArrowRight } from "lucide-react";
 import type { Special } from "@/types";
 import { formatDays, formatHours, formatIdr } from "@/lib/specials";
-import { mapsHref, venuePath } from "@/lib/specials/deal-page";
+import { mapsHref, savingPercent, savingText, venuePath } from "@/lib/specials/deal-page";
 
 export function SpecialCard({
   special,
@@ -15,7 +15,10 @@ export function SpecialCard({
   onNow?: boolean;
 }) {
   const hours = formatHours(special.start_time, special.end_time);
-  const price = formatIdr(special.price_idr);
+  // Both prices and a real saving: "IDR 110k instead of IDR 150k (save 26%)", worded as on the venue page.
+  // It carries the price, so the price pill would only repeat it. One price: the pill, as before.
+  const saving = savingPercent(special.price_idr, special.normal_price_idr) !== null ? savingText(special) : null;
+  const price = saving ? null : formatIdr(special.price_idr);
   const handle = special.instagram_handle?.replace(/^@/, "");
   const page = venuePath(special.venue_name);
 
@@ -37,6 +40,7 @@ export function SpecialCard({
               </span>
             ) : null}
           </h3>
+          {saving ? <p className="mt-1 text-sm font-semibold text-brand-deep-green dark:text-brand-gold">{saving}</p> : null}
         </div>
         {price ? (
           <span className="shrink-0 rounded-full bg-brand-gold/15 px-3 py-1 text-sm font-semibold text-brand-deep-green dark:text-brand-gold">
