@@ -28,6 +28,8 @@ import {
 } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { displayPrice } from "@/lib/price-display";
+import { PriceTag } from "./price-tag";
 import { formatEventTime } from "@/lib/utils";
 import { rolledForward } from "@/lib/events/buckets";
 import { EventCardPlaceholder } from "./event-card-placeholder";
@@ -240,11 +242,7 @@ function SelectedEventCard({ event }: { event: Event }) {
             <span>{event.organizer_name}</span>
           </div>
         )}
-        {event.price_info && (
-          <div className="text-sm font-medium text-brand-terracotta">
-            {event.price_info}
-          </div>
-        )}
+        <PriceTag price={displayPrice(event.price_info)} />
       </div>
 
       <div className="px-5 pb-6">

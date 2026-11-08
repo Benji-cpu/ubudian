@@ -5,10 +5,11 @@ import { formatEventTime, isRecentlyAddedEvent } from "@/lib/utils";
 import { formatEventDateLine } from "@/lib/events/format";
 import { getTimeSensitivityLabel } from "@/lib/events/discovery";
 import { echoesTitle } from "@/lib/events/echoes-title";
-import { isFreeEvent, formatPriceInfo } from "@/lib/price-parser";
+import { displayPrice } from "@/lib/price-display";
 import { categoryShortLabel } from "@/lib/constants";
 import { EventCardPlaceholder } from "./event-card-placeholder";
 import { EventCardExternalLinks } from "./event-card-external-links";
+import { PriceTag } from "./price-tag";
 import { MapPin, Clock, Calendar, User } from "lucide-react";
 import type { Event } from "@/types";
 
@@ -25,7 +26,8 @@ interface EventCardProps {
 
 export function EventCard({ event, saveButton, hideDate }: EventCardProps) {
   const dateLine = formatEventDateLine(event);
-  const isFree = isFreeEvent(event.price_info);
+  const price = displayPrice(event.price_info);
+  const isFree = price.kind === "free";
   const timeSensitivity = getTimeSensitivityLabel(event);
 
   return (
@@ -116,11 +118,9 @@ export function EventCard({ event, saveButton, hideDate }: EventCardProps) {
           )}
 
           <div className="mt-2 flex items-center gap-2">
-            {event.price_info && !isFree && (
-              <span className="text-sm font-semibold tracking-tight text-brand-terracotta">
-                {formatPriceInfo(event.price_info)}
-              </span>
-            )}
+            {/* Free shows as the badge on the image. With no usable price the slot says so,
+                so the organiser's name beside it is never read as the price. */}
+            {!isFree && <PriceTag price={price} />}
             <EventCardExternalLinks
               venueMapUrl={event.venue_map_url}
               externalTicketUrl={event.external_ticket_url}

@@ -5,10 +5,11 @@ import { formatEventTime, isRecentlyAddedEvent } from "@/lib/utils";
 import { formatEventDateLine } from "@/lib/events/format";
 import { getTimeSensitivityLabel } from "@/lib/events/discovery";
 import { echoesTitle } from "@/lib/events/echoes-title";
-import { isFreeEvent, formatPriceInfo } from "@/lib/price-parser";
+import { displayPrice } from "@/lib/price-display";
 import { categoryShortLabel } from "@/lib/constants";
 import { EventCardPlaceholder } from "./event-card-placeholder";
 import { EventCardExternalLinks } from "./event-card-external-links";
+import { PriceTag } from "./price-tag";
 import { MapPin, Clock, Calendar, User } from "lucide-react";
 import type { Event } from "@/types";
 
@@ -26,7 +27,8 @@ export function EventGridCard({
   aspectClass = "aspect-[16/10]",
 }: EventGridCardProps) {
   const dateLine = formatEventDateLine(event);
-  const isFree = isFreeEvent(event.price_info);
+  const price = displayPrice(event.price_info);
+  const isFree = price.kind === "free";
   const timeSensitivity = getTimeSensitivityLabel(event);
 
   return (
@@ -129,12 +131,8 @@ export function EventGridCard({
           )}
 
           <div className="mt-3.5 flex items-center justify-between border-t border-brand-deep-green/10 pt-3 dark:border-brand-deep-green/15">
-            <div className="flex items-center gap-2">
-              {event.price_info && !isFree && (
-                <span className="text-sm font-semibold tracking-tight text-brand-terracotta">
-                  {formatPriceInfo(event.price_info)}
-                </span>
-              )}
+            <div className="flex min-w-0 items-center gap-2">
+              {!isFree && <PriceTag price={price} />}
               <EventCardExternalLinks
                 venueMapUrl={event.venue_map_url}
                 externalTicketUrl={event.external_ticket_url}
