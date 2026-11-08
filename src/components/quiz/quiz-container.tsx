@@ -26,16 +26,19 @@ interface StoredResult {
 }
 
 interface QuizContainerProps {
-  events: Event[];
+  /** "Your week in Ubud": the next gatherings for each archetype, worked out on the server. */
+  weekFor: Partial<Record<ArchetypeId, Event[]>>;
 }
 
-export function QuizContainer({ events }: QuizContainerProps) {
+export function QuizContainer({ weekFor }: QuizContainerProps) {
   const [step, setStep] = useState<Step>("intro");
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<{ question_id: number; answer_id: string }[]>([]);
   const [result, setResult] = useState<{ primary: ArchetypeId; secondary: ArchetypeId; scores: QuizScores } | null>(null);
   const [userSegment, setUserSegment] = useState<UserSegment | null>(null);
   const [submitFailed, setSubmitFailed] = useState(false);
+  // The quiz's email step signs them up for the weekly email.
+  const [subscribed, setSubscribed] = useState(false);
 
   // Check for stored result on mount
   useEffect(() => {
@@ -43,6 +46,9 @@ export function QuizContainer({ events }: QuizContainerProps) {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
         const parsed: StoredResult = JSON.parse(stored);
+        // Restoring a saved result after hydration: the server can't read localStorage,
+        // so this one-off sync has to happen in an effect.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setResult({
           primary: parsed.primary,
           secondary: parsed.secondary,
@@ -52,6 +58,7 @@ export function QuizContainer({ events }: QuizContainerProps) {
         if (parsed.userSegment) {
           setUserSegment(parsed.userSegment);
         }
+        setSubscribed(!!parsed.email);
         setStep("results");
       }
     } catch {
@@ -117,6 +124,7 @@ export function QuizContainer({ events }: QuizContainerProps) {
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(stored));
     submitToServer(result, answers, email);
+    setSubscribed(true);
     setStep("results");
   }
 
@@ -142,6 +150,7 @@ export function QuizContainer({ events }: QuizContainerProps) {
     setResult(null);
     setUserSegment(null);
     setSubmitFailed(false);
+    setSubscribed(false);
   }
 
   // ---- Render ----
@@ -152,10 +161,11 @@ export function QuizContainer({ events }: QuizContainerProps) {
         primary={result.primary}
         secondary={result.secondary}
         scores={result.scores}
-        events={events}
+        weekEvents={weekFor[result.primary] ?? []}
         onRetake={handleRetake}
         userSegment={userSegment}
         submitFailed={submitFailed}
+        subscribed={subscribed}
       />
     );
   }

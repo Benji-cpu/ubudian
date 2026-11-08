@@ -1,9 +1,12 @@
-import { createClient } from "@/lib/supabase/server";
 import { QuizContainer } from "@/components/quiz/quiz-container";
-import { stripEmbeddings } from "@/lib/events/strip-embedding";
-import { visibleListings } from "@/lib/events/listing-checks";
-import type { Event } from "@/types";
+import { getPublicListings } from "@/lib/events/timetable-queries";
+import { nextForArchetype, weekAhead } from "@/lib/events/timetable";
+import { ARCHETYPE_IDS } from "@/lib/quiz-data";
+import type { ArchetypeId, Event } from "@/types";
 import type { Metadata } from "next";
+
+// "Your week in Ubud" on the result is read off the Bali clock: never a cached copy.
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Discover Your Ubud Spirit",
@@ -12,22 +15,14 @@ export const metadata: Metadata = {
 };
 
 export default async function QuizPage() {
-  const supabase = await createClient();
-  const today = new Date().toISOString().split("T")[0];
-
-  const { data: eventsData } = await supabase
-    .from("events")
-    .select("*")
-    .eq("status", "approved")
-    .gte("start_date", today)
-    .order("start_date", { ascending: true })
-    .limit(20);
-
-  const events = visibleListings(stripEmbeddings((eventsData ?? []) as Event[]));
+  // The result shows the next five gatherings for the reader's archetype. Pick
+  // them here, so the browser gets five per archetype instead of the whole week.
+  const week = weekAhead(await getPublicListings());
+  const weekFor = Object.fromEntries(ARCHETYPE_IDS.map((id) => [id, nextForArchetype(week, id)])) as Record<ArchetypeId, Event[]>;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-brand-off-white to-brand-cream dark:from-background dark:to-background">
-      <QuizContainer events={events} />
+      <QuizContainer weekFor={weekFor} />
     </div>
   );
 }

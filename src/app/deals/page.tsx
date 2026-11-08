@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SpecialCard } from "@/components/specials/special-card";
 import { NewsletterSignup } from "@/components/layout/newsletter-signup";
@@ -54,13 +55,19 @@ export default async function DealsPage() {
               Get the week&apos;s best deals and what&apos;s on, by email every Wednesday. Free.
             </p>
             <NewsletterSignup variant="dark" source="deals_top" />
-            <p className="mt-3 text-center text-sm text-brand-off-white/70">
-              Want events picked for you too?{" "}
-              <Link href="/quiz" className="font-medium text-brand-gold underline">
-                Take the 90-second quiz
-              </Link>
-              .
-            </p>
+            <div className="mt-5 text-center">
+              <p className="text-sm text-brand-off-white/70">Want events picked for you too?</p>
+              <Button
+                asChild
+                variant="outline"
+                className="mt-2 border-brand-gold/70 bg-transparent text-brand-gold hover:bg-brand-gold/10 hover:text-brand-gold"
+              >
+                <Link href="/quiz">
+                  <Sparkles className="h-4 w-4" aria-hidden />
+                  Find your Ubud: a 90-second quiz
+                </Link>
+              </Button>
+            </div>
           </div>
         </div>
       </section>
@@ -140,6 +147,11 @@ export default async function DealsPage() {
           <Button asChild size="lg" className="mt-6">
             <Link href="/tonight/add">Add your deal</Link>
           </Button>
+          <p className="mt-4 text-sm">
+            <Link href="/for-venues" className="font-medium text-brand-deep-green underline underline-offset-4">
+              How it works, and how many people read us
+            </Link>
+          </p>
         </div>
       </section>
     </div>

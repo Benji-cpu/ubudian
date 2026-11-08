@@ -3,24 +3,20 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { ARCHETYPES, ARCHETYPE_IDS } from "@/lib/quiz-data";
-import {
-  getEventsForArchetype,
-
-  getStoriesForArchetype,
-  getPractitionersForArchetype,
-} from "@/lib/quiz-helpers";
+import { getPractitionersForArchetype } from "@/lib/quiz-helpers";
+import { getPublicListings } from "@/lib/events/timetable-queries";
+import { nextForArchetype, weekAhead } from "@/lib/events/timetable";
+import { YourWeek } from "@/components/quiz/your-week";
 import { getGuidesForArchetype } from "@/lib/guides/match-archetype";
 import { getStarterPack } from "@/lib/guides/starter-packs";
 import { getGuidesByRelatedSlugs } from "@/lib/guides/queries";
 import { getSiteSettings } from "@/lib/site-settings";
 import { QuizArchetypeCard } from "@/components/quiz/quiz-archetype-card";
-import { EventCard } from "@/components/events/event-card";
 import { GuideCard } from "@/components/guides/guide-card";
 import { PractitionerCard } from "@/components/practitioners/practitioner-card";
 import { RecommendedRetreatCta } from "@/components/journeys/recommended-retreat-cta";
 import { Button } from "@/components/ui/button";
 import { SITE_URL } from "@/lib/constants";
-import { visibleListings } from "@/lib/events/listing-checks";
 import type { ArchetypeId, Event, Guide, Practitioner } from "@/types";
 import type { Metadata } from "next";
 
@@ -62,7 +58,7 @@ export default async function ArchetypeResultPage({ params }: PageProps) {
   const archetype = ARCHETYPES[slug as ArchetypeId];
   if (!archetype) notFound();
 
-  let events: Event[] = [];
+  let weekEvents: Event[] = [];
   let guides: Guide[] = [];
   let practitioners: Practitioner[] = [];
 
@@ -70,16 +66,10 @@ export default async function ArchetypeResultPage({ params }: PageProps) {
 
   try {
     const supabase = await createClient();
-    const today = new Date().toISOString().split("T")[0];
 
-    const [eventsRes, guidesRes, practitionersRes] = await Promise.all([
-      supabase
-        .from("events")
-        .select("*")
-        .eq("status", "approved")
-        .gte("start_date", today)
-        .order("start_date", { ascending: true })
-        .limit(20),
+    const [listings, guidesRes, practitionersRes] = await Promise.all([
+      // "Your week in Ubud": the same public listings and Bali clock as /ubud-tonight.
+      getPublicListings(),
       settings.guides_enabled
         ? supabase
             .from("guides")
@@ -95,13 +85,12 @@ export default async function ArchetypeResultPage({ params }: PageProps) {
         .limit(24),
     ]);
 
-    events = visibleListings((eventsRes.data ?? []) as Event[]);
+    weekEvents = nextForArchetype(weekAhead(listings), archetype.id);
     guides = (guidesRes.data ?? []) as Guide[];
     practitioners = (practitionersRes.data ?? []) as Practitioner[];
   } catch {
     // Supabase unreachable — render with empty recommendations
   }
-  const matchedEvents = getEventsForArchetype(events, archetype.id);
   const matchedPractitioners = getPractitionersForArchetype(practitioners, archetype.id);
   const matchedGuides = settings.guides_enabled
     ? getGuidesForArchetype(guides, archetype.id, 3)
@@ -153,6 +142,11 @@ export default async function ArchetypeResultPage({ params }: PageProps) {
           {archetype.description}
         </p>
 
+        {/* The next five gatherings for this archetype, with the weekly email right under them */}
+        <div className="mt-10">
+          <YourWeek archetypeName={archetype.name} events={weekEvents} />
+        </div>
+
         {/* Browse events for archetype */}
         <div className="mt-6">
           <Button asChild variant="outline" size="lg" className="w-full sm:w-auto">
@@ -172,7 +166,7 @@ export default async function ArchetypeResultPage({ params }: PageProps) {
                 Start here, in this order
               </p>
               <h2 className="mt-3 font-serif text-2xl font-medium text-brand-deep-green sm:text-3xl">
-                A reading sequence for The {archetype.name}
+                A reading sequence for {archetype.name}
               </h2>
               <p className="mt-4 text-base leading-relaxed text-brand-charcoal-light">
                 {starterPack.intro}
@@ -234,20 +228,6 @@ export default async function ArchetypeResultPage({ params }: PageProps) {
                   Browse all guides for {archetype.name} &rarr;
                 </Link>
               </Button>
-            </div>
-          </div>
-        )}
-
-        {/* Recommended events */}
-        {matchedEvents.length > 0 && (
-          <div className="mt-12">
-            <h2 className="font-serif text-2xl font-medium text-brand-deep-green">
-              Events for {archetype.name}
-            </h2>
-            <div className="mt-6 space-y-3">
-              {matchedEvents.map((event) => (
-                <EventCard key={event.id} event={event} />
-              ))}
             </div>
           </div>
         )}

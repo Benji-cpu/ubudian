@@ -108,6 +108,18 @@ export default async function HomePage() {
             >
               <Link href="/deals">Food deals</Link>
             </Button>
+            {/* The quiz is the best way in: half the subscribers came through it. */}
+            <Button
+              asChild
+              size="lg"
+              variant="outline"
+              className="border-brand-gold/70 bg-brand-gold/10 text-white hover:bg-brand-gold/20 hover:text-white"
+            >
+              <Link href="/quiz">
+                <Sparkles className="h-4 w-4 text-brand-gold" aria-hidden />
+                Find your Ubud: a 90-second quiz
+              </Link>
+            </Button>
           </div>
         </div>
       </section>

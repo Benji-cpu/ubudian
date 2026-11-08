@@ -62,6 +62,19 @@ export async function Footer() {
         {/* Social / Info */}
         <div className="mt-10 flex flex-wrap items-center justify-center gap-6">
           {/* Instagram link removed 5 Oct: @theubudian isn't confirmed as ours. Restore only on Ben's word. */}
+          {[
+            { href: "/ubud-tonight", label: "Ubud tonight" },
+            { href: "/ubud-events-this-week", label: "This week" },
+            { href: "/for-venues", label: "For venues" },
+          ].map((l) => (
+            <Link
+              key={l.href}
+              href={l.href}
+              className="py-2 text-sm text-brand-off-white/80 transition-colors hover:text-brand-gold"
+            >
+              {l.label}
+            </Link>
+          ))}
           <Link
             href="/about"
             className="py-2 text-sm text-brand-off-white/80 transition-colors hover:text-brand-gold"

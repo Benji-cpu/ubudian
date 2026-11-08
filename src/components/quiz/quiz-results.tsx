@@ -3,9 +3,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ARCHETYPES, ARCHETYPE_IDS } from "@/lib/quiz-data";
-import { getEventsForArchetype, getToursForArchetype, getStoriesForArchetype } from "@/lib/quiz-helpers";
 import { QuizShareButtons } from "./quiz-share-buttons";
-import { EventCard } from "@/components/events/event-card";
+import { YourWeek } from "./your-week";
 import { Button } from "@/components/ui/button";
 import { SITE_URL } from "@/lib/constants";
 import type { ArchetypeId, QuizScores, Event, UserSegment } from "@/types";
@@ -14,27 +13,29 @@ interface QuizResultsProps {
   primary: ArchetypeId;
   secondary: ArchetypeId;
   scores: QuizScores;
-  events: Event[];
+  /** The next gatherings for `primary` this week, already matched (`nextForArchetype`). */
+  weekEvents: Event[];
   onRetake: () => void;
   userSegment?: UserSegment | null;
   submitFailed?: boolean;
+  /** They left their email in the quiz, so they already get the weekly email. */
+  subscribed?: boolean;
 }
 
 export function QuizResults({
   primary,
   secondary,
   scores,
-  events,
+  weekEvents,
   onRetake,
   userSegment,
   submitFailed,
+  subscribed,
 }: QuizResultsProps) {
   const archetype = ARCHETYPES[primary];
   const secondaryArchetype = ARCHETYPES[secondary];
   const maxScore = Math.max(...Object.values(scores));
   const shareUrl = `${SITE_URL}/quiz/results/${primary}`;
-
-  const matchedEvents = getEventsForArchetype(events, primary);
 
   const segmentCTA = (() => {
     const segment = userSegment || "visiting";
@@ -71,18 +72,13 @@ export function QuizResults({
       );
     }
 
-    // visiting or legacy (null)
+    // visiting or legacy (null). The weekly email is offered right above, under the week's events.
     return (
-      <div className="space-y-3">
-        <Button asChild size="lg">
-          <Link href="/login?redirect=/dashboard">
-            Sign in to see your full event feed
-          </Link>
-        </Button>
-        <p className="text-sm text-muted-foreground">
-          We also send a weekly email with events matched to your spirit.
-        </p>
-      </div>
+      <Button asChild size="lg">
+        <Link href="/login?redirect=/dashboard">
+          Sign in to see your full event feed
+        </Link>
+      </Button>
     );
   })();
 
@@ -158,17 +154,10 @@ export function QuizResults({
         })}
       </div>
 
-      {/* Conversion block — matched events preview + gated CTA */}
+      {/* The next five gatherings for this archetype, with the weekly email right under them */}
       <div className="mt-10">
-        <h3 className="font-serif text-2xl font-medium text-brand-deep-green dark:text-brand-gold">
-          Your custom spread
-        </h3>
-        <p className="mt-2 text-muted-foreground">
-          A handful of gatherings — and the journeys further down — picked for{" "}
-          {archetype.name}. Sign in to keep this spread on your profile and
-          we&apos;ll keep tuning it; if you left your email, it&apos;s already on
-          its way to your inbox.
-        </p>
+        {/* The email they left in the quiz only counts once the result reached us. */}
+        <YourWeek archetypeName={archetype.name} events={weekEvents} subscribed={subscribed && !submitFailed} />
         {submitFailed && (
           <p className="mt-2 text-sm italic text-muted-foreground/70">
             We couldn&apos;t sync your result just now — it&apos;s saved on this
@@ -176,49 +165,8 @@ export function QuizResults({
           </p>
         )}
 
-        {/* Show first 3 event cards */}
-        {matchedEvents.length > 0 && (
-          <div className="mt-6 space-y-3">
-            {matchedEvents.slice(0, 3).map((event) => (
-              <EventCard key={event.id} event={event} />
-            ))}
-          </div>
-        )}
-
-        {/* Gated card — blurred preview with lock */}
-        <div className="relative mt-3 overflow-hidden rounded-xl border border-border bg-card p-4">
-          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-card/80 backdrop-blur-sm">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-deep-green/10">
-              <svg
-                className="h-5 w-5 text-brand-deep-green"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                />
-              </svg>
-            </div>
-            <p className="mt-2 text-center text-sm font-medium text-foreground">
-              {matchedEvents.length > 3
-                ? `${matchedEvents.length - 3} more events matched to your spirit`
-                : "More events matched weekly to your spirit"}
-            </p>
-          </div>
-          {/* Blurred placeholder content */}
-          <div className="select-none opacity-30" aria-hidden="true">
-            <div className="h-4 w-3/4 rounded bg-muted" />
-            <div className="mt-2 h-3 w-1/2 rounded bg-muted" />
-            <div className="mt-2 h-3 w-2/3 rounded bg-muted" />
-          </div>
-        </div>
-
         {/* Segment-aware CTA */}
-        <div className="mt-6 text-center">
+        <div className="mt-8 text-center">
           {segmentCTA}
         </div>
       </div>
