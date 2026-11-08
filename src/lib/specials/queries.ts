@@ -9,6 +9,11 @@ import { PUBLIC_SPECIAL_COLUMNS } from "./index";
  * the private contact fields never reach a page.
  */
 export async function getLiveSpecials(): Promise<Special[]> {
+  return (await readLiveSpecials()) ?? [];
+}
+
+/** The same read, but null when it fails, for a count that must not show a false 0 (/for-venues). */
+export async function readLiveSpecials(): Promise<Special[] | null> {
   const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("specials")
@@ -18,7 +23,7 @@ export async function getLiveSpecials(): Promise<Special[]> {
     .order("venue_name");
   if (error) {
     console.error("getLiveSpecials:", error.message);
-    return [];
+    return null;
   }
   return (data ?? []) as Special[];
 }
