@@ -9,7 +9,7 @@ import { AddToCalendarButton } from "@/components/events/add-to-calendar-button"
 import { EventCard } from "@/components/events/event-card";
 import { EventHero } from "@/components/events/event-hero";
 import { rolledForward } from "@/lib/events/buckets";
-import { nowInBali } from "@/lib/events/bali-time";
+import { eventStartsWhen, nowInBali } from "@/lib/events/bali-time";
 import { EventMap } from "@/components/events/event-map";
 import Link from "next/link";
 import { HowToGetIn } from "@/components/events/how-to-get-in";
@@ -38,6 +38,13 @@ import type { Event } from "@/types";
 interface EventPageProps {
   params: Promise<{ slug: string }>;
 }
+
+/** The deals link under the buttons, by when the event starts: "tonight" only for an evening event today. */
+const DEALS_LINK = {
+  tonight: "Tonight's food deals in Ubud",
+  today: "Food deals in Ubud today",
+  "another-day": "Food deals in Ubud",
+} as const;
 
 export async function generateMetadata({ params }: EventPageProps): Promise<Metadata> {
   try {
@@ -190,6 +197,7 @@ export default async function EventPage({ params }: EventPageProps) {
   // Without this the detail page renders the seed date (e.g. April 26)
   // while the card already displays the next-instance date (May 24).
   const eRolled = rolledForward([e])[0] ?? e;
+  const startsWhen = eventStartsWhen(eRolled, nowInBali());
 
   const saveButton = currentProfileId ? (
     <SaveEventButton
@@ -231,9 +239,9 @@ export default async function EventPage({ params }: EventPageProps) {
         <InterestButton eventId={e.id} initialCount={interestCount} />
         <OutboundClickBeacon eventId={e.id} hrefs={trackedHrefs} />
         <p className="mx-auto mt-3 max-w-3xl px-4 text-sm text-muted-foreground sm:px-6">
-          Making a night of it?{" "}
+          {startsWhen === "tonight" ? "Making a night of it? " : null}
           <Link href="/deals" className="font-medium text-brand-deep-green underline underline-offset-4">
-            Today&apos;s food deals in Ubud
+            {DEALS_LINK[startsWhen]}
           </Link>
         </p>
 

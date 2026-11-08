@@ -116,6 +116,21 @@ export function parseTimeToMinutes(value: string | null): number | null {
 }
 
 /**
+ * When the event starts, by Bali's calendar and clock: "tonight" (today, at
+ * 16:00 or later), "today" (today, earlier or with no start time) or
+ * "another-day" (any other date, including a multi-day event already under
+ * way). Pass the event rolled forward, so a weekly class goes by its next date.
+ */
+export function eventStartsWhen(
+  event: Pick<Event, "start_date" | "start_time">,
+  now: BaliNow
+): "tonight" | "today" | "another-day" {
+  if (event.start_date !== now.dateStr) return "another-day";
+  const start = parseTimeToMinutes(event.start_time);
+  return start !== null && start >= 16 * 60 ? "tonight" : "today";
+}
+
+/**
  * How long a same-day listing with a start time but no end time is assumed to
  * run. Without it, an 8am class with no end time counted as "happening now"
  * until midnight — the homepage's "Tonight" list was showing morning classes
