@@ -1,12 +1,8 @@
-import { Clock, MapPin, Instagram, Globe } from "lucide-react";
+import Link from "next/link";
+import { Clock, MapPin, Instagram, Globe, ArrowRight } from "lucide-react";
 import type { Special } from "@/types";
 import { formatDays, formatHours, formatIdr } from "@/lib/specials";
-
-function mapsHref(s: Special): string {
-  if (s.google_maps_url) return s.google_maps_url;
-  const q = [s.venue_name, s.venue_address || s.venue_area, "Ubud"].filter(Boolean).join(", ");
-  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`;
-}
+import { mapsHref, venuePath } from "@/lib/specials/deal-page";
 
 export function SpecialCard({
   special,
@@ -21,6 +17,7 @@ export function SpecialCard({
   const hours = formatHours(special.start_time, special.end_time);
   const price = formatIdr(special.price_idr);
   const handle = special.instagram_handle?.replace(/^@/, "");
+  const page = venuePath(special.venue_name);
 
   return (
     <article className="rounded-xl border border-brand-gold/20 bg-card p-5 shadow-sm">
@@ -90,6 +87,16 @@ export function SpecialCard({
         ) : null}
       </div>
 
+      {page ? (
+        <Link
+          href={page}
+          className="-mb-2 mt-1 inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-brand-deep-green underline-offset-4 hover:underline dark:text-brand-gold"
+        >
+          Details and share
+          <span className="sr-only">: {special.venue_name}</span>
+          <ArrowRight className="h-4 w-4" aria-hidden />
+        </Link>
+      ) : null}
     </article>
   );
 }

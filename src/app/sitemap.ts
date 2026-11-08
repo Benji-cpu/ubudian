@@ -4,6 +4,8 @@ import { SITE_URL } from "@/lib/constants";
 import { HUBS } from "@/lib/hubs";
 import { getSiteSettings } from "@/lib/site-settings";
 import { isPublicListing } from "@/lib/events/listing-checks";
+import { getLiveSpecials } from "@/lib/specials/queries";
+import { venuePages } from "@/lib/specials/deal-page";
 
 /**
  * The sitemap must agree with `site_settings`. A flagged-off section renders
@@ -24,6 +26,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     practitionersRes,
     placesRes,
     partnersRes,
+    liveDeals,
   ] = await Promise.all([
     supabase
       .from("events")
@@ -45,6 +48,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       .from("partners")
       .select("slug, updated_at")
       .eq("is_active", true),
+    getLiveSpecials(),
   ]);
 
   const staticPages: MetadataRoute.Sitemap = [
@@ -81,6 +85,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
 
 
+  // One page per venue with a live deal; a lapsed deal's page 404s, so it drops out here too.
+  const dealPages: MetadataRoute.Sitemap = venuePages(liveDeals).map((v) => ({
+    url: `${SITE_URL}/deals/${v.slug}`,
+    lastModified: v.lastChecked,
+    changeFrequency: "weekly",
+    priority: 0.7,
+  }));
+
   const guidePages: MetadataRoute.Sitemap = (guidesRes.data ?? []).map((g) => ({
     url: `${SITE_URL}/guides/${g.slug}`,
     lastModified: g.updated_at,
@@ -112,6 +124,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [
     ...staticPages,
     ...eventPages,
+    ...dealPages,
     ...(settings.guides_enabled ? guidePages : []),
     ...practitionerPages,
     ...placePages,

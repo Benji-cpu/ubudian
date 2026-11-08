@@ -2,9 +2,13 @@ import type { Special } from "@/types";
 import type { BaliNow } from "@/lib/events/bali-time";
 import { parseTimeToMinutes } from "@/lib/events/bali-time";
 
-/** Everything a public page may show. Never add the contact_* columns here. */
+/**
+ * Everything a public page may show. Never add the contact_* columns or
+ * confirm_token here. `source` is never printed: it only decides what the
+ * venue page may claim (its "checked" line and the "How to use it" box).
+ */
 export const PUBLIC_SPECIAL_COLUMNS =
-  "id, venue_name, venue_area, venue_address, google_maps_url, instagram_handle, website_url, title, description, price_idr, weekdays, days_stated, start_time, end_time, source_url, expires_on, confirmed_at";
+  "id, venue_name, venue_area, venue_address, google_maps_url, instagram_handle, website_url, title, description, price_idr, normal_price_idr, weekdays, days_stated, start_time, end_time, source, source_url, expires_on, confirmed_at";
 
 /** A special lapses this many days after it was last confirmed. */
 export const SPECIAL_LIFETIME_DAYS = 30;

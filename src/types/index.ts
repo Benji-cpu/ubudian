@@ -725,12 +725,16 @@ export interface Special {
   title: string;
   description: string | null;
   price_idr: number | null;
+  /** What the same thing costs without the deal, when the venue or its menu says. */
+  normal_price_idr?: number | null;
   /** 0 = Sunday … 6 = Saturday. Empty = every day. */
   weekdays: number[];
   /** false = the source gives no days; weekdays is empty but does NOT mean every day. */
   days_stated?: boolean;
   start_time: string | null;
   end_time: string | null;
+  /** How it reached us: `form` / `admin` / `whatsapp` came from the venue; `seed` / `scout` / `instagram` from its public pages. */
+  source?: string;
   /** Public page the deal was read from (the venue's own page where possible). */
   source_url: string | null;
   expires_on: string;
