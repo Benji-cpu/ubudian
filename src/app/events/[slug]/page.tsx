@@ -233,7 +233,7 @@ export default async function EventPage({ params }: EventPageProps) {
         <p className="mx-auto mt-3 max-w-3xl px-4 text-sm text-muted-foreground sm:px-6">
           Making a night of it?{" "}
           <Link href="/deals" className="font-medium text-brand-deep-green underline underline-offset-4">
-            Today&apos;s food and drink deals in Ubud
+            Today&apos;s food deals in Ubud
           </Link>
         </p>
 
@@ -248,6 +248,19 @@ export default async function EventPage({ params }: EventPageProps) {
             </Button>
           </div>
         )}
+
+        {/* Weekly email, one compact line right under the buttons, where people decide.
+            The page's only sign-up: it used to sit at the very bottom, under the share row. */}
+        <div className="mx-auto mt-6 max-w-3xl px-4 sm:px-6">
+          <div className="flex flex-col gap-3 rounded-lg border border-brand-gold/20 bg-brand-gold/5 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-sm text-foreground">
+              Get this week&apos;s picks and new deals every Wednesday. Free.
+            </p>
+            <div className="w-full sm:max-w-sm">
+              <NewsletterSignup source="event" />
+            </div>
+          </div>
+        </div>
 
         {/* Description */}
         <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
@@ -334,14 +347,6 @@ export default async function EventPage({ params }: EventPageProps) {
             </Button>
           </div>
         )}
-
-        {/* Weekly email sign-up: where people decide to come back. */}
-        <section className="mx-auto max-w-md px-4 pt-10 text-center sm:px-6">
-          <p className="text-sm font-medium text-foreground">
-            Get the week&apos;s best deals and what&apos;s on, every Wednesday.
-          </p>
-          <NewsletterSignup source="event" className="mx-auto mt-3 max-w-md" />
-        </section>
 
         {/* Related Events */}
         {related.length > 0 && (
