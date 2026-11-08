@@ -12,10 +12,13 @@ import { SITE_URL } from "@/lib/constants";
 // "On now" and "today" are read off the clock, so never serve a cached copy.
 export const dynamic = "force-dynamic";
 
+// The hero and the meta description say the same thing, and name no deal that can end.
+const DEALS_LINE =
+  "Real savings at Ubud cafés, spas and classes, most of them a quarter or more off. Each deal shows its own saving.";
+
 export const metadata: Metadata = {
   title: "Ubud deals — real savings on food and wellness",
-  description:
-    "Food and wellness deals in Ubud, usually a quarter or more off the normal price: 2-for-1 pizza, spa mornings, 30% off a set lunch. No drink deals. Free weekly email.",
+  description: DEALS_LINE,
   alternates: { canonical: `${SITE_URL}/deals` },
 };
 
@@ -39,15 +42,13 @@ export default async function DealsPage() {
 
   return (
     <div>
-      <section className="bg-brand-deep-green px-4 py-14 text-center sm:py-20">
+      {/* Literal hex: the brand-deep-green token turns light sage in dark mode, under light text. */}
+      <section className="bg-[#2C4A3E] px-4 py-14 text-center sm:py-20">
         <div className="mx-auto max-w-3xl">
           <h1 className="mt-3 font-serif text-4xl font-medium tracking-tight text-brand-off-white sm:text-5xl">
             Ubud deals
           </h1>
-          <p className="mt-4 text-lg text-brand-off-white/80">
-            Only real savings: usually a quarter or more off the normal price, like 2-for-1 pizza or a
-            spa morning at 30% off. Each deal shows its own saving.
-          </p>
+          <p className="mt-4 text-lg text-brand-off-white/80">{DEALS_LINE}</p>
           <div className="mx-auto mt-8 max-w-md text-left">
             <p className="mb-2 text-center text-sm text-brand-off-white/70">
               Get the week&apos;s best deals and what&apos;s on, by email every Wednesday. Free.
