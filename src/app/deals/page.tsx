@@ -14,7 +14,7 @@ export const dynamic = "force-dynamic";
 
 // The hero and the meta description say the same thing, and name no deal that can end.
 const DEALS_LINE =
-  "Real savings at Ubud cafés, spas and classes, most of them a quarter or more off. Each deal shows its own saving.";
+  "Real savings at Ubud cafés, spas and classes, most of them a quarter or more off. Each deal says what you get or save.";
 
 export const metadata: Metadata = {
   title: "Ubud deals — real savings on food and wellness",
