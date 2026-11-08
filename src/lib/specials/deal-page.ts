@@ -109,9 +109,6 @@ export function dealPageDescription(deals: Pick<Special, "title" | "description"
   return text.length <= 160 ? text : `${text.slice(0, 159).trimEnd()}…`;
 }
 
-/** The one way to use a deal the venue gave us. Worded the same on every page. */
-export const HOW_TO_USE = "Show this page or mention The Ubudian when you order or book.";
-
 const FROM_THE_VENUE = new Set(["form", "admin", "whatsapp"]);
 
 /**
@@ -134,6 +131,57 @@ export function checkedLine(d: Pick<Special, "source" | "confirmed_at">): string
 export function sharedCheckedLine(deals: Pick<Special, "source" | "confirmed_at">[]): string | null {
   const lines = new Set(deals.map(checkedLine));
   return lines.size === 1 ? [...lines][0] : null;
+}
+
+/** A full stop after "Jl.", "No.", "Rp.", "e.g." or "approx." doesn't end the sentence. */
+const ABBREVIATION = /(?:^|[\s(])(?:jl|jln|no|rp|approx|incl|e\.g|i\.e)\.$/i;
+
+/** A description's sentences. "USD 33.75", "Jl. Raya Ubud" and "e.g. ice cream" stay inside theirs. */
+function sentences(text: string): string[] {
+  const out: string[] = [];
+  for (const piece of text.split(/(?<=[.!?]["”’)]?)\s+|\s*\n\s*/)) {
+    if (!piece) continue;
+    const last = out.length - 1;
+    if (last >= 0 && (ABBREVIATION.test(out[last]) || /^[a-z]/.test(piece))) out[last] = `${out[last]} ${piece}`;
+    else out.push(piece);
+  }
+  return out;
+}
+
+const NAMES_US = /\bthe\s+ubudian\b|\bthis\s+page\b/i;
+
+/** "code UTS11", "promo code KAV30", "code: UBUD": the word after "code" has a digit or is in capitals. "Dress code applies" is no code. */
+function namesACode(sentence: string): boolean {
+  return [...sentence.matchAll(/\bcode\b\s*:?\s*["“‘']?([a-z0-9][a-z0-9-]{2,})/gi)].some(
+    ([, word]) => /\d/.test(word) || word === word.toUpperCase()
+  );
+}
+
+/**
+ * How to claim the deal, in its own words: the first sentence of its
+ * description that mentions The Ubudian, this page or a booking code ("Book
+ * with code UTS11."). Null when none does: the venue never agreed to a
+ * mention, so we don't promise one gets the deal.
+ */
+export function redemptionLine(description: string | null | undefined): string | null {
+  const text = description?.trim();
+  if (!text) return null;
+  return sentences(text).find((s) => NAMES_US.test(s) || namesACode(s)) ?? null;
+}
+
+/**
+ * What the "How to use it" box says: each deal's redemptionLine, from deals
+ * the venue gave us only (a deal read off its own page works by its own terms,
+ * whatever the text says). Once, bare, when every deal on the page says the
+ * same; otherwise each line names its deal, so none reads as covering a deal it
+ * doesn't. Empty: no box.
+ */
+export function howToUse(deals: Pick<Special, "title" | "description" | "source">[]): { deal: string | null; line: string }[] {
+  const lines = deals.map((d) => ({ deal: dealTitle(d), line: fromTheVenue(d) ? redemptionLine(d.description) : null }));
+  const said = lines.filter((l): l is { deal: string; line: string } => l.line !== null);
+  if (said.length === 0) return [];
+  if (new Set(lines.map((l) => l.line)).size === 1) return [{ deal: null, line: said[0].line }];
+  return said;
 }
 
 function hash(text: string): number {

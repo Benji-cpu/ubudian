@@ -15,6 +15,8 @@ import {
   fromTheVenue,
   checkedLine,
   sharedCheckedLine,
+  redemptionLine,
+  howToUse,
   moreDeals,
   mapsHref,
 } from "@/lib/specials/deal-page";
@@ -181,6 +183,86 @@ describe("what we can say about the check", () => {
     expect(sharedCheckedLine([samosa, curry, kids])).toBe("Checked with the venue on 16 Oct");
     expect(sharedCheckedLine([samosa, { ...curry, confirmed_at: "2026-11-01T00:00:00Z" }])).toBeNull();
     expect(sharedCheckedLine([samosa, { ...curry, source: "seed" }])).toBeNull();
+  });
+});
+
+describe("how to use it", () => {
+  it("is the first sentence that mentions The Ubudian, this page or a booking code", () => {
+    expect(
+      redemptionLine(
+        "Order any burrito bowl and get loaded fries free. Dine-in only: mention The Ubudian or show this page when you order. Wet burritos and a vegan menu."
+      )
+    ).toBe("Dine-in only: mention The Ubudian or show this page when you order.");
+    expect(redemptionLine("Book with code UTS11. Valid until the end of November 2026.")).toBe("Book with code UTS11.");
+    expect(redemptionLine("Show this page at the counter.")).toBe("Show this page at the counter.");
+    expect(redemptionLine("Book on their website with code KAV30; paid in full in advance.")).toBe(
+      "Book on their website with code KAV30; paid in full in advance."
+    );
+    expect(redemptionLine("Say the ubudian sent you. Then order.")).toBe("Say the ubudian sent you.");
+  });
+
+  it("keeps a sentence whole across prices, brackets and street abbreviations", () => {
+    expect(
+      redemptionLine(
+        "Mention The Ubudian when you book and pay USD 33.75 per person instead of USD 45. Balinese cooking classes with a market tour."
+      )
+    ).toBe("Mention The Ubudian when you book and pay USD 33.75 per person instead of USD 45.");
+    expect(
+      redemptionLine("Mention The Ubudian when you order and get a dessert free (normally IDR 20,000 each). Rice field view.")
+    ).toBe("Mention The Ubudian when you order and get a dessert free (normally IDR 20,000 each).");
+    expect(redemptionLine("Open daily on Jl. Raya Pengosekan No. 12. Show this page at the till.")).toBe("Show this page at the till.");
+    expect(redemptionLine("Show this page at our Jl. Raya Ubud shop. Open daily.")).toBe("Show this page at our Jl. Raya Ubud shop.");
+    expect(redemptionLine("Free dessert.\nMention The Ubudian when you order")).toBe("Mention The Ubudian when you order");
+  });
+
+  it("is null when the deal never says how to claim it through us", () => {
+    expect(redemptionLine("Vegetarian curries for IDR 110k plus tax and service (normally IDR 150k), on Mondays.")).toBeNull();
+    expect(redemptionLine("Free cheese fries for children on Sundays. Ask the staff how it works when you order.")).toBeNull();
+    expect(redemptionLine("Smart casual dress code applies. Free dessert with every main.")).toBeNull();
+    expect(redemptionLine("A true Ubudian favourite.")).toBeNull();
+    expect(redemptionLine("")).toBeNull();
+    expect(redemptionLine(null)).toBeNull();
+    expect(redemptionLine(undefined)).toBeNull();
+  });
+
+  const cilantro = {
+    ...base,
+    venue_name: "Cilantro Mexican Restaurant",
+    title: "Free loaded fries with any burrito bowl",
+    description: "Order any burrito bowl and get loaded fries free. Dine-in only: mention The Ubudian or show this page when you order.",
+    source: "admin",
+  };
+
+  it("says the deal's own line, once, and nothing when no deal has one", () => {
+    expect(howToUse([cilantro])).toEqual([
+      { deal: null, line: "Dine-in only: mention The Ubudian or show this page when you order." },
+    ]);
+    // Pesona agreed no mention: none of its deals says how to claim it through us.
+    const pesona = [
+      { ...curry, description: "Vegetarian curries for IDR 110k plus tax and service (normally IDR 150k), on Mondays." },
+      { ...samosa, description: "Buy one order of samosas and get a second one free, on Tuesdays." },
+      { ...kids, description: "Free cheese fries for children on Sundays. Ask the staff how it works when you order." },
+    ];
+    expect(howToUse(pesona)).toEqual([]);
+    expect(howToUse([{ ...cilantro, description: null }])).toEqual([]);
+  });
+
+  it("never gives a box to a deal read off the venue's own page, whatever its text says", () => {
+    const kaveri = { ...base, title: "30% off spa treatments", description: "Book on their website with code KAV30.", source: "seed" };
+    expect(howToUse([kaveri])).toEqual([]);
+    expect(howToUse([{ ...cilantro, source: "scout" }])).toEqual([]);
+    expect(howToUse([{ ...cilantro, source: "instagram" }])).toEqual([]);
+  });
+
+  it("names each deal when a venue's deals don't all say the same", () => {
+    const mention = "Mention The Ubudian when you order.";
+    const withLine = { ...samosa, description: `Buy one, get one free. ${mention}` };
+    expect(howToUse([withLine, { ...curry, description: mention }])).toEqual([{ deal: null, line: mention }]);
+    expect(howToUse([withLine, curry])).toEqual([{ deal: "Samosa Double-Dip", line: mention }]);
+    expect(howToUse([withLine, { ...curry, description: "Book with code CURRY20." }])).toEqual([
+      { deal: "Samosa Double-Dip", line: mention },
+      { deal: "Curry Cure", line: "Book with code CURRY20." },
+    ]);
   });
 });
 

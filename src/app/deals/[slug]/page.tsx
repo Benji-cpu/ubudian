@@ -19,12 +19,11 @@ import { dealTitle } from "@/lib/email/weekly-deals";
 import { formatDays, formatHours } from "@/lib/specials";
 import { getLiveSpecials } from "@/lib/specials/queries";
 import {
-  HOW_TO_USE,
   checkedLine,
   dealPageDescription,
   dealPageTitle,
   dealsForVenue,
-  fromTheVenue,
+  howToUse,
   mapsHref,
   moreDeals,
   offerLine,
@@ -91,6 +90,7 @@ export default async function DealPage({ params }: DealPageProps) {
   const shareText = `${offerLine(deals)} at ${venueInUbud(venueName)}`;
   const others = moreDeals(all, slug);
   const showsPrice = deals.some((d) => savingText(d) !== null);
+  const howTo = howToUse(deals);
 
   const linkClass =
     "inline-flex min-h-11 items-center gap-1.5 font-medium text-brand-deep-green underline-offset-4 hover:underline dark:text-brand-gold";
@@ -152,13 +152,19 @@ export default async function DealPage({ params }: DealPageProps) {
       </section>
 
       <section className="mx-auto max-w-3xl space-y-5 px-4 py-8 sm:px-6">
-        {/* Only where the venue knows us: a deal read off its own page works by its own terms. */}
-        {deals.some(fromTheVenue) ? (
+        {/* The deal's own words for claiming it, and only where the venue gave us the deal and says how:
+            a deal read off its own page, or one with no mention of us, works by the venue's terms. */}
+        {howTo.length > 0 ? (
           <div className="rounded-xl bg-brand-pale-green p-5">
             <p className="text-xs font-semibold uppercase tracking-widest text-brand-deep-green dark:text-brand-gold">
               How to use it
             </p>
-            <p className="mt-1 text-lg font-medium text-foreground">{HOW_TO_USE}</p>
+            {howTo.map(({ deal, line }) => (
+              <p key={`${deal}:${line}`} className="mt-1 text-lg font-medium text-foreground">
+                {deal ? <span className="font-semibold text-brand-deep-green dark:text-brand-gold">{deal}: </span> : null}
+                {line}
+              </p>
+            ))}
           </div>
         ) : null}
 
