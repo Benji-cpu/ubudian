@@ -93,7 +93,9 @@ describe("specials helpers", () => {
     expect(runsOn(unknown, 2)).toBe(false);
     expect(isOnNow(unknown, tue6pm)).toBe(false);
     expect(specialsForToday([{ ...base, ...unknown }], tue6pm)).toHaveLength(0);
-    expect(formatDays(unknown)).toBe("Days not stated");
+    expect(formatDays(unknown)).toBe("Days: ask the venue");
+    expect(formatDays(unknown, "Days not stated")).toBe("Days not stated");
     expect(formatDays({ weekdays: [], days_stated: true })).toBe("Every day");
+    expect(formatDays({ weekdays: [2], days_stated: true }, "Days not stated")).toBe("Tue");
   });
 });

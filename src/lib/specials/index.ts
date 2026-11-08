@@ -78,9 +78,19 @@ function startKey(s: Pick<Special, "start_time">): number {
   return parseTimeToMinutes(s.start_time) ?? 24 * 60;
 }
 
-/** formatWeekdays, but honest about a deal whose source gives no days. Prefer this. */
-export function formatDays(special: Pick<Special, "weekdays"> & { days_stated?: boolean }): string {
-  return daysUnknown(special) ? "Days not stated" : formatWeekdays(special.weekdays);
+/** What a reader sees for a deal whose source gives no days: the same words on the cards, the venue pages and /deals. */
+export const DAYS_ASK_THE_VENUE = "Days: ask the venue";
+
+/**
+ * formatWeekdays, but honest about a deal whose source gives no days. Prefer this.
+ * `unknown` is what such a deal shows: readers are told to ask the venue; a page
+ * the venue itself reads passes its own words.
+ */
+export function formatDays(
+  special: Pick<Special, "weekdays"> & { days_stated?: boolean },
+  unknown: string = DAYS_ASK_THE_VENUE
+): string {
+  return daysUnknown(special) ? unknown : formatWeekdays(special.weekdays);
 }
 
 /** "Tue, Thu" / "Every day" / "Weekdays" / "Weekends". */

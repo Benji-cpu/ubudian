@@ -5,7 +5,7 @@ import { SpecialCard } from "@/components/specials/special-card";
 import { NewsletterSignup } from "@/components/layout/newsletter-signup";
 import { ChannelFollow } from "@/components/whatsapp/channel-follow";
 import { nowInBali } from "@/lib/events/bali-time";
-import { daysUnknown, isOnNow, runsOn, specialsForToday, WEEKDAY_NAMES } from "@/lib/specials";
+import { DAYS_ASK_THE_VENUE, daysUnknown, isOnNow, runsOn, specialsForToday, WEEKDAY_NAMES } from "@/lib/specials";
 import { getLiveSpecials } from "@/lib/specials/queries";
 import { SITE_URL } from "@/lib/constants";
 
@@ -107,8 +107,9 @@ export default async function DealsPage() {
 
             {askDays.length > 0 && (
               <div className="mt-12">
+                {/* Same words as the card's day line for these deals. */}
                 <h2 className="font-serif text-xl text-brand-deep-green dark:text-brand-gold sm:text-2xl">
-                  Days to confirm: ask the venue
+                  {DAYS_ASK_THE_VENUE}
                 </h2>
                 <p className="mt-2 text-sm text-muted-foreground">
                   We don&apos;t know which days these run yet. Check with the venue before you go.

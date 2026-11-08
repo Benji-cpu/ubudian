@@ -79,7 +79,7 @@ export function ReconfirmForm({ token, specials }: { token: string; specials: Sp
       <ul className="space-y-3">
         {specials.map((s) => {
           const on = running.has(s.id);
-          const meta = [formatDays(s), formatHours(s.start_time, s.end_time), formatIdr(s.price_idr)]
+          const meta = [formatDays(s, "Days not stated"), formatHours(s.start_time, s.end_time), formatIdr(s.price_idr)]
             .filter(Boolean)
             .join(" · ");
           return (
