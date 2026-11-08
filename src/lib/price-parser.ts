@@ -106,6 +106,21 @@ export function matchesPriceBracket(
 }
 
 /**
+ * The /events price filters (`?price=` and `?free=true`). One function for
+ * the list and for the count above it, so the two never disagree.
+ */
+export function filterByPrice<T extends { price_info: string | null }>(
+  events: T[],
+  bracket: PriceBracket | null,
+  freeOnly: boolean
+): T[] {
+  let out = events;
+  if (bracket) out = out.filter((e) => matchesPriceBracket(e.price_info, bracket));
+  if (freeOnly) out = out.filter((e) => matchesPriceBracket(e.price_info, "free"));
+  return out;
+}
+
+/**
  * Make a stored price readable. Ticket sites and the parser hand over raw
  * rupiah ("IDR 4368932", "IDR 90000"); the rest of the calendar reads
  * "Rp 250K". Anything that is not a bare rupiah amount passes through as-is.

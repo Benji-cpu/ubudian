@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { groupEventsByDate } from "@/lib/events/group-by-date";
+import { countListedEvents, groupEventsByDate } from "@/lib/events/group-by-date";
 import type { Event } from "@/types";
 
 function makeEvent(
@@ -125,5 +125,19 @@ describe("groupEventsByDate", () => {
       end_date: "2026-04-12",
     });
     expect(groupEventsByDate([past], TUES_8AM)).toEqual([]);
+  });
+});
+
+describe("countListedEvents", () => {
+  it("counts the cards the list shows, not its date headers or ended events", () => {
+    const events = [
+      makeEvent({ id: "a", start_date: "2026-04-21" }),
+      makeEvent({ id: "b", start_date: "2026-04-21" }),
+      makeEvent({ id: "c", start_date: "2026-04-22" }),
+      makeEvent({ id: "past", start_date: "2026-04-10", end_date: "2026-04-12" }),
+    ];
+    // Two date groups, three cards: the hero and the list both say 3.
+    expect(groupEventsByDate(events, TUES_8AM)).toHaveLength(2);
+    expect(countListedEvents(events, TUES_8AM)).toBe(3);
   });
 });

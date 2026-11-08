@@ -121,3 +121,18 @@ describe("formatPriceInfo", () => {
     expect(formatPriceInfo(null)).toBeNull();
   });
 });
+
+describe("filterByPrice", () => {
+  it("applies the same ?price= and ?free= filters the /events list does", async () => {
+    const { filterByPrice } = await import("@/lib/price-parser");
+    const events = [
+      { id: "free", price_info: "Free" },
+      { id: "cheap", price_info: "Rp 55,000" },
+      { id: "dear", price_info: "Rp 750,000" },
+      { id: "unknown", price_info: null },
+    ];
+    expect(filterByPrice(events, null, false).map((e) => e.id)).toEqual(["free", "cheap", "dear", "unknown"]);
+    expect(filterByPrice(events, "under-100k", false).map((e) => e.id)).toEqual(["cheap", "unknown"]);
+    expect(filterByPrice(events, null, true).map((e) => e.id)).toEqual(["free"]);
+  });
+});

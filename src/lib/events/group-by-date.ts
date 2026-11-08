@@ -78,6 +78,15 @@ export function groupEventsByDate(
   });
 }
 
+/**
+ * How many events the list view shows for `events`: the cards under the date
+ * headers, never the headers themselves. The /events hero uses this so its
+ * count is the same number as the list's "N of M".
+ */
+export function countListedEvents(events: Event[], now: Date = new Date()): number {
+  return groupEventsByDate(events, now).reduce((n, g) => n + g.events.length, 0);
+}
+
 function labelFor(dateKey: string, todayStr: string, tomorrowStr: string): string {
   const pretty = format(parseYMDLocal(dateKey), "EEE d MMM"); // "Sat 7 Jun"
   if (dateKey === todayStr) return `Today · ${pretty}`;

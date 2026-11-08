@@ -46,6 +46,7 @@ export function EventList({
       containerClassName="space-y-2.5"
       emptyState={<EventListEmptyState />}
       renderSkeleton={() => <EventRowSkeleton />}
+      isCounted={(row) => row.kind === "event"}
       renderItem={(row) => {
         if (row.kind === "header") {
           return (

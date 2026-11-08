@@ -22,6 +22,8 @@ import { filterEventsInRange } from "@/lib/events/filter-range";
 import { splitByTier, pickSpotlight, bannerEyebrow } from "@/lib/events/discovery";
 import { stripEmbeddings } from "@/lib/events/strip-embedding";
 import { visibleListings } from "@/lib/events/listing-checks";
+import { countListedEvents } from "@/lib/events/group-by-date";
+import { filterByPrice, type PriceBracket } from "@/lib/price-parser";
 import { FestivalBanner } from "@/components/events/festival-banner";
 import { MoreHappenings } from "@/components/events/more-happenings";
 import { WeekPicks } from "@/components/events/week-picks";
@@ -269,7 +271,21 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
   const primaryEvents = core.length ? core : discovery;
   const extraDiscovery = core.length ? discovery : [];
   const spotlight = useOwnViewport ? null : pickSpotlight(discovery);
-  const heroCount = useOwnViewport ? viewEvents.length : primaryEvents.length;
+  // The hero counts the list under it: the same events after the same price
+  // filter and date grouping the list applies. It said "183 gatherings" over a
+  // list saying "187 remaining" (the list was counting its date headers).
+  const listedEvents = filterByPrice(
+    primaryEvents,
+    (params.price as PriceBracket | undefined) ?? null,
+    params.free === "true"
+  );
+  const heroCount = useOwnViewport
+    ? viewEvents.length
+    : isFeedView || isMapView
+      ? primaryEvents.length
+      : view === "grid"
+        ? listedEvents.length
+        : countListedEvents(listedEvents);
 
   return (
     <div>
@@ -279,7 +295,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
       <p className="mx-auto mt-3 max-w-5xl px-4 text-sm text-muted-foreground sm:px-6">
         Eating out first?{" "}
         <Link href="/deals" className="font-medium text-brand-deep-green underline underline-offset-4">
-          Today&apos;s food and drink deals in Ubud
+          Today&apos;s food deals in Ubud
         </Link>
       </p>
 

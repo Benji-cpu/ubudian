@@ -12,6 +12,12 @@ interface PaginatedEventsProps<T> {
   emptyState?: React.ReactNode;
   /** Custom skeleton block shown when more items are loading. */
   renderSkeleton?: () => React.ReactNode;
+  /**
+   * Which items are events, for the "N of M" count. The list view mixes date
+   * headers into `items`; counting those made it say "187 remaining" under a
+   * hero of 183 gatherings. Defaults to every item.
+   */
+  isCounted?: (item: T) => boolean;
 }
 
 /**
@@ -28,21 +34,27 @@ export function PaginatedEvents<T extends { id: string }>({
   containerClassName,
   emptyState,
   renderSkeleton,
+  isCounted,
 }: PaginatedEventsProps<T>) {
   const [visibleCount, setVisibleCount] = useState(pageSize);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
+
+  // Back to the first page whenever the list itself changes (e.g. when
+  // filters change). Adjusted during render, React's pattern for state that
+  // follows a prop, so the old page never renders once against new items.
+  const [pagedFor, setPagedFor] = useState({ items, pageSize });
+  if (pagedFor.items !== items || pagedFor.pageSize !== pageSize) {
+    setPagedFor({ items, pageSize });
+    setVisibleCount(pageSize);
+  }
 
   const visibleItems = useMemo(
     () => items.slice(0, visibleCount),
     [items, visibleCount]
   );
   const hasMore = visibleCount < items.length;
-
-  // Reset visible count whenever the underlying items list changes
-  // (e.g. when filters change).
-  useEffect(() => {
-    setVisibleCount(pageSize);
-  }, [items, pageSize]);
+  const shownCount = isCounted ? visibleItems.filter(isCounted).length : visibleItems.length;
+  const totalCount = isCounted ? items.filter(isCounted).length : items.length;
 
   useEffect(() => {
     if (!hasMore) return;
@@ -100,7 +112,7 @@ export function PaginatedEvents<T extends { id: string }>({
             >
               Show more events
               <span className="ml-2 text-muted-foreground">
-                · {items.length - visibleCount} remaining
+                · {shownCount} of {totalCount} shown
               </span>
             </Button>
           </div>

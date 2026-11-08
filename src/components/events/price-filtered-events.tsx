@@ -6,7 +6,7 @@ import { EventList } from "@/components/events/event-list";
 import { EventGridView } from "@/components/events/event-grid-view";
 import { EventCalendar } from "@/components/events/event-calendar";
 import { EventWeekView } from "@/components/events/event-week-view";
-import { matchesPriceBracket, type PriceBracket } from "@/lib/price-parser";
+import { filterByPrice, type PriceBracket } from "@/lib/price-parser";
 import type { Event } from "@/types";
 
 interface PriceFilteredEventsProps {
@@ -26,16 +26,10 @@ export function PriceFilteredEvents({
   const priceBracket = searchParams.get("price") as PriceBracket | null;
   const freeOnly = searchParams.get("free") === "true";
 
-  const filtered = useMemo(() => {
-    let out = events;
-    if (priceBracket) {
-      out = out.filter((e) => matchesPriceBracket(e.price_info, priceBracket));
-    }
-    if (freeOnly) {
-      out = out.filter((e) => matchesPriceBracket(e.price_info, "free"));
-    }
-    return out;
-  }, [events, priceBracket, freeOnly]);
+  const filtered = useMemo(
+    () => filterByPrice(events, priceBracket, freeOnly),
+    [events, priceBracket, freeOnly]
+  );
 
   if (view === "calendar") return <EventCalendar events={filtered} />;
   if (view === "week") return <EventWeekView events={filtered} />;
