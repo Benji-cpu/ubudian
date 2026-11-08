@@ -78,7 +78,12 @@ describe("displayPrice: ranges", () => {
 
 describe("displayPrice: small print", () => {
   it("lets text such as online / walk-in follow the price", () => {
-    expect(displayPrice("IDR 170,000 online / walk-in")).toEqual({ kind: "amount", label: "IDR 170k", note: "online / walk-in" });
+    expect(displayPrice("IDR 170,000 online / walk-in")).toEqual({
+      kind: "amount",
+      label: "IDR 170k",
+      note: "online / walk-in",
+      amount: { min: 170_000, max: 170_000, currency: "IDR" },
+    });
     expect(show("IDR 150k (cash only)")).toBe("IDR 150k · cash only");
     expect(show("500,000 IDR per couple (advance booking)")).toBe("IDR 500k · per couple (advance booking)");
   });
@@ -145,5 +150,14 @@ describe("formatAmountRange", () => {
   it("writes one amount once", () => {
     expect(formatAmountRange(150_000, 150_000)).toBe("IDR 150k");
     expect(formatAmountRange(150_000, 152_000)).toBe("IDR 150-152k");
+  });
+});
+
+describe("the amounts behind the label", () => {
+  it("are the rounded amounts the reader sees, for structured data", () => {
+    expect(displayPrice("Rp 194,174").amount).toEqual({ min: 195_000, max: 195_000, currency: "IDR" });
+    expect(displayPrice("Rp 300,000 - Rp 350,000").amount).toEqual({ min: 300_000, max: 350_000, currency: "IDR" });
+    expect(displayPrice("$85").amount).toEqual({ min: 85, max: 85, currency: "USD" });
+    expect(displayPrice("By donation").amount).toBeUndefined();
   });
 });

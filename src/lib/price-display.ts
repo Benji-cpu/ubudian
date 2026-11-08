@@ -26,6 +26,8 @@ export interface PriceDisplay {
   label: string;
   /** Small print after the label, e.g. "online / walk-in" or "cash only". Null when there is nothing worth adding. */
   note: string | null;
+  /** The amounts behind an "amount" label, as shown (IDR rounded the same way), for structured data. */
+  amount?: { min: number; max: number; currency: string };
 }
 
 export const CHECK_WITH_ORGANISER = "Check with the organiser";
@@ -314,5 +316,8 @@ export function displayPrice(priceInfo: string | null | undefined): PriceDisplay
     noteParts = priced.map((t) => t.label);
   }
 
-  return { kind: "amount", label, note: cleanNote(noteParts) };
+  const lo = Math.min(...values);
+  const hi = Math.max(...values);
+  const amount = currency === "IDR" ? { min: roundIdr(lo), max: roundIdr(hi), currency } : { min: lo, max: hi, currency };
+  return { kind: "amount", label, note: cleanNote(noteParts), amount };
 }

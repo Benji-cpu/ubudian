@@ -3,15 +3,13 @@ import { createClient } from "@/lib/supabase/server";
 import { queryWithRetry } from "@/lib/supabase/retry";
 import { EventCard } from "@/components/events/event-card";
 import { bucketEventsByTime } from "@/lib/events/buckets";
-import { nowInBali, parseTimeToMinutes } from "@/lib/events/bali-time";
+import { nowInBali } from "@/lib/events/bali-time";
 import { stripEmbeddings } from "@/lib/events/strip-embedding";
 import { visibleListings } from "@/lib/events/listing-checks";
+import { stillAheadToday } from "@/lib/events/timetable";
 import type { Event } from "@/types";
 
 const MAX_CARDS = 6;
-
-/** Minutes after its start that a gathering is still worth walking into. */
-const JOINABLE_AFTER_START_MIN = 30;
 
 /**
  * The homepage's one job: what is still ahead today. Falls back to the rest
@@ -46,13 +44,11 @@ export async function FeaturedEvents() {
     );
     if (error) console.error("Homepage events query error:", error);
 
-    const buckets = bucketEventsByTime(visibleListings(stripEmbeddings((data ?? []) as Event[])), new Date());
-    const stillJoinable = buckets.happening_now.filter((e) => {
-      if (e.end_date && e.end_date > e.start_date) return true;
-      const start = parseTimeToMinutes(e.start_time);
-      return start === null || bali.timeMinutes - start <= JOINABLE_AFTER_START_MIN;
-    });
-    tonight = [...stillJoinable, ...buckets.today];
+    const events = visibleListings(stripEmbeddings((data ?? []) as Event[]));
+    const now = new Date();
+    // The same "still ahead" rule as /ubud-tonight (30 minutes' grace after a start).
+    tonight = stillAheadToday(events, now);
+    const buckets = bucketEventsByTime(events, now);
     thisWeek = [...buckets.tomorrow, ...buckets.weekend, ...buckets.next_week];
   } catch {
     // Supabase unreachable — fall through to the honest empty state.
