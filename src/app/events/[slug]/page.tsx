@@ -257,9 +257,14 @@ export default async function EventPage({ params }: EventPageProps) {
           </div>
         )}
 
-        {/* Weekly email, one compact line right under the buttons, where people decide.
-            The page's only sign-up: it used to sit at the very bottom, under the share row. */}
-        <div className="mx-auto mt-6 max-w-3xl px-4 sm:px-6">
+        {/* Description */}
+        <div className="mx-auto max-w-3xl px-4 pt-10 sm:px-6">
+          <MarkdownContent content={e.description} />
+        </div>
+
+        {/* Weekly email, one compact line just below the description: asked once the reader knows what
+            the event is, not before. The page's only sign-up. */}
+        <div className="mx-auto mb-10 mt-8 max-w-3xl px-4 sm:px-6">
           <div className="flex flex-col gap-3 rounded-lg border border-brand-gold/20 bg-brand-gold/5 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-sm text-foreground">
               Get this week&apos;s picks and new deals every Wednesday. Free.
@@ -268,11 +273,6 @@ export default async function EventPage({ params }: EventPageProps) {
               <NewsletterSignup source="event" />
             </div>
           </div>
-        </div>
-
-        {/* Description */}
-        <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
-          <MarkdownContent content={e.description} />
         </div>
 
         {/* Facilitator card (renders nothing if no linked story) */}
