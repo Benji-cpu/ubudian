@@ -34,7 +34,7 @@ export async function Footer() {
             {SITE_NAME}
           </h3>
           <p className="mt-2 text-sm text-brand-off-white/80">
-            Ubud&apos;s deals and gatherings, checked daily. Free.
+            Ubud&apos;s deals and events, updated daily. Free.
           </p>
         </div>
 
