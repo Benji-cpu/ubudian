@@ -65,13 +65,13 @@ export function DealForm({
         <Input id="deal-title" required value={d.title} onChange={(e) => set("title", e.target.value)} placeholder="2-for-1 pizza night" />
       </div>
       <div className="space-y-1.5">
-        <Label htmlFor="deal-price">Price in IDR (optional)</Label>
+        <Label htmlFor="deal-price">Price with the deal, in IDR (optional)</Label>
         <Input id="deal-price" inputMode="numeric" value={d.price} onChange={(e) => set("price", e.target.value)} placeholder="95000" />
       </div>
       <div className="space-y-1.5">
         <Label htmlFor="deal-normal-price">Your normal price in IDR (we need this to list it)</Label>
         <Input id="deal-normal-price" inputMode="numeric" value={d.normal_price} onChange={(e) => set("normal_price", e.target.value)} placeholder="190000" />
-        <p className="text-xs text-muted-foreground">What the same thing costs without the deal. We list food deals at least 25% below it, and classes, spas and studios at least 20% below.</p>
+        <p className="text-xs text-muted-foreground">What the same thing costs without the deal. For a free item, enter the price of that item. For a 2-for-1, the price of one. Food deals must be at least 25% cheaper than this. Classes, spas and studios must be at least 20% cheaper.</p>
       </div>
       <div className="space-y-1.5">
         <Label>Which days?</Label>

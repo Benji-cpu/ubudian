@@ -127,7 +127,7 @@ export function SpecialSubmissionForm() {
             name="price"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Price in IDR (optional)</FormLabel>
+                <FormLabel>Price with the deal, in IDR (optional)</FormLabel>
                 <FormControl>
                   <Input inputMode="numeric" placeholder="135000" {...field} />
                 </FormControl>
@@ -144,7 +144,7 @@ export function SpecialSubmissionForm() {
                 <FormControl>
                   <Input inputMode="numeric" placeholder="190000" {...field} />
                 </FormControl>
-                <FormDescription>What the same thing costs without the deal. We list food deals at least 25% below it, and classes, spas and studios at least 20% below.</FormDescription>
+                <FormDescription>What the same thing costs without the deal. For a free item, enter the price of that item. For a 2-for-1, the price of one. Food deals must be at least 25% cheaper than this. Classes, spas and studios must be at least 20% cheaper.</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -227,13 +227,13 @@ export function SpecialSubmissionForm() {
         </fieldset>
 
         <fieldset className="space-y-5">
-          <legend className="font-serif text-xl text-brand-deep-green dark:text-brand-gold">Your restaurant</legend>
+          <legend className="font-serif text-xl text-brand-deep-green dark:text-brand-gold">Your business</legend>
           <FormField
             control={form.control}
             name="venue_name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Name</FormLabel>
+                <FormLabel>Business name</FormLabel>
                 <FormControl>
                   <Input placeholder="Warung Example" {...field} />
                 </FormControl>

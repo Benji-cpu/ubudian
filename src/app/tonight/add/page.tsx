@@ -17,7 +17,7 @@ export default function AddSpecialPage() {
             Add your deal
           </h1>
           <p className="mt-4 text-lg text-muted-foreground">
-            Free for Ubud restaurants, cafés and wellness spaces. Your deal shows on The Ubudian on the
+            Free for Ubud restaurants, cafés, spas, classes and studios. Your deal shows on The Ubudian on the
             days it runs, and guests tell you The Ubudian sent them.
           </p>
         </div>
@@ -26,9 +26,9 @@ export default function AddSpecialPage() {
       <section className="mx-auto max-w-2xl px-4 py-12 sm:px-6">
         <div className="mb-8 rounded-md border bg-muted/50 p-4 text-sm text-muted-foreground">
           <ul className="list-disc space-y-1 pl-5">
-            <li>One deal per form: a 2-for-1, a breakfast or lunch set, a weekly food night, a wellness offer. Add as many as you run.</li>
+            <li>One deal per form: a 2-for-1, a breakfast or lunch set, a class, a weekly food night, a wellness offer. Add as many as you run.</li>
             <li>We list food deals that are at least 25% off your normal price (a 2-for-1, a free item, kids eat free), and classes, spas and studios at least 20% off. Tell us the normal price. We don&apos;t list drink deals.</li>
-            <li>We check new and changed deals every night; most are live by the next morning. Free, now and later.</li>
+            <li>We check new and changed deals every night; most are live by the next morning. Free.</li>
             <li>Once a month we message you to check it&apos;s still running. If we don&apos;t hear back, it comes off.</li>
           </ul>
         </div>

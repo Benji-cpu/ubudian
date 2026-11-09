@@ -70,13 +70,22 @@ export default function PrivacyPage() {
               publish it.
             </li>
             <li>
+              <strong>Venue deals.</strong> If you add a deal, we keep your name,
+              WhatsApp number and email (if you give one), so we can check once a
+              month that the deal is still running. They are never shown on the
+              site.
+            </li>
+            <li>
               <strong>Technical data.</strong> Like most websites, our hosting
               provider logs basic technical information (such as IP address and
               browser type) for security and reliability.
             </li>
             <li>
-              <strong>Deal page counts.</strong> Deal pages count views and taps
-              without cookies or personal data.
+              <strong>Deal page counts.</strong> We count how many times each deal
+              page is opened and how many times its Directions, website,
+              Instagram and share buttons are tapped. For each one we keep only
+              the page, the button and the time. We use no cookies for this, and
+              we keep no names, IP addresses or device details with the counts.
             </li>
           </ul>
         </Section>
@@ -87,6 +96,7 @@ export default function PrivacyPage() {
             <li>To send you the weekly newsletter you signed up for.</li>
             <li>To process tour bookings.</li>
             <li>To review and publish events you submit.</li>
+            <li>To tell venues how often their deal page is opened and tapped, and to check with them once a month that their deal still runs.</li>
             <li>To keep the platform secure, prevent abuse, and fix problems.</li>
             <li>To respond to you when you get in touch.</li>
           </ul>
