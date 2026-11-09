@@ -1,6 +1,7 @@
 /**
  * Deals a venue can copy instead of inventing one (Ben, 9 Oct). Every example passes the listing rule:
- * food or wellness, no drink deal, and a saving of 25% or more (CLAUDE.md "What we list").
+ * food or wellness, no drink deal, and a saving of 25% or more on food, 20% or more on classes, spas and studios
+ * (CLAUDE.md "What we list").
  */
 const EXAMPLES: Record<string, string[]> = {
   cafe: ["30% off breakfast sets before 10am", "2-for-1 smoothie bowls, Mon–Wed", "30% off all cakes after 4pm"],

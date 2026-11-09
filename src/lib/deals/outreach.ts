@@ -68,7 +68,7 @@ export function dmText(v: Pick<OutreachVenue, "name" | "invite_token">, knownTit
     ? isLive
       ? `We have listed your ${deal} on the site, free. Do you have any other deals?`
       : `We saw your ${deal} and would like to list it. Is it still available? Do you have any other deals?`
-    : "Do you have a deal for guests? For example 25% or more off a meal or a wellness session. Food and wellness only, not drinks.";
+    : "Do you have a deal for guests? For example 25% or more off a meal, or 20% or more off a class or spa session. Food and wellness only, not drinks.";
   return [
     `Hi ${shortName(v.name)} team! This is The Ubudian (theubudian.life), a website that shows Ubud's food and wellness deals to locals and visitors.`,
     ask,

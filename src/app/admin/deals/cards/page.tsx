@@ -40,8 +40,8 @@ export default async function CardsPage({ searchParams }: { searchParams: Promis
             </div>
             <div className="mx-auto w-36" dangerouslySetInnerHTML={{ __html: c.qr }} />
             <div className="text-sm">
-              <p>Deals of 25% or more off, for food and wellness (not drinks). Free, no commission.</p>
-              <p>Promo diskon 25% atau lebih, untuk makanan dan wellness (bukan minuman). Gratis, tanpa komisi.</p>
+              <p>Deals of 25% or more off food, or 20% or more off classes, spas and studios (not drinks). Free, no commission.</p>
+              <p>Promo diskon minimal 25% untuk makanan, atau minimal 20% untuk kelas, spa dan studio (bukan minuman). Gratis, tanpa komisi.</p>
               <p className="mt-1 text-xs">theubudian.life</p>
               <p className="mt-1 font-medium">Questions? theubudianlife@gmail.com</p>
               <VisitedButton venueId={c.id} />

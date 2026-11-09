@@ -144,7 +144,7 @@ export function SpecialSubmissionForm() {
                 <FormControl>
                   <Input inputMode="numeric" placeholder="190000" {...field} />
                 </FormControl>
-                <FormDescription>What the same thing costs without the deal. We list deals at least 25% below it.</FormDescription>
+                <FormDescription>What the same thing costs without the deal. We list food deals at least 25% below it, and classes, spas and studios at least 20% below.</FormDescription>
                 <FormMessage />
               </FormItem>
             )}

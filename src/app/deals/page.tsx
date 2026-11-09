@@ -134,7 +134,7 @@ export default async function DealsPage() {
         <div className="mx-auto max-w-xl">
           <h2 className="font-serif text-2xl text-brand-deep-green sm:text-3xl">Run a restaurant or café in Ubud?</h2>
           <p className="mt-3 text-brand-charcoal-light">
-            List your food or wellness deal for free if it&apos;s at least 25% off your normal price. It shows here on the days it runs,
+            List your deal for free if it&apos;s at least 25% off your normal price for food, or 20% off for a class, spa or studio. It shows here on the days it runs,
             and we check it with you once a month so nothing goes stale. We don&apos;t list drink deals.
           </p>
           <Button asChild size="lg" className="mt-6">
