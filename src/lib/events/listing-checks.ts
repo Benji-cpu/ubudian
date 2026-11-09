@@ -12,6 +12,7 @@
  * all read the same rules.
  */
 import { parseRecurrenceRule, daysOfWeekArray } from "@/lib/recurrence";
+import { withPlainTitle } from "./plain-title";
 
 type ListingFields = {
   venue_name: string | null;
@@ -213,9 +214,12 @@ type VisibleFields = SlotFields &
  *
  * Which copy survives follows the cleanup script: a series over a one-off,
  * then the surest way in, then the oldest row.
+ *
+ * Every title comes back in plain letters (`plainTitle()`), so no public
+ * page shows Instagram's "𝗕𝗢𝗟𝗗" lettering.
  */
 export function visibleListings<T extends VisibleFields>(rows: T[]): T[] {
-  const eligible = rows.filter((r) => r.moderation_reason !== UNMODERATED && wayIn(r));
+  const eligible = rows.map(withPlainTitle).filter((r) => r.moderation_reason !== UNMODERATED && wayIn(r));
   const strength = (r: T) => ({ tickets: 2, organiser: 1, "walk-in": 0 })[wayIn(r)!.kind];
   const ordered = [...eligible].sort(
     (a, b) =>

@@ -25,6 +25,7 @@ import { isSafeUrl } from "@/lib/url-validation";
 import { getCurrentProfile } from "@/lib/auth";
 import { MentionedInGuides } from "@/components/cross-links/mentioned-in-guides";
 import { isPublicListing, visibleListings } from "@/lib/events/listing-checks";
+import { withPlainTitle } from "@/lib/events/plain-title";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -62,7 +63,7 @@ export async function generateMetadata({ params }: EventPageProps): Promise<Meta
       return { title: "Event Not Found" };
     }
 
-    const e = event as Event;
+    const e = withPlainTitle(event as Event);
 
     return {
       title: `${e.title} | Events in Ubud`,
@@ -112,7 +113,7 @@ export default async function EventPage({ params }: EventPageProps) {
       notFound();
     }
 
-    e = event as Event;
+    e = withPlainTitle(event as Event);
     // The embedding column rides on select("*"); grab it for similarity, then
     // strip it so the 768-float vector never serialises down to a client component.
     const queryEmbedding = (event as Record<string, unknown>).embedding ?? null;

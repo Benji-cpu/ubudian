@@ -19,6 +19,7 @@ import { getAdapter } from "./source-adapter";
 import { validateAndNormalizeDate } from "./date-validator";
 import { logHealthEvent } from "./health-utils";
 import { tidyShortDescription } from "@/lib/events/summary";
+import { plainTitle } from "@/lib/events/plain-title";
 import { logActivity } from "./activity-log";
 import { enrichFromUrls, applyEnrichment } from "./url-enricher";
 import { geocodeVenue } from "@/lib/geocoding";
@@ -705,6 +706,9 @@ export async function createEventFromParsed(
   if (!parsed.title || !parsed.start_date) {
     return { messageId, status: "failed", error: "Missing required fields: title or start_date" };
   }
+
+  // Instagram's "𝗕𝗢𝗟𝗗" lettering becomes plain letters before dedup, the slug and the insert.
+  parsed.title = plainTitle(parsed.title);
 
   // Validate and normalize dates
   const startDateResult = validateAndNormalizeDate(parsed.start_date, "start_date");

@@ -635,6 +635,17 @@ describe("createEventFromParsed", () => {
     mockRecordDedupMatch.mockResolvedValue(undefined);
   });
 
+  it("stores Instagram's bold lettering as plain letters", async () => {
+    const parsed: ParsedEvent = {
+      title: "𝗧𝗛𝗘 𝗔𝗡𝗧𝗜𝗗𝗢𝗧𝗘",
+      description: "x",
+      category: "Ceremony & Sound",
+      start_date: "2030-06-15",
+    };
+    await createEventFromParsed("msg-1", parsed, "src-1", true);
+    expect(parsed.title).toBe("THE ANTIDOTE");
+  });
+
   describe("URL enrichment", () => {
     it("calls the enricher when source_url is present and a target field is missing", async () => {
       const parsed: ParsedEvent = {

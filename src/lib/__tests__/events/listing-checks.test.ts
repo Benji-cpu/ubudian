@@ -114,4 +114,12 @@ describe("visibleListings", () => {
     const oneOff = listing({ id: "oneoff", title: "Dissolve Eros w/ Tara", venue_name: "Paradiso", start_time: "18:00:00", is_recurring: false, recurrence_rule: null, start_date: "2026-09-29", external_ticket_url: "https://x.test" });
     expect(visibleListings([oneOff, series]).map((r) => r.id)).toEqual(["series"]);
   });
+
+  it("shows Instagram's bold or italic lettering as plain letters, and leaves other titles alone", () => {
+    const fancy = listing({ id: "fancy", title: "𝗧𝗛𝗘 𝗔𝗡𝗧𝗜𝗗𝗢𝗧𝗘 ✨ 𝘴𝘰𝘶𝘯𝘥 𝘣𝘢𝘵𝘩" });
+    const plain = listing({ id: "plain", title: "Café Kirtan", start_time: "20:00:00" });
+    const [a, b] = visibleListings([fancy, plain]);
+    expect(a.title).toBe("THE ANTIDOTE ✨ sound bath");
+    expect(b).toBe(plain);
+  });
 });
