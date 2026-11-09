@@ -37,6 +37,8 @@ export const metadata: Metadata = {
     template: `%s | ${SITE_NAME}`,
   },
   description: SITE_DESCRIPTION,
+  // Google Search Console ownership tag. Public by design; removing it unverifies the site.
+  verification: { google: "ngXG5t6T69g3iH1AggVYrJqMjVzlV8LmGckQYwUkPqw" },
 };
 
 export default function RootLayout({
