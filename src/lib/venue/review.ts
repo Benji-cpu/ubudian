@@ -2,6 +2,7 @@ import { z } from "zod";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { nowInBali } from "@/lib/events/bali-time";
 import { addDaysToDateStr, SPECIAL_LIFETIME_DAYS } from "@/lib/specials";
+import { dealPaths, pingIndexNow, type IndexNowResult } from "@/lib/indexnow";
 import { EDITABLE_DEAL_FIELDS } from "./schema";
 
 /**
@@ -90,14 +91,23 @@ export function updateFor(row: Row, d: Decision, todayStr: string, nowIso: strin
   return { ...base, ...fresh, status: "live" };
 }
 
-export type ApplyReport = { published: number; flagged: number; rejected: number; skipped: number };
+export type ApplyReport = {
+  published: number;
+  flagged: number;
+  rejected: number;
+  skipped: number;
+  /** The IndexNow ping for /deals and the venue pages that changed; null when nothing went live. */
+  indexNow?: IndexNowResult | null;
+};
 
 export async function applyDecisions(decisions: Decision[]): Promise<ApplyReport> {
   const supabase = createAdminClient();
   const report: ApplyReport = { published: 0, flagged: 0, rejected: 0, skipped: 0 };
   const today = nowInBali().dateStr;
+  // Venues whose page changed: a new deal went live, or an edit to a live one did.
+  const changedVenues = new Set<string>();
   for (const d of decisions) {
-    const { data } = await supabase.from("specials").select("id, status, pending_changes").eq("id", d.id).maybeSingle();
+    const { data } = await supabase.from("specials").select("id, status, pending_changes, venue_name").eq("id", d.id).maybeSingle();
     const update = data ? updateFor(data as Row, d, today, new Date().toISOString()) : null;
     if (!update) {
       report.skipped++;
@@ -106,7 +116,10 @@ export async function applyDecisions(decisions: Decision[]): Promise<ApplyReport
     const { error } = await supabase.from("specials").update(update).eq("id", d.id);
     if (error) report.skipped++;
     else report[d.action === "publish" ? "published" : d.action === "flag" ? "flagged" : "rejected"]++;
+    if (!error && d.action === "publish" && typeof data?.venue_name === "string") changedVenues.add(data.venue_name);
   }
+  // Ask the search engines to recrawl /deals and those venue pages. Never throws.
+  report.indexNow = changedVenues.size > 0 ? await pingIndexNow(dealPaths([...changedVenues]), { label: "deals review" }) : null;
   return report;
 }
 

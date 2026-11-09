@@ -31,6 +31,7 @@ import { persistRemoteImage } from "@/lib/ingestion/image-persistence";
 import { autoApprovePending, ROUTINE_VERDICT_OK } from "@/lib/maintenance/auto-approve";
 import { nowInBali } from "@/lib/events/bali-time";
 import type { ParsedEvent } from "@/lib/ingestion/types";
+import { eventListingPaths, pingIndexNow, type IndexNowResult } from "@/lib/indexnow";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -142,6 +143,7 @@ export async function POST(request: Request) {
     }
   }
 
+  let indexNow: IndexNowResult | null = null;
   if (approveIds.length) {
     const gate = await autoApprovePending({ onlyIds: approveIds, maxElapsedMs: 15_000 });
     for (const d of gate.decisions) {
@@ -157,6 +159,8 @@ export async function POST(request: Request) {
         o.reason = "not reached by the gate this run";
       }
     }
+    // New listings are live: ask the search engines to recrawl the pages they show on. Never throws.
+    if (gate.approved > 0) indexNow = await pingIndexNow(eventListingPaths(), { label: `events-bus ${body.source}` });
   }
 
   return NextResponse.json({
@@ -167,6 +171,7 @@ export async function POST(request: Request) {
       duplicates: result.duplicates,
       failed: result.failed,
       outcomes,
+      indexNow,
     },
     error: null,
   });

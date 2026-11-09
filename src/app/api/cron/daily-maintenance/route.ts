@@ -38,6 +38,7 @@ import { checkLiveness, type Liveness } from "@/lib/maintenance/liveness";
 import { nowInBali } from "@/lib/events/bali-time";
 import { sendDueReconfirms, type ReconfirmRunResult } from "@/lib/specials/reconfirm";
 import { expireStalePending } from "@/lib/venue/review";
+import { eventListingPaths, pingIndexNow, type IndexNowResult } from "@/lib/indexnow";
 
 // The gate makes up to AUTO_APPROVE_MAX_PER_RUN Gemini calls on top of the
 // link-health sweep, so this route needs more than the platform default.
@@ -218,6 +219,11 @@ export async function GET(request: Request) {
     return null;
   });
 
+  // The night's listings are settled (published, archived, swept): ask the
+  // search engines to recrawl the pages built from them. Never fails the run
+  // and stays out of `errors`: its status is logged in `indexNow` below.
+  const indexNow: IndexNowResult = await pingIndexNow(eventListingPaths(), { label: "daily-maintenance" });
+
   const payload = {
     startedAt,
     finishedAt: new Date().toISOString(),
@@ -247,6 +253,7 @@ export async function GET(request: Request) {
     specialsReconfirm,
     dealsReview,
     eventsDesk,
+    indexNow,
     telegramWebhook,
     linkHealth,
     review,
