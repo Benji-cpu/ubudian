@@ -740,4 +740,6 @@ export interface Special {
   expires_on: string;
   /** When it was last checked: against its source when seeded, or by the venue. */
   confirmed_at: string;
+  /** When the row last changed (the sitemap's date for the deal pages). */
+  updated_at?: string;
 }

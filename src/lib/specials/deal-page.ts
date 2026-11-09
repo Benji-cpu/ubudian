@@ -27,16 +27,35 @@ export function dealsForVenue<T extends Pick<Special, "venue_name">>(deals: T[],
   return deals.filter((d) => venueSlug(d.venue_name) === slug);
 }
 
-/** One row per venue with a live deal: its slug and when its newest deal was checked (for the sitemap). */
-export function venuePages(deals: Pick<Special, "venue_name" | "confirmed_at">[]): { slug: string; lastChecked: string }[] {
-  const latest = new Map<string, string>();
+/** The latest of these timestamps, or undefined when none parses. */
+export function newestTime(times: (string | null | undefined)[]): string | undefined {
+  let best: string | undefined;
+  for (const t of times) {
+    if (!t || Number.isNaN(Date.parse(t))) continue;
+    if (!best || Date.parse(t) > Date.parse(best)) best = t;
+  }
+  return best;
+}
+
+/**
+ * One row per venue with a live deal, for the sitemap: its slug, when its
+ * newest deal was checked, and when its page last changed (the newest
+ * `updated_at` or check among its deals, since either changes what the page says).
+ */
+export function venuePages(
+  deals: Pick<Special, "venue_name" | "confirmed_at" | "updated_at">[]
+): { slug: string; lastChecked: string; lastModified: string }[] {
+  const pages = new Map<string, { lastChecked: string; lastModified: string }>();
   for (const d of deals) {
     const slug = venueSlug(d.venue_name);
     if (!slug) continue;
-    const held = latest.get(slug);
-    if (!held || Date.parse(d.confirmed_at) > Date.parse(held)) latest.set(slug, d.confirmed_at);
+    const held = pages.get(slug);
+    pages.set(slug, {
+      lastChecked: newestTime([held?.lastChecked, d.confirmed_at]) ?? d.confirmed_at,
+      lastModified: newestTime([held?.lastModified, d.updated_at, d.confirmed_at]) ?? d.confirmed_at,
+    });
   }
-  return [...latest].map(([slug, lastChecked]) => ({ slug, lastChecked }));
+  return [...pages].map(([slug, p]) => ({ slug, ...p }));
 }
 
 /** How far below the normal price, rounded down so we never claim more than the prices say. Null without both prices or a real saving. */

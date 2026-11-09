@@ -8,7 +8,7 @@ import { parseTimeToMinutes } from "@/lib/events/bali-time";
  * venue page may claim (its "checked" line and the "How to use it" box).
  */
 export const PUBLIC_SPECIAL_COLUMNS =
-  "id, venue_name, venue_area, venue_address, google_maps_url, instagram_handle, website_url, title, description, price_idr, normal_price_idr, weekdays, days_stated, start_time, end_time, source, source_url, expires_on, confirmed_at";
+  "id, venue_name, venue_area, venue_address, google_maps_url, instagram_handle, website_url, title, description, price_idr, normal_price_idr, weekdays, days_stated, start_time, end_time, source, source_url, expires_on, confirmed_at, updated_at";
 
 /** A special lapses this many days after it was last confirmed. */
 export const SPECIAL_LIFETIME_DAYS = 30;

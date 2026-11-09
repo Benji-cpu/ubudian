@@ -5,7 +5,7 @@ import { HUBS } from "@/lib/hubs";
 import { getSiteSettings } from "@/lib/site-settings";
 import { isPublicListing } from "@/lib/events/listing-checks";
 import { getLiveSpecials } from "@/lib/specials/queries";
-import { venuePages } from "@/lib/specials/deal-page";
+import { newestTime, venuePages } from "@/lib/specials/deal-page";
 
 /**
  * The sitemap must agree with `site_settings`. A flagged-off section renders
@@ -51,10 +51,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     getLiveSpecials(),
   ]);
 
+  const publicEvents = (eventsRes.data ?? []).filter(isPublicListing);
+  const dealVenues = venuePages(liveDeals);
+
+  // Real dates, not "now": the listing pages changed when their newest listing
+  // did; the deal pages when a live deal was last edited or checked. Left out
+  // (rather than guessed) when the read came back empty.
+  const listingsChanged = newestTime(publicEvents.map((e) => e.updated_at));
+  const dealsChanged = newestTime(dealVenues.map((v) => v.lastModified));
+
   const staticPages: MetadataRoute.Sitemap = [
     { url: SITE_URL, changeFrequency: "daily", priority: 1.0 },
-    { url: `${SITE_URL}/events`, changeFrequency: "daily", priority: 0.9 },
-    { url: `${SITE_URL}/deals`, changeFrequency: "daily", priority: 0.9 },
+    { url: `${SITE_URL}/events`, lastModified: listingsChanged, changeFrequency: "daily", priority: 0.9 },
+    { url: `${SITE_URL}/ubud-tonight`, lastModified: listingsChanged, changeFrequency: "daily", priority: 0.9 },
+    { url: `${SITE_URL}/ubud-events-this-week`, lastModified: listingsChanged, changeFrequency: "daily", priority: 0.9 },
+    { url: `${SITE_URL}/deals`, lastModified: dealsChanged, changeFrequency: "daily", priority: 0.9 },
+    // Its live numbers include the deals count, so it changes when a deal does.
+    { url: `${SITE_URL}/for-venues`, lastModified: dealsChanged, changeFrequency: "weekly", priority: 0.6 },
     ...HUBS.map((h) => ({
       url: `${SITE_URL}/${h.slug}`,
       changeFrequency: "weekly" as const,
@@ -74,21 +87,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE_URL}/events/submit`, changeFrequency: "monthly", priority: 0.4 },
   ];
 
-
-
-  const eventPages: MetadataRoute.Sitemap = (eventsRes.data ?? []).filter(isPublicListing).map((e) => ({
+  const eventPages: MetadataRoute.Sitemap = publicEvents.map((e) => ({
     url: `${SITE_URL}/events/${e.slug}`,
     lastModified: e.updated_at,
     changeFrequency: "weekly",
     priority: 0.7,
   }));
 
-
-
   // One page per venue with a live deal; a lapsed deal's page 404s, so it drops out here too.
-  const dealPages: MetadataRoute.Sitemap = venuePages(liveDeals).map((v) => ({
+  const dealPages: MetadataRoute.Sitemap = dealVenues.map((v) => ({
     url: `${SITE_URL}/deals/${v.slug}`,
-    lastModified: v.lastChecked,
+    lastModified: v.lastModified,
     changeFrequency: "weekly",
     priority: 0.7,
   }));

@@ -4,6 +4,7 @@ import {
   venuePath,
   dealsForVenue,
   venuePages,
+  newestTime,
   savingPercent,
   savingText,
   leadDeal,
@@ -28,7 +29,7 @@ describe("public columns", () => {
     const cols = PUBLIC_SPECIAL_COLUMNS.split(",").map((c) => c.trim());
     const isPrivate = (c: string) => c.startsWith("contact_") || ["confirm_token", "review_note", "research_note"].includes(c);
     expect(cols.filter(isPrivate)).toEqual([]);
-    expect(cols).toEqual(expect.arrayContaining(["normal_price_idr", "source", "confirmed_at"]));
+    expect(cols).toEqual(expect.arrayContaining(["normal_price_idr", "source", "confirmed_at", "updated_at"]));
   });
 });
 
@@ -89,9 +90,26 @@ describe("venue slugs", () => {
       { ...base, id: "m", venue_name: "Moksa", confirmed_at: "2026-10-27T00:00:00Z" },
     ];
     expect(venuePages(rows)).toEqual([
-      { slug: "pesona-lounge-ubud", lastChecked: "2026-11-01T00:00:00Z" },
-      { slug: "moksa", lastChecked: "2026-10-27T00:00:00Z" },
+      { slug: "pesona-lounge-ubud", lastChecked: "2026-11-01T00:00:00Z", lastModified: "2026-11-01T00:00:00Z" },
+      { slug: "moksa", lastChecked: "2026-10-27T00:00:00Z", lastModified: "2026-10-27T00:00:00Z" },
     ]);
+  });
+
+  it("dates each venue page by its newest change, whether an edit or a check", () => {
+    const rows = [
+      { ...samosa, confirmed_at: "2026-10-15T00:00:00Z", updated_at: "2026-11-05T09:00:00Z" },
+      { ...curry, confirmed_at: "2026-11-01T00:00:00Z", updated_at: "2026-11-01T00:00:00Z" },
+      { ...base, id: "m", venue_name: "Moksa", confirmed_at: "2026-10-27T00:00:00Z", updated_at: "2026-10-20T00:00:00Z" },
+    ];
+    expect(venuePages(rows)).toEqual([
+      { slug: "pesona-lounge-ubud", lastChecked: "2026-11-01T00:00:00Z", lastModified: "2026-11-05T09:00:00Z" },
+      { slug: "moksa", lastChecked: "2026-10-27T00:00:00Z", lastModified: "2026-10-27T00:00:00Z" },
+    ]);
+  });
+
+  it("takes the newest of a set of times and skips the blanks", () => {
+    expect(newestTime(["2026-11-01T00:00:00Z", null, "2026-11-08T03:00:00Z", undefined, "nonsense"])).toBe("2026-11-08T03:00:00Z");
+    expect(newestTime([null, undefined])).toBeUndefined();
   });
 });
 
