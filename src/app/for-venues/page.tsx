@@ -35,6 +35,8 @@ interface Copy {
   rule: string;
   button: string;
   afterButton: string;
+  /** Before and after the email address: "If the form is hard, email your deal to" … "and we'll add it for you." */
+  emailInstead: [string, string];
   questions: string;
 }
 
@@ -43,25 +45,26 @@ const EN: Copy = {
   eyebrow: "For venues",
   title: "List your deal on The Ubudian. Free.",
   lead: "A free listing for a real saving, seen by people looking for food and wellness in Ubud.",
-  numbersTitle: "Our readers, counted live",
-  numbersNote: "Counted from our database each time this page opens. Never rounded, never estimated.",
+  numbersTitle: "Our numbers, counted live",
+  numbersNote: "Counted from our own records each time this page opens.",
   subscribers: (n) => (n === 1 ? "person is subscribed to our weekly email" : "people are subscribed to our weekly email"),
   deals: (d, p) => `${d === 1 ? "deal is" : "deals are"} live right now, at ${p} ${p === 1 ? "place" : "places"}`,
   readers: (n) =>
-    `${n === 1 ? "reader" : "readers"} tapped an event’s ticket link or “I’m interested” button in the last ${READER_WINDOW_DAYS} days`,
-  readersNote: "Counted once per phone or computer.",
-  updated: (date) => `Last updated ${date}`,
+    `${n === 1 ? "phone or computer" : "phones or computers"} tapped an event’s ticket or “I’m interested” button in the last ${READER_WINDOW_DAYS} days`,
+  readersNote: "Counted once per phone or computer. This counts only people who tapped, not everyone who visits.",
+  updated: (date) => `Counted when this page opened, ${date}.`,
   howTitle: "How it works",
   how: [
     "Guests mention The Ubudian or show the deal page when they book or order. You decide who qualifies.",
-    "No codes, no app, no contract, no commission. You can stop any time.",
-    "We feature new deals in a Friday Instagram post and tag you.",
+    "You don’t need a code, an app or a contract. We take no commission. You can stop any time.",
+    "Every Friday from 13 November, we feature new deals in an Instagram post and tag you.",
     "We check the deal with you every 30 days.",
   ],
   ruleTitle: "The rule",
-  rule: "At least 25% off your normal price for food and café deals, or at least 20% off for classes, spas and studios, or a free item with a purchase. No drink deals.",
+  rule: "At least 25% off your normal price for food. At least 20% off for classes, spas and studios. Or a free item with a purchase. No drink deals.",
   button: "Add your deal",
   afterButton: "We check new deals every night. Most are live by the next morning.",
+  emailInstead: ["If the form is hard, email your deal to", "and we’ll add it for you."],
   questions: "Questions? Email",
 };
 
@@ -69,25 +72,26 @@ const ID: Copy = {
   lang: "id",
   eyebrow: "Untuk tempat usaha",
   title: "Pasang promo Anda di The Ubudian. Gratis.",
-  lead: "Promo Anda tampil gratis dan dilihat orang yang sedang mencari makanan dan wellness di Ubud. Syaratnya satu: hematnya harus nyata.",
-  numbersTitle: "Pembaca kami, dihitung langsung",
-  numbersNote: "Dihitung dari database kami setiap kali halaman ini dibuka. Tidak dibulatkan, tidak diperkirakan.",
+  lead: "Promo Anda tampil gratis dan dilihat orang yang sedang mencari makanan dan wellness di Ubud. Syaratnya satu: diskonnya harus nyata.",
+  numbersTitle: "Angka kami, dihitung langsung",
+  numbersNote: "Dihitung dari catatan kami sendiri setiap kali halaman ini dibuka.",
   subscribers: () => "orang berlangganan email mingguan kami",
   deals: (_d, p) => `promo sedang aktif, di ${p} tempat`,
-  readers: () => `pembaca mengklik link tiket atau tombol “I’m interested” di halaman acara dalam ${READER_WINDOW_DAYS} hari terakhir`,
-  readersNote: "Dihitung satu kali per HP atau komputer.",
-  updated: (date) => `Terakhir diperbarui ${date}`,
+  readers: () => `HP atau komputer mengklik link tiket atau tombol “I’m interested” di halaman acara dalam ${READER_WINDOW_DAYS} hari terakhir`,
+  readersNote: "Dihitung satu kali per HP atau komputer. Ini hanya menghitung yang mengklik, bukan semua pengunjung.",
+  updated: (date) => `Dihitung saat halaman ini dibuka, ${date}.`,
   howTitle: "Cara kerjanya",
   how: [
     "Tamu cukup menyebut The Ubudian atau menunjukkan halaman promo saat memesan. Anda yang menentukan siapa yang berhak.",
-    "Tanpa kode, tanpa aplikasi, tanpa kontrak, tanpa komisi. Bisa berhenti kapan saja.",
-    "Promo baru kami tampilkan di postingan Instagram setiap Jumat, dan akun Anda kami tag.",
+    "Tidak wajib pakai kode, aplikasi, atau kontrak. Tanpa komisi. Bisa berhenti kapan saja.",
+    "Setiap Jumat mulai 13 November, promo baru kami tampilkan di postingan Instagram, dan akun Anda kami tag.",
     "Setiap 30 hari kami cek lagi promonya bersama Anda.",
   ],
   ruleTitle: "Syaratnya",
-  rule: "Promo diskon minimal 25% untuk makanan, atau minimal 20% untuk kelas, spa dan studio, atau gratis satu item dengan pembelian. Bukan promo minuman.",
+  rule: "Minimal 25% dari harga normal untuk makanan. Minimal 20% untuk kelas, spa dan studio. Atau gratis satu item dengan pembelian. Bukan promo minuman.",
   button: "Tambahkan promo Anda",
   afterButton: "Formulirnya singkat, dalam bahasa Inggris. Kami cek promo baru setiap malam, biasanya sudah tayang besok paginya.",
+  emailInstead: ["Kalau formulir sulit, kirim promo Anda lewat email ke", "dan kami yang memasukkan."],
   questions: "Ada pertanyaan? Email ke",
 };
 
@@ -121,14 +125,12 @@ function Numbers({ copy, numbers }: { copy: Copy; numbers: ReaderNumbers }) {
             <dt className="w-20 shrink-0 text-right font-serif text-4xl font-medium text-brand-terracotta sm:w-24 sm:text-5xl">{fmt(l.value)}</dt>
             <dd className="min-w-0">
               <p className="text-foreground">{l.label}</p>
-              <p className="mt-0.5 text-xs text-muted-foreground">
-                {l.note ? `${l.note} ` : ""}
-                {updated}
-              </p>
+              {l.note ? <p className="mt-0.5 text-xs text-muted-foreground">{l.note}</p> : null}
             </dd>
           </div>
         ))}
       </dl>
+      <p className="mt-6 border-t border-brand-gold/20 pt-4 text-xs text-muted-foreground">{updated}</p>
     </div>
   );
 }
@@ -169,6 +171,13 @@ function Half({ copy, numbers, id, first }: { copy: Copy; numbers: ReaderNumbers
           <Link href="/tonight/add">{copy.button}</Link>
         </Button>
         <p className="mt-3 text-sm text-muted-foreground">{copy.afterButton}</p>
+        <p className="mt-2 text-sm text-muted-foreground">
+          {copy.emailInstead[0]}{" "}
+          <a href={`mailto:${CONTACT_EMAIL}`} className="font-medium text-brand-deep-green underline underline-offset-4 dark:text-brand-gold">
+            {CONTACT_EMAIL}
+          </a>{" "}
+          {copy.emailInstead[1]}
+        </p>
         <p className="mt-2 text-sm text-muted-foreground">
           {copy.questions}{" "}
           <a href={`mailto:${CONTACT_EMAIL}`} className="font-medium text-brand-deep-green underline underline-offset-4 dark:text-brand-gold">
