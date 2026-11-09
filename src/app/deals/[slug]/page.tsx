@@ -14,6 +14,7 @@ import {
 import { NewsletterSignup } from "@/components/layout/newsletter-signup";
 import { SpecialCard } from "@/components/specials/special-card";
 import { DealShare } from "@/components/specials/deal-share";
+import { DealPageTracker } from "@/components/specials/deal-page-tracker";
 import { nowInBali } from "@/lib/events/bali-time";
 import { dealTitle } from "@/lib/email/weekly-deals";
 import { formatDays, formatHours } from "@/lib/specials";
@@ -97,6 +98,8 @@ export default async function DealPage({ params }: DealPageProps) {
 
   return (
     <div>
+      {/* Counts views and taps for the venue's own number (deal_page_events); renders nothing. */}
+      <DealPageTracker slug={slug} specialId={deals.length === 1 ? deals[0].id : undefined} />
       <section className="mx-auto max-w-3xl px-4 pt-6 sm:px-6">
         <Breadcrumb>
           <BreadcrumbList>
@@ -170,7 +173,7 @@ export default async function DealPage({ params }: DealPageProps) {
 
         <ul className="flex flex-wrap gap-x-6 text-sm">
           <li>
-            <a href={directions} target="_blank" rel="noopener noreferrer" className={linkClass}>
+            <a href={directions} target="_blank" rel="noopener noreferrer" className={linkClass} data-deal-track="map">
               <MapPin className="h-4 w-4" aria-hidden />
               Map and directions
             </a>
@@ -182,6 +185,7 @@ export default async function DealPage({ params }: DealPageProps) {
                 target="_blank"
                 rel="noopener noreferrer"
                 className={linkClass}
+                data-deal-track="instagram"
               >
                 <Instagram className="h-4 w-4" aria-hidden />@{handle}
               </a>
@@ -189,7 +193,7 @@ export default async function DealPage({ params }: DealPageProps) {
           ) : null}
           {website && isSafeUrl(website) ? (
             <li>
-              <a href={website} target="_blank" rel="noopener noreferrer" className={linkClass}>
+              <a href={website} target="_blank" rel="noopener noreferrer" className={linkClass} data-deal-track="website">
                 <Globe className="h-4 w-4" aria-hidden />
                 Website
               </a>

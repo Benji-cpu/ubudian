@@ -8,7 +8,7 @@ export const metadata: Metadata = {
     "How The Ubudian collects, uses, and protects your personal information.",
 };
 
-const LAST_UPDATED = "2 June 2026";
+const LAST_UPDATED = "9 November 2026";
 const CONTACT_EMAIL = "mystechcards@gmail.com";
 
 export default function PrivacyPage() {
@@ -73,6 +73,10 @@ export default function PrivacyPage() {
               <strong>Technical data.</strong> Like most websites, our hosting
               provider logs basic technical information (such as IP address and
               browser type) for security and reliability.
+            </li>
+            <li>
+              <strong>Deal page counts.</strong> Deal pages count views and taps
+              without cookies or personal data.
             </li>
           </ul>
         </Section>

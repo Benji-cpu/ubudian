@@ -2,6 +2,9 @@ import { redirect } from "next/navigation";
 import { isAdmin } from "@/lib/auth";
 import { listForReview } from "@/lib/venue/review";
 import { formatHours, formatIdr, formatWeekdays } from "@/lib/specials";
+import { emptyCounts, getAllDealPageCounts, type DealPageCounts } from "@/lib/specials/deal-counts";
+import { venueSlug } from "@/lib/specials/deal-page";
+import { getLiveSpecials } from "@/lib/specials/queries";
 import { DecideButtons } from "./decide-buttons";
 
 export const metadata = { title: "Deals waiting — Admin" };
@@ -24,7 +27,7 @@ function describe(p: Record<string, unknown>) {
  */
 export default async function AdminDealsPage() {
   if (!(await isAdmin())) redirect("/");
-  const items = await listForReview();
+  const [items, pages] = await Promise.all([listForReview(), dealPageNumbers()]);
   const flagged = items.filter((i) => i.previous_note?.startsWith("flag:"));
 
   return (
@@ -67,6 +70,59 @@ export default async function AdminDealsPage() {
           ))}
         </ul>
       )}
+
+      <section>
+        <h2 className="text-lg font-semibold">Page views / taps (30 days)</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Each venue&apos;s own deal page: views (once per reader per visit) and taps on its map, website, Instagram and share
+          buttons. No cookies, no personal data; bots and our own checks (any page opened with ?nocount=1) aren&apos;t counted.
+        </p>
+        {pages === null ? (
+          <p className="mt-3 rounded-xl border p-4 text-sm text-muted-foreground">Counts unavailable right now.</p>
+        ) : pages.length === 0 ? (
+          <p className="mt-3 rounded-xl border p-4 text-sm text-muted-foreground">No venue has a live deal.</p>
+        ) : (
+          <ul className="mt-3 divide-y rounded-xl border bg-card">
+            {pages.map((p) => (
+              <li key={p.slug} className="flex items-center justify-between gap-3 px-4 py-2 text-sm">
+                <a href={`/deals/${p.slug}?nocount=1`} className="font-medium underline-offset-2 hover:underline">
+                  {p.venue}
+                </a>
+                <span className="tabular-nums text-muted-foreground" title={tapDetail(p.counts)}>
+                  <span className="font-semibold text-foreground">{p.counts.views}</span> views ·{" "}
+                  <span className="font-semibold text-foreground">{p.counts.taps}</span> taps
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
     </div>
   );
+}
+
+/** Every venue with a live deal and its page's numbers, most viewed first. Null when the counts can't be read. */
+async function dealPageNumbers(): Promise<{ slug: string; venue: string; counts: DealPageCounts }[] | null> {
+  try {
+    const [live, counts] = await Promise.all([getLiveSpecials(), getAllDealPageCounts(30)]);
+    const venues = new Map<string, string>();
+    for (const d of live) {
+      const slug = venueSlug(d.venue_name);
+      if (slug && !venues.has(slug)) venues.set(slug, d.venue_name);
+    }
+    return [...venues]
+      .map(([slug, venue]) => ({ slug, venue, counts: counts.get(slug) ?? emptyCounts() }))
+      .sort((a, b) => b.counts.views - a.counts.views || b.counts.taps - a.counts.taps || a.venue.localeCompare(b.venue));
+  } catch (err) {
+    console.error("admin deal page counts:", err);
+    return null;
+  }
+}
+
+/** "map 3, share 1": the taps by kind, for the hover title. */
+function tapDetail(c: DealPageCounts): string {
+  const parts = Object.entries(c.byKind)
+    .filter(([k, n]) => k !== "view" && n > 0)
+    .map(([k, n]) => `${k} ${n}`);
+  return parts.length ? parts.join(", ") : "no taps";
 }
