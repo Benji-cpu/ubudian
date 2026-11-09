@@ -15,7 +15,7 @@ export const dynamic = "force-dynamic";
 
 // The hero and the meta description say the same thing, and name no deal that can end.
 const DEALS_LINE =
-  "Real savings at Ubud cafés, spas and classes, most of them a quarter or more off. Each deal says what you get or save.";
+  "Real savings at Ubud cafés, spas and classes. Each deal says what you get or save.";
 
 export const metadata: Metadata = {
   title: "Ubud deals — real savings on food and wellness",
@@ -139,10 +139,10 @@ export default async function DealsPage() {
 
       <section className="bg-brand-pale-green px-4 py-14 text-center">
         <div className="mx-auto max-w-xl">
-          <h2 className="font-serif text-2xl text-brand-deep-green sm:text-3xl">Run a restaurant or café in Ubud?</h2>
+          <h2 className="font-serif text-2xl text-brand-deep-green sm:text-3xl">Run a café, restaurant, spa, class or studio in Ubud?</h2>
           <p className="mt-3 text-brand-charcoal-light">
-            List your deal for free if it&apos;s at least 25% off your normal price for food, or 20% off for a class, spa or studio. It shows here on the days it runs,
-            and we check it with you once a month so nothing goes stale. We don&apos;t list drink deals.
+            List your deal for free. Food deals must be at least 25% off your normal price. Classes, spas and studios must be at least 20% off.
+            Your deal shows here on the days it runs. Once a month we ask you if it is still running. We don&apos;t list drink deals.
           </p>
           <Button asChild size="lg" className="mt-6">
             <Link href="/tonight/add">Add your deal</Link>
