@@ -10,7 +10,7 @@ import { isSafeUrl } from "@/lib/url-validation";
 import { nowInBali, parseTimeToMinutes } from "./bali-time";
 import { bucketEventsByTime } from "./buckets";
 
-/** Minutes after its start that a gathering is still worth walking into. */
+/** Minutes after its start that an event is still worth walking into. */
 export const JOINABLE_AFTER_START_MIN = 30;
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -160,8 +160,9 @@ export function matchesArchetype(event: Pick<Event, "archetype_tags" | "category
 }
 
 /**
- * The quiz's "Your week in Ubud": what is still ahead today and over the next
- * six days, soonest first, each listing once.
+ * The quiz's "Your week in Ubud": what is still ahead today (the same 30-minute
+ * grace as /ubud-tonight, so ended events are gone) and over the next six
+ * days, soonest first, each listing once.
  */
 export function weekAhead(events: Event[], now: Date = new Date()): Event[] {
   const today = nowInBali(now).dateStr;
@@ -172,9 +173,50 @@ export function weekAhead(events: Event[], now: Date = new Date()): Event[] {
   return [...stillAheadToday(events, now).sort(compareByTime), ...rest].filter((e) => !seen.has(e.id) && !!seen.add(e.id));
 }
 
-/** The next `limit` listings for an archetype, from a `weekAhead()` list. */
-export function nextForArchetype(week: Event[], archetype: ArchetypeId, limit = 5): Event[] {
-  return week.filter((e) => matchesArchetype(e, archetype)).slice(0, limit);
+/** At most this many picks on one day, so "Your week" is spread over the week. */
+export const MAX_PICKS_PER_DAY = 2;
+
+/** The Bali day a listing is on: a multi-day event already under way counts as today. */
+function dayOf(e: Pick<Event, "start_date">, today: string): string {
+  return e.start_date < today ? today : e.start_date;
+}
+
+/**
+ * Up to `limit` listings for an archetype from a `weekAhead()` list, spread
+ * over the week: the soonest one on each day first, then a second on a day
+ * while there is room, never more than `MAX_PICKS_PER_DAY` on one day.
+ * Returned soonest first.
+ */
+export function nextForArchetype(week: Event[], archetype: ArchetypeId, limit = 5, now: Date = new Date()): Event[] {
+  const today = nowInBali(now).dateStr;
+  const matching = week.filter((e) => matchesArchetype(e, archetype));
+  const picked = new Set<Event>();
+  const perDay = new Map<string, number>();
+  for (let round = 1; round <= MAX_PICKS_PER_DAY && picked.size < limit; round++) {
+    for (const e of matching) {
+      if (picked.size >= limit) break;
+      if (picked.has(e)) continue;
+      const day = dayOf(e, today);
+      if ((perDay.get(day) ?? 0) >= round) continue;
+      picked.add(e);
+      perDay.set(day, (perDay.get(day) ?? 0) + 1);
+    }
+  }
+  return matching.filter((e) => picked.has(e));
+}
+
+/**
+ * The heading and line over "Your week in Ubud". When every pick falls on one
+ * day it is not a week, so the heading says "Next up for you" and the line
+ * names the day.
+ */
+export function yourWeekHeading(events: Pick<Event, "start_date">[], now: Date = new Date()): { title: string; line: string } {
+  const today = nowInBali(now).dateStr;
+  const days = new Set(events.map((e) => dayOf(e, today)));
+  if (days.size !== 1) return { title: "Your week in Ubud", line: "Events that suit you this week." };
+  const [day] = days;
+  const when = day === today ? "still to come today" : day === addDays(today, 1) ? "tomorrow" : `on ${longDate(day)}`;
+  return { title: "Next up for you", line: `Events that suit you, ${when}.` };
 }
 
 /** Directions: the listing's own Maps link, else a Maps search for the venue in Ubud. */
@@ -202,10 +244,22 @@ function clock(minutes: number): string {
   return `${h12}${m ? `:${String(m).padStart(2, "0")}` : ""} ${h >= 12 ? "PM" : "AM"}`;
 }
 
-/** "Checked today at 6:30 AM Bali time", "Checked yesterday at …", "Checked Sat 7 Nov at …". */
-export function checkedLine(iso: string, now: Date = new Date()): string {
+/** "Updated today at 6:30 AM Bali time", "Updated yesterday at …", "Updated Sat 7 Nov at …". The update is automatic. */
+export function updatedLine(iso: string, now: Date = new Date()): string {
   const at = nowInBali(new Date(iso));
   const today = nowInBali(now).dateStr;
   const when = at.dateStr === today ? "today" : at.dateStr === addDays(today, -1) ? "yesterday" : shortDate(at.dateStr);
-  return `Checked ${when} at ${clock(at.timeMinutes)} Bali time`;
+  return `Updated ${when} at ${clock(at.timeMinutes)} Bali time`;
+}
+
+/** What the page says when a listing names no venue. */
+export const NO_VENUE = "Venue: check with the organiser";
+
+/** One line under the heading of /ubud-tonight and /ubud-events-this-week: what these pages cover, and what they don't. */
+export const TIMETABLE_SCOPE =
+  "Dance, ceremony, sound and movement events in Ubud. Not every show, restaurant night or live-music night is listed.";
+
+/** "1 event", "14 events". */
+export function eventCount(n: number): string {
+  return `${n} ${n === 1 ? "event" : "events"}`;
 }

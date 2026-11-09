@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { CHECK_WITH_ORGANISER, displayPrice, formatAmountRange } from "../price-display";
+import { CHECK_WITH_ORGANISER, displayPrice, formatAmountRange, mentionsResidentPrice } from "../price-display";
 
 const show = (s: string | null) => {
   const d = displayPrice(s);
@@ -159,5 +159,21 @@ describe("the amounts behind the label", () => {
     expect(displayPrice("Rp 300,000 - Rp 350,000").amount).toEqual({ min: 300_000, max: 350_000, currency: "IDR" });
     expect(displayPrice("$85").amount).toEqual({ min: 85, max: 85, currency: "USD" });
     expect(displayPrice("By donation").amount).toBeUndefined();
+  });
+});
+
+describe("small print a reader can read", () => {
+  it("spells out minimum spend, without touching the data", () => {
+    expect(show("IDR 200k min spend at the venue")).toBe("IDR 200k · minimum spend at the venue");
+    expect(show("Rp 200.000 min. spend at the venue")).toBe("IDR 200k · minimum spend at the venue");
+    expect(show("IDR 200k minimum spend")).toBe("IDR 200k · minimum spend");
+  });
+
+  it("knows when a page needs the KITAS / KTP footnote", () => {
+    expect(mentionsResidentPrice(["IDR 150,000 (local KITAS) / IDR 200,000 (visitors)", null])).toBe(true);
+    expect(mentionsResidentPrice(["IDR 100k (KTP) / IDR 150k (visitors)"])).toBe(true);
+    // No KTP in the small print (an unlabelled second price), so no footnote.
+    expect(mentionsResidentPrice(["IDR 100k KTP / IDR 150k"])).toBe(false);
+    expect(mentionsResidentPrice(["IDR 150k online / walk-in", "By donation", null])).toBe(false);
   });
 });

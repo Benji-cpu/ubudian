@@ -15,10 +15,11 @@ export const metadata: Metadata = {
 };
 
 export default async function QuizPage() {
-  // The result shows the next five gatherings for the reader's archetype. Pick
-  // them here, so the browser gets five per archetype instead of the whole week.
-  const week = weekAhead(await getPublicListings());
-  const weekFor = Object.fromEntries(ARCHETYPE_IDS.map((id) => [id, nextForArchetype(week, id)])) as Record<ArchetypeId, Event[]>;
+  // The result shows up to five events for the reader's archetype over the week.
+  // Pick them here, so the browser gets five per archetype instead of the whole week.
+  const now = new Date();
+  const week = weekAhead(await getPublicListings(), now);
+  const weekFor = Object.fromEntries(ARCHETYPE_IDS.map((id) => [id, nextForArchetype(week, id, 5, now)])) as Record<ArchetypeId, Event[]>;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-brand-off-white to-brand-cream dark:from-background dark:to-background">

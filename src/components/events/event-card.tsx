@@ -126,9 +126,9 @@ export function EventCard({ event, saveButton, hideDate }: EventCardProps) {
               externalTicketUrl={event.external_ticket_url}
             />
             {event.organizer_name && (
-              <span className="ml-auto flex items-center gap-1 text-[11px] text-muted-foreground truncate">
-                <User className="h-3 w-3 shrink-0" />
-                <span className="truncate">{event.organizer_name}</span>
+              <span className="ml-auto flex min-w-0 items-center gap-1 text-[11px] text-muted-foreground truncate">
+                <User className="h-3 w-3 shrink-0" aria-hidden />
+                <span className="truncate">Organiser: {event.organizer_name}</span>
               </span>
             )}
           </div>

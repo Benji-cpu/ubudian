@@ -26,7 +26,7 @@ interface StoredResult {
 }
 
 interface QuizContainerProps {
-  /** "Your week in Ubud": the next gatherings for each archetype, worked out on the server. */
+  /** "Your week in Ubud": events for each archetype over the next seven days, worked out on the server. */
   weekFor: Partial<Record<ArchetypeId, Event[]>>;
 }
 

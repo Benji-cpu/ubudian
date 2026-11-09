@@ -1,15 +1,16 @@
 import type { Metadata } from "next";
 import { OutboundListBeacon } from "@/components/events/outbound-list-beacon";
-import { TimetableJsonLd, TimetableLinks, TimetableRow, TimetableSubscribe } from "@/components/events/timetable";
-import { baliWeek, checkedLine, dateSpan, shortDate, thisWeekByDay, weekTitle } from "@/lib/events/timetable";
+import { TimetableJsonLd, TimetableLinks, TimetableNotes, TimetableRow, TimetableSubscribe } from "@/components/events/timetable";
+import { baliWeek, dateSpan, eventCount, shortDate, thisWeekByDay, TIMETABLE_SCOPE, updatedLine, weekTitle } from "@/lib/events/timetable";
 import { getLastIngestAt, getPublicListings } from "@/lib/events/timetable-queries";
 import { SITE_URL } from "@/lib/constants";
 
-// Today's part of the week is read off the Bali clock, so never serve a cached copy.
+// Today's part of the week is read off the Bali clock on every request (the
+// /ubud-tonight rule, 30-minute grace), so never serve a cached copy.
 export const dynamic = "force-dynamic";
 
 const DESCRIPTION =
-  "Every gathering in Ubud this week, Monday to Sunday, day by day: dance, ceremonies, sound, breathwork, workshops. Times, venues, prices and tickets, checked every day.";
+  "Dance, ceremony, sound and movement events in Ubud this week, Monday to Sunday, day by day. Times, venues, prices and tickets, updated every day.";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { monday, sunday } = baliWeek();
@@ -43,13 +44,12 @@ export default async function UbudThisWeekPage() {
       {/* Literal hex: the brand-deep-green token turns light sage in dark mode, under light text. */}
       <section className="bg-[#2C4A3E] py-12 sm:py-16">
         <div className="mx-auto max-w-3xl px-4 sm:px-6">
-          {lastIngest ? <p className="text-sm text-[#FAF5EC]/75">{checkedLine(lastIngest, now)}</p> : null}
+          {lastIngest ? <p className="text-sm text-[#FAF5EC]/75">{updatedLine(lastIngest, now)}</p> : null}
           <h1 className="mt-2 font-serif text-4xl font-medium tracking-tight text-[#FAF5EC] sm:text-5xl">Ubud events this week</h1>
           <p className="mt-3 font-serif text-xl italic text-brand-gold">Monday to Sunday, {dateSpan(monday, sunday)}</p>
-          <p className="mt-4 max-w-xl text-[#FAF5EC]/80">
-            {rows.length > 0
-              ? `${rows.length} ${rows.length === 1 ? "gathering" : "gatherings"} from today to Sunday, day by day.`
-              : "Nothing else is listed for this week."}
+          <p className="mt-4 max-w-xl text-sm text-[#FAF5EC]/75">{TIMETABLE_SCOPE}</p>
+          <p className="mt-3 max-w-xl text-[#FAF5EC]/80">
+            {rows.length > 0 ? `${eventCount(rows.length)} from today to Sunday, day by day.` : "Nothing else is listed for this week."}
           </p>
           {days.length > 1 ? (
             <nav aria-label="Jump to a day" className="mt-6 flex flex-wrap gap-2">
@@ -81,7 +81,7 @@ export default async function UbudThisWeekPage() {
                   ))}
                 </ul>
               ) : (
-                <p className="py-4 text-muted-foreground">Nothing listed yet. New gatherings are added every night.</p>
+                <p className="py-4 text-muted-foreground">Nothing listed yet. New events are added every night.</p>
               )}
             </section>
           ))}
@@ -91,9 +91,9 @@ export default async function UbudThisWeekPage() {
           <TimetableSubscribe source="ubud_this_week" />
         </div>
 
-        <p className="mt-6 text-sm text-muted-foreground">
-          Times are Bali time. Prices often change at the door, so check with the organiser before you go.
-        </p>
+        <div className="mt-6">
+          <TimetableNotes events={rows} />
+        </div>
 
         <div className="mt-10">
           <TimetableLinks current="week" />

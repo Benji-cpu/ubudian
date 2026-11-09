@@ -13,7 +13,7 @@ interface QuizResultsProps {
   primary: ArchetypeId;
   secondary: ArchetypeId;
   scores: QuizScores;
-  /** The next gatherings for `primary` this week, already matched (`nextForArchetype`). */
+  /** Events for `primary` over the next seven days, already matched and spread (`nextForArchetype`). */
   weekEvents: Event[];
   onRetake: () => void;
   userSegment?: UserSegment | null;
@@ -154,7 +154,7 @@ export function QuizResults({
         })}
       </div>
 
-      {/* The next five gatherings for this archetype, with the weekly email right under them */}
+      {/* Up to five events for this archetype over the week, with the weekly email right under them */}
       <div className="mt-10">
         {/* The email they left in the quiz only counts once the result reached us. */}
         <YourWeek archetypeName={archetype.name} events={weekEvents} subscribed={subscribed && !submitFailed} />

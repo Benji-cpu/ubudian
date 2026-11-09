@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import {
   baliWeek,
-  checkedLine,
+  eventCount,
   eventMapHref,
   matchesArchetype,
   nextForArchetype,
@@ -10,8 +10,10 @@ import {
   stillAheadToday,
   thisWeekByDay,
   tonightTitle,
+  updatedLine,
   weekAhead,
   weekTitle,
+  yourWeekHeading,
 } from "@/lib/events/timetable";
 import type { Event } from "@/types";
 
@@ -154,10 +156,15 @@ describe("titles", () => {
     expect(weekTitle("2026-11-30", "2026-12-06")).toBe("Ubud events this week (30 Nov–6 Dec)");
   });
 
-  it("says when the listings were last checked, in Bali time", () => {
-    expect(checkedLine("2026-11-08T22:30:00Z", MON_7PM)).toBe("Checked today at 6:30 AM Bali time");
-    expect(checkedLine("2026-11-08T11:00:00Z", MON_7PM)).toBe("Checked yesterday at 7 PM Bali time");
-    expect(checkedLine("2026-11-06T02:00:00Z", MON_7PM)).toBe("Checked Fri 6 Nov at 10 AM Bali time");
+  it("says when the listings were last updated, in Bali time", () => {
+    expect(updatedLine("2026-11-08T22:30:00Z", MON_7PM)).toBe("Updated today at 6:30 AM Bali time");
+    expect(updatedLine("2026-11-08T11:00:00Z", MON_7PM)).toBe("Updated yesterday at 7 PM Bali time");
+    expect(updatedLine("2026-11-06T02:00:00Z", MON_7PM)).toBe("Updated Fri 6 Nov at 10 AM Bali time");
+  });
+
+  it("counts events, not gatherings", () => {
+    expect(eventCount(1)).toBe("1 event");
+    expect(eventCount(14)).toBe("14 events");
   });
 });
 
@@ -178,9 +185,40 @@ describe("the quiz's week", () => {
 
   it("lists the next matches over seven days, soonest first, each listing once", () => {
     const week = weekAhead(events, MON_7PM);
-    expect(ids(nextForArchetype(week, "seeker"))).toEqual(["yoga-daily", "tagged-wed", "sound-thu"]);
-    expect(ids(nextForArchetype(week, "seeker", 2))).toEqual(["yoga-daily", "tagged-wed"]);
+    expect(ids(nextForArchetype(week, "seeker", 5, MON_7PM))).toEqual(["yoga-daily", "tagged-wed", "sound-thu"]);
+    expect(ids(nextForArchetype(week, "seeker", 2, MON_7PM))).toEqual(["yoga-daily", "tagged-wed"]);
     expect(ids(week)).not.toContain("far-off");
+  });
+
+  it("spreads the picks over the week, at most two a day", () => {
+    const sound = (id: string, start_date: string, start_time: string) =>
+      ev({ id, start_date, start_time, category: "Ceremony & Sound" });
+    const crowded = [
+      sound("mon-a", "2026-11-09", "19:15:00"),
+      sound("mon-b", "2026-11-09", "20:00:00"),
+      sound("mon-c", "2026-11-09", "21:00:00"),
+      sound("tue-a", "2026-11-10", "09:00:00"),
+      sound("tue-b", "2026-11-10", "18:00:00"),
+      sound("sat-a", "2026-11-14", "10:00:00"),
+    ];
+    const picks = nextForArchetype(weekAhead(crowded, MON_7PM), "seeker", 5, MON_7PM);
+    // One per day first (Mon, Tue, Sat), then a second on the soonest days.
+    expect(ids(picks)).toEqual(["mon-a", "mon-b", "tue-a", "tue-b", "sat-a"]);
+    expect(yourWeekHeading(picks, MON_7PM).title).toBe("Your week in Ubud");
+  });
+
+  it("says \"Next up for you\" when every pick is on one day, and drops what has ended", () => {
+    const tonight = [
+      ev({ id: "ended", start_date: "2026-11-09", start_time: "18:00:00", end_time: "18:45:00", category: "Ceremony & Sound" }),
+      ev({ id: "started-20-min-ago", start_date: "2026-11-09", start_time: "18:40:00", category: "Ceremony & Sound" }),
+      ev({ id: "later", start_date: "2026-11-09", start_time: "21:00:00", category: "Ceremony & Sound" }),
+      ev({ id: "too-late-to-join", start_date: "2026-11-09", start_time: "18:00:00", category: "Ceremony & Sound" }),
+    ];
+    const picks = nextForArchetype(weekAhead(tonight, MON_7PM), "seeker", 5, MON_7PM);
+    expect(ids(picks)).toEqual(["started-20-min-ago", "later"]);
+    expect(yourWeekHeading(picks, MON_7PM)).toEqual({ title: "Next up for you", line: "Events that suit you, still to come today." });
+    expect(yourWeekHeading([ev({ id: "thu", start_date: "2026-11-12" })], MON_7PM).line).toBe("Events that suit you, on Thursday 12 Nov.");
+    expect(yourWeekHeading([], MON_7PM).title).toBe("Your week in Ubud");
   });
 });
 

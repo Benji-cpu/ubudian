@@ -1,17 +1,19 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { OutboundListBeacon } from "@/components/events/outbound-list-beacon";
-import { TimetableJsonLd, TimetableLinks, TimetableRow, TimetableSubscribe } from "@/components/events/timetable";
+import { TimetableJsonLd, TimetableLinks, TimetableNotes, TimetableRow, TimetableSubscribe } from "@/components/events/timetable";
 import { nowInBali } from "@/lib/events/bali-time";
-import { checkedLine, compareByTime, longDate, stillAheadToday, tonightTitle } from "@/lib/events/timetable";
+import { compareByTime, eventCount, longDate, stillAheadToday, TIMETABLE_SCOPE, tonightTitle, updatedLine } from "@/lib/events/timetable";
 import { getLastIngestAt, getPublicListings } from "@/lib/events/timetable-queries";
 import { SITE_URL } from "@/lib/constants";
 
-// "Still to come" is read off the Bali clock, so never serve a cached copy.
+// "Still to come" is read off the Bali clock on every request (30-minute
+// grace, as on the homepage), so ended events drop off and the count changes
+// through the day. Never serve a cached copy.
 export const dynamic = "force-dynamic";
 
 const DESCRIPTION =
-  "What's still on in Ubud today: dance, ceremonies, sound, breathwork and more, with times, venues, prices and tickets. Checked every day.";
+  "What's still on in Ubud today: dance, ceremony, sound and movement events, with times, venues, prices and tickets. Updated every day.";
 
 export async function generateMetadata(): Promise<Metadata> {
   const title = tonightTitle(nowInBali().dateStr);
@@ -45,14 +47,15 @@ export default async function UbudTonightPage() {
       {/* Literal hex: the brand-deep-green token turns light sage in dark mode, under light text. */}
       <section className="bg-[#2C4A3E] py-12 sm:py-16">
         <div className="mx-auto max-w-3xl px-4 sm:px-6">
-          {lastIngest ? <p className="text-sm text-[#FAF5EC]/75">{checkedLine(lastIngest, now)}</p> : null}
+          {lastIngest ? <p className="text-sm text-[#FAF5EC]/75">{updatedLine(lastIngest, now)}</p> : null}
           <h1 className="mt-2 font-serif text-4xl font-medium tracking-tight text-[#FAF5EC] sm:text-5xl">
             Things to do in Ubud tonight
           </h1>
           <p className="mt-3 font-serif text-xl italic text-brand-gold">{longDate(today)}</p>
-          <p className="mt-4 max-w-xl text-[#FAF5EC]/80">
+          <p className="mt-4 max-w-xl text-sm text-[#FAF5EC]/75">{TIMETABLE_SCOPE}</p>
+          <p className="mt-3 max-w-xl text-[#FAF5EC]/80">
             {tonight.length > 0
-              ? `${tonight.length} ${tonight.length === 1 ? "gathering" : "gatherings"} still to come today, with times, venues and how to get in.`
+              ? `${eventCount(tonight.length)} still to come today, with times, venues and how to get in.`
               : "Nothing else is listed for today."}
           </p>
         </div>
@@ -79,9 +82,9 @@ export default async function UbudTonightPage() {
           <TimetableSubscribe source="ubud_tonight" />
         </div>
 
-        <p className="mt-6 text-sm text-muted-foreground">
-          Times are Bali time. Prices often change at the door, so check with the organiser before you go.
-        </p>
+        <div className="mt-6">
+          <TimetableNotes events={tonight} />
+        </div>
 
         <div className="mt-10">
           <TimetableLinks current="tonight" />

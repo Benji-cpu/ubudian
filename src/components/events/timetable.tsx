@@ -2,9 +2,9 @@ import Link from "next/link";
 import { ArrowRight, ExternalLink, MapPin } from "lucide-react";
 import { NewsletterSignup } from "@/components/layout/newsletter-signup";
 import { eventJsonLd, jsonLdScript } from "@/lib/events/event-jsonld";
-import { eventMapHref, outboundLink, shortDate } from "@/lib/events/timetable";
+import { eventMapHref, NO_VENUE, outboundLink, shortDate } from "@/lib/events/timetable";
 import { HUBS } from "@/lib/hubs";
-import { displayPrice } from "@/lib/price-display";
+import { displayPrice, mentionsResidentPrice, RESIDENT_PRICE_FOOTNOTE } from "@/lib/price-display";
 import { formatEventTime } from "@/lib/utils";
 import type { Event } from "@/types";
 import { PriceTag } from "./price-tag";
@@ -12,12 +12,13 @@ import { PriceTag } from "./price-tag";
 const linkClass =
   "inline-flex min-h-8 items-center gap-1 font-medium text-brand-deep-green underline-offset-4 hover:underline dark:text-brand-gold";
 
-/** One listing on a dated page: time, title, venue with a map link, price, and the ticket or listing link. */
+/** One listing on a dated page: time, title, venue with a map link (or a line saying there is none), price, and the ticket or listing link. */
 export function TimetableRow({ event }: { event: Event }) {
+  const venue = event.venue_name?.trim() || null;
   const multiDay = !!event.end_date && event.end_date > event.start_date;
   const start = event.start_time ? formatEventTime(event.start_time) : null;
   const until = multiDay ? `until ${shortDate(event.end_date!)}` : event.end_time && start ? `to ${formatEventTime(event.end_time)}` : null;
-  const map = eventMapHref(event);
+  const map = venue ? eventMapHref(event) : null;
   const out = outboundLink(event);
 
   return (
@@ -32,19 +33,24 @@ export function TimetableRow({ event }: { event: Event }) {
             {event.title}
           </Link>
         </h3>
-        {event.venue_name ? (
+        {venue ? (
           <p className="mt-1 flex flex-wrap items-center gap-x-3 text-sm text-muted-foreground">
             <span className="inline-flex min-w-0 items-center gap-1">
               <MapPin className="h-3.5 w-3.5 shrink-0" aria-hidden />
-              <span className="break-words">{event.venue_name}</span>
+              <span className="break-words">{venue}</span>
             </span>
             {map ? (
-              <a href={map} target="_blank" rel="noopener noreferrer" className={linkClass} aria-label={`Map: ${event.venue_name}`}>
+              <a href={map} target="_blank" rel="noopener noreferrer" className={linkClass} aria-label={`Map: ${venue}`}>
                 Map
               </a>
             ) : null}
           </p>
-        ) : null}
+        ) : (
+          <p className="mt-1 flex items-center gap-1 text-sm text-muted-foreground">
+            <MapPin className="h-3.5 w-3.5 shrink-0" aria-hidden />
+            {NO_VENUE}
+          </p>
+        )}
         <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1">
           <PriceTag price={displayPrice(event.price_info)} />
           {out ? (
@@ -56,6 +62,20 @@ export function TimetableRow({ event }: { event: Event }) {
         </div>
       </div>
     </li>
+  );
+}
+
+/**
+ * The small print under a timetable: Bali time, prices change at the door,
+ * and, once per page, what a KITAS / KTP price means when any row shows one.
+ */
+export function TimetableNotes({ events }: { events: Event[] }) {
+  const resident = mentionsResidentPrice(events.map((e) => e.price_info));
+  return (
+    <div className="space-y-1 text-sm text-muted-foreground">
+      <p>Times are Bali time. Prices often change at the door, so check with the organiser before you go.</p>
+      {resident ? <p>{RESIDENT_PRICE_FOOTNOTE}</p> : null}
+    </div>
   );
 }
 

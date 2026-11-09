@@ -2,22 +2,25 @@ import Link from "next/link";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { EventCard } from "@/components/events/event-card";
 import { NewsletterSignup } from "@/components/layout/newsletter-signup";
+import { yourWeekHeading } from "@/lib/events/timetable";
 import type { Event } from "@/types";
 
 /**
- * "Your week in Ubud" on a quiz result: the next gatherings that match the
- * archetype (from `nextForArchetype()`), with the weekly email right under
- * them, where the reader has just seen what it would bring. A reader who
- * left their email in the quiz is already on the list and is told so.
+ * "Your week in Ubud" on a quiz result: up to five events that match the
+ * archetype, spread over the next seven days (from `nextForArchetype()`),
+ * with the weekly email right under them, where the reader has just seen what
+ * it would bring. A reader who left their email in the quiz is already on the
+ * list and is told so.
  */
 export function YourWeek({ archetypeName, events, subscribed = false }: { archetypeName: string; events: Event[]; subscribed?: boolean }) {
+  const heading = yourWeekHeading(events);
   return (
     <section>
-      <h2 className="font-serif text-2xl font-medium text-brand-deep-green dark:text-brand-gold sm:text-3xl">Your week in Ubud</h2>
+      <h2 className="font-serif text-2xl font-medium text-brand-deep-green dark:text-brand-gold sm:text-3xl">{heading.title}</h2>
       <p className="mt-2 text-muted-foreground">
         {events.length > 0
-          ? `The next ${events.length === 1 ? "gathering" : `${events.length} gatherings`} for ${archetypeName}, from today.`
-          : `Nothing for ${archetypeName} is listed in the next seven days yet. New gatherings are added every night.`}
+          ? `${heading.line} Times are Bali time.`
+          : `Nothing for ${archetypeName} is listed in the next seven days yet. New events are added every night.`}
       </p>
 
       {events.length > 0 ? (

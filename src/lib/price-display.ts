@@ -273,7 +273,17 @@ function cleanNote(parts: string[]): string | null {
   if (!note || note.length > NOTE_MAX) return null;
   // Small print never links out or carries an unformatted amount.
   if (/https?:|www\.|\.[a-z]{2,}\b|\d{4,}|\d[.,]\d{3}/i.test(note)) return null;
-  return note;
+  // Readers shouldn't have to decode "min spend"; the data keeps whatever the source wrote.
+  return note.replace(/\bmin\.?\s+spend\b/g, "minimum spend");
+}
+
+/** Resident rates ("IDR 150k · local KITAS / visitors") need one footnote per page. */
+const RESIDENT_RATE = /\b(?:KITAS|KTP)\b/;
+export const RESIDENT_PRICE_FOOTNOTE = "KITAS / KTP prices are for Indonesian residents.";
+
+/** Does any price on the page mention a KITAS or KTP rate? Then the page shows `RESIDENT_PRICE_FOOTNOTE` once. */
+export function mentionsResidentPrice(priceInfos: (string | null | undefined)[]): boolean {
+  return priceInfos.some((p) => RESIDENT_RATE.test(displayPrice(p).note ?? ""));
 }
 
 export function displayPrice(priceInfo: string | null | undefined): PriceDisplay {

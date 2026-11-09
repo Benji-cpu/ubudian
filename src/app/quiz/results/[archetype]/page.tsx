@@ -24,9 +24,9 @@ interface PageProps {
   params: Promise<{ archetype: string }>;
 }
 
-export async function generateStaticParams() {
-  return ARCHETYPE_IDS.map((id) => ({ archetype: id }));
-}
+// "Your week in Ubud" is read off the Bali clock, so events that have ended
+// drop off: render per request, never a copy built at deploy time.
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { archetype: slug } = await params;
@@ -85,7 +85,8 @@ export default async function ArchetypeResultPage({ params }: PageProps) {
         .limit(24),
     ]);
 
-    weekEvents = nextForArchetype(weekAhead(listings), archetype.id);
+    const now = new Date();
+    weekEvents = nextForArchetype(weekAhead(listings, now), archetype.id, 5, now);
     guides = (guidesRes.data ?? []) as Guide[];
     practitioners = (practitionersRes.data ?? []) as Practitioner[];
   } catch {
@@ -142,7 +143,7 @@ export default async function ArchetypeResultPage({ params }: PageProps) {
           {archetype.description}
         </p>
 
-        {/* The next five gatherings for this archetype, with the weekly email right under them */}
+        {/* Up to five events for this archetype over the week, with the weekly email right under them */}
         <div className="mt-10">
           <YourWeek archetypeName={archetype.name} events={weekEvents} />
         </div>
