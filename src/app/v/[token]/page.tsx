@@ -142,7 +142,7 @@ export default async function VenueInvitePage({ params }: { params: Promise<{ to
         <div className="rounded-xl border bg-card p-5">
           <h2 className="font-serif text-xl text-brand-deep-green">{hasDeal ? "Add another deal" : "Add your deal"}</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Tap an example or write your own. We list food, café and wellness deals that save guests at least 25% (no drink deals). Free: no fees, no commission. {REVIEW_PROMISE}.
+            Tap an example or write your own. We list deals that save guests at least 25% on food and cafés, or at least 20% on classes, spas and studios (no drink deals). Free: no fees, no commission. {REVIEW_PROMISE}.
           </p>
           <div className="mt-4">
             <InviteForm token={token} examples={examples} />

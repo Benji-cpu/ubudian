@@ -21,7 +21,7 @@ export const specialSubmissionSchema = z.object({
   title: z.string().trim().min(3, "Say what the deal is").max(80).refine(NO_LINKS, "No links, please"),
   description: z.string().trim().max(300).optional().or(z.literal("")).refine(NO_LINKS, "No links, please"),
   price_idr: z.number().int().min(0).max(10_000_000).nullable().optional(),
-  /** What the same thing costs without the deal; lets the review check the 25% rule. */
+  /** What the same thing costs without the deal; lets the review check the saving (25% for food, 20% for classes, spas and studios). */
   normal_price_idr: z.number().int().min(0).max(10_000_000).nullable().optional(),
   weekdays: z.array(z.number().int().min(0).max(6)).max(7),
   start_time: z.string().regex(TIME, "Use HH:MM").optional().or(z.literal("")),

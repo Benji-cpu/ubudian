@@ -125,7 +125,7 @@ const foundSpecial = z.object({
   start_time: time,
   end_time: time,
   source_url: z.string().url().max(500),
-  /** The routine's call on CLAUDE.md "What we list": food/café/wellness, 25%+ below normal, saving nameable. */
+  /** The routine's call on CLAUDE.md "What we list": food/café/wellness, 25%+ below normal (20%+ for classes, spas and studios), saving nameable. */
   passes_rule: z.boolean(),
   /** One plain line: the saving, or why it fails. */
   reason: text(300),
@@ -173,7 +173,8 @@ export function parseFindings(raw: unknown): { findings: Findings; skipped: { in
 export type Findings = z.infer<typeof findingsSchema>;
 
 export const NOTE_FOUND_PASSES = "Found by our check of your public pages. We'll list it once you confirm it's still running.";
-export const NOTE_FOUND_FAILS = "Not listed: we list food, café and wellness deals at least 25% below your normal price. Add your normal price and we'll look again.";
+export const NOTE_FOUND_FAILS =
+  "Not listed: we list food and café deals at least 25% below your normal price, and classes, spas and studios at least 20% below. Add your normal price and we'll look again.";
 export const NOTE_NOT_RUNNING = "Taken down: we couldn't find this offer on your pages any more. Add it again if it's still running.";
 
 export type ScoutReport = { venues: number; contactsAdded: number; specialsAdded: number; duplicates: number; closed: number; renewed: number; takenDown: number; unknownVenues: number };

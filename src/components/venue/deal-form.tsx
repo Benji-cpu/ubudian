@@ -71,7 +71,7 @@ export function DealForm({
       <div className="space-y-1.5">
         <Label htmlFor="deal-normal-price">Your normal price in IDR (we need this to list it)</Label>
         <Input id="deal-normal-price" inputMode="numeric" value={d.normal_price} onChange={(e) => set("normal_price", e.target.value)} placeholder="190000" />
-        <p className="text-xs text-muted-foreground">What the same thing costs without the deal. We list deals at least 25% below it.</p>
+        <p className="text-xs text-muted-foreground">What the same thing costs without the deal. We list food deals at least 25% below it, and classes, spas and studios at least 20% below.</p>
       </div>
       <div className="space-y-1.5">
         <Label>Which days?</Label>

@@ -1,5 +1,5 @@
 -- The Ubudian — public schema snapshot.
--- Generated 2026-10-06 by scripts/dump-schema.ts from the live database.
+-- Generated 2026-11-09 by scripts/dump-schema.ts from the live database.
 -- Reference only: supabase/migrations/ is the source of truth. Do not hand-edit; regenerate.
 
 CREATE TABLE blog_posts (
@@ -50,6 +50,15 @@ CREATE TABLE curation_reports (
   created_at timestamp with time zone NOT NULL DEFAULT now(),
   emailed_at timestamp with time zone,
   PRIMARY KEY (month)
+);
+
+CREATE TABLE deal_page_events (
+  id bigint NOT NULL,
+  venue_slug text NOT NULL,
+  special_id uuid,
+  kind text NOT NULL,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  PRIMARY KEY (id)
 );
 
 CREATE TABLE deal_venues (

@@ -9,6 +9,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { FeedbackFab } from "@/components/feedback/feedback-fab";
 import { ActivityTrailInstaller } from "@/components/feedback/activity-trail-installer";
 import { AuthSync } from "@/components/auth/auth-sync";
+import { NoCountFlag } from "@/components/layout/no-count-flag";
 import { WelcomeFirstLoginModal } from "@/components/onboarding/welcome-first-login-modal";
 import { FeedbackNudge } from "@/components/onboarding/feedback-nudge";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -62,6 +63,7 @@ export default function RootLayout({
           <FeedbackNudge />
           <ActivityTrailInstaller />
           <AuthSync />
+          <NoCountFlag />
         </ThemeProvider>
         <Analytics />
         <SpeedInsights />
