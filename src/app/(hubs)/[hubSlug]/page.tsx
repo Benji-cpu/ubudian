@@ -12,6 +12,7 @@ import { formatEventTime } from "@/lib/utils";
 import { nowInBali } from "@/lib/events/bali-time";
 import { SITE_URL } from "@/lib/constants";
 import type { Event } from "@/types";
+import { EVENT_COLUMNS } from "@/lib/events/columns";
 
 // ISR: regenerate at most hourly — fresh enough for an agenda, static for SEO.
 export const revalidate = 3600;
@@ -56,7 +57,7 @@ export default async function HubPage({
   const supabase = createAdminClient();
   const { data } = await supabase
     .from("events")
-    .select("*")
+    .select(EVENT_COLUMNS)
     .eq("status", "approved")
     .overlaps("vibe_tags", hub.vibeTags)
     .or(`start_date.gte.${today},is_recurring.eq.true`)

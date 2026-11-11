@@ -12,6 +12,7 @@ import { ARCHETYPE_IDS } from "@/lib/quiz-data";
 import { NextResponse, after } from "next/server";
 import { quizSubmitSchema } from "@/lib/quiz/submit-schema";
 import type { ArchetypeId, Event } from "@/types";
+import { EVENT_COLUMNS } from "@/lib/events/columns";
 
 export async function POST(request: Request) {
   const ip = getClientIp(request);
@@ -124,7 +125,7 @@ export async function POST(request: Request) {
           const today = new Date().toISOString().split("T")[0];
           const evRes = await admin
             .from("events")
-            .select("*")
+            .select(EVENT_COLUMNS)
             .eq("status", "approved")
             .gte("start_date", today)
             .order("start_date", { ascending: true })

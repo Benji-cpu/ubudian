@@ -13,6 +13,7 @@ import { addDays, weekStartFor } from "@/lib/events/picks";
 import { rolledForward } from "@/lib/events/buckets";
 import { visibleListings } from "@/lib/events/listing-checks";
 import type { Event } from "@/types";
+import { EVENT_COLUMNS } from "@/lib/events/columns";
 
 export async function POST(request: Request) {
   if (!isEventsBusAuthorised(request.headers.get("authorization"))) {
@@ -33,7 +34,7 @@ export async function POST(request: Request) {
   }
 
   const supabase = createAdminClient();
-  const { data, error } = await supabase.from("events").select("*").in("id", ids).eq("status", "approved");
+  const { data, error } = await supabase.from("events").select(EVENT_COLUMNS).in("id", ids).eq("status", "approved");
   if (error) return NextResponse.json({ data: null, error: error.message }, { status: 500 });
 
   const weekEnd = addDays(body.week_start, 6);

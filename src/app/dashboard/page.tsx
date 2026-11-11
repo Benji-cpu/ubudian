@@ -10,6 +10,7 @@ import { EventCard } from "@/components/events/event-card";
 import { Button } from "@/components/ui/button";
 import type { ArchetypeId, Event, QuizResultRecord } from "@/types";
 import type { Metadata } from "next";
+import { EVENT_COLUMNS } from "@/lib/events/columns";
 
 export const metadata: Metadata = {
   title: "My Dashboard",
@@ -52,7 +53,7 @@ export default async function DashboardPage() {
 
     const { data: eventsData } = await supabase
       .from("events")
-      .select("*")
+      .select(EVENT_COLUMNS)
       .eq("status", "approved")
       .gte("start_date", today)
       .order("start_date", { ascending: true })

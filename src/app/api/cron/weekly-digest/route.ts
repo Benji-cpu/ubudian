@@ -16,6 +16,7 @@ import { NEWSLETTER_FROM, sendTransactionalEmail } from "@/lib/email";
 import { SITE_URL } from "@/lib/constants";
 import { ARCHETYPE_IDS } from "@/lib/quiz-data";
 import type { ArchetypeId, Event } from "@/types";
+import { EVENT_COLUMNS } from "@/lib/events/columns";
 
 export const maxDuration = 60;
 
@@ -76,7 +77,7 @@ export async function POST(request: Request) {
     supabase.from("saved_events").select("profile_id"),
     supabase
       .from("events")
-      .select("*")
+      .select(EVENT_COLUMNS)
       .eq("status", "approved")
       .or(`start_date.gte.${bali.dateStr},is_recurring.eq.true`),
   ]);

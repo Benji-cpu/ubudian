@@ -20,6 +20,7 @@ import { rolledForward } from "@/lib/events/buckets";
 import { visibleListings } from "@/lib/events/listing-checks";
 import { addDays, weekStartFor } from "@/lib/events/picks";
 import type { Event } from "@/types";
+import { EVENT_COLUMNS } from "@/lib/events/columns";
 
 export const maxDuration = 60;
 
@@ -54,7 +55,7 @@ export async function GET(request: Request) {
       .limit(800),
     supabase
       .from("events")
-      .select("*")
+      .select(EVENT_COLUMNS)
       .eq("status", "approved")
       .or(`start_date.gte.${today},end_date.gte.${today},is_recurring.eq.true`),
     supabase.from("event_signals").select("event_id, kind").gte("created_at", since30).limit(20000),

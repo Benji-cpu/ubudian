@@ -8,6 +8,7 @@ import { stripEmbeddings } from "@/lib/events/strip-embedding";
 import { visibleListings } from "@/lib/events/listing-checks";
 import { stillAheadToday } from "@/lib/events/timetable";
 import type { Event } from "@/types";
+import { EVENT_COLUMNS } from "@/lib/events/columns";
 
 const MAX_CARDS = 6;
 
@@ -37,7 +38,7 @@ export async function FeaturedEvents() {
       () =>
         supabase
           .from("events")
-          .select("*")
+          .select(EVENT_COLUMNS)
           .eq("status", "approved")
           .or(`start_date.gte.${today},is_recurring.eq.true,end_date.gte.${today}`),
       "homepage-events"

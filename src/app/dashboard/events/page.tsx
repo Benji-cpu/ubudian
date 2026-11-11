@@ -7,6 +7,7 @@ import { DashboardEventsTabs } from "./dashboard-events-tabs";
 import { stripEmbeddings } from "@/lib/events/strip-embedding";
 import type { Event } from "@/types";
 import type { Metadata } from "next";
+import { EVENT_COLUMNS } from "@/lib/events/columns";
 
 export const metadata: Metadata = {
   title: "My Agenda",
@@ -24,7 +25,7 @@ export default async function DashboardEventsPage() {
   const [submittedRes, savedRes, icsToken, trustedRes] = await Promise.all([
     supabase
       .from("events")
-      .select("*")
+      .select(EVENT_COLUMNS)
       .eq("submitted_by_email", profile.email)
       .order("created_at", { ascending: false }),
     supabase

@@ -30,6 +30,7 @@ import { WeekPicks } from "@/components/events/week-picks";
 import { SuggestSource } from "@/components/events/suggest-source";
 import { getWeekPicks, type WeekPick } from "@/lib/events/picks";
 import type { ArchetypeId, Event, QuizResultRecord } from "@/types";
+import { EVENT_COLUMNS } from "@/lib/events/columns";
 
 const VIEWS_USING_OWN_VIEWPORT = new Set(["calendar", "week"]);
 
@@ -118,7 +119,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
 
     const { data: events, error } = await queryWithRetry(() => {
       const sortByNewest = params.sort === "newest";
-      let query = supabase.from("events").select("*").eq("status", "approved");
+      let query = supabase.from("events").select(EVENT_COLUMNS).eq("status", "approved");
       // For "newest" we can sort DB-side on created_at — recurring rolling
       // doesn't move the row's authored timestamp. For "date" (default) we
       // sort client-side after roll-forward; the DB's `start_date` column is

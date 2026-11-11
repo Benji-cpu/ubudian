@@ -35,6 +35,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import type { Event } from "@/types";
+import { EVENT_COLUMNS } from "@/lib/events/columns";
 
 interface EventPageProps {
   params: Promise<{ slug: string }>;
@@ -54,7 +55,7 @@ export async function generateMetadata({ params }: EventPageProps): Promise<Meta
 
     const { data: event } = await supabase
       .from("events")
-      .select("*")
+      .select(EVENT_COLUMNS)
       .eq("slug", slug)
       .eq("status", "approved")
       .single();
@@ -142,7 +143,7 @@ export default async function EventPage({ params }: EventPageProps) {
       if (ids.length > 0) {
         const { data: rel } = await supabase
           .from("events")
-          .select("*")
+          .select(EVENT_COLUMNS)
           .in("id", ids)
           .eq("status", "approved");
         const order = new Map(ids.map((id, i) => [id, i] as const));
@@ -160,7 +161,7 @@ export default async function EventPage({ params }: EventPageProps) {
     if (related.length === 0) {
       const { data: relatedEvents, error: relatedError } = await supabase
         .from("events")
-        .select("*")
+        .select(EVENT_COLUMNS)
         .eq("status", "approved")
         .eq("category", e.category)
         .neq("id", e.id)
