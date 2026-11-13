@@ -31,6 +31,7 @@ import { SuggestSource } from "@/components/events/suggest-source";
 import { getWeekPicks, type WeekPick } from "@/lib/events/picks";
 import type { ArchetypeId, Event, QuizResultRecord } from "@/types";
 import { EVENT_COLUMNS } from "@/lib/events/columns";
+import { cachedRead, CACHE_TAGS } from "@/lib/cached-read";
 
 const VIEWS_USING_OWN_VIEWPORT = new Set(["calendar", "week"]);
 
@@ -68,6 +69,116 @@ interface EventsPageProps {
     festivals?: string;
   }>;
 }
+
+/** The filters that change the database read. Free-text ones (q, venue) are not cached. */
+type ListFilters = Pick<
+  Awaited<EventsPageProps["searchParams"]>,
+  "sort" | "happening" | "category" | "q" | "time" | "venue" | "archetype" | "intents"
+>;
+
+function buildEventsQuery(
+  client: ReturnType<typeof createAdminClient>,
+  params: ListFilters,
+  view: string,
+  today: string
+) {
+  const sortByNewest = params.sort === "newest";
+  let query = client.from("events").select(EVENT_COLUMNS).eq("status", "approved");
+  // For "newest" we can sort DB-side on created_at — recurring rolling
+  // doesn't move the row's authored timestamp. For "date" (default) we
+  // sort client-side after roll-forward; the DB's `start_date` column is
+  // the seed date, which is misleading once we re-anchor to the next
+  // occurrence.
+  if (sortByNewest) {
+    query = query.order("created_at", { ascending: false });
+  }
+
+  // Happening Now filter
+  if (params.happening === "true") {
+    query = query
+      .lte("start_date", today)
+      .or(`end_date.gte.${today},end_date.is.null`);
+  } else if (view === "list" || view === "grid" || view === "feed") {
+    // Feed/list/grid: future events, recurring past-start (rolled forward
+    // by the bucket logic), AND multi-day events still in their span
+    // (so day-3-of-5 retreats land in the in_progress bucket instead of
+    // being filtered out by the start_date floor).
+    query = query.or(
+      `start_date.gte.${today},is_recurring.eq.true,end_date.gte.${today}`
+    );
+  }
+
+  if (params.category) {
+    query = query.eq("category", params.category);
+  }
+
+  // NOTE: `params.from` / `params.to` are intentionally NOT applied at the
+  // DB layer. Recurring events store their seed `start_date`, so a DB-side
+  // BETWEEN would strip every recurring class whose original date sits
+  // outside the window — including weekly events whose next occurrence
+  // lands squarely inside it. The range is applied in `filterEventsInRange`
+  // below, after roll-forward, for views that share the page-level events
+  // array (feed, list, grid, map). Calendar and Week views manage their
+  // own viewport via `expandRecurrence`.
+
+  if (params.q) {
+    const q = `%${params.q}%`;
+    query = query.or(
+      `title.ilike.${q},short_description.ilike.${q},venue_name.ilike.${q},category.ilike.${q}`
+    );
+  }
+
+  if (params.time === "morning") {
+    query = query.or("start_time.is.null,start_time.lt.12:00:00");
+  } else if (params.time === "afternoon") {
+    query = query.or(
+      "start_time.is.null,and(start_time.gte.12:00:00,start_time.lt.17:00:00)"
+    );
+  } else if (params.time === "evening") {
+    query = query.or("start_time.is.null,start_time.gte.17:00:00");
+  }
+
+  if (params.venue) {
+    query = query.ilike("venue_name", `%${params.venue}%`);
+  }
+
+  if (params.archetype) {
+    query = query.contains("archetype_tags", [params.archetype]);
+  }
+
+  if (params.intents) {
+    // Comma-separated intent ids — match events that carry at least one.
+    const intents = params.intents
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+    if (intents.length > 0) {
+      query = query.overlaps("intent_tags", intents);
+    }
+  }
+
+  return query;
+}
+
+/**
+ * The list read, cached for 15 minutes per Bali date and filter set, so a
+ * crawler walking the filter links costs one database read per combination,
+ * not one per hit. Approved events are public, so the admin client reads the
+ * same rows a visitor would. Throws on error (never cached).
+ */
+const readEventListRows = cachedRead(
+  async (today: string, view: string, filterKey: string): Promise<Event[]> => {
+    const filters = JSON.parse(filterKey) as ListFilters;
+    const { data, error } = await queryWithRetry(
+      () => buildEventsQuery(createAdminClient(), filters, view, today),
+      "events-list"
+    );
+    if (error) throw new Error(error.message);
+    return (data ?? []) as unknown as Event[];
+  },
+  "events-list-v1",
+  { seconds: 900, tag: CACHE_TAGS.events }
+);
 
 export default async function EventsPage({ searchParams }: EventsPageProps) {
   const params = await searchParams;
@@ -117,86 +228,34 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
       }
     }
 
-    const { data: events, error } = await queryWithRetry(() => {
-      const sortByNewest = params.sort === "newest";
-      let query = supabase.from("events").select(EVENT_COLUMNS).eq("status", "approved");
-      // For "newest" we can sort DB-side on created_at — recurring rolling
-      // doesn't move the row's authored timestamp. For "date" (default) we
-      // sort client-side after roll-forward; the DB's `start_date` column is
-      // the seed date, which is misleading once we re-anchor to the next
-      // occurrence.
-      if (sortByNewest) {
-        query = query.order("created_at", { ascending: false });
+    const today = nowInBali().dateStr;
+    const filters: ListFilters = {
+      sort: params.sort,
+      happening: params.happening,
+      category: params.category,
+      q: params.q,
+      time: params.time,
+      venue: params.venue,
+      archetype: params.archetype,
+      intents: params.intents,
+    };
+    let events: Event[] | null = null;
+    let error: { message: string } | null = null;
+    if (filters.q || filters.venue) {
+      // Free text: read directly, the combinations are endless.
+      const direct = await queryWithRetry(
+        () => buildEventsQuery(createAdminClient(), filters, view, today),
+        "events-list"
+      );
+      events = (direct.data ?? null) as unknown as Event[] | null;
+      error = direct.error ? { message: direct.error.message } : null;
+    } else {
+      try {
+        events = await readEventListRows(today, view, JSON.stringify(filters));
+      } catch (err) {
+        error = { message: err instanceof Error ? err.message : String(err) };
       }
-
-      const today = nowInBali().dateStr;
-
-      // Happening Now filter
-      if (params.happening === "true") {
-        query = query
-          .lte("start_date", today)
-          .or(`end_date.gte.${today},end_date.is.null`);
-      } else if (view === "list" || view === "grid" || view === "feed") {
-        // Feed/list/grid: future events, recurring past-start (rolled forward
-        // by the bucket logic), AND multi-day events still in their span
-        // (so day-3-of-5 retreats land in the in_progress bucket instead of
-        // being filtered out by the start_date floor).
-        query = query.or(
-          `start_date.gte.${today},is_recurring.eq.true,end_date.gte.${today}`
-        );
-      }
-
-      if (params.category) {
-        query = query.eq("category", params.category);
-      }
-
-      // NOTE: `params.from` / `params.to` are intentionally NOT applied at the
-      // DB layer. Recurring events store their seed `start_date`, so a DB-side
-      // BETWEEN would strip every recurring class whose original date sits
-      // outside the window — including weekly events whose next occurrence
-      // lands squarely inside it. The range is applied in `filterEventsInRange`
-      // below, after roll-forward, for views that share the page-level events
-      // array (feed, list, grid, map). Calendar and Week views manage their
-      // own viewport via `expandRecurrence`.
-
-      if (params.q) {
-        const q = `%${params.q}%`;
-        query = query.or(
-          `title.ilike.${q},short_description.ilike.${q},venue_name.ilike.${q},category.ilike.${q}`
-        );
-      }
-
-      if (params.time === "morning") {
-        query = query.or("start_time.is.null,start_time.lt.12:00:00");
-      } else if (params.time === "afternoon") {
-        query = query.or(
-          "start_time.is.null,and(start_time.gte.12:00:00,start_time.lt.17:00:00)"
-        );
-      } else if (params.time === "evening") {
-        query = query.or("start_time.is.null,start_time.gte.17:00:00");
-      }
-
-      if (params.venue) {
-        query = query.ilike("venue_name", `%${params.venue}%`);
-      }
-
-      if (params.archetype) {
-        query = query.contains("archetype_tags", [params.archetype]);
-      }
-
-      if (params.intents) {
-        // Comma-separated intent ids — match events that carry at least one.
-        const intents = params.intents
-          .split(",")
-          .map((s) => s.trim())
-          .filter(Boolean);
-        if (intents.length > 0) {
-          query = query.overlaps("intent_tags", intents);
-        }
-      }
-
-      return query;
-    }, "events-list");
+    }
     if (error) console.error("Events query error:", error);
     // The gate's rules at read time: moderated, a way in, one card per gathering.
     allEvents = visibleListings(stripEmbeddings((events ?? []) as Event[]));
