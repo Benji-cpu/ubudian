@@ -112,4 +112,29 @@ describe("persistRemoteImage", () => {
     const url = await persistRemoteImage("https://cdn.example.com/a.png", "events", "id");
     expect(url).toBeNull();
   });
+  it("stores a large PNG as a web-sized JPEG with a long cache time", async () => {
+    const sharp = (await import("sharp")).default;
+    const w = 2400, h = 1600;
+    const raw = Buffer.alloc(w * h * 3);
+    for (let i = 0; i < raw.length; i += 3) {
+      const px = i / 3;
+      const grain = ((i * 2654435761) >>> 0) % 7;
+      raw[i] = Math.floor(((px % w) / w) * 240) + grain;
+      raw[i + 1] = Math.floor((Math.floor(px / w) / h) * 240) + grain;
+      raw[i + 2] = 120 + grain;
+    }
+    const png = await sharp(raw, { raw: { width: w, height: h, channels: 3 } }).png().toBuffer();
+    const body = png.buffer.slice(png.byteOffset, png.byteOffset + png.byteLength) as ArrayBuffer;
+    mockFetch(body, { contentType: "image/png" });
+
+    await persistRemoteImage("https://cdn.example.com/big.png", "events", "evt-big");
+
+    expect(mockUpload).toHaveBeenCalledTimes(1);
+    const [path, bytes, opts] = mockUpload.mock.calls[0];
+    expect(path).toMatch(/^events\/evt-big-\d+-[a-z0-9]+\.jpg$/);
+    expect((opts as { contentType: string }).contentType).toBe("image/jpeg");
+    expect((opts as { cacheControl: string }).cacheControl).toBe("31536000");
+    expect((bytes as Uint8Array).byteLength).toBeLessThan(png.byteLength / 4);
+    expect((await sharp(bytes as Uint8Array).metadata()).width).toBe(1280);
+  });
 });

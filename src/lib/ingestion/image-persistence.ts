@@ -5,6 +5,7 @@
  */
 
 import { createAdminClient } from "@/lib/supabase/admin";
+import { shrinkForWeb, STORAGE_CACHE_SECONDS } from "@/lib/images/shrink";
 
 const MAX_BYTES = 5 * 1024 * 1024; // 5 MB
 const TIMEOUT_MS = 10_000;
@@ -59,6 +60,11 @@ export async function persistRemoteImage(
     return null;
   }
 
+  // Store a web-sized JPEG, not the original (see lib/images/shrink.ts).
+  const shrunk = await shrinkForWeb(bytes, contentType);
+  bytes = shrunk.bytes;
+  contentType = shrunk.contentType;
+
   const ext = MIME_EXT[contentType];
   const safeKey = keyHint.replace(/[^a-zA-Z0-9_-]/g, "").slice(0, 40) || "image";
   const fileName = `${folder}/${safeKey}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
@@ -66,7 +72,7 @@ export async function persistRemoteImage(
   const supabase = createAdminClient();
   const { error: uploadError } = await supabase.storage
     .from("images")
-    .upload(fileName, bytes, { contentType, upsert: false });
+    .upload(fileName, bytes, { contentType, upsert: false, cacheControl: STORAGE_CACHE_SECONDS });
 
   if (uploadError) return null;
 

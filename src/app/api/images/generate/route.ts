@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAdmin } from "@/lib/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { shrinkForWeb, STORAGE_CACHE_SECONDS } from "@/lib/images/shrink";
 import { generateImage } from "@/lib/stability";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
 
@@ -38,13 +39,16 @@ export async function POST(request: NextRequest) {
     const imageBuffer = await generateImage(prompt);
 
     const supabase = createAdminClient();
-    const fileName = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2)}.png`;
+    // Store a web-sized JPEG, not the 1-3 MB PNG the model returns.
+    const shrunk = await shrinkForWeb(new Uint8Array(imageBuffer), "image/png");
+    const fileName = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2)}.${shrunk.ext}`;
 
     const { error: uploadError } = await supabase.storage
       .from("images")
-      .upload(fileName, imageBuffer, {
-        contentType: "image/png",
+      .upload(fileName, shrunk.bytes, {
+        contentType: shrunk.contentType,
         upsert: false,
+        cacheControl: STORAGE_CACHE_SECONDS,
       });
 
     if (uploadError) {

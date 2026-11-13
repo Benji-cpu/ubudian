@@ -24,6 +24,7 @@ import type { WahaWebhookPayload } from "@/lib/ingestion/adapters/whatsapp";
 
 // Import to register adapter
 import "@/lib/ingestion/adapters/whatsapp";
+import { shrinkForWeb, STORAGE_CACHE_SECONDS } from "@/lib/images/shrink";
 
 /**
  * Incoming WAHA message handler.
@@ -114,14 +115,15 @@ export async function POST(request: Request) {
             const media = await downloadWahaMedia(body.payload.mediaUrl);
             if (media) {
               const adminClient = createAdminClient();
-              const ext = media.contentType.includes("png") ? "png" : "jpg";
-              const filename = `ingestion/${Date.now()}-${body.payload.id}.${ext}`;
+              const shrunk = await shrinkForWeb(new Uint8Array(media.buffer), media.contentType);
+              const filename = `ingestion/${Date.now()}-${body.payload.id}.${shrunk.ext}`;
 
               const { error: uploadError } = await adminClient.storage
                 .from("images")
-                .upload(filename, media.buffer, {
-                  contentType: media.contentType,
+                .upload(filename, shrunk.bytes, {
+                  contentType: shrunk.contentType,
                   upsert: false,
+                  cacheControl: STORAGE_CACHE_SECONDS,
                 });
 
               if (!uploadError) {

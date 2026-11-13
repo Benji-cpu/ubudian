@@ -25,6 +25,7 @@ import type { TelegramUpdate } from "@/lib/ingestion/adapters/telegram";
 
 // Import to register the adapter
 import "@/lib/ingestion/adapters/telegram";
+import { shrinkForWeb, STORAGE_CACHE_SECONDS } from "@/lib/images/shrink";
 
 export async function POST(request: Request) {
   // Verify the webhook secret. Telegram sends it as the
@@ -119,14 +120,15 @@ export async function POST(request: Request) {
         const telegramUrl = rawMsg.image_urls[i];
         const media = await downloadTelegramMedia(telegramUrl);
         if (media) {
-          const ext = media.contentType.includes("png") ? "png" : "jpg";
-          const filename = `ingestion/${Date.now()}-tg-${rawMsg.external_id}-${i}.${ext}`;
+          const shrunk = await shrinkForWeb(new Uint8Array(media.buffer), media.contentType);
+          const filename = `ingestion/${Date.now()}-tg-${rawMsg.external_id}-${i}.${shrunk.ext}`;
 
           const { error: uploadError } = await supabase.storage
             .from("images")
-            .upload(filename, media.buffer, {
-              contentType: media.contentType,
+            .upload(filename, shrunk.bytes, {
+              contentType: shrunk.contentType,
               upsert: false,
+              cacheControl: STORAGE_CACHE_SECONDS,
             });
 
           if (!uploadError) {
