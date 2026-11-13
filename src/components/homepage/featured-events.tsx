@@ -1,14 +1,10 @@
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
-import { queryWithRetry } from "@/lib/supabase/retry";
+import { getPublicListings } from "@/lib/events/timetable-queries";
 import { EventCard } from "@/components/events/event-card";
 import { bucketEventsByTime } from "@/lib/events/buckets";
 import { nowInBali } from "@/lib/events/bali-time";
-import { stripEmbeddings } from "@/lib/events/strip-embedding";
-import { visibleListings } from "@/lib/events/listing-checks";
 import { stillAheadToday } from "@/lib/events/timetable";
 import type { Event } from "@/types";
-import { EVENT_COLUMNS } from "@/lib/events/columns";
 
 const MAX_CARDS = 6;
 
@@ -32,20 +28,9 @@ export async function FeaturedEvents() {
   const bali = nowInBali();
 
   try {
-    const supabase = await createClient();
-    const today = bali.dateStr;
-    const { data, error } = await queryWithRetry(
-      () =>
-        supabase
-          .from("events")
-          .select(EVENT_COLUMNS)
-          .eq("status", "approved")
-          .or(`start_date.gte.${today},is_recurring.eq.true,end_date.gte.${today}`),
-      "homepage-events"
-    );
-    if (error) console.error("Homepage events query error:", error);
-
-    const events = visibleListings(stripEmbeddings((data ?? []) as Event[]));
+    // The shared, cached read (public columns only): one database read every
+    // 15 minutes, not one per homepage hit.
+    const events = await getPublicListings();
     const now = new Date();
     // The same "still ahead" rule as /ubud-tonight (30 minutes' grace after a start).
     tonight = stillAheadToday(events, now);

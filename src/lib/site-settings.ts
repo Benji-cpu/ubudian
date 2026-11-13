@@ -1,5 +1,6 @@
 import { cache } from "react";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { cachedRead, CACHE_TAGS } from "@/lib/cached-read";
 
 export type SiteSettings = {
   blog_enabled: boolean;
@@ -17,13 +18,30 @@ export const SITE_SETTINGS_FALLBACK: SiteSettings = {
   guides_enabled: false,
 };
 
-export const getSiteSettings = cache(async (): Promise<SiteSettings> => {
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from("site_settings")
-    .select("blog_enabled, stories_enabled, tours_enabled, newsletter_archive_enabled, guides_enabled")
-    .eq("id", 1)
-    .maybeSingle();
+/**
+ * The feature switches, read on every page by the header and footer. Cached
+ * for an hour; the admin settings route clears the cache when a switch moves.
+ * Read with the admin client (five booleans, no cookies), so the read can be
+ * shared between visitors.
+ */
+const readSiteSettings = cachedRead(
+  async (): Promise<SiteSettings> => {
+    const { data, error } = await createAdminClient()
+      .from("site_settings")
+      .select("blog_enabled, stories_enabled, tours_enabled, newsletter_archive_enabled, guides_enabled")
+      .eq("id", 1)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    return (data as SiteSettings | null) ?? SITE_SETTINGS_FALLBACK;
+  },
+  "site-settings-v1",
+  { seconds: 3600, tag: CACHE_TAGS.siteSettings }
+);
 
-  return (data as SiteSettings | null) ?? SITE_SETTINGS_FALLBACK;
+export const getSiteSettings = cache(async (): Promise<SiteSettings> => {
+  try {
+    return await readSiteSettings();
+  } catch {
+    return SITE_SETTINGS_FALLBACK;
+  }
 });

@@ -1,5 +1,6 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { queryWithRetry } from "@/lib/supabase/retry";
+import { cachedRead, CACHE_TAGS } from "@/lib/cached-read";
 import { nowInBali } from "./bali-time";
 import { visibleListings } from "./listing-checks";
 import type { Event } from "@/types";
@@ -18,20 +19,37 @@ export const PUBLIC_EVENT_COLUMNS =
  * filters `start_date >= today` alone, which would drop every weekly rhythm.
  */
 export async function getPublicListings(): Promise<Event[]> {
-  const today = nowInBali().dateStr;
-  const supabase = createAdminClient();
-  const { data, error } = await queryWithRetry(
-    () =>
-      supabase
-        .from("events")
-        .select(PUBLIC_EVENT_COLUMNS)
-        .eq("status", "approved")
-        .or(`start_date.gte.${today},is_recurring.eq.true,end_date.gte.${today}`),
-    "public-listings"
-  );
-  if (error) console.error("getPublicListings:", error.message);
-  return visibleListings((data ?? []) as unknown as Event[]);
+  try {
+    return visibleListings(await readPublicListingRows(nowInBali().dateStr));
+  } catch (err) {
+    console.error("getPublicListings:", err instanceof Error ? err.message : err);
+    return [];
+  }
 }
+
+/**
+ * The database read behind getPublicListings, cached for 15 minutes per Bali
+ * date. The calendar changes once a night, so this is one read every 15
+ * minutes however many pages and crawlers ask. Throws on error (never cached).
+ */
+const readPublicListingRows = cachedRead(
+  async (today: string): Promise<Event[]> => {
+    const supabase = createAdminClient();
+    const { data, error } = await queryWithRetry(
+      () =>
+        supabase
+          .from("events")
+          .select(PUBLIC_EVENT_COLUMNS)
+          .eq("status", "approved")
+          .or(`start_date.gte.${today},is_recurring.eq.true,end_date.gte.${today}`),
+      "public-listings"
+    );
+    if (error) throw new Error(error.message);
+    return (data ?? []) as unknown as Event[];
+  },
+  "public-listings-v1",
+  { seconds: 900, tag: CACHE_TAGS.events }
+);
 
 /** When the newest ingest run finished, for the "Checked … Bali time" line. Null hides the line. */
 export async function getLastIngestAt(): Promise<string | null> {

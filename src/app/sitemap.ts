@@ -16,6 +16,11 @@ import { newestTime, venuePages } from "@/lib/specials/deal-page";
  * than in most apps, because the events directory *is* the distribution
  * strategy; poisoning the sitemap undercuts the one thing that works.
  */
+// Rebuilt at most once an hour. Without this the sitemap would be built once
+// at deploy time (it reads no cookies), and before 13 Nov 2026 it was built on
+// every crawler request.
+export const revalidate = 3600;
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const supabase = createAdminClient();
   const settings = await getSiteSettings();

@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
+import { CACHE_TAGS } from "@/lib/cached-read";
 
 const settingsSchema = z.object({
   blog_enabled: z.boolean(),
@@ -44,6 +45,7 @@ export async function PATCH(request: Request) {
       return NextResponse.json({ error: "Failed to update settings" }, { status: 500 });
     }
 
+    revalidateTag(CACHE_TAGS.siteSettings, { expire: 0 });
     revalidatePath("/", "layout");
 
     return NextResponse.json({ success: true });
