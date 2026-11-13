@@ -36,6 +36,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import type { Event } from "@/types";
 import { EVENT_COLUMNS } from "@/lib/events/columns";
+import { cachedRead, CACHE_TAGS } from "@/lib/cached-read";
 
 interface EventPageProps {
   params: Promise<{ slug: string }>;
@@ -51,20 +52,13 @@ const DEALS_LINK = {
 export async function generateMetadata({ params }: EventPageProps): Promise<Metadata> {
   try {
     const { slug } = await params;
-    const supabase = await createClient();
-
-    const { data: event } = await supabase
-      .from("events")
-      .select(EVENT_COLUMNS)
-      .eq("slug", slug)
-      .eq("status", "approved")
-      .single();
+    const { event } = await readEventPage(slug, nowInBali().dateStr);
 
     if (!event) {
       return { title: "Event Not Found" };
     }
 
-    const e = withPlainTitle(event as Event);
+    const e = withPlainTitle(event);
 
     return {
       title: `${e.title} | Events in Ubud`,
@@ -82,57 +76,43 @@ export async function generateMetadata({ params }: EventPageProps): Promise<Meta
 }
 
 /**
- * rolledForward moves recurring rows to their next date but passes one-offs
- * through as they are, so a one-off that ended yesterday still needs dropping
- * (the nightly archive sweep catches it, but only overnight).
+ * Everything the page needs from the events table: the event itself (without
+ * its embedding) and up to four related events. Cached for 15 minutes per slug
+ * and Bali date, so a crawler re-reading an event page costs nothing. Approved
+ * events are public, so the admin client reads what a visitor would. Throws on
+ * a database error (never cached); a slug that does not exist is `event: null`.
  */
-function notOver(events: Event[]): Event[] {
-  const today = nowInBali().dateStr;
-  return events.filter((e) => (e.end_date && e.end_date > e.start_date ? e.end_date : e.start_date) >= today);
-}
-
-export default async function EventPage({ params }: EventPageProps) {
-  let e: Event;
-  let related: Event[] = [];
-  let currentProfileId: string | null = null;
-  let initiallySaved = false;
-
-  try {
-    const { slug } = await params;
-    const supabase = await createClient();
-
-    const { data: event } = await supabase
+const readEventPage = cachedRead(
+  async (slug: string, today: string): Promise<{ event: Event | null; related: Event[] }> => {
+    const supabase = createAdminClient();
+    const { data: row, error } = await supabase
       .from("events")
       .select("*")
       .eq("slug", slug)
       .eq("status", "approved")
-      .single();
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!row) return { event: null, related: [] };
 
-    // Rows the gate would not publish today (never moderated, or no way in)
-    // stay up in the data until Ben applies the walk cleanup; they 404 here.
-    if (!event || !isPublicListing(event as Event)) {
-      notFound();
-    }
+    // The embedding rides on select("*"): keep it for the similarity search,
+    // then drop it so the 768-float vector is neither cached nor sent to a
+    // client component.
+    const queryEmbedding = (row as Record<string, unknown>).embedding ?? null;
+    const event = { ...(row as Record<string, unknown>) };
+    delete event.embedding;
+    const e = event as unknown as Event;
 
-    e = withPlainTitle(event as Event);
-    // The embedding column rides on select("*"); grab it for similarity, then
-    // strip it so the 768-float vector never serialises down to a client component.
-    const queryEmbedding = (event as Record<string, unknown>).embedding ?? null;
-    delete (e as unknown as Record<string, unknown>).embedding;
+    // rolledForward moves recurring rows to their next date but passes one-offs
+    // through as they are, so a one-off that ended yesterday still needs dropping
+    // (the nightly archive sweep catches it, but only overnight).
+    const upcoming = (events: Event[]) =>
+      rolledForward(visibleListings(events)).filter(
+        (r) => (r.end_date && r.end_date > r.start_date ? r.end_date : r.start_date) >= today
+      );
 
-    const profile = await getCurrentProfile();
-    if (profile) {
-      currentProfileId = profile.id;
-      const { data: saved } = await supabase
-        .from("saved_events")
-        .select("event_id")
-        .eq("profile_id", profile.id)
-        .eq("event_id", e.id)
-        .maybeSingle();
-      initiallySaved = !!saved;
-    }
+    let related: Event[] = [];
 
-    // "More like this" — semantic nearest neighbours by embedding cosine.
+    // "More like this": nearest neighbours by embedding cosine.
     if (queryEmbedding) {
       const { data: matches } = await supabase.rpc("match_events_by_embedding", {
         query_embedding: queryEmbedding,
@@ -149,10 +129,9 @@ export default async function EventPage({ params }: EventPageProps) {
         const order = new Map(ids.map((id, i) => [id, i] as const));
         // Roll recurring rows to their next date, then drop past one-offs; the
         // embedding match knows nothing about time ("Sep 4" showed in October).
-        related = notOver(rolledForward(visibleListings((rel ?? []) as Event[])))
+        related = upcoming((rel ?? []) as unknown as Event[])
           .sort((a, b) => (order.get(a.id) ?? 99) - (order.get(b.id) ?? 99))
           .slice(0, 4);
-        related.forEach((r) => delete (r as unknown as Record<string, unknown>).embedding);
       }
     }
 
@@ -169,8 +148,48 @@ export default async function EventPage({ params }: EventPageProps) {
         .order("start_date", { ascending: true })
         .limit(8);
       if (relatedError) console.error("Related events query error:", relatedError);
-      related = notOver(rolledForward(visibleListings((relatedEvents ?? []) as Event[]))).slice(0, 4);
-      related.forEach((r) => delete (r as unknown as Record<string, unknown>).embedding);
+      related = upcoming((relatedEvents ?? []) as unknown as Event[]).slice(0, 4);
+    }
+
+    return { event: e, related };
+  },
+  "event-page-v1",
+  { seconds: 900, tag: CACHE_TAGS.events }
+);
+
+export default async function EventPage({ params }: EventPageProps) {
+  let e: Event;
+  let related: Event[] = [];
+  let currentProfileId: string | null = null;
+  let initiallySaved = false;
+
+  try {
+    const { slug } = await params;
+    const supabase = await createClient();
+
+    // One cached read per event and Bali date (see readEventPage below), not
+    // four database reads per view.
+    const page = await readEventPage(slug, nowInBali().dateStr);
+
+    // Rows the gate would not publish today (never moderated, or no way in)
+    // stay up in the data until Ben applies the walk cleanup; they 404 here.
+    if (!page.event || !isPublicListing(page.event)) {
+      notFound();
+    }
+
+    e = withPlainTitle(page.event);
+    related = page.related;
+
+    const profile = await getCurrentProfile();
+    if (profile) {
+      currentProfileId = profile.id;
+      const { data: saved } = await supabase
+        .from("saved_events")
+        .select("event_id")
+        .eq("profile_id", profile.id)
+        .eq("event_id", e.id)
+        .maybeSingle();
+      initiallySaved = !!saved;
     }
   } catch {
     notFound();
