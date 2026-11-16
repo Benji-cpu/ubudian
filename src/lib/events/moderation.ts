@@ -35,6 +35,10 @@ export type ModerationResult =
 // Tried in order. On the free tier each model has its own 20 requests/day, so a
 // model that 429s (or is retired, 404) hands the call to the next one instead of
 // holding the event. Measured 5 Oct 2026: these three answer on this key.
+// Checked 16 Nov 2026 against Google's deprecation page and the live API: all
+// three still answer with this config (temperature included). 2.5 Flash-Lite
+// has no shutdown date; 3.1 Flash-Lite shuts down 7 May 2027. The 1 Dec 2026
+// redirect is for `gemini-2.5-flash` (not -lite), which this repo does not use.
 const MODELS = ["gemini-2.5-flash-lite", "gemini-3.1-flash-lite", "gemini-3.5-flash-lite"];
 
 const SYSTEM_PROMPT = `You are the content safety gate for The Ubudian, a community events platform for Ubud, Bali.
