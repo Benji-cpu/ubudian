@@ -1,7 +1,23 @@
 import { createClient } from "@/lib/supabase/server";
+import { cookies } from "next/headers";
 import type { Profile } from "@/types";
 
+/**
+ * True when the request carries a Supabase sign-in cookie. Without one there
+ * is no session, so skip the auth network call (19 Nov 2026: crawlers made
+ * one on every page view; see src/middleware.ts).
+ */
+async function hasAuthCookie(): Promise<boolean> {
+  try {
+    const store = await cookies();
+    return store.getAll().some((c) => c.name.startsWith("sb-") && c.name.includes("-auth-token"));
+  } catch {
+    return true;
+  }
+}
+
 export async function getCurrentUser() {
+  if (!(await hasAuthCookie())) return null;
   try {
     const supabase = await createClient();
     const {
@@ -14,6 +30,7 @@ export async function getCurrentUser() {
 }
 
 export async function getCurrentProfile(): Promise<Profile | null> {
+  if (!(await hasAuthCookie())) return null;
   try {
     const supabase = await createClient();
     const {

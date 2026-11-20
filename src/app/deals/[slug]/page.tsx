@@ -37,8 +37,15 @@ import { isSafeUrl } from "@/lib/url-validation";
 import { SITE_URL } from "@/lib/constants";
 import type { Special } from "@/types";
 
-// A deal lapses on its date, so never serve a copy that could still show it.
-export const dynamic = "force-dynamic";
+// A deal lapses on its date: rebuilt at most every 5 minutes, so a lapsed deal
+// is gone within 5 minutes of midnight (19 Nov 2026, Vercel CPU).
+export const revalidate = 300;
+
+// No pages are built ahead; each is built on its first visit and then cached
+// (an empty list is what turns on that caching for a [slug] route).
+export async function generateStaticParams() {
+  return [];
+}
 
 interface DealPageProps {
   params: Promise<{ slug: string }>;

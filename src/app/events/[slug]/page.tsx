@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
 import { SITE_URL } from "@/lib/constants";
 import { MarkdownContent } from "@/components/content/markdown-content";
 import { ShareButtons } from "@/components/content/share-buttons";
@@ -15,14 +14,13 @@ import Link from "next/link";
 import { HowToGetIn } from "@/components/events/how-to-get-in";
 import { NewsletterSignup } from "@/components/layout/newsletter-signup";
 import { FacilitatorCard } from "@/components/events/facilitator-card";
-import { SaveEventButton } from "@/components/dashboard/save-event-button";
+import { ViewerSaveEventButton } from "@/components/dashboard/viewer-save-event-button";
 import { InterestButton } from "@/components/events/interest-button";
 import { OutboundClickBeacon } from "@/components/events/outbound-click-beacon";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { Button } from "@/components/ui/button";
 import { MapPin, ExternalLink, User } from "lucide-react";
 import { isSafeUrl } from "@/lib/url-validation";
-import { getCurrentProfile } from "@/lib/auth";
 import { MentionedInGuides } from "@/components/cross-links/mentioned-in-guides";
 import { isPublicListing, visibleListings } from "@/lib/events/listing-checks";
 import { withPlainTitle } from "@/lib/events/plain-title";
@@ -37,6 +35,17 @@ import {
 import type { Event } from "@/types";
 import { EVENT_COLUMNS } from "@/lib/events/columns";
 import { cachedRead, CACHE_TAGS } from "@/lib/cached-read";
+
+// Cached for everyone and rebuilt at most every 5 minutes (19 Nov 2026: per-
+// request renders for crawlers got the Vercel team paused). The event data
+// itself is already cached for 15 minutes (readEventPage).
+export const revalidate = 300;
+
+// No pages are built ahead; each is built on its first visit and then cached
+// (an empty list is what turns on that caching for a [slug] route).
+export async function generateStaticParams() {
+  return [];
+}
 
 interface EventPageProps {
   params: Promise<{ slug: string }>;
@@ -160,12 +169,9 @@ const readEventPage = cachedRead(
 export default async function EventPage({ params }: EventPageProps) {
   let e: Event;
   let related: Event[] = [];
-  let currentProfileId: string | null = null;
-  let initiallySaved = false;
 
   try {
     const { slug } = await params;
-    const supabase = await createClient();
 
     // One cached read per event and Bali date (see readEventPage below), not
     // four database reads per view.
@@ -180,17 +186,6 @@ export default async function EventPage({ params }: EventPageProps) {
     e = withPlainTitle(page.event);
     related = page.related;
 
-    const profile = await getCurrentProfile();
-    if (profile) {
-      currentProfileId = profile.id;
-      const { data: saved } = await supabase
-        .from("saved_events")
-        .select("event_id")
-        .eq("profile_id", profile.id)
-        .eq("event_id", e.id)
-        .maybeSingle();
-      initiallySaved = !!saved;
-    }
   } catch {
     notFound();
   }
@@ -220,13 +215,9 @@ export default async function EventPage({ params }: EventPageProps) {
   const eRolled = rolledForward([e])[0] ?? e;
   const startsWhen = eventStartsWhen(eRolled, nowInBali());
 
-  const saveButton = currentProfileId ? (
-    <SaveEventButton
-      eventId={eRolled.id}
-      profileId={currentProfileId}
-      initialSaved={initiallySaved}
-    />
-  ) : null;
+  // Signed-in readers' saved state is read in the browser, so this page can
+  // be cached for everyone (19 Nov 2026).
+  const saveButton = <ViewerSaveEventButton eventId={eRolled.id} />;
 
   return (
     <>

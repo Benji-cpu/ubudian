@@ -19,11 +19,21 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(target, 308);
   }
 
+  // 19 Nov 2026: a visitor with no Supabase sign-in cookie (every crawler and
+  // most readers) has no session to refresh, so skip the auth network call.
+  // /admin still goes through updateSession, which sends them to /login.
+  const hasAuthCookie = request.cookies
+    .getAll()
+    .some((c) => c.name.startsWith("sb-") && c.name.includes("-auth-token"));
+  if (!hasAuthCookie && !pathname.startsWith("/admin")) {
+    return NextResponse.next();
+  }
+
   return await updateSession(request);
 }
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|txt|xml|webmanifest|js|css|woff2?)$).*)",
   ],
 };

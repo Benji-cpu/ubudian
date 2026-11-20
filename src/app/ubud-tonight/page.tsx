@@ -7,10 +7,11 @@ import { compareByTime, eventCount, longDate, stillAheadToday, TIMETABLE_SCOPE, 
 import { getLastIngestAt, getPublicListings } from "@/lib/events/timetable-queries";
 import { SITE_URL } from "@/lib/constants";
 
-// "Still to come" is read off the Bali clock on every request (30-minute
-// grace, as on the homepage), so ended events drop off and the count changes
-// through the day. Never serve a cached copy.
-export const dynamic = "force-dynamic";
+// "Still to come" is read off the Bali clock, so ended events drop off and the
+// count changes through the day. Rebuilt at most every 5 minutes (19 Nov 2026:
+// per-request renders got the Vercel team paused); with the 30-minute grace an
+// ended event is gone within the half hour.
+export const revalidate = 300;
 
 const DESCRIPTION =
   "What's still on in Ubud today: dance, ceremony, sound and movement events, with times, venues, prices and tickets. Updated every day.";

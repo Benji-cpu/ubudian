@@ -5,9 +5,10 @@ import { baliWeek, dateSpan, eventCount, shortDate, thisWeekByDay, TIMETABLE_SCO
 import { getLastIngestAt, getPublicListings } from "@/lib/events/timetable-queries";
 import { SITE_URL } from "@/lib/constants";
 
-// Today's part of the week is read off the Bali clock on every request (the
-// /ubud-tonight rule, 30-minute grace), so never serve a cached copy.
-export const dynamic = "force-dynamic";
+// Today's part of the week is read off the Bali clock (the /ubud-tonight rule,
+// 30-minute grace). Rebuilt at most every 5 minutes (19 Nov 2026: per-request
+// renders got the Vercel team paused).
+export const revalidate = 300;
 
 const DESCRIPTION =
   "Dance, ceremony, sound and movement events in Ubud this week, Monday to Sunday, day by day. Times, venues, prices and tickets, updated every day.";

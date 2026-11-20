@@ -5,8 +5,9 @@ import { ARCHETYPE_IDS } from "@/lib/quiz-data";
 import type { ArchetypeId, Event } from "@/types";
 import type { Metadata } from "next";
 
-// "Your week in Ubud" on the result is read off the Bali clock: never a cached copy.
-export const dynamic = "force-dynamic";
+// "Your week in Ubud" is read off the Bali clock: rebuilt at most every 5
+// minutes (19 Nov 2026, Vercel CPU).
+export const revalidate = 300;
 
 export const metadata: Metadata = {
   title: "Discover Your Ubud Spirit",

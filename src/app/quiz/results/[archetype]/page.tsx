@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { ARCHETYPES, ARCHETYPE_IDS } from "@/lib/quiz-data";
 import { getPractitionersForArchetype } from "@/lib/quiz-helpers";
 import { getPublicListings } from "@/lib/events/timetable-queries";
@@ -25,8 +25,12 @@ interface PageProps {
 }
 
 // "Your week in Ubud" is read off the Bali clock, so events that have ended
-// drop off: render per request, never a copy built at deploy time.
-export const dynamic = "force-dynamic";
+// drop off: rebuilt at most every 5 minutes (19 Nov 2026, Vercel CPU).
+export const revalidate = 300;
+
+export function generateStaticParams() {
+  return ARCHETYPE_IDS.map((archetype) => ({ archetype }));
+}
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { archetype: slug } = await params;
@@ -65,7 +69,9 @@ export default async function ArchetypeResultPage({ params }: PageProps) {
   const settings = await getSiteSettings();
 
   try {
-    const supabase = await createClient();
+    // Published guides and active practitioners only; the admin client reads
+    // no cookies, so this page can be cached (19 Nov 2026).
+    const supabase = createAdminClient();
 
     const [listings, guidesRes, practitionersRes] = await Promise.all([
       // "Your week in Ubud": the same public listings and Bali clock as /ubud-tonight.

@@ -10,6 +10,13 @@ interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
+// Cached and rebuilt at most hourly (19 Nov 2026: per-request renders got the
+// Vercel team paused). Built on first visit, not ahead.
+export const revalidate = 3600;
+export async function generateStaticParams() {
+  return [];
+}
+
 export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {

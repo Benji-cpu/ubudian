@@ -5,8 +5,8 @@ import { renderTimetableOg, timetableOgSize } from "@/lib/og/timetable-card";
 export const alt = "Things to do in Ubud tonight, on The Ubudian";
 export const size = timetableOgSize;
 export const contentType = "image/png";
-// The card carries today's date, so build it per request rather than once at deploy.
-export const dynamic = "force-dynamic";
+// The share card shows the date; an hour-old copy is fine (19 Nov 2026).
+export const revalidate = 3600;
 
 export default async function UbudTonightOgImage() {
   return renderTimetableOg({

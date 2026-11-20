@@ -5,8 +5,9 @@ import { Button } from "@/components/ui/button";
 import { getReaderNumbers, READER_WINDOW_DAYS, type ReaderNumbers } from "@/lib/venue/reader-numbers";
 import { SITE_URL } from "@/lib/constants";
 
-// The numbers are counted on every visit; a cached copy would show old ones.
-export const dynamic = "force-dynamic";
+// The reader numbers are 30-day counts: an hour-old copy is fine (19 Nov 2026,
+// Vercel CPU).
+export const revalidate = 3600;
 
 const CONTACT_EMAIL = "theubudianlife@gmail.com";
 

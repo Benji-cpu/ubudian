@@ -10,8 +10,9 @@ import { DAYS_ASK_THE_VENUE, daysUnknown, isOnNow, runsOn, specialsForToday, WEE
 import { getLiveSpecials } from "@/lib/specials/queries";
 import { SITE_URL } from "@/lib/constants";
 
-// "On now" and "today" are read off the clock, so never serve a cached copy.
-export const dynamic = "force-dynamic";
+// "On now" and "today" are read off the clock: rebuilt at most every 5 minutes
+// (19 Nov 2026: per-request renders got the Vercel team paused).
+export const revalidate = 300;
 
 // The hero and the meta description say the same thing, and name no deal that can end.
 const DEALS_LINE =
