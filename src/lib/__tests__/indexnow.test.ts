@@ -49,6 +49,9 @@ describe("the pages each change touches", () => {
     const paths = eventListingPaths();
     expect(paths.slice(0, 3)).toEqual(["/events", "/ubud-tonight", "/ubud-events-this-week"]);
     expect(paths).toContain("/ecstatic-dance-ubud");
+    expect(paths).toContain("/kirtan-ubud");
+    expect(paths).toContain("/pyramids-of-chi-schedule");
+    expect(paths).toHaveLength(3 + 12);
   });
 
   it("deals: /deals and each venue's page", () => {

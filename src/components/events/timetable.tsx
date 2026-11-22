@@ -3,7 +3,7 @@ import { ArrowRight, ExternalLink, MapPin } from "lucide-react";
 import { NewsletterSignup } from "@/components/layout/newsletter-signup";
 import { eventJsonLd, jsonLdScript } from "@/lib/events/event-jsonld";
 import { eventMapHref, NO_VENUE, outboundLink, shortDate } from "@/lib/events/timetable";
-import { HUBS } from "@/lib/hubs";
+import { HUBS, isVenueHub } from "@/lib/hubs";
 import { displayPrice, mentionsResidentPrice, RESIDENT_PRICE_FOOTNOTE } from "@/lib/price-display";
 import { formatEventTime } from "@/lib/utils";
 import type { Event } from "@/types";
@@ -105,7 +105,15 @@ export function TimetableLinks({ current }: { current: "tonight" | "week" }) {
     <section className="border-t border-border pt-8">
       <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">By practice</h2>
       <div className="mt-3 flex flex-wrap gap-2">
-        {HUBS.map((h) => (
+        {HUBS.filter((h) => !isVenueHub(h)).map((h) => (
+          <Link key={h.slug} href={`/${h.slug}`} className={pill}>
+            {h.title}
+          </Link>
+        ))}
+      </div>
+      <h2 className="mt-6 text-sm font-semibold uppercase tracking-wider text-muted-foreground">By venue</h2>
+      <div className="mt-3 flex flex-wrap gap-2">
+        {HUBS.filter(isVenueHub).map((h) => (
           <Link key={h.slug} href={`/${h.slug}`} className={pill}>
             {h.title}
           </Link>

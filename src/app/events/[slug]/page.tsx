@@ -11,6 +11,7 @@ import { rolledForward } from "@/lib/events/buckets";
 import { eventStartsWhen, nowInBali } from "@/lib/events/bali-time";
 import { EventMap } from "@/components/events/event-map";
 import Link from "next/link";
+import { hubsForVenue } from "@/lib/hubs";
 import { HowToGetIn } from "@/components/events/how-to-get-in";
 import { NewsletterSignup } from "@/components/layout/newsletter-signup";
 import { FacilitatorCard } from "@/components/events/facilitator-card";
@@ -304,6 +305,11 @@ export default async function EventPage({ params }: EventPageProps) {
                 <MapPin className="mt-0.5 h-5 w-5 shrink-0 text-brand-gold" />
                 <div className="min-w-0 flex-1">
                   <p className="font-medium break-words">{e.venue_name}</p>
+                  {hubsForVenue(e.venue_name).slice(0, 1).map((h) => (
+                    <Link key={h.slug} href={`/${h.slug}`} className="mt-1 inline-block text-sm text-primary hover:underline">
+                      More at {e.venue_name}
+                    </Link>
+                  ))}
                   {e.venue_address && (
                     <p className="text-sm text-muted-foreground break-words">{e.venue_address}</p>
                   )}

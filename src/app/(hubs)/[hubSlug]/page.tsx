@@ -2,7 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { HUBS, getHub } from "@/lib/hubs";
+import { HUBS, getHub, isVenueHub } from "@/lib/hubs";
+import { NewsletterSignup } from "@/components/layout/newsletter-signup";
 import { HubJsonLd } from "@/components/hubs/hub-json-ld";
 import { EventGridCard } from "@/components/events/event-grid-card";
 import { stripEmbeddings } from "@/lib/events/strip-embedding";
@@ -19,6 +20,15 @@ export const revalidate = 3600;
 // Closed set of hubs — unknown slugs hard-404 at the routing layer instead of
 // streaming a soft-404 (200 + not-found UI), which Google would index.
 export const dynamicParams = false;
+
+const FEATURED_TAG_HUBS = [
+  "kirtan-ubud",
+  "meditation-ubud",
+  "live-music-ubud",
+  "ecstatic-dance-ubud",
+  "sound-healing-ubud",
+  "cacao-ceremony-ubud",
+];
 
 export function generateStaticParams() {
   return HUBS.map((h) => ({ hubSlug: h.slug }));
@@ -55,11 +65,11 @@ export default async function HubPage({
 
   const today = nowInBali().dateStr;
   const supabase = createAdminClient();
-  const { data } = await supabase
-    .from("events")
-    .select(EVENT_COLUMNS)
-    .eq("status", "approved")
-    .overlaps("vibe_tags", hub.vibeTags)
+  const base = supabase.from("events").select(EVENT_COLUMNS).eq("status", "approved");
+  const matched = isVenueHub(hub)
+    ? base.in("venue_name", hub.venueNames ?? [])
+    : base.overlaps("vibe_tags", hub.vibeTags);
+  const { data } = await matched
     .or(`start_date.gte.${today},is_recurring.eq.true`)
     .order("start_date", { ascending: true })
     .limit(80);
@@ -73,7 +83,12 @@ export default async function HubPage({
     (e) => !(e.is_recurring && e.recurrence_rule) && e.start_date >= today
   );
 
-  const siblings = HUBS.filter((h) => h.slug !== hub.slug);
+  const venueHub = isVenueHub(hub);
+  const tagHubs = HUBS.filter((h) => !isVenueHub(h) && h.slug !== hub.slug);
+  const venueHubs = HUBS.filter((h) => isVenueHub(h) && h.slug !== hub.slug);
+  // A venue hub links to a short list of tag hubs, not all of them.
+  const tagLinks = venueHub ? tagHubs.filter((h) => FEATURED_TAG_HUBS.includes(h.slug)) : tagHubs;
+  const siblings = [...venueHubs, ...tagLinks];
 
   return (
     <div className="min-h-screen bg-background">
@@ -154,7 +169,17 @@ export default async function HubPage({
           </p>
         )}
 
-        <section className="mt-14 border-t border-border pt-8">
+        <section className="mt-14 rounded-xl border border-brand-gold/20 px-4 py-10 text-center">
+          <div className="mx-auto max-w-xl">
+            <h2 className="font-serif text-2xl text-brand-deep-green dark:text-brand-gold">
+              Get the free weekly email: what&apos;s on in Ubud
+            </h2>
+            <p className="mt-2 text-sm text-muted-foreground">One short email. Free. Unsubscribe any time.</p>
+            <NewsletterSignup source="hub" className="mx-auto mt-6 max-w-md" />
+          </div>
+        </section>
+
+        <section className="mt-10 border-t border-border pt-8">
           <p className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
             Go deeper
           </p>
