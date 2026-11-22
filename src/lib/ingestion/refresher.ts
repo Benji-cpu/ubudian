@@ -14,6 +14,7 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { fetchEventDetail } from "@/lib/ingestion/adapters/megatix";
 import { logActivity } from "@/lib/ingestion/activity-log";
+import { absoluteImageUrl } from "./image-url";
 
 const MEGATIX_HOST = "megatix.co.id";
 const DEFAULT_FETCH_DELAY_MS = 750;
@@ -232,7 +233,7 @@ async function refreshOne(
   }
 
   const eventUrl = `https://megatix.co.id/events/${slug}`;
-  const incomingCover = detail.cover ?? null;
+  const incomingCover = absoluteImageUrl(detail.cover);
   const incomingTicketUrl = eventUrl;
   const incomingPriceInfo = detail.display_price ?? null;
   const incomingOrganizer = detail.promoter_name ?? null;

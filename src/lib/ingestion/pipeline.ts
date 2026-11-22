@@ -25,6 +25,7 @@ import { enrichFromUrls, applyEnrichment } from "./url-enricher";
 import { geocodeVenue } from "@/lib/geocoding";
 import { isStaleProneTicketHost, fetchTicketLastDay } from "@/lib/events/ticket-freshness";
 import type { IngestionRunResult, ParsedEvent, ProcessResult, RawMessage } from "./types";
+import { absoluteImageUrl } from "./image-url";
 
 /**
  * Fields we'll backfill on an existing event when a higher-quality dedup
@@ -948,7 +949,7 @@ export async function createEventFromParsed(
           organizer_name: parsed.organizer_name || null,
           organizer_contact: parsed.organizer_contact || null,
           organizer_instagram: parsed.organizer_instagram || null,
-          cover_image_url: parsed.cover_image_url || null,
+          cover_image_url: absoluteImageUrl(parsed.cover_image_url),
           status: eventStatus,
           source_id: sourceId,
           source_event_id: parsed.source_event_id || null,

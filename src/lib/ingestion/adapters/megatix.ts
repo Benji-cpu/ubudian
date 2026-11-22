@@ -10,6 +10,7 @@
 
 import type { SourceAdapter, RawMessage, ParsedEvent } from "../types";
 import { registerAdapter } from "../source-adapter";
+import { absoluteImageUrl } from "../image-url";
 
 const MEGATIX_BASE = "https://megatix.co.id/api/v2/events";
 const MEGATIX_USER_AGENT =
@@ -211,7 +212,7 @@ const megatixAdapter: SourceAdapter = {
         price_info: event.display_price || null,
         external_ticket_url: eventUrl,
         organizer_name: event.promoter_name || null,
-        cover_image_url: event.cover || null,
+        cover_image_url: absoluteImageUrl(event.cover),
         source_url: eventUrl,
         source_event_id: String(event.id),
         quality_score: 0.9,
