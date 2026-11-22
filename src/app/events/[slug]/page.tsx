@@ -11,7 +11,8 @@ import { rolledForward } from "@/lib/events/buckets";
 import { eventStartsWhen, nowInBali } from "@/lib/events/bali-time";
 import { EventMap } from "@/components/events/event-map";
 import Link from "next/link";
-import { hubsForVenue } from "@/lib/hubs";
+import { hubsForVenue, hubsForVibeTags } from "@/lib/hubs";
+import { longDate } from "@/lib/events/timetable";
 import { HowToGetIn } from "@/components/events/how-to-get-in";
 import { NewsletterSignup } from "@/components/layout/newsletter-signup";
 import { FacilitatorCard } from "@/components/events/facilitator-card";
@@ -216,6 +217,21 @@ export default async function EventPage({ params }: EventPageProps) {
   const eRolled = rolledForward([e])[0] ?? e;
   const startsWhen = eventStartsWhen(eRolled, nowInBali());
 
+  // A one-off whose last day is behind us. Search still sends readers here
+  // (22 Nov 2026: most Google clicks land on event pages, many already over),
+  // so the page says so and points at what is on now instead of selling tickets.
+  const lastDay = e.end_date ?? e.start_date;
+  const isPast = !e.is_recurring && Boolean(lastDay) && lastDay < nowInBali().dateStr;
+  const nowLinks = isPast
+    ? [
+        // vibe_tags is selected (EVENT_COLUMNS) but not on the Event type.
+        ...hubsForVibeTags((e as Event & { vibe_tags?: string[] | null }).vibe_tags),
+        ...hubsForVenue(e.venue_name),
+      ].slice(0, 3)
+    : [];
+  const nowPill =
+    "rounded-full border border-brand-gold/40 bg-background px-4 py-1.5 text-sm font-medium text-foreground transition-colors hover:border-brand-gold hover:bg-brand-gold/10";
+
   // Signed-in readers' saved state is read in the browser, so this page can
   // be cached for everyone (19 Nov 2026).
   const saveButton = <ViewerSaveEventButton eventId={eRolled.id} />;
@@ -248,8 +264,32 @@ export default async function EventPage({ params }: EventPageProps) {
         </nav>
 
         {/* How to get in — tickets, the organiser, or the door */}
-        <HowToGetIn event={e} />
-        <InterestButton eventId={e.id} initialCount={interestCount} />
+        {isPast ? (
+          <div className="mx-auto mt-6 max-w-3xl px-4 sm:px-6">
+            <div className="rounded-lg border border-brand-gold/30 bg-brand-gold/10 px-4 py-4">
+              <p className="font-medium text-foreground">This event was on {longDate(lastDay)}.</p>
+              <p className="mt-1 text-sm text-muted-foreground">Here is what is on in Ubud now.</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <Link href="/ubud-events-this-week" className={nowPill}>
+                  This week in Ubud
+                </Link>
+                <Link href="/ubud-tonight" className={nowPill}>
+                  Tonight
+                </Link>
+                {nowLinks.map((h) => (
+                  <Link key={h.slug} href={`/${h.slug}`} className={nowPill}>
+                    {h.title}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </div>
+        ) : (
+          <>
+            <HowToGetIn event={e} />
+            <InterestButton eventId={e.id} initialCount={interestCount} />
+          </>
+        )}
         <OutboundClickBeacon eventId={e.id} hrefs={trackedHrefs} />
         <p className="mx-auto mt-3 max-w-3xl px-4 text-sm text-muted-foreground sm:px-6">
           {startsWhen === "tonight" ? "Making a night of it? " : null}
@@ -259,7 +299,7 @@ export default async function EventPage({ params }: EventPageProps) {
         </p>
 
         {/* Inline ticket CTA (desktop) */}
-        {e.external_ticket_url && isSafeUrl(e.external_ticket_url) && (
+        {!isPast && e.external_ticket_url && isSafeUrl(e.external_ticket_url) && (
           <div className="mx-auto mt-4 hidden max-w-3xl px-4 sm:px-6 md:block">
             <Button asChild size="lg">
               <a href={e.external_ticket_url} target="_blank" rel="noopener noreferrer">
@@ -363,7 +403,7 @@ export default async function EventPage({ params }: EventPageProps) {
         </div>
 
         {/* Sticky mobile ticket CTA */}
-        {e.external_ticket_url && isSafeUrl(e.external_ticket_url) && (
+        {!isPast && e.external_ticket_url && isSafeUrl(e.external_ticket_url) && (
           <div className="fixed inset-x-0 bottom-0 z-30 border-t border-brand-gold/20 bg-background/95 px-4 py-3 backdrop-blur-sm md:hidden">
             <Button asChild className="w-full" size="lg">
               <a href={e.external_ticket_url} target="_blank" rel="noopener noreferrer">
