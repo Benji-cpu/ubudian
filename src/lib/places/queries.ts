@@ -1,9 +1,12 @@
-import { createClient } from "@/lib/supabase/server";
+// Service-role client, not the cookie client: /places/[slug] is a cached (ISR)
+// page and reading cookies there throws at runtime (22 Nov 2026: every place
+// page returned 500). Every query here filters to is_published rows.
+import { createAdminClient } from "@/lib/supabase/admin";
 import type { Place } from "@/types";
 
 export async function getPublishedPlaces(): Promise<Place[]> {
   try {
-    const supabase = await createClient();
+    const supabase = createAdminClient();
     const { data } = await supabase
       .from("places")
       .select("*")
@@ -18,7 +21,7 @@ export async function getPublishedPlaces(): Promise<Place[]> {
 
 export async function getPlaceBySlug(slug: string): Promise<Place | null> {
   try {
-    const supabase = await createClient();
+    const supabase = createAdminClient();
     const { data } = await supabase
       .from("places")
       .select("*")
@@ -37,7 +40,7 @@ export async function getRelatedPlaces(
   limit = 3,
 ): Promise<Place[]> {
   try {
-    const supabase = await createClient();
+    const supabase = createAdminClient();
     let query = supabase
       .from("places")
       .select("*")

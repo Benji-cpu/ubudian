@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import type { GuideShortcodeKind, Guide } from "@/types";
 
 interface MentionedInGuidesProps {
@@ -18,7 +18,10 @@ export async function MentionedInGuides({
   let guides: Guide[] = [];
 
   try {
-    const supabase = await createClient();
+    // Service-role read, not the cookie client: this renders inside cached
+    // (ISR) pages, where reading cookies throws at runtime (22 Nov 2026: every
+    // event and place page returned 500). The query below filters to published rows.
+    const supabase = createAdminClient();
     const { data } = await supabase
       .from("guide_entity_references")
       .select("guide_id, position, guides(*)")

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import type { Story } from "@/types";
 
 interface FacilitatorCardProps {
@@ -14,7 +14,10 @@ export async function FacilitatorCard({ organizerName }: FacilitatorCardProps) {
   let story: Story | null = null;
 
   try {
-    const supabase = await createClient();
+    // Service-role read, not the cookie client: this renders inside cached
+    // (ISR) pages, where reading cookies throws at runtime (22 Nov 2026: every
+    // event and place page returned 500). The query below filters to published rows.
+    const supabase = createAdminClient();
     const { data, error } = await supabase
       .from("stories")
       .select("*")
