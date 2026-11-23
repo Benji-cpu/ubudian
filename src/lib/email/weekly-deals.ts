@@ -1,5 +1,6 @@
 import { GREEN, GOLD, CHARCOAL, esc } from "@/lib/email/brand";
 import { daysUnknown, formatDays, formatIdr, formatWeekdays } from "@/lib/specials";
+import { venuePath } from "@/lib/specials/deal-page";
 import type { Special } from "@/types";
 
 /** Where the deals live on the site. One constant, so a rename is one line. */
@@ -215,9 +216,14 @@ export function buildDealsBlockHtml(deals: Special[], siteUrl: string): string {
       const desc = blurb
         ? `<p style="margin:6px 0 0;font-size:13px;line-height:1.5;color:${CHARCOAL};font-family:Georgia,serif;">${esc(clip(blurb, 160))}</p>`
         : "";
+      // The title opens the venue's own page (how to claim, the map, its other deals), which is also where views are counted.
+      const path = venuePath(s.venue_name);
+      const title = path
+        ? `<a href="${siteUrl}${path}" style="color:${GREEN};text-decoration:none;">${esc(dealTitle(s))}</a>`
+        : esc(dealTitle(s));
       return `
   <tr><td style="padding:14px 32px;border-top:1px solid ${GOLD}22;">
-    <p style="margin:0;font-size:17px;color:${GREEN};font-family:Georgia,serif;font-weight:500;">${esc(dealTitle(s))}</p>
+    <p style="margin:0;font-size:17px;color:${GREEN};font-family:Georgia,serif;font-weight:500;">${title}</p>
     <p style="margin:4px 0 0;font-size:13px;color:${CHARCOAL}aa;font-family:Georgia,serif;">${where}${when ? ` · ${esc(when)}` : ""}</p>
     ${desc}
   </td></tr>`;

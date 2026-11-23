@@ -1,3 +1,4 @@
+import { SITE_URL } from "@/lib/constants";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getPlaceBySlug, getRelatedPlaces } from "@/lib/places/queries";
@@ -25,6 +26,7 @@ export async function generateMetadata({
   if (!place) return { title: "Place" };
   return {
     title: `${place.name}`,
+    alternates: { canonical: `${SITE_URL}/places/${slug}` },
     description:
       place.short_description ?? place.description?.slice(0, 160) ?? undefined,
   };

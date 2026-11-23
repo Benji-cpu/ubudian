@@ -74,6 +74,8 @@ export async function generateMetadata({ params }: EventPageProps): Promise<Meta
     return {
       title: `${e.title} | Events in Ubud`,
       description: e.short_description || e.description?.slice(0, 160),
+      // One address per event, so a link with tracking parameters is not indexed as a second page.
+      alternates: { canonical: `${SITE_URL}/events/${e.slug}` },
       openGraph: {
         title: e.title,
         description: e.short_description || e.description?.slice(0, 160),

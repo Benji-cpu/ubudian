@@ -162,6 +162,17 @@ describe("buildDealsBlockHtml", () => {
     expect(buildDealsBlockHtml([], "https://theubudian.life")).toBe("");
   });
 
+  it("links each deal's title to its venue page", () => {
+    const html = buildDealsBlockHtml([deal({ venue_name: "Café Wayan & Bakery", title: "Free dessert" })], "https://theubudian.life");
+    expect(html).toContain('<a href="https://theubudian.life/deals/cafe-wayan-bakery"');
+  });
+
+  it("leaves the title unlinked when the venue name gives no page address", () => {
+    const html = buildDealsBlockHtml([deal({ venue_name: "!!!", title: "Free dessert" })], "https://theubudian.life");
+    expect(html).toContain("Free dessert");
+    expect(html).not.toContain("/deals/");
+  });
+
   it("shows 12-hour times, no source line, and escapes text", () => {
     const html = buildDealsBlockHtml(
       [deal({ title: "Tacos <b>2-for-1</b>", weekdays: [0, 2], price_idr: 135000 })],
