@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { baliDateTime, eventJsonLd, jsonLdScript } from "@/lib/events/event-jsonld";
+import { hubListEvents } from "@/components/hubs/hub-json-ld";
 import type { Event } from "@/types";
 
 const base = {
@@ -35,6 +36,11 @@ describe("eventJsonLd", () => {
     });
   });
 
+  it("still names a location when the venue is unknown, because Google rejects an Event without one", () => {
+    const ld = eventJsonLd({ ...base, venue_name: null } as unknown as Event, "https://theubudian.life");
+    expect(ld.location).toMatchObject({ "@type": "Place", name: "Ubud", address: { addressLocality: "Ubud", addressCountry: "ID" } });
+  });
+
   it("prices a range, Free and nothing the way the page does", () => {
     expect(eventJsonLd({ ...base, price_info: "Rp 300,000 - Rp 350,000" }).offers).toMatchObject({
       "@type": "AggregateOffer",
@@ -63,5 +69,23 @@ describe("jsonLdScript", () => {
     const out = jsonLdScript({ name: "</script><script>alert(1)</script>" });
     expect(out).not.toContain("</script>");
     expect(JSON.parse(out)).toEqual({ name: "</script><script>alert(1)</script>" });
+  });
+});
+
+describe("hubListEvents", () => {
+  it("dates a weekly class at its next occurrence, not the day it was first listed", () => {
+    const weekly = {
+      ...base,
+      id: "2",
+      slug: "sunday-kirtan",
+      start_date: "2026-06-07",
+      is_recurring: true,
+      recurrence_rule: '{"frequency":"weekly","day_of_week":0}',
+      created_at: "2026-06-01T00:00:00Z",
+    } as unknown as Event;
+    const oneOff = { ...base, id: "3", start_date: "2026-11-26", is_recurring: false, recurrence_rule: null, created_at: "2026-11-01T00:00:00Z" } as unknown as Event;
+    // Tuesday 24 Nov 2026, midday in Bali.
+    const list = hubListEvents([weekly, oneOff], new Date("2026-11-24T04:00:00Z"));
+    expect(list.map((e) => `${e.slug} ${e.start_date}`)).toEqual(["ecstatic-dance 2026-11-26", "sunday-kirtan 2026-11-29"]);
   });
 });

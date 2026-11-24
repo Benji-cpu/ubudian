@@ -1,67 +1,20 @@
 import type { Event } from "@/types";
-import { SITE_URL } from "@/lib/constants";
+import { eventJsonLd, jsonLdScript } from "@/lib/events/event-jsonld";
 
 interface EventJsonLdProps {
+  /** The event as the page shows it: a weekly class already rolled forward to its next date. */
   event: Event;
 }
 
+/**
+ * schema.org Event for an event's own page. Built by the same `eventJsonLd`
+ * the timetable pages use, so every page gives Google the same shape: Bali
+ * time with its offset, a location even when the venue is unknown (Google
+ * rejects an Event without one), and a priced offer.
+ */
 export function EventJsonLd({ event }: EventJsonLdProps) {
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Event",
-    name: event.title,
-    description: event.short_description || event.description?.slice(0, 200),
-    startDate: event.start_time
-      ? `${event.start_date}T${event.start_time}`
-      : event.start_date,
-    ...(event.end_date && {
-      endDate: event.end_time
-        ? `${event.end_date}T${event.end_time}`
-        : event.end_date,
-    }),
-    ...(event.venue_name && {
-      location: {
-        "@type": "Place",
-        name: event.venue_name,
-        ...(event.venue_address && {
-          address: {
-            "@type": "PostalAddress",
-            streetAddress: event.venue_address,
-            addressLocality: "Ubud",
-            addressRegion: "Bali",
-            addressCountry: "ID",
-          },
-        }),
-        ...(event.latitude != null && event.longitude != null && {
-          geo: {
-            "@type": "GeoCoordinates",
-            latitude: event.latitude,
-            longitude: event.longitude,
-          },
-        }),
-      },
-    }),
-    ...(event.cover_image_url && { image: event.cover_image_url }),
-    ...(event.organizer_name && {
-      organizer: {
-        "@type": "Organization",
-        name: event.organizer_name,
-      },
-    }),
-    ...(event.price_info && {
-      offers: {
-        "@type": "Offer",
-        description: event.price_info,
-        url: event.external_ticket_url || `${SITE_URL}/events/${event.slug}`,
-      },
-    }),
-    url: `${SITE_URL}/events/${event.slug}`,
-  };
+  const description = event.short_description || event.description?.slice(0, 200);
+  const jsonLd = { ...eventJsonLd(event), ...(description && { description }) };
 
-  return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-    />
-  );
+  return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdScript(jsonLd) }} />;
 }
